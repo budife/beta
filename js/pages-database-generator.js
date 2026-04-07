@@ -3,7 +3,7 @@
 const $ = (sel) => document.querySelector(sel);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const campaignRegex = /^\d{8}.*$/; // Wajib diawali 8 digit angka (YYYYMMDD)
+    const campaignRegex = /^\d{8}[A-Za-z]?_.*$/; // Format: YYYYMMDD atau YYYYMMDDX, diikuti _Nama-Campaign_XXXX
 
     const campaignIdEl = $('#campaignId');
 
@@ -39,6 +39,10 @@ const $ = (sel) => document.querySelector(sel);
     let emails = [];                 // ["a@a.com", ...]
     let krKeys = [];                 // ["KRHRED_Unit_30", ...]
     const krValues = new Map();      // email -> Map(key -> value)
+    let campaignType = 'static';     // 'static' or 'dynamic'
+
+    // Get KRHRED section element
+    const krhredSection = $('#krhredSection');
 
     // ---------- Helpers ----------
     function parseManyEmails(text) {
@@ -99,36 +103,52 @@ const $ = (sel) => document.querySelector(sel);
       krHeadRow.querySelectorAll('th[data-key]').forEach(th => th.remove());
       for (const key of krKeys) {
         const th = document.createElement('th');
-        th.className = 'px-2 py-2 border-b border-slate-800 whitespace-nowrap';
+        th.className = 'krhred-header';
         th.setAttribute('data-key', key);
         th.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="font-mono">${key}</span>
-            <button class="text-slate-400 hover:text-rose-400" title="Hapus kolom" data-remove-key="${key}">✕</button>
+          <div class="krhred-header-content">
+            <span class="krhred-key">${key}</span>
+            <button class="krhred-remove-btn" title="Hapus kolom" data-remove-key="${key}">
+              <i class="fa-solid fa-times"></i>
+            </button>
           </div>`;
         krHeadRow.appendChild(th);
       }
 
       // Body
       krBody.innerHTML = '';
+      if (emails.length === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+          <td colspan="100%" class="table-empty-state">
+            <i class="fa-solid fa-inbox"></i>
+            <p>Belum ada email ditambahkan</p>
+          </td>
+        `;
+        krBody.appendChild(emptyRow);
+        return;
+      }
+
       for (const email of emails) {
         const tr = document.createElement('tr');
 
         const tdEmail = document.createElement('td');
-        tdEmail.className = 'px-3 py-2 sticky left-0 bg-slate-900/80 backdrop-blur border-b border-slate-800';
+        tdEmail.className = 'email-column';
         tdEmail.innerHTML = `
-          <div class="flex items-center gap-2">
-            <input class="w-64 md:w-72 rounded-xl bg-slate-900 border border-slate-700 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="${email}" />
-            <button class="text-slate-400 hover:text-rose-400" title="Hapus email" data-remove-email="${email}">🗑</button>
+          <div class="email-input-wrapper">
+            <input class="email-input" value="${email}" placeholder="email@example.com" />
+            <button class="email-remove-btn" title="Hapus email" data-remove-email="${email}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
           </div>`;
         tr.appendChild(tdEmail);
 
         const rowMap = ensureRowMap(email);
         for (const key of krKeys) {
           const td = document.createElement('td');
-          td.className = 'px-2 py-2 border-b border-slate-800';
+          td.className = 'krhred-column';
           const inp = document.createElement('input');
-          inp.className = 'w-44 md:w-56 rounded-xl bg-slate-900 border border-slate-700 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+          inp.className = 'krhred-input';
           inp.value = rowMap.get(key) ?? '';
           inp.placeholder = 'nilai';
           inp.addEventListener('input', () => { rowMap.set(key, inp.value); updateUI(); });
@@ -171,13 +191,40 @@ const $ = (sel) => document.querySelector(sel);
 
     function buildAllFiles(campaignId, emailList, useKr) {
       let mast = '', pref = '', subs = '', attr = '';
+      
+      // Build records by email (correct order)
       emailList.forEach((email, i) => {
         const id = recordId(campaignId, i);
         mast += rowCustMast(id, email);
         pref += rowCustPref(id, email, campaignId);
         subs += rowCustSubs(id, email);
-        attr += useKr ? rowsCustAttrDynamic(id, email, campaignId) : rowsCustAttrStatic(id, email, campaignId);
       });
+      
+      // For CustAttr, if dynamic, build by key groups
+      if (useKr) {
+        // Add CMPG_ID for all emails
+        emailList.forEach((email, i) => {
+          const id = recordId(campaignId, i);
+          attr += `${id}|${email}|CMPG_ID|${campaignId}|\n`;
+        });
+        
+        // Add KRHRED values grouped by key
+        krKeys.forEach(key => {
+          emailList.forEach((email, i) => {
+            const id = recordId(campaignId, i);
+            const rowMap = krValues.get(email) || new Map();
+            const val = rowMap.get(key) ?? '';
+            attr += `${id}|${email}|${key}|${val}|\n`;
+          });
+        });
+      } else {
+        // Static: just add CMPG_ID
+        emailList.forEach((email, i) => {
+          const id = recordId(campaignId, i);
+          attr += rowsCustAttrStatic(id, email, campaignId);
+        });
+      }
+      
       return {
         [`${campaignId}-CustMast.txt`]: mast,
         [`${campaignId}-CustPref.txt`]: pref,
@@ -233,8 +280,8 @@ const $ = (sel) => document.querySelector(sel);
     }
 
     function updateUI() {
-      const campaignId = campaignIdEl.value.trim();
-      const useKr = krKeys.length > 0;
+      const campaignIdVal = campaignIdEl.value.trim();
+      const useKrVal = campaignType === 'dynamic' && krKeys.length > 0;
 
       // Stats & validation
       const invalid = emails.filter(e => !emailRegex.test(e));
@@ -246,33 +293,49 @@ const $ = (sel) => document.querySelector(sel);
         invalidInfo.classList.add('hidden');
       }
 
-      const ok = campaignRegex.test(campaignId) && emails.length > 0 && invalid.length === 0;
+      const ok = campaignRegex.test(campaignIdVal) && emails.length > 0 && invalid.length === 0;
       btnDownload.disabled = !ok;
       btnSave.disabled = !ok;
 
       stateMsg.textContent = ok
         ? ''
-        : (!campaignRegex.test(campaignId)
+        : (!campaignRegex.test(campaignIdVal)
             ? 'Isi Campaign ID diawali YYYYMMDD.'
             : 'Tambahkan minimal 1 email valid.');
 
       // Previews
       previewsEl.innerHTML = '';
       if (!ok) return;
-      const show = Math.min(emails.length, 5);
-      const ids = Array.from({length: show}, (_, i) => recordId(campaignId, i));
-      const sample = emails.slice(0, show);
-      const previews = {
-        [`${campaignId}-CustMast.txt`]: sample.map((e,i)=>rowCustMast(ids[i], e)).join('') + (emails.length>show?'…\n':''),
-        [`${campaignId}-CustPref.txt`]: sample.map((e,i)=>rowCustPref(ids[i], e, campaignId)).join('') + (emails.length>show?'…\n':''),
-        [`${campaignId}-CustSubs.txt`]: sample.map((e,i)=>rowCustSubs(ids[i], e)).join('') + (emails.length>show?'…\n':''),
-        [`${campaignId}-CustAttr.txt`]: sample.map((e,i)=> (useKr ? rowsCustAttrDynamic(ids[i], e, campaignId) : rowsCustAttrStatic(ids[i], e, campaignId))).join('') + (emails.length>show?'…\n':''),
-      };
-      for (const [name, content] of Object.entries(previews)) {
+      
+      // Build actual preview content
+      const files = buildAllFiles(campaignIdVal, emails, useKrVal);
+      
+      for (const [name, content] of Object.entries(files)) {
         const card = document.createElement('div');
-        card.className = 'bg-slate-900 rounded-2xl shadow p-4';
-        card.innerHTML = '<div class="flex items-center justify-between"><h3 class="font-medium text-slate-200 truncate pr-2">'+name+'</h3><span class="text-[10px] px-2 py-1 rounded-full bg-slate-800 border border-slate-700">preview</span></div><pre class="mt-3 text-sm overflow-auto max-h-40 whitespace-pre-wrap leading-relaxed font-mono text-slate-300"></pre>';
-        card.querySelector('pre').textContent = content;
+        card.className = 'preview-card';
+        
+        // Count lines and show file info
+        const lines = content.split('\n').filter(line => line.trim()).length;
+        const isKrFile = name.includes('CustAttr');
+        const fileSize = (new Blob([content]).size / 1024).toFixed(1);
+        
+        card.innerHTML = `
+          <div class="preview-header">
+            <div class="preview-title">
+              <i class="fa-solid fa-file-lines"></i>
+              <span>${name}</span>
+            </div>
+            <div class="preview-badge">
+              <span class="preview-lines">${lines} baris</span>
+              <span class="preview-size">${fileSize} KB</span>
+            </div>
+          </div>
+          <div class="preview-content">
+            <pre>${content.substring(0, 500)}${content.length > 500 ? '\n\n...' : ''}</pre>
+          </div>
+          ${isKrFile && useKrVal ? '<div class="preview-notice"><i class="fa-solid fa-info-circle"></i> Format: CMPG_ID semua email → KRHRED_Unit_30 semua email → dst</div>' : ''}
+        `;
+        
         previewsEl.appendChild(card);
       }
     }
@@ -328,21 +391,31 @@ const $ = (sel) => document.querySelector(sel);
     });
 
     addKeyBtn.addEventListener('click', () => {
-      const key = normalizeKey(newKeyEl.value);
-      if (!krKeys.includes(key)) {
-        krKeys.push(key);
-        for (const email of emails) ensureRowMap(email).set(key, ensureRowMap(email).get(key) ?? '');
-        newKeyEl.value = '';
-        renderTable();
-        updateUI();
-      }
+      const key = normalizeKey(newKeyEl.value.trim());
+      if (!key) return;
+      if (krKeys.includes(key)) return alert('Kolom sudah ada.');
+      
+      // Add visual feedback
+      const krhredSection = document.getElementById('krhredSection');
+      krhredSection.style.transition = 'all 0.3s ease';
+      krhredSection.style.background = '#f0fdf4';
+      
+      krKeys.push(key);
+      for (const email of emails) ensureRowMap(email).set(key, '');
+      newKeyEl.value = '';
+      renderTable();
+      updateUI();
+      
+      // Reset background after animation
+      setTimeout(() => {
+        krhredSection.style.background = '';
+      }, 500);
     });
 
     btnDownload.addEventListener('click', async () => {
       const campaignId = campaignIdEl.value.trim();
-      const useKr = krKeys.length > 0;
+      const useKr = campaignType === 'dynamic' && krKeys.length > 0;
       const files = buildAllFiles(campaignId, emails, useKr);
-      // unduh berurutan + tampilkan fallback links
       for (const [name, content] of Object.entries(files)) {
         downloadText(name, content);
         await new Promise(r => setTimeout(r, 120));
@@ -352,13 +425,41 @@ const $ = (sel) => document.querySelector(sel);
 
     btnSave.addEventListener('click', async () => {
       const campaignId = campaignIdEl.value.trim();
-      const useKr = krKeys.length > 0;
+      const useKr = campaignType === 'dynamic' && krKeys.length > 0;
       const files = buildAllFiles(campaignId, emails, useKr);
       await saveAllToFolder(files);
     });
 
     campaignIdEl.addEventListener('input', updateUI);
 
-    // Init empty table
+    // Campaign type change handler
+    document.querySelectorAll('input[name="campaignType"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        campaignType = e.target.value;
+        toggleKRHREDSection();
+        
+        // Clear KR keys if switching to static
+        if (campaignType === 'static') {
+          krKeys = [];
+          renderTable();
+        }
+        
+        updateUI();
+      });
+    });
+
+    // Toggle KRHRED section visibility
+    function toggleKRHREDSection() {
+      if (krhredSection) {
+        if (campaignType === 'dynamic') {
+          krhredSection.style.display = 'block';
+        } else {
+          krhredSection.style.display = 'none';
+        }
+      }
+    }
+
+    // Init
+    toggleKRHREDSection();
     renderTable();
     updateUI();

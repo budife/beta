@@ -1,3 +1,221 @@
+/* ===================================
+   TOAST UTILITY - Merged from toast.js
+   =================================== */
+
+/* ===================================
+   SHARED TOAST UTILITY
+   =================================== */
+
+// Global Toast Manager Class
+class ToastManager {
+  constructor() {
+    this.container = null;
+    this.init();
+  }
+  
+  init() {
+    // Create toast container if it doesn't exist
+    if (!document.getElementById('toast-container')) {
+      this.container = document.createElement('div');
+      this.container.id = 'toast-container';
+      this.container.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 10000;
+        pointer-events: none;
+      `;
+      // Append to layout area
+      const layoutArea = document.querySelector('main.layout');
+      if (layoutArea) {
+        layoutArea.appendChild(this.container);
+      } else {
+        // Fallback to body
+        document.body.appendChild(this.container);
+      }
+    } else {
+      this.container = document.getElementById('toast-container');
+    }
+  }
+  
+  show(message, type = 'info', options = {}) {
+    const {
+      duration = 3000,
+      position = 'top-right'
+    } = options;
+    
+    // Update container position
+    this.updatePosition(position);
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.cssText = `
+      background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : type === 'warning' ? '#eab308' : '#3b82f6'};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      max-width: 300px;
+      word-wrap: break-word;
+    `;
+    toast.textContent = message;
+    
+    this.container.appendChild(toast);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateX(0)';
+    });
+    
+    // Remove on click
+    toast.addEventListener('click', () => {
+      this.remove(toast);
+    });
+    
+    // Auto remove
+    setTimeout(() => {
+      this.remove(toast);
+    }, duration);
+  }
+  
+  updatePosition(position) {
+    const positions = {
+      'top-right': 'top: 80px; right: 20px;',
+      'top-left': 'top: 80px; left: 20px;',
+      'bottom-right': 'bottom: 20px; right: 20px;',
+      'bottom-left': 'bottom: 20px; left: 20px;'
+    };
+    
+    this.container.style.cssText = `
+      position: fixed;
+      z-index: 10000;
+      pointer-events: none;
+      ${positions[position] || positions['top-right']}
+    `;
+  }
+  
+  remove(toast) {
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
+  
+  success(message, options = {}) {
+    this.show(message, 'success', options);
+  }
+  
+  error(message, options = {}) {
+    this.show(message, 'error', options);
+  }
+  
+  warning(message, options = {}) {
+    this.show(message, 'warning', options);
+  }
+  
+  info(message, options = {}) {
+    this.show(message, 'info', options);
+  }
+}
+
+// Shared showToast function
+function showToast(message, type = 'info', title = '') {
+  // Use global toast system if available
+  if (type === 'success' && window.toastSuccess) {
+    window.toastSuccess(message, title);
+    return;
+  } else if (type === 'error' && window.toastError) {
+    window.toastError(message, title);
+    return;
+  } else if (type === 'warning' && window.toastWarning) {
+    window.toastWarning(message, title);
+    return;
+  } else if (window.toastInfo) {
+    window.toastInfo(message, title);
+    return;
+  }
+  
+  // Fallback - create simple toast
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    z-index: 10000;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  // Animate in
+  setTimeout(() => toast.style.opacity = '1', 100);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Initialize global toast manager
+window.toastManager = new ToastManager();
+
+// Global toast functions for compatibility
+window.toastSuccess = function(message, title = '') {
+  if (window.toastManager) {
+    window.toastManager.success(message);
+  }
+};
+
+window.toastError = function(message, title = '') {
+  if (window.toastManager) {
+    window.toastManager.error(message);
+  }
+};
+
+window.toastWarning = function(message, title = '') {
+  if (window.toastManager) {
+    window.toastManager.warning(message);
+  }
+};
+
+window.toastInfo = function(message, title = '') {
+  if (window.toastManager) {
+    window.toastManager.info(message);
+  }
+};
+
+// Export for module usage
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { ToastManager, showToast };
+}
+
+
+// Initialize Toast Manager
+document.addEventListener('DOMContentLoaded', () => {
+  window.toastManager = new ToastManager();
+});
+
+/* ===================================
+   ORIGINAL CODE
+   =================================== */
+
 
 // ---- Extracted scripts from inline <script> blocks ----
 // Initialize CodeMirror editor for htmlInput textarea
@@ -15,114 +233,75 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const downloadBtn = document.getElementById('downloadBtn');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
   const textModeBtn = document.getElementById('textModeBtn');
+  const checkLayoutBtn = document.getElementById('checkLayoutBtn');
   const clearAllBtn = document.getElementById('clearAllBtn');
-  // const toggleKrhredBtn = document.getElementById('toggleKrhredBtn'); // REMOVED
+  const progressContainer = document.getElementById('progressContainer');
+  const progressText = document.getElementById('progressText');
+  const stopBtn = document.getElementById('stopBtn');
+  const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
+  
+  // AbortController for stopping operations
+  let abortController = null;
+  let currentOperation = null;
 
-  // Toast notification system
+  // Toast notification - using global toast manager
   function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    
-    const colors = {
-      success: { bg: '#10b981', text: 'white', icon: '✓' },
-      error: { bg: '#ef4444', text: 'white', icon: '✕' },
-      warning: { bg: '#f59e0b', text: 'white', icon: '⚠' },
-      info: { bg: '#6366f1', text: 'white', icon: 'ℹ' }
-    };
-    
-    const color = colors[type] || colors.info;
-    
-    toast.style.cssText = `
-      background: ${color.bg};
-      color: ${color.text};
-      padding: 12px 16px;
-      border-radius: 8px;
-      min-width: 280px;
-      max-width: 420px;
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0;
-      transform: translateX(100%) translateY(-20px);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 4000;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-left: 4px solid ${color.bg};
-      margin-bottom: 10px;
-    `;
-    
-    toast.innerHTML = `
-      <span style="font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 50%; flex-shrink: 0;">
-        ${color.icon}
-      </span>
-      <span style="flex: 1;">${message}</span>
-    `;
-    
-    // Insert at the beginning (top) of container
-    toastContainer.insertBefore(toast, toastContainer.firstChild);
-    
-    // Animate in
-    setTimeout(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(0) translateY(0)';
-    }, 10);
-    
-    // Remove after 4.5 seconds
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(100%) translateY(-20px)';
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.parentNode.removeChild(toast);
-        }
-      }, 300);
-    }, 4500);
-  }
-
-  // Modal confirmation system
-  function showConfirmModal(message, onConfirm, onCancel) {
-    const modal = document.getElementById('confirmModal');
-    const messageEl = document.getElementById('confirmMessage');
-    const okBtn = document.getElementById('confirmOk');
-    const cancelBtn = document.getElementById('confirmCancel');
-    
-    messageEl.textContent = message;
-    modal.style.display = 'flex';
-    
-    const handleConfirm = () => {
-      modal.style.display = 'none';
-      okBtn.removeEventListener('click', handleConfirm);
-      cancelBtn.removeEventListener('click', handleCancel);
-      if (onConfirm) onConfirm();
-    };
-    
-    const handleCancel = () => {
-      modal.style.display = 'none';
-      okBtn.removeEventListener('click', handleConfirm);
-      cancelBtn.removeEventListener('click', handleCancel);
-      if (onCancel) onCancel();
-    };
-    
-    okBtn.addEventListener('click', handleConfirm);
-    cancelBtn.addEventListener('click', handleCancel);
-    
-    // Close on backdrop click
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        handleCancel();
-      }
-    });
-  }
-
-  checkLayoutBtn.addEventListener('click', () => {
-    let content = editor.getValue();
-    if (!content.trim()) {
-      showToast('Please paste HTML content first.', 'error');
-      return;
+    if (type === 'success' && window.toastSuccess) {
+      window.toastSuccess(message);
+    } else if (type === 'error' && window.toastError) {
+      window.toastError(message);
+    } else if (type === 'warning' && window.toastWarning) {
+      window.toastWarning(message);
+    } else if (window.toastInfo) {
+      window.toastInfo(message);
+    } else {
+      console.log(`[${type.toUpperCase()}] ${message}`);
     }
-    // Replace placeholders <%[KRHRED_Unit_XX]|%> with textbox values or remove if empty
+  }
+
+  // Progress indicator functions
+  function showProgress(text, operation) {
+    progressText.textContent = text;
+    progressContainer.classList.remove('hidden');
+    currentOperation = operation;
+    abortController = new AbortController();
+  }
+
+  function hideProgress() {
+    progressContainer.classList.add('hidden');
+    currentOperation = null;
+    abortController = null;
+  }
+
+  // Stop button functionality
+  stopBtn.addEventListener('click', () => {
+    if (abortController) {
+      abortController.abort();
+      console.log('Operation stopped');
+      hideProgress();
+    }
+  });
+
+  // Helper function to validate URL
+  function isValidUrl(url) {
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Helper function to validate URLholders <%[KRHRED_Unit_XX]|%> with textbox values or remove if empty
+  checkLayoutBtn.addEventListener('click', () => {
+    console.log('Check Layout button clicked');
+    let content = editor.getValue();
+    console.log('Editor content length:', content.length);
+    console.log('Editor content preview:', content.substring(0, 200));
+    
     const inputs = krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
+    console.log('KRHRED inputs found:', inputs.length);
+    
     let hasValidKrhred = false;
     
     inputs.forEach(input => {
@@ -131,19 +310,24 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       if (input.value && input.value.trim() !== '') {
         content = content.replace(regex, input.value);
         hasValidKrhred = true;
+        console.log(`Replaced KRHRED_Unit_${num} with: ${input.value}`);
       } else {
         // Remove empty KRHRED placeholders completely
         content = content.replace(regex, '');
+        console.log(`Removed empty KRHRED_Unit_${num}`);
       }
     });
     
+    console.log('Has valid KRHRED:', hasValidKrhred);
+    
     if (!hasValidKrhred) {
-      showToast('No KRHRED values to apply. Please fill in KRHRED values first.', 'warning');
+      console.log('No KRHRED values to apply. Please fill in KRHRED values first.');
       return;
     }
     
     // Fix image URLs to absolute URLs if original URL is provided
     const originalUrlValue = document.getElementById('originalUrlInput').value.trim();
+    console.log('Original URL:', originalUrlValue);
     
     // Convert relative image URLs to absolute URLs
     let processedContent = content;
@@ -156,32 +340,26 @@ const originalUrlInput = document.getElementById('originalUrlInput');
         processedContent = content.replace(/src="(?!https?:\/\/)([^"]+)"/g, (match, p1) => {
           const relativePath = p1.replace(/"/g, '');
           // Don't convert if already absolute, data URL, or protocol-relative
-          if (!relativePath.match(/^(https?:\/\/|data:|\/\/)/)) {
-            return `src="${baseUrlString}${relativePath}"`;
+          if (relativePath.startsWith('data:') || relativePath.startsWith('//')) {
+            return match;
           }
-          return match;
+          return `src="${baseUrlString}${relativePath}"`;
         });
-        
-        // Convert href attributes
-        processedContent = processedContent.replace(/href="(?!https?:\/\/)([^"]+)"/g, (match, p1) => {
-          const relativePath = p1.replace(/"/g, '');
-          // Don't convert if already absolute, data URL, or protocol-relative
-          if (!relativePath.match(/^(https?:\/\/|data:|\/\/)/)) {
-            return `href="${baseUrlString}${relativePath}"`;
-          }
-          return match;
-        });
-      } catch (error) {
-        console.log('Error processing URLs:', error);
+        console.log('Processed content with absolute URLs');
+      } catch (e) {
+        console.error('Error processing URLs:', e);
         processedContent = content; // Fallback to original content
       }
     }
+    
+    console.log('Opening processed content in new tab');
     
     // Save content as a Blob and open in new tab
     const blob = new Blob([processedContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
-    if (statusDiv) { statusDiv.textContent = ''; statusDiv.id = ''; }
+    
+    console.log('Layout checked successfully! Opening in new tab...');
   });
 
   addKrhredBtn.addEventListener('click', () => {
@@ -214,6 +392,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     input.id = `krhred_unit_${newNum}`;
     input.name = `krhred_unit_${newNum}`;
     input.placeholder = newNum.toString();
+    input.className = 'lc-input-field';
     div.appendChild(input);
 
     // Insert in correct position for 4 columns layout
@@ -236,14 +415,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       } else {
         input.style.backgroundColor = '';
       }
-      saveState();
     });
 
-    // Add auto-save event listener
-    input.addEventListener('input', saveState);
-
     // Show success message
-    showToast(`Added krhred_unit_${newNum} in 4-column layout`, 'success');
+    console.log(`Unit ${newNum} added successfully!`);
   });
 
   // Input color feedback for existing inputs
@@ -274,7 +449,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
           if (originalUrlInput.value.trim() === url) {
             downloadBtn.click();
           }
-        }, 1000);
+        }, 0);
       }
     } else {
       downloadBtn.style.display = 'none';
@@ -287,77 +462,65 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   manualPasteBtn.addEventListener('click', () => {
     const url = originalUrlInput.value.trim();
     if (!url) {
-      showToast('Please enter a URL first.', 'error');
+      console.log('Please enter a URL first.');
       return;
     }
     
-    // Open URL in new tab and show instructions
-    window.open(url, '_blank');
-    localStorage.setItem('layoutCheckerURL', url);
-    showToast('Page opened in new tab. Please copy source code (Ctrl+U or Right-click → View Page Source) and paste it here.', 'info');
+    // Show progress
+    showProgress('Opening page in new tab...', 'open-tab');
     
-    // Focus HTML editor
-    editor.focus();
+    // Open URL in new tab after a short delay
+    setTimeout(() => {
+      window.open(url, '_blank');
+      localStorage.setItem('layoutCheckerURL', url);
+      console.log('Page opened in new tab. Please copy source code (Ctrl+U or Right-click → View Page Source) and paste it here.');
+      setTimeout(() => {
+        hideProgress();
+      }, 1000);
+    }, 500);
   });
 
-  // Toggle Manual functionality - REMOVED but button kept for future
-  // toggleKrhredBtn.addEventListener('click', () => {
-  //   const container = krhredUnitsContainer;
-  //   const inputGrid = container.querySelector('.input-grid');
-  //   
-  //   if (inputGrid.style.display === 'none') {
-  //     inputGrid.style.display = 'grid';
-  //     toggleKrhredBtn.innerHTML = `
-  //       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-  //         <path d="M12 15.5A3.5 3.5 0 0 1 5 0l-3.5-3.5z"/>
-  //       </svg>
-  //       Hide Manual
-  //     `;
-  //     showToast('Manual mode enabled', 'success');
-  //   } else {
-  //     inputGrid.style.display = 'none';
-  //     toggleKrhredBtn.innerHTML = `
-  //       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-  //         <path d="M12 15.5A3.5 3.5 0 0 1 5 0l-3.5-3.5z"/>
-  //       </svg>
-  //       Show Manual
-  //     `;
-  //     showToast('Manual mode disabled', 'info');
-  //   }
-  // });
-
   // Text mode button functionality
-  textModeBtn.addEventListener('click', () => {
+  textModeBtn.addEventListener('click', async () => {
     const url = originalUrlInput.value.trim();
     if (!url) {
-      showToast('Please enter a URL first.', 'error');
+      console.log('Please enter a URL first.');
       return;
     }
     
-    // Try to fetch as plain text (some servers allow this)
-    showToast('Attempting to fetch as plain text...', 'info');
+    // Show progress
+    showProgress('Fetching as plain text...', 'fetch-text');
     
-    fetch(url, {
-      headers: {
-        'Accept': 'text/plain,text/html,*/*;q=0.8'
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'text/plain,text/html,*/*;q=0.8'
+        },
+        signal: abortController.signal
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch');
       }
-    }).then(response => {
-      if (response.ok) {
-        return response.text();
-      }
-      throw new Error('Failed to fetch');
-    }).then(content => {
+      
+      const content = await response.text();
+      
       if (content && content.includes('<html')) {
         editor.setValue(content);
-        // generateKrhredColumns will be called by editor.on('change') event
-        showToast('Content fetched successfully in text mode!', 'success');
+        console.log('Content loaded successfully!');
+        generateKrhredColumns(content);
       } else {
-        throw new Error('Invalid content received');
+        console.log('Unable to fetch content as plain text. Please use Manual Paste option.');
       }
-    }).catch(error => {
-      showToast('Text mode failed. Please use manual paste option.', 'warning');
-      console.log('Text mode error:', error);
-    });
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Fetch cancelled');
+      } else {
+        console.log('Failed to fetch content. Please use Manual Paste option.');
+      }
+    } finally {
+      hideProgress();
+    }
   });
 
   // Helper function to validate URL
@@ -371,7 +534,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   }
 
   // Function to detect krhred_unit_xx in HTML and generate columns
-  function generateKrhredColumns(htmlContent) {
+  function generateKrhredColumns(htmlContent, showNotification = true) {
     // DEBUG: Log function start
     console.log('=== generateKrhredColumns START ===');
     console.log('HTML content length:', htmlContent.length);
@@ -416,12 +579,11 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     console.log('Existing inputs found:', existingNumbers);
     console.log('Existing input elements:', currentInputs.length);
     
-    // Remove units that are not in the HTML (but keep default 30-37)
-    const defaultUnits = [30, 31, 32, 33, 34, 35, 36, 37];
+    // Remove units that are not in the HTML (including default units if not in HTML)
     currentInputs.forEach(input => {
       const unitNumber = parseInt(input.id.replace('krhred_unit_', ''), 10);
-      if (!matches.includes(unitNumber) && !defaultUnits.includes(unitNumber)) {
-        console.log(`Removing unit ${unitNumber} - not in HTML and not default`);
+      if (!matches.includes(unitNumber)) {
+        console.log(`Removing unit ${unitNumber} - not in HTML`);
         input.parentElement.remove();
       }
     });
@@ -452,6 +614,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
         input.id = `krhred_unit_${unitNumber}`;
         input.name = `krhred_unit_${unitNumber}`;
         input.placeholder = unitNumber.toString();
+        input.className = 'lc-input-field';
         div.appendChild(input);
         inputGrid.appendChild(div);
         
@@ -465,11 +628,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
           } else {
             input.style.backgroundColor = '';
           }
-          saveState();
         });
         
         // Add auto-save event listener
-        input.addEventListener('input', saveState);
+        input.addEventListener('input', () => {});
       } else {
         // DEBUG: Log skipped units
         console.log(`Skipping unit ${unitNumber} - already exists`);
@@ -482,11 +644,13 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     console.log('=== generateKrhredColumns END ===');
     
     // Show combined toast notification for HTML fetch and KRHRED units found
-    if (matches.length > 0) {
-      console.log(`Generated ${matches.length} krhred_unit columns:`, matches);
-      showToast(`HTML fetched successfully! Found ${matches.length} KRHRED units: ${matches.join(', ')}`, 'success');
-    } else {
-      showToast('HTML fetched successfully! No KRHRED units found.', 'success');
+    if (showNotification) {
+      if (matches.length > 0) {
+        console.log(`Generated ${matches.length} krhred_unit columns:`, matches);
+        console.log(`HTML fetched! Found ${matches.length} KRHRED units: ${matches.join(', ')}`);
+      } else {
+        console.log('HTML fetched! No KRHRED units found. Showing default layout.');
+      }
     }
   }
 
@@ -494,12 +658,15 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   downloadBtn.addEventListener('click', async () => {
     const url = originalUrlInput.value.trim();
     if (!url) {
-      showToast('Please enter a URL first.', 'error');
+      console.log('Please enter a URL first.');
       return;
     }
 
     try {
-      // Show loading state
+      // Show progress
+      showProgress('Fetching HTML content...', 'download');
+      
+      // Disable button during fetch
       downloadBtn.disabled = true;
       downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px; animation: spin 1s linear infinite;"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg>Fetching...';
 
@@ -522,29 +689,27 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       // Try direct fetch first with timeout
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-        
-        const response = await fetch(url, {
-          mode: 'cors',
-          signal: controller.signal,
-          headers: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-          }
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch(url, { 
+          signal: abortController ? abortController.signal : controller.signal
         });
         
         clearTimeout(timeoutId);
         
         if (response.ok) {
-          htmlContent = await response.text();
-          usedProxy = 'direct';
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('text/html')) {
+            htmlContent = await response.text();
+            console.log('Direct connection successful!');
+          }
         }
-      } catch (directError) {
-        console.log('Direct fetch failed, trying proxies...');
-        lastError = directError;
+      } catch (error) {
+        lastError = error;
+        // Continue to try proxies
       }
 
-      // If direct fetch failed, try CORS proxies sequentially (not parallel to avoid rate limits)
+      // If direct fetch failed, try CORS proxies sequentially
       if (!htmlContent) {
         for (let i = 0; i < corsProxies.length; i++) {
           const proxy = corsProxies[i];
@@ -626,27 +791,19 @@ const originalUrlInput = document.getElementById('originalUrlInput');
 
       if (htmlContent) {
         editor.setValue(htmlContent);
-        // generateKrhredColumns will be called by editor.on('change') event
-        
-        // No toast here - generateKrhredColumns will show the notification
+        // Directly call generateKrhredColumns to create input fields
+        generateKrhredColumns(htmlContent);
       } else {
         throw new Error(lastError?.message || 'All fetch attempts failed');
       }
 
     } catch (error) {
       console.error('Error fetching HTML:', error);
-      
-      // Try to open in new tab as fallback
-      try {
-        window.open(url, '_blank');
-        localStorage.setItem('layoutCheckerURL', url);
-        showToast('Unable to fetch automatically. Page opened in new tab. Please copy the source code manually.\n\nTip: Right-click → View Page Source or press Ctrl+U', 'warning');
-      } catch (fallbackError) {
-        showToast('Error: Unable to fetch the HTML content. Please copy the source code manually from the URL and paste it here.', 'error');
-      }
+      console.log('Failed to fetch HTML content. Please try again or use Manual Paste option.');
     } finally {
       downloadBtn.disabled = false;
       downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Download';
+      hideProgress();
     }
   });
 
@@ -655,161 +812,82 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const krhredInput = document.getElementById('krhredInput');
 
   applyKrhredBtn.addEventListener('click', () => {
+    console.log('Apply KRHRED button clicked');
     const krhredText = krhredInput.value.trim();
+    console.log('KRHRED text length:', krhredText.length);
+    console.log('KRHRED text preview:', krhredText.substring(0, 200));
+    
     if (!krhredText) {
-      showToast('Please paste krhred values first.', 'error');
+      console.log('Please paste krhred values first.');
       return;
     }
 
     // Parse krhred values in new format: attr:KRHRED_Unit_XX : <next line value>
     const lines = krhredText.split('\n');
     const krhredValues = {};
+    console.log('Total lines:', lines.length);
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (line.startsWith('attr:KRHRED_Unit_')) {
-        const key = line.replace('attr:', '').replace(' :', '');
+        const key = line.replace('attr:', '').replace(' :', '').replace(':', '');
         const value = lines[i + 1] ? lines[i + 1].trim() : '';
         krhredValues[key] = value;
+        console.log(`Parsed: ${key} = ${value}`);
         i++; // skip value line
       }
     }
+    
+    console.log('KRHRED values found:', krhredValues);
 
     // Apply values to corresponding input fields
     Object.keys(krhredValues).forEach(key => {
       const unitNumber = key.replace('KRHRED_Unit_', '');
       const inputField = document.getElementById(`krhred_unit_${unitNumber}`);
+      console.log(`Looking for input: krhred_unit_${unitNumber}`);
       if (inputField) {
         inputField.value = krhredValues[key];
         inputField.dispatchEvent(new Event('input')); // color update
+        console.log(`Applied value to unit ${unitNumber}`);
+      } else {
+        console.log(`Input field not found for unit ${unitNumber}`);
       }
     });
-
-    saveState();
+    
+    console.log('KRHRED values applied successfully!');
   });
 
   // Clear All functionality
   clearAllBtn.addEventListener('click', () => {
-    showConfirmModal(
-      'Are you sure you want to clear all data? This action cannot be undone.',
-      () => {
-        performClearAll();
-        showToast('All data cleared successfully!', 'success');
-      },
-      () => {
-        showToast('Clear action cancelled.', 'info');
-      }
-    );
+    if (confirm('Are you sure you want to clear all KRHRED values?')) {
+      performClearAll();
+      console.log('KRHRED values cleared successfully!');
+    } else {
+      console.log('Clear action cancelled.');
+    }
   });
 
   function performClearAll() {
-    // Reset krhredUnitsContainer to initial state
-    const inputGrid = krhredUnitsContainer.querySelector('#inputGrid');
-    if (inputGrid) {
-      // Clear all inputs completely
-      inputGrid.innerHTML = '';
-      
-      // Recreate initial 8 units (30-37) with proper structure
-      const initialUnits = [
-        { id: 30, placeholder: '30' },
-        { id: 31, placeholder: '31' },
-        { id: 32, placeholder: '32' },
-        { id: 33, placeholder: '33' },
-        { id: 34, placeholder: '34' },
-        { id: 35, placeholder: '35' },
-        { id: 36, placeholder: '36' },
-        { id: 37, placeholder: '37' }
-      ];
-      
-      initialUnits.forEach((unit, index) => {
-        // Create wrapper div
-        const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.flexDirection = 'column';
-        
-        // Create input
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id = `krhred_unit_${unit.id}`;
-        input.name = `krhred_unit_${unit.id}`;
-        input.placeholder = unit.placeholder;
-        
-        // Add to DOM
-        div.appendChild(input);
-        inputGrid.appendChild(div);
-        
-        // Add input color feedback
-        input.addEventListener('input', () => {
-          const length = input.value.trim().length;
-          if (length > 60) {
-            input.style.backgroundColor = 'red';
-          } else if (length > 0) {
-            input.style.backgroundColor = 'lightgreen';
-          } else {
-            input.style.backgroundColor = '';
-          }
-          saveState();
-        });
-        
-        // Add auto-save event listener
-        input.addEventListener('input', saveState);
-      });
-    }
-
-    // Clear krhred textarea and HTML editor
+    // Clear all KRHRED unit values only
+    const inputs = krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
+    inputs.forEach(input => {
+      input.value = '';
+      input.style.backgroundColor = '';
+    });
+    
+    // Clear KRHRED textarea only
     document.getElementById('krhredInput').value = '';
-    editor.setValue('');
-
-    // Clear URL & hide download button
-    document.getElementById('originalUrlInput').value = '';
-    document.getElementById('downloadBtn').style.display = 'none';
-    document.getElementById('manualPasteBtn').style.display = 'none';
-    document.getElementById('textModeBtn').style.display = 'none';
-
-    // Remove saved state
-    localStorage.removeItem('layoutChecker_state');
-    localStorage.removeItem('layoutCheckerSource');
-    localStorage.removeItem('layoutCheckerURL');
   }
 
-  // Handle F5 refresh with confirmation
-  let refreshTimer;
-  window.addEventListener('beforeunload', (e) => {
-    const hasData = editor.getValue().trim() || 
-                   document.getElementById('krhredInput').value.trim() ||
-                   document.querySelectorAll('input[id^="krhred_unit_"]').some(input => input.value.trim());
-    
-    if (hasData) {
-      e.preventDefault();
-      e.returnValue = 'You have unsaved data. Are you sure you want to leave?';
-      return e.returnValue;
-    }
-  });
-
-  // Handle keyboard shortcuts
+  // Handle F5 refresh - clear data without prompt
   window.addEventListener('keydown', (e) => {
-    // F5 or Ctrl+R
     if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-      const hasData = editor.getValue().trim() || 
-                     document.getElementById('krhredInput').value.trim() ||
-                     document.querySelectorAll('input[id^="krhred_unit_"]').some(input => input.value.trim());
-      
-      if (hasData) {
-        e.preventDefault();
-        showConfirmModal(
-          'You have unsaved data. Are you sure you want to refresh and clear everything?',
-          () => {
-            performClearAll();
-            showToast('Data cleared. Refreshing page...', 'info');
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
-          },
-          () => {
-            showToast('Refresh cancelled.', 'info');
-          }
-        );
-      }
+      e.preventDefault();
+      performClearAll();
+      console.log('Data cleared. Refreshing page...');
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
   });
 
@@ -817,7 +895,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   window.addEventListener('load', () => {
     const storedSource = localStorage.getItem('layoutCheckerSource');
     const storedURL = localStorage.getItem('layoutCheckerURL');
-    
+
     if (storedSource) {
       editor.setValue(storedSource);
       // generateKrhredColumns will be called by editor.on('change') event
@@ -826,76 +904,76 @@ const originalUrlInput = document.getElementById('originalUrlInput');
         downloadBtn.style.display = 'flex';
         manualPasteBtn.style.display = 'flex';
       }
-      showToast('Source code automatically pasted from previous page!', 'success');
+      console.log('Source code automatically pasted from previous page!');
     }
-    // Don't remove localStorage items to prevent saving state
-    // localStorage.removeItem('layoutCheckerSource');
-    // localStorage.removeItem('layoutCheckerURL');
+    localStorage.removeItem('layoutCheckerSource');
+    localStorage.removeItem('layoutCheckerURL');
   });
 
-  // State persistence - DISABLED to prevent saving state
-  function saveState() {
-    // Don't save state to localStorage
-    // const state = {
-    //   htmlContent: editor.getValue(),
-    //   originalUrl: document.getElementById('originalUrlInput').value,
-    //   krhredValues: {}
-    // };
-    // const krhredInputs = document.querySelectorAll('input[id^="krhred_unit_"]');
-    // krhredInputs.forEach(input => {
-    //   state.krhredValues[input.id] = input.value;
-    // });
-    // localStorage.setItem('layoutChecker_state', JSON.stringify(state));
-  }
+  // State persistence - DISABLED
+  // function saveState() {
+  //   const state = {
+  //     htmlContent: editor.getValue(),
+  //     originalUrl: document.getElementById('originalUrlInput').value,
+  //     krhredValues: {}
+  //   };
+  //   const krhredInputs = document.querySelectorAll('input[id^="krhred_unit_"]');
+  //   krhredInputs.forEach(input => {
+  //     state.krhredValues[input.id] = input.value;
+  //   });
+  //   localStorage.setItem('layoutChecker_state', JSON.stringify(state));
+  // }
 
-  function loadState() {
-    const saved = localStorage.getItem('layoutChecker_state');
-    if (saved) {
-      try {
-        const state = JSON.parse(saved);
-        if (state.htmlContent) { 
-          editor.setValue(state.htmlContent);
-          // generateKrhredColumns will be called by editor.on('change') event
-        }
-        if (state.originalUrl) {
-          document.getElementById('originalUrlInput').value = state.originalUrl;
-          document.getElementById('downloadBtn').style.display = 'flex';
-          document.getElementById('manualPasteBtn').style.display = 'flex';
-        }
-        if (state.krhredValues) {
-          Object.keys(state.krhredValues).forEach(inputId => {
-            const input = document.getElementById(inputId);
-            if (input) {
-              input.value = state.krhredValues[inputId];
-              input.dispatchEvent(new Event('input'));
-            }
-          });
-        }
-      } catch (e) {
-        console.error('Error loading state:', e);
-      }
-    }
-  }
+  // function loadState() {
+  //   const saved = localStorage.getItem('layoutChecker_state');
+  //   if (saved) {
+  //     try {
+  //       const state = JSON.parse(saved);
+  //       if (state.htmlContent) { 
+  //         editor.setValue(state.htmlContent);
+  //         // generateKrhredColumns will be called by editor.on('change') event
+  //       }
+  //       if (state.originalUrl) {
+  //         document.getElementById('originalUrlInput').value = state.originalUrl;
+  //         document.getElementById('downloadBtn').style.display = 'flex';
+  //         document.getElementById('manualPasteBtn').style.display = 'flex';
+  //       }
+  //       if (state.krhredValues) {
+  //         Object.keys(state.krhredValues).forEach(inputId => {
+  //           const input = document.getElementById(inputId);
+  //           if (input) {
+  //             input.value = state.krhredValues[inputId];
+  //             input.dispatchEvent(new Event('input'));
+  //           }
+  //         });
+  //       }
+  //     } catch (e) {
+  //       console.error('Error loading state:', e);
+  //     }
+  //   }
+  // }
 
-  // Auto-save on input changes
+  // Auto-save on input changes - DISABLED
   editor.on('change', () => {
     const content = editor.getValue();
     if (content.trim()) {
-      generateKrhredColumns(content);
+      generateKrhredColumns(content, false);
     }
-    saveState();
+    //  // DISABLED
   });
-  document.getElementById('originalUrlInput').addEventListener('input', saveState);
-  document.getElementById('krhredInput').addEventListener('input', saveState);
+  // document.getElementById('originalUrlInput').addEventListener('input', saveState); // DISABLED
+  // document.getElementById('krhredInput').addEventListener('input', saveState); // DISABLED
 
-  // Auto-save for existing krhred inputs
+
+  // Auto-save for existing krhred inputs - DISABLED
   const existingKrhredInputs = document.querySelectorAll('input[id^="krhred_unit_"]');
   existingKrhredInputs.forEach(input => {
-    input.addEventListener('input', saveState);
+    // input.addEventListener('input', saveState); // DISABLED
   });
 
-  // Load state when page loads
-  window.addEventListener('load', loadState);
 
-  // Save state before leaving page
-  window.addEventListener('beforeunload', saveState);
+  // Load state when page loads - DISABLED
+  // window.addEventListener('load', loadState); // DISABLED
+
+  // Save state before leaving page - DISABLED
+  // window.addEventListener('beforeunload', saveState); // DISABLED
