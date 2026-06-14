@@ -31,31 +31,60 @@ const $ = (sel) => document.querySelector(sel);
     const previewsEl = $('#previews');
     const countInfo = $('#countInfo');
     const invalidInfo = $('#invalidInfo');
+    const emailCount = $('#emailCount');
+    const validCount = $('#validCount');
+    const krhredCount = $('#krhredCount');
+    const campaignError = $('#campaignError');
+    const emailError = $('#emailError');
+    const keyError = $('#keyError');
 
     const dlSection = $('#dlSection');
     const downloadsList = $('#downloadsList');
 
     // State
-    let emails = [];                 // ["a@a.com", ...]
+    let emails = [];                 // [{ id, email }, ...]
     let krKeys = [];                 // ["KRHRED_Unit_30", ...]
-    const krValues = new Map();      // email -> Map(key -> value)
+    const krValues = new Map();      // row id -> Map(key -> value)
     let campaignType = 'static';     // 'static' or 'dynamic'
+    let nextRowId = 1;
 
     // Get KRHRED section element
     const krhredSection = $('#krhredSection');
 
     // ---------- Helpers ----------
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function setFieldError(element, message = '') {
+      element.textContent = message;
+      element.classList.toggle('hidden', !message);
+    }
+
+    function setStatus(message, type = 'neutral') {
+      stateMsg.textContent = message;
+      stateMsg.classList.remove('is-neutral', 'is-ready', 'is-error');
+      stateMsg.classList.add(`is-${type}`);
+    }
+
+    function renderPreviewEmpty(message) {
+      previewsEl.innerHTML = `
+        <div class="preview-empty">
+          <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+          <p>${escapeHtml(message)}</p>
+        </div>`;
+    }
+
     function parseManyEmails(text) {
-      const raw = (text || '')
+      return (text || '')
         .split(/[\n,;\s]+/)        // baris, koma, titik koma, spasi
         .map(s => s.trim())
         .filter(Boolean);
-      const out = [];
-      const seen = new Set(emails);  // hindari duplikat dgn existing
-      for (const e of raw) {
-        if (!seen.has(e)) { out.push(e); seen.add(e); }
-      }
-      return out;
     }
 
     function normalizeKey(k) {
@@ -74,26 +103,29 @@ const $ = (sel) => document.querySelector(sel);
       return `KRHRED_Unit_${max + 1}`;
     }
 
-    function ensureRowMap(email) {
-      if (!krValues.has(email)) krValues.set(email, new Map());
-      return krValues.get(email);
+    function createEmailRow(email) {
+      const row = { id: nextRowId, email };
+      nextRowId += 1;
+      emails.push(row);
+      ensureRowMap(row.id);
+      return row;
     }
 
-    function migrateEmail(oldEmail, newEmail) {
-      if (oldEmail === newEmail) return;
-      if (!emailRegex.test(newEmail)) return; // ignore invalid sampai valid
-      if (emails.includes(newEmail)) return; // hindari duplikat
-      const map = krValues.get(oldEmail) || new Map();
-      krValues.delete(oldEmail);
-      krValues.set(newEmail, map);
-      emails = emails.map(e => (e === oldEmail ? newEmail : e));
-      renderTable();
+    function ensureRowMap(rowId) {
+      if (!krValues.has(rowId)) krValues.set(rowId, new Map());
+      return krValues.get(rowId);
+    }
+
+    function migrateEmail(rowId, newEmail) {
+      const row = emails.find(item => item.id === rowId);
+      if (!row || row.email === newEmail) return;
+      row.email = newEmail;
       updateUI();
     }
 
-    function removeEmailRow(email) {
-      emails = emails.filter(e => e !== email);
-      krValues.delete(email);
+    function removeEmailRow(rowId) {
+      emails = emails.filter(row => row.id !== rowId);
+      krValues.delete(rowId);
       renderTable();
       updateUI();
     }
@@ -107,8 +139,8 @@ const $ = (sel) => document.querySelector(sel);
         th.setAttribute('data-key', key);
         th.innerHTML = `
           <div class="krhred-header-content">
-            <span class="krhred-key">${key}</span>
-            <button class="krhred-remove-btn" title="Hapus kolom" data-remove-key="${key}">
+            <span class="krhred-key">${escapeHtml(key)}</span>
+            <button class="krhred-remove-btn" type="button" title="Hapus kolom ${escapeHtml(key)}" aria-label="Hapus kolom ${escapeHtml(key)}" data-remove-key="${escapeHtml(key)}">
               <i class="fa-solid fa-times"></i>
             </button>
           </div>`;
@@ -129,21 +161,22 @@ const $ = (sel) => document.querySelector(sel);
         return;
       }
 
-      for (const email of emails) {
+      for (const row of emails) {
+        const { id: rowId, email } = row;
         const tr = document.createElement('tr');
 
         const tdEmail = document.createElement('td');
         tdEmail.className = 'email-column';
         tdEmail.innerHTML = `
           <div class="email-input-wrapper">
-            <input class="email-input" value="${email}" placeholder="email@example.com" />
-            <button class="email-remove-btn" title="Hapus email" data-remove-email="${email}">
+            <input class="email-input" type="email" value="${escapeHtml(email)}" placeholder="email@example.com" aria-label="Email customer" />
+            <button class="email-remove-btn" type="button" title="Hapus ${escapeHtml(email)}" aria-label="Hapus ${escapeHtml(email)}" data-remove-row="${rowId}">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>`;
         tr.appendChild(tdEmail);
 
-        const rowMap = ensureRowMap(email);
+        const rowMap = ensureRowMap(rowId);
         for (const key of krKeys) {
           const td = document.createElement('td');
           td.className = 'krhred-column';
@@ -159,7 +192,7 @@ const $ = (sel) => document.querySelector(sel);
 
         // email change listener
         const emailInput = tdEmail.querySelector('input');
-        emailInput.addEventListener('change', () => migrateEmail(email, emailInput.value.trim()));
+        emailInput.addEventListener('input', () => migrateEmail(rowId, emailInput.value.trim()));
       }
 
       // Listeners: remove email / remove key
@@ -172,8 +205,8 @@ const $ = (sel) => document.querySelector(sel);
           updateUI();
         });
       });
-      krBody.querySelectorAll('button[data-remove-email]').forEach(btn => {
-        btn.addEventListener('click', () => removeEmailRow(btn.getAttribute('data-remove-email')));
+      krBody.querySelectorAll('button[data-remove-row]').forEach(btn => {
+        btn.addEventListener('click', () => removeEmailRow(Number(btn.getAttribute('data-remove-row'))));
       });
     }
 
@@ -182,18 +215,21 @@ const $ = (sel) => document.querySelector(sel);
     function rowCustPref(id, email, campaignId) { return `${id}|${email}|CMPG_ID|${campaignId}|\n`; }
     function rowCustSubs(id, email) { return `${id}|${email}|IMO Marketing|Y|\n`; }
     function rowsCustAttrStatic(id, email, campaignId) { return `${id}|${email}|CMPG_ID|${campaignId}|\n`; }
-    function rowsCustAttrDynamic(id, email, campaignId) {
-      let out = `${id}|${email}|CMPG_ID|${campaignId}|\n`;
-      const rowMap = krValues.get(email) || new Map();
-      for (const key of krKeys) { const val = rowMap.get(key) ?? ''; out += `${id}|${email}|${key}|${val}|\n`; }
-      return out;
+    function getEmailValue(entry) {
+      return typeof entry === 'string' ? entry : entry.email;
+    }
+
+    function getEntryValues(entry) {
+      if (typeof entry === 'string') return krValues.get(entry) || new Map();
+      return krValues.get(entry.id) || new Map();
     }
 
     function buildAllFiles(campaignId, emailList, useKr) {
       let mast = '', pref = '', subs = '', attr = '';
       
       // Build records by email (correct order)
-      emailList.forEach((email, i) => {
+      emailList.forEach((entry, i) => {
+        const email = getEmailValue(entry);
         const id = recordId(campaignId, i);
         mast += rowCustMast(id, email);
         pref += rowCustPref(id, email, campaignId);
@@ -203,23 +239,26 @@ const $ = (sel) => document.querySelector(sel);
       // For CustAttr, if dynamic, build by key groups
       if (useKr) {
         // Add CMPG_ID for all emails
-        emailList.forEach((email, i) => {
+        emailList.forEach((entry, i) => {
+          const email = getEmailValue(entry);
           const id = recordId(campaignId, i);
           attr += `${id}|${email}|CMPG_ID|${campaignId}|\n`;
         });
         
         // Add KRHRED values grouped by key
         krKeys.forEach(key => {
-          emailList.forEach((email, i) => {
+          emailList.forEach((entry, i) => {
+            const email = getEmailValue(entry);
             const id = recordId(campaignId, i);
-            const rowMap = krValues.get(email) || new Map();
+            const rowMap = getEntryValues(entry);
             const val = rowMap.get(key) ?? '';
             attr += `${id}|${email}|${key}|${val}|\n`;
           });
         });
       } else {
         // Static: just add CMPG_ID
-        emailList.forEach((email, i) => {
+        emailList.forEach((entry, i) => {
+          const email = getEmailValue(entry);
           const id = recordId(campaignId, i);
           attr += rowsCustAttrStatic(id, email, campaignId);
         });
@@ -252,8 +291,7 @@ const $ = (sel) => document.querySelector(sel);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = name;
-        a.textContent = `⬇️ ${name}`;
-        a.className = 'inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 w-fit';
+        a.textContent = name;
         downloadsList.appendChild(a);
         // revoke setelah 2 menit (link cukup lama untuk di-klik)
         setTimeout(() => { URL.revokeObjectURL(url); a.removeAttribute('href'); a.classList.add('opacity-50','pointer-events-none'); }, 120000);
@@ -272,40 +310,78 @@ const $ = (sel) => document.querySelector(sel);
           await writable.write(content);
           await writable.close();
         }
+        setStatus('Empat file berhasil disimpan ke folder yang dipilih.', 'ready');
       } catch (e) {
         if (e && e.name === 'AbortError') return;
         errorEl.textContent = e?.message || 'Gagal menyimpan ke folder.';
         errorEl.classList.remove('hidden');
+        setStatus('File belum tersimpan. Periksa pesan error di bawah.', 'error');
       }
     }
 
     function updateUI() {
       const campaignIdVal = campaignIdEl.value.trim();
       const useKrVal = campaignType === 'dynamic' && krKeys.length > 0;
+      const dynamicReady = campaignType === 'static' || krKeys.length > 0;
 
       // Stats & validation
-      const invalid = emails.filter(e => !emailRegex.test(e));
+      const invalid = emails.filter(row => !emailRegex.test(row.email));
       countInfo.textContent = `Total: ${emails.length}`;
+      emailCount.textContent = emails.length;
+      validCount.textContent = emails.length - invalid.length;
+      krhredCount.textContent = campaignType === 'dynamic' ? krKeys.length : 0;
       if (invalid.length) {
-        invalidInfo.textContent = `Invalid: ${invalid.slice(0,3).join(', ')}${invalid.length>3?', …':''}`;
+        invalidInfo.textContent = `Invalid: ${invalid.slice(0,3).map(row => row.email).join(', ')}${invalid.length>3?', …':''}`;
         invalidInfo.classList.remove('hidden');
       } else {
         invalidInfo.classList.add('hidden');
       }
 
-      const ok = campaignRegex.test(campaignIdVal) && emails.length > 0 && invalid.length === 0;
+      const ok = campaignRegex.test(campaignIdVal)
+        && emails.length > 0
+        && invalid.length === 0
+        && dynamicReady;
       btnDownload.disabled = !ok;
       btnSave.disabled = !ok;
 
-      stateMsg.textContent = ok
-        ? ''
-        : (!campaignRegex.test(campaignIdVal)
-            ? 'Isi Campaign ID diawali YYYYMMDD.'
-            : 'Tambahkan minimal 1 email valid.');
+      const campaignIsValid = campaignRegex.test(campaignIdVal);
+      setFieldError(
+        campaignError,
+        campaignIdVal && !campaignIsValid
+          ? 'Campaign ID harus diawali delapan digit tanggal, lalu underscore.'
+          : ''
+      );
+
+      if (ok) {
+        const dynamicInfo = campaignType === 'dynamic'
+          ? ` dengan ${krKeys.length} kolom KRHRED`
+          : '';
+        setStatus(`Siap membuat 4 file untuk ${emails.length} email${dynamicInfo}.`, 'ready');
+      } else if (!campaignIsValid) {
+        setStatus('Isi Campaign ID dengan format YYYYMMDD_Nama-Campaign_XXXX.', 'neutral');
+      } else if (!emails.length) {
+        setStatus('Tambahkan minimal satu email untuk membuat file.', 'neutral');
+      } else if (!dynamicReady) {
+        setStatus('Tambahkan minimal satu kolom KRHRED untuk campaign Dynamic.', 'neutral');
+      } else {
+        setStatus('Perbaiki email invalid sebelum membuat file.', 'error');
+      }
 
       // Previews
+      if (!ok) {
+        renderPreviewEmpty(
+          !campaignIsValid
+            ? 'Preview akan muncul setelah Campaign ID valid.'
+            : !emails.length
+              ? 'Tambahkan minimal satu email valid untuk melihat preview.'
+              : !dynamicReady
+                ? 'Tambahkan minimal satu kolom KRHRED untuk melihat preview Dynamic.'
+              : 'Perbaiki email invalid untuk melanjutkan.'
+        );
+        return;
+      }
+
       previewsEl.innerHTML = '';
-      if (!ok) return;
       
       // Build actual preview content
       const files = buildAllFiles(campaignIdVal, emails, useKrVal);
@@ -323,7 +399,7 @@ const $ = (sel) => document.querySelector(sel);
           <div class="preview-header">
             <div class="preview-title">
               <i class="fa-solid fa-file-lines"></i>
-              <span>${name}</span>
+              <span title="${escapeHtml(name)}">${escapeHtml(name)}</span>
             </div>
             <div class="preview-badge">
               <span class="preview-lines">${lines} baris</span>
@@ -331,7 +407,7 @@ const $ = (sel) => document.querySelector(sel);
             </div>
           </div>
           <div class="preview-content">
-            <pre>${content.substring(0, 500)}${content.length > 500 ? '\n\n...' : ''}</pre>
+            <pre>${escapeHtml(content.substring(0, 500))}${content.length > 500 ? '\n\n...' : ''}</pre>
           </div>
           ${isKrFile && useKrVal ? '<div class="preview-notice"><i class="fa-solid fa-info-circle"></i> Format: CMPG_ID semua email → KRHRED_Unit_30 semua email → dst</div>' : ''}
         `;
@@ -343,24 +419,40 @@ const $ = (sel) => document.querySelector(sel);
     // --- Events ---
     addEmailBtn.addEventListener('click', () => {
       const v = (newEmailEl.value || '').trim();
-      if (!v) return;
-      if (!emailRegex.test(v)) return alert('Email tidak valid.');
-      if (!emails.includes(v)) {
-        emails.push(v);
-        ensureRowMap(v);
-        renderTable();
-        updateUI();
+      setFieldError(emailError);
+      if (!v) {
+        setFieldError(emailError, 'Masukkan alamat email terlebih dahulu.');
+        newEmailEl.focus();
+        return;
       }
+      if (!emailRegex.test(v)) {
+        setFieldError(emailError, 'Format email tidak valid.');
+        newEmailEl.focus();
+        return;
+      }
+      createEmailRow(v);
+      renderTable();
+      updateUI();
       newEmailEl.value = '';
+    });
+
+    newEmailEl.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addEmailBtn.click();
+      }
     });
 
     // Bulk handlers
     bulkBtn.addEventListener('click', () => {
       bulkBox.classList.toggle('hidden');
+      bulkBtn.setAttribute('aria-expanded', String(!bulkBox.classList.contains('hidden')));
       bulkInfo.textContent = '';
+      if (!bulkBox.classList.contains('hidden')) bulkEmailsEl.focus();
     });
     cancelBulkBtn.addEventListener('click', () => {
       bulkBox.classList.add('hidden');
+      bulkBtn.setAttribute('aria-expanded', 'false');
       bulkEmailsEl.value = '';
       bulkInfo.textContent = '';
     });
@@ -372,12 +464,9 @@ const $ = (sel) => document.querySelector(sel);
         if (emailRegex.test(e)) valid.push(e);
         else invalid.push(e);
       }
-      // tambah yang valid & belum ada
+      // Email yang sama tetap dibuat sebagai customer row terpisah.
       for (const e of valid) {
-        if (!emails.includes(e)) {
-          emails.push(e);
-          ensureRowMap(e);
-        }
+        createEmailRow(e);
       }
       renderTable();
       updateUI();
@@ -392,24 +481,26 @@ const $ = (sel) => document.querySelector(sel);
 
     addKeyBtn.addEventListener('click', () => {
       const key = normalizeKey(newKeyEl.value.trim());
+      setFieldError(keyError);
       if (!key) return;
-      if (krKeys.includes(key)) return alert('Kolom sudah ada.');
-      
-      // Add visual feedback
-      const krhredSection = document.getElementById('krhredSection');
-      krhredSection.style.transition = 'all 0.3s ease';
-      krhredSection.style.background = '#f0fdf4';
+      if (krKeys.includes(key)) {
+        setFieldError(keyError, 'Kolom KRHRED tersebut sudah ada.');
+        newKeyEl.focus();
+        return;
+      }
       
       krKeys.push(key);
-      for (const email of emails) ensureRowMap(email).set(key, '');
+      for (const row of emails) ensureRowMap(row.id).set(key, '');
       newKeyEl.value = '';
       renderTable();
       updateUI();
-      
-      // Reset background after animation
-      setTimeout(() => {
-        krhredSection.style.background = '';
-      }, 500);
+    });
+
+    newKeyEl.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addKeyBtn.click();
+      }
     });
 
     btnDownload.addEventListener('click', async () => {
@@ -421,6 +512,7 @@ const $ = (sel) => document.querySelector(sel);
         await new Promise(r => setTimeout(r, 120));
       }
       renderDownloadLinks(files);
+      setStatus('Download dimulai. Link manual tersedia jika browser memblokir salah satu file.', 'ready');
     });
 
     btnSave.addEventListener('click', async () => {
@@ -460,6 +552,9 @@ const $ = (sel) => document.querySelector(sel);
     }
 
     // Init
+    if (new URLSearchParams(window.location.search).get('embed') === '1') {
+      document.body.classList.add('is-embedded');
+    }
     toggleKRHREDSection();
     renderTable();
     updateUI();

@@ -90,7 +90,7 @@ const TOOL_META = {
 };
 
 function getVersion() {
-  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.3.1';
+  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.4.0';
 }
 
 function withBasePath(path) {
@@ -383,6 +383,7 @@ function styleEmbeddedTool(frame) {
     const frameDocument = frame.contentDocument;
     const frameWindow = frame.contentWindow;
     if (!frameDocument || !frameWindow) return;
+    const allowsPageScroll = frameWindow.location.pathname.endsWith('/database-generator.html');
 
     const style = frameDocument.createElement('style');
     style.textContent = `
@@ -401,7 +402,9 @@ function styleEmbeddedTool(frame) {
         min-width: 0 !important;
         min-height: 0 !important;
         margin: 0 !important;
-        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: ${allowsPageScroll ? 'auto' : 'hidden'} !important;
+        overscroll-behavior: contain;
       }
       main#main-content > .sidebar,
       main#main-content > .main-content,

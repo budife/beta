@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.4.0 · 14 June 2026** - Refactored Database Generator into a compact workspace with inline validation, stable embedded scrolling, aligned controls, duplicate-email support, responsive data tables, clearer file previews, and generator regression tests.
 - **v6.3.1 · 14 June 2026** - Moved the primary repository and GitHub Pages base path from `beta-uat` to `beta`.
 - **v6.3.0 · 14 June 2026** - Added the shared UI style guide, reusable design tokens, consistent 12px form controls across all tools, regular-weight typography, and responsive Database Checker modal and workspace refinements.
 - **v6.2.0 · 14 June 2026** - Added Database-to-Layout Test with automatic HTML loading, random or manual customer selection, KRHRED personalization and highlighting, subject normalization, coverage alerts, full-screen preview, and temporary URL/subject drafts.
@@ -38,10 +39,6 @@ category: Home
 - **v4.0.0 · 14 March 2026** - Released version 4.
 - **v3.0.0 · 20 February 2026** - Released version 3.
 - **v2.0.0 · 13 October 2025** - Renamed the application to **eDM Helper** and released version 2.
-- **v1.0.0 · 17 August 2025** - Released version 1.
-- **29 June 2025** - Added Layout Checker and Database Counter.
-- **v0.0.0 Beta Live · 27 May 2025** - The first public beta went live.
-- **April 2025** - The application was first created under the name **Alpha Sensei**.
 
 ## Useful Links
 

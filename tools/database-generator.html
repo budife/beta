@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.3.1">
-  <link rel="stylesheet" href="../css/pages-database-generator.css">
-  <link rel="stylesheet" href="../css/controls.css?v=6.3.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.4.0">
+  <link rel="stylesheet" href="../css/pages-database-generator.css?v=6.4.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.4.0">
   
   <title>Database Generator - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -40,147 +40,194 @@
   </header>
 
   <main id="main-content" role="main">
-    <div class="container">
+    <div class="generator-shell">
       <div class="page-header">
         <h1>
           <i class="fa-solid fa-database"></i>
           Database Generator
         </h1>
-        <p class="subtitle">Generate campaign files and data with ease</p>
+        <p class="subtitle">Generate four campaign database files from one compact workspace.</p>
       </div>
-      
-      <div class="form-grid">
-        <div class="form-field">
-        <label for="campaignId" class="form-label">
-          <i class="fa-solid fa-tag form-label-icon"></i>
-          Campaign ID
-        </label>
-        <input id="campaignId" class="form-input" placeholder="YYYYMMDD_Nama-Campaign_XXXX" spellcheck="false" />
-        <p class="form-hint">Format: <span class="font-mono">20250817_Independence-Day_1700</span> atau <span class="font-mono">20250817A_Independence-Day_1700</span></p>
-      </div>
-      
-      <div class="form-field">
-        <label class="form-label">
-          <i class="fa-solid fa-cog form-label-icon"></i>
-          Tipe Campaign
-        </label>
-        <div class="campaign-type-selector">
-          <label class="radio-option">
-            <input type="radio" name="campaignType" value="static" checked>
-            <span class="radio-label">Static</span>
-            <span class="radio-hint">Tanpa KRHRED</span>
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="campaignType" value="dynamic">
-            <span class="radio-label">Dynamic</span>
-            <span class="radio-hint">Dengan KRHRED</span>
-          </label>
-        </div>
-      </div>
-    </div>
 
-    <!-- PANEL: EMAIL + KRHRED -->
-    <section id="krPanel" class="panel">
-      <div class="panel-header">
-        <div class="panel-row">
-          <div class="panel-field">
-            <label for="newEmail" class="form-label">
-              <i class="fa-solid fa-envelope form-label-icon"></i>
-              Tambah Email
-            </label>
-            <input id="newEmail" class="form-input" placeholder="email@contoh.com"/>
+      <section class="generator-card setup-card" aria-labelledby="setup-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-eyebrow">Setup</p>
+            <h2 id="setup-title">Campaign details</h2>
           </div>
-          <button id="addEmail" class="btn success">Tambah email</button>
+          <p class="section-copy">Campaign ID determines every generated filename and record ID.</p>
         </div>
-        
-        <!-- KRHRED Section - Only for Dynamic Campaign -->
-        <div id="krhredSection" class="krhred-section">
-          <div class="panel-field">
+
+        <div class="setup-grid">
+          <div class="form-field">
+            <label for="campaignId" class="form-label">
+              <i class="fa-solid fa-tag form-label-icon" aria-hidden="true"></i>
+              Campaign ID
+            </label>
+            <input id="campaignId" class="form-input campaign-id-input" placeholder="YYYYMMDD_Nama-Campaign_XXXX" spellcheck="false" aria-describedby="campaignHint campaignError" />
+            <p id="campaignHint" class="form-hint">Contoh: <span class="font-mono">20250817_Independence-Day_1700</span></p>
+            <p id="campaignError" class="field-error hidden" role="alert"></p>
+          </div>
+
+          <fieldset class="form-field campaign-type-field">
+            <legend class="form-label">
+              <i class="fa-solid fa-sliders form-label-icon" aria-hidden="true"></i>
+              Tipe Campaign
+            </legend>
+            <div class="campaign-type-selector">
+              <label class="radio-option">
+                <input type="radio" name="campaignType" value="static" checked>
+                <span>
+                  <span class="radio-label">Static</span>
+                  <span class="radio-hint">Tanpa personalisasi KRHRED</span>
+                </span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="campaignType" value="dynamic">
+                <span>
+                  <span class="radio-label">Dynamic</span>
+                  <span class="radio-hint">Dengan kolom KRHRED</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </section>
+
+      <section id="krPanel" class="generator-card workspace-card" aria-labelledby="data-title">
+        <div class="section-heading workspace-heading">
+          <div>
+            <p class="section-eyebrow">Customer data</p>
+            <h2 id="data-title">Email and KRHRED values</h2>
+          </div>
+          <div class="data-summary" aria-label="Data summary">
+            <span><strong id="emailCount">0</strong> emails</span>
+            <span><strong id="validCount">0</strong> valid</span>
+            <span><strong id="krhredCount">0</strong> KRHRED</span>
+          </div>
+        </div>
+
+        <div class="workspace-toolbar">
+          <div class="toolbar-field toolbar-email">
+            <label for="newEmail" class="form-label">
+              <i class="fa-solid fa-envelope form-label-icon" aria-hidden="true"></i>
+              Tambah email
+            </label>
+            <div class="input-button-group">
+              <input id="newEmail" class="form-input" type="email" placeholder="email@contoh.com" aria-describedby="emailError" />
+              <button id="addEmail" class="btn primary" type="button">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Tambah
+              </button>
+            </div>
+            <p id="emailError" class="field-error hidden" role="alert"></p>
+          </div>
+
+          <div id="krhredSection" class="toolbar-field krhred-section">
             <label for="newKey" class="form-label">
-              <i class="fa-solid fa-columns form-label-icon"></i>
+              <i class="fa-solid fa-table-columns form-label-icon" aria-hidden="true"></i>
               Tambah kolom KRHRED
             </label>
             <div class="input-button-group">
-              <input id="newKey" class="form-input" placeholder="KRHRED_Unit_30"/>
-              <button id="addKey" class="btn primary">Tambah kolom</button>
+              <input id="newKey" class="form-input font-mono" placeholder="KRHRED_Unit_30" aria-describedby="keyHint keyError" />
+              <button id="addKey" class="btn secondary" type="button">Tambah kolom</button>
             </div>
-            <p class="form-hint">Kosongkan untuk auto: <span class="font-mono">KRHRED_Unit_N</span> berikutnya.</p>
+            <p id="keyHint" class="form-hint">Kosongkan untuk nomor berikutnya.</p>
+            <p id="keyError" class="field-error hidden" role="alert"></p>
+          </div>
+
+          <div class="toolbar-action">
+            <span class="form-label toolbar-action-spacer" aria-hidden="true">Bulk action</span>
+            <button id="bulkBtn" class="btn secondary" type="button" aria-expanded="false" aria-controls="bulkBox">
+              <i class="fa-solid fa-paste" aria-hidden="true"></i>
+              Tempel banyak email
+            </button>
           </div>
         </div>
 
-        <!-- tombol buka panel bulk -->
-        <div>
-          <button id="bulkBtn" class="btn secondary">Tempel banyak email</button>
+        <div id="bulkBox" class="bulk-box hidden">
+          <label for="bulkEmails" class="form-label">
+            <i class="fa-solid fa-paste form-label-icon" aria-hidden="true"></i>
+            Tempel banyak email
+          </label>
+          <p class="form-hint">Pisahkan dengan baris baru, koma, titik koma, atau spasi.</p>
+          <textarea id="bulkEmails" placeholder="email1@a.com&#10;email2@a.com, email3@a.com"></textarea>
+          <div class="bulk-actions">
+            <button id="applyBulk" class="btn primary" type="button">Tambahkan email valid</button>
+            <button id="cancelBulk" class="btn quiet" type="button">Batal</button>
+          </div>
+          <p id="bulkInfo" class="inline-feedback" role="status" aria-live="polite"></p>
         </div>
-      </div>
 
-      <!-- panel bulk -->
-      <div id="bulkBox" class="bulk-box hidden">
-        <label class="form-label">
-          <i class="fa-solid fa-paste form-label-icon"></i>
-          Tempel banyak email (pisahkan dengan baris/koma/titik koma/spasi)
-        </label>
-        <textarea id="bulkEmails" placeholder="email1@a.com&#10;email2@a.com, email3@a.com; email4@a.com"></textarea>
-        <div class="flex">
-          <button id="applyBulk">Tambahkan</button>
-          <button id="cancelBulk">Batal</button>
+        <div class="table-meta">
+          <div>
+            <span id="countInfo">Total: 0</span>
+            <span id="invalidInfo" class="hidden error-text"></span>
+          </div>
+          <span class="table-help">Klik nilai di tabel untuk mengedit langsung.</span>
         </div>
-        <p id="bulkInfo"></p>
-      </div>
 
-      <div class="text-xs text-slate-400 mb-2 flex items-center gap-3">
-        <span id="countInfo">Total: 0</span>
-        <span id="invalidInfo" class="hidden text-rose-400"></span>
-      </div>
+        <div class="data-table-wrap" tabindex="0" aria-label="Customer database values">
+          <table class="data-table">
+            <thead>
+              <tr id="krHeadRow">
+                <th scope="col">Email</th>
+              </tr>
+            </thead>
+            <tbody id="krBody"></tbody>
+          </table>
+        </div>
 
-      <div class="overflow-auto">
-        <table>
-          <thead>
-            <tr id="krHeadRow">
-              <th>Email</th>
-              <!-- dynamic head cells here -->
-            </tr>
-          </thead>
-          <tbody id="krBody"></tbody>
-        </table>
-      </div>
+        <details class="table-tips">
+          <summary><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> Panduan tabel</summary>
+          <ul>
+            <li>Email dan nilai KRHRED dapat diedit langsung di tabel.</li>
+            <li>Gunakan tombol hapus pada baris atau header untuk menghapus data.</li>
+            <li>Tabel akan scroll horizontal ketika kolom KRHRED bertambah.</li>
+          </ul>
+        </details>
+      </section>
 
-      <div class="table-tips">
-        <h4><i class="fa-solid fa-lightbulb"></i> Tips Penggunaan</h4>
-        <ul>
-          <li>Klik ikon <i class="fa-solid fa-times"></i> di header kolom untuk menghapus kolom KRHRED</li>
-          <li>Klik ikon <i class="fa-solid fa-trash"></i> di baris email untuk menghapus email</li>
-          <li>Input email bisa diedit langsung di tabel</li>
-          <li>Nilai KRHRED akan otomatis tersimpan saat Anda mengetik</li>
-          <li>Tabel bisa scroll horizontal jika kolom terlalu banyak</li>
-        </ul>
-      </div>
-    </section>
+      <section class="generator-card output-card" aria-labelledby="output-title">
+        <div class="section-heading output-heading">
+          <div>
+            <p class="section-eyebrow">Output</p>
+            <h2 id="output-title">Generated files</h2>
+          </div>
+          <div class="output-actions">
+            <button id="btnDownload" class="btn primary" type="button" disabled>
+              <i class="fa-solid fa-download" aria-hidden="true"></i>
+              Download 4 files
+            </button>
+            <button id="btnSave" class="btn secondary" type="button" disabled>
+              <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+              Save to folder
+            </button>
+          </div>
+        </div>
 
-    <div class="flex flex-wrap">
-      <button id="btnDownload" class="btn" disabled>
-        Download 4 file
-      </button>
-      <button id="btnSave" class="btn success" disabled>
-        Save to folder
-      </button>
-      <span id="stateMsg" class="text-xs text-slate-400"></span>
+        <div id="stateMsg" class="status-bar is-neutral" role="status" aria-live="polite"></div>
+        <p id="error" class="status-bar is-error hidden" role="alert"></p>
+
+        <section id="previews" class="preview-grid" aria-label="Generated file previews">
+          <div class="preview-empty">
+            <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+            <p>Isi Campaign ID dan tambahkan minimal satu email valid untuk melihat preview.</p>
+          </div>
+        </section>
+
+        <section id="dlSection" class="manual-downloads hidden">
+          <h3>Unduhan manual</h3>
+          <div id="downloadsList"></div>
+          <p>Gunakan link ini jika browser memblokir download otomatis.</p>
+        </section>
+
+        <p class="output-note">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          Save to folder tersedia di Chrome dan Edge desktop. Browser lain tetap dapat memakai Download 4 files.
+        </p>
+      </section>
     </div>
-
-    <p id="error" class="hidden"></p>
-
-    <section id="previews" class="grid grid-cols-1 md:grid-cols-2 gap-4"></section>
-
-    <!-- Fallback links jika auto-download diblok -->
-    <section id="dlSection" class="hidden">
-      <h3>Unduhan manual (fallback)</h3>
-      <div id="downloadsList"></div>
-      <p>Jika auto-download tidak berjalan, klik link di atas satu per satu.</p>
-    </section>
-
-    <footer class="mt-6 text-xs text-slate-400">
-      <p>Catatan: "Save to folder" memakai File System Access API (tersedia di Chrome/Edge desktop). Jika tidak didukung, gunakan tombol <em>Download 4 file</em> atau link fallback.</p>
-    </footer>
   </main>
 
   <!-- Footer -->
@@ -211,7 +258,7 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js" defer></script>
-<script src="../js/pages-database-generator.js" defer></script>
+<script src="../js/version-config.js?v=6.4.0" defer></script>
+<script src="../js/pages-database-generator.js?v=6.4.0" defer></script>
 </body>
 </html>
