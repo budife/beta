@@ -1,10 +1,10 @@
 :root {
-  --sidebar-width: 272px;
-  --app-border: #e7e7e9;
-  --app-muted: #71717a;
-  --app-soft: #fafafa;
-  --app-accent: #f18c8e;
-  --app-accent-soft: #fff1f1;
+  --sidebar-width: var(--ui-sidebar-width);
+  --app-border: var(--ui-border);
+  --app-muted: var(--ui-muted);
+  --app-soft: var(--ui-surface);
+  --app-accent: var(--ui-accent);
+  --app-accent-soft: var(--ui-accent-soft);
 }
 
 * {
@@ -20,9 +20,10 @@ body {
 
 body {
   overflow: hidden;
-  color: #18181b;
-  background: #fff;
-  font-family: var(--font-family-base);
+  color: var(--ui-text);
+  background: var(--ui-background);
+  font-family: var(--ui-font);
+  font-weight: var(--ui-weight-regular);
 }
 
 button,
@@ -57,14 +58,14 @@ a {
   gap: 12px;
   min-height: 82px;
   padding: 18px 20px;
-  color: #18181b;
+  color: var(--ui-text);
   text-decoration: none;
   border-bottom: 1px solid var(--app-border);
 }
 
 .sidebar-brand:hover {
-  color: #18181b;
-  background: #fff;
+  color: var(--ui-text);
+  background: var(--ui-background);
 }
 
 .brand-mark {
@@ -74,9 +75,9 @@ a {
   height: 38px;
   flex: 0 0 38px;
   color: #fff;
-  background: var(--app-accent);
+  background: var(--ui-accent);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: var(--ui-weight-semibold);
 }
 
 .sidebar-brand strong,
@@ -86,6 +87,7 @@ a {
 
 .sidebar-brand strong {
   font-size: 15px;
+  font-weight: var(--ui-weight-semibold);
   line-height: 1.35;
 }
 
@@ -93,7 +95,7 @@ a {
   margin-top: 2px;
   color: var(--app-muted);
   font-size: 12px;
-  font-weight: 400;
+  font-weight: var(--ui-weight-regular);
 }
 
 .sidebar-navigation {
@@ -112,7 +114,7 @@ a {
   margin: 0 10px 8px;
   color: #a1a1aa;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: var(--ui-weight-semibold);
   letter-spacing: .1em;
   text-transform: uppercase;
 }
@@ -123,11 +125,11 @@ a {
   gap: 11px;
   min-height: 42px;
   padding: 9px 11px;
-  color: #52525b;
+  color: var(--ui-text-secondary);
   border-left: 3px solid transparent;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: var(--ui-weight-medium);
 }
 
 .sidebar-link i {
@@ -137,15 +139,15 @@ a {
 }
 
 .sidebar-link:hover {
-  color: #18181b;
+  color: var(--ui-text);
   background: #f3f3f4;
 }
 
 .sidebar-link.active {
-  color: #9f3f45;
+  color: var(--ui-accent-dark);
   background: var(--app-accent-soft);
   border-left-color: var(--app-accent);
-  font-weight: 600;
+  font-weight: var(--ui-weight-semibold);
 }
 
 .sidebar-link.active i {

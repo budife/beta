@@ -1,0 +1,71 @@
+:root {
+  /* Brand */
+  --ui-accent: #f18c8e;
+  --ui-accent-hover: #df777a;
+  --ui-accent-dark: #9f3f45;
+  --ui-accent-soft: #fff1f1;
+
+  /* Neutral */
+  --ui-text: #212121;
+  --ui-text-secondary: #52525b;
+  --ui-muted: #71717a;
+  --ui-border: #e4e4e7;
+  --ui-border-strong: #d4d4d8;
+  --ui-background: #ffffff;
+  --ui-surface: #f8f9fa;
+  --ui-surface-muted: #f4f4f5;
+
+  /* Feedback */
+  --ui-success: #166534;
+  --ui-success-bg: #f0fdf4;
+  --ui-success-border: #bbf7d0;
+  --ui-error: #b91c1c;
+  --ui-error-bg: #fef2f2;
+  --ui-error-border: #fecaca;
+
+  /* Typography */
+  --ui-font: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    Arial, sans-serif;
+  --ui-font-mono: Consolas, Monaco, "Courier New", monospace;
+  --ui-weight-light: 300;
+  --ui-weight-regular: 400;
+  --ui-weight-medium: 500;
+  --ui-weight-semibold: 600;
+  --ui-control-font-size: 12px;
+  --ui-control-line-height: 1.35;
+  --ui-control-min-height: 28px;
+
+  /* Spacing */
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-6: 24px;
+  --ui-space-8: 32px;
+
+  /* Shape and depth */
+  --ui-radius-control: 2px;
+  --ui-radius-panel: 2px;
+  --ui-border-default: 1px solid var(--ui-border);
+  --ui-shadow-modal: 0 6px 18px rgb(0 0 0 / 14%);
+
+  /* Layout */
+  --ui-sidebar-width: clamp(260px, 19vw, 288px);
+  --ui-content-gap: clamp(4px, 0.6vw, 12px);
+  --ui-page-padding: clamp(12px, 1.7vw, 32px);
+
+  /* Motion */
+  --ui-duration-fast: 150ms;
+  --ui-duration-normal: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
