@@ -1,215 +1,7 @@
-/* ===================================
-   TOAST UTILITY - Merged from toast.js
-   =================================== */
-
-/* ===================================
-   SHARED TOAST UTILITY
-   =================================== */
-
-// Global Toast Manager Class
-class ToastManager {
-  constructor() {
-    this.container = null;
-    this.init();
-  }
-  
-  init() {
-    // Create toast container if it doesn't exist
-    if (!document.getElementById('toast-container')) {
-      this.container = document.createElement('div');
-      this.container.id = 'toast-container';
-      this.container.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        z-index: 10000;
-        pointer-events: none;
-      `;
-      // Append to layout area
-      const layoutArea = document.querySelector('main.layout');
-      if (layoutArea) {
-        layoutArea.appendChild(this.container);
-      } else {
-        // Fallback to body
-        document.body.appendChild(this.container);
-      }
-    } else {
-      this.container = document.getElementById('toast-container');
-    }
-  }
-  
-  show(message, type = 'info', options = {}) {
-    const {
-      duration = 3000,
-      position = 'top-right'
-    } = options;
-    
-    // Update container position
-    this.updatePosition(position);
-    
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.style.cssText = `
-      background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : type === 'warning' ? '#eab308' : '#3b82f6'};
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      pointer-events: auto;
-      cursor: pointer;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      max-width: 300px;
-      word-wrap: break-word;
-    `;
-    toast.textContent = message;
-    
-    this.container.appendChild(toast);
-    
-    // Animate in
-    requestAnimationFrame(() => {
-      toast.style.transform = 'translateX(0)';
-    });
-    
-    // Remove on click
-    toast.addEventListener('click', () => {
-      this.remove(toast);
-    });
-    
-    // Auto remove
-    setTimeout(() => {
-      this.remove(toast);
-    }, duration);
-  }
-  
-  updatePosition(position) {
-    const positions = {
-      'top-right': 'top: 80px; right: 20px;',
-      'top-left': 'top: 80px; left: 20px;',
-      'bottom-right': 'bottom: 20px; right: 20px;',
-      'bottom-left': 'bottom: 20px; left: 20px;'
-    };
-    
-    this.container.style.cssText = `
-      position: fixed;
-      z-index: 10000;
-      pointer-events: none;
-      ${positions[position] || positions['top-right']}
-    `;
-  }
-  
-  remove(toast) {
-    toast.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  }
-  
-  success(message, options = {}) {
-    this.show(message, 'success', options);
-  }
-  
-  error(message, options = {}) {
-    this.show(message, 'error', options);
-  }
-  
-  warning(message, options = {}) {
-    this.show(message, 'warning', options);
-  }
-  
-  info(message, options = {}) {
-    this.show(message, 'info', options);
-  }
-}
-
-// Shared showToast function
-function showToast(message, type = 'info', title = '') {
-  // Use global toast system if available
-  if (type === 'success' && window.toastSuccess) {
-    window.toastSuccess(message, title);
-    return;
-  } else if (type === 'error' && window.toastError) {
-    window.toastError(message, title);
-    return;
-  } else if (type === 'warning' && window.toastWarning) {
-    window.toastWarning(message, title);
-    return;
-  } else if (window.toastInfo) {
-    window.toastInfo(message, title);
-    return;
-  }
-  
-  // Fallback - create simple toast
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-    color: white;
-    padding: 12px 20px;
-    border-radius: 5px;
-    z-index: 10000;
-    font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  `;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  
-  // Animate in
-  setTimeout(() => toast.style.opacity = '1', 100);
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  }, 3000);
-}
-
-// Initialize global toast manager
-window.toastManager = new ToastManager();
-
-// Global toast functions for compatibility
-window.toastSuccess = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.success(message);
-  }
-};
-
-window.toastError = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.error(message);
-  }
-};
-
-window.toastWarning = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.warning(message);
-  }
-};
-
-window.toastInfo = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.info(message);
-  }
-};
-
-// Export for module usage
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { ToastManager, showToast };
-}
-
-
-// Initialize Toast Manager
 document.addEventListener('DOMContentLoaded', () => {
-  window.toastManager = new ToastManager();
+  if (new URLSearchParams(window.location.search).get('embed') === '1') {
+    document.body.classList.add('is-embedded');
+  }
 });
 
 /* ===================================
@@ -285,6 +77,7 @@ function initializeFields() {
     currentCampaignId = ''; // Reset current campaign ID
     // Update character counts to 0 when no XML
     updateAllCharCounts();
+    updateEnvironmentToggle();
     return;
   }
   
@@ -315,6 +108,7 @@ function initializeFields() {
   const messageBody = xmlDoc.querySelector('MessageBody');
   const link = messageBody ? messageBody.getAttribute('content') : '';
   if (elements.linkInput) elements.linkInput.value = link;
+  updateEnvironmentToggle();
   
   // Update character counts after loading values
   updateAllCharCounts();
@@ -365,54 +159,349 @@ let hasUnsavedChanges = false;
 
 // Performance: Cache DOM elements
 const elements = {
-  saveFileBtn: document.getElementById('saveFileBtn'),
-  editor: null, // Will be initialized as CodeMirror
+  saveFileBtn: null,
+  editor: null,
   campaignIdInput: document.getElementById('campaignId'),
+  toggleUatBtn: document.getElementById('toggleUatBtn'),
   subjectInput: document.getElementById('subject'),
   linkInput: document.getElementById('link'),
   campaignCountIndicator: document.getElementById('campaignCountIndicator'),
   breadcrumb: document.getElementById('breadcrumb'),
+  fileMetadata: document.getElementById('fileMetadata'),
+  fileStatus: document.getElementById('fileStatus'),
+  workspaceEmptyState: document.getElementById('workspaceEmptyState'),
+  configControls: document.getElementById('configControls'),
+  validationSummary: document.getElementById('validationSummary'),
+  fileCountBadge: document.getElementById('fileCountBadge'),
+  fileTreeFilter: document.getElementById('fileTreeFilter'),
+  previousXmlBtn: document.getElementById('previousXmlBtn'),
+  nextXmlBtn: document.getElementById('nextXmlBtn'),
+  xmlWorkflow: document.getElementById('xmlWorkflow'),
+  xmlWorkflowProgress: document.getElementById('xmlWorkflowProgress'),
+  currentXmlName: document.getElementById('currentXmlName'),
+  nextXmlName: document.getElementById('nextXmlName'),
   overlay: document.getElementById('overlay'),
   spinner: document.querySelector('.spinner')
 };
 
-// Initialize CodeMirror editor
-let editor;
-function initializeCodeMirror() {
-  const textarea = document.getElementById('editor');
-  if (textarea) {
-    editor = CodeMirror.fromTextArea(textarea, {
-      mode: 'xml',
-      theme: 'monokai',
-      lineNumbers: true,
-      lineWrapping: true,
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-      autoCloseTags: true,
-      matchTags: true,
-      extraKeys: {
-        'Ctrl-F': 'findPersistent',
-        'Ctrl-H': 'replace',
-        'F11': function(cm) {
-          cm.setOption('fullScreen', !cm.getOption('fullScreen'));
-        },
-        'Esc': function(cm) {
-          if (cm.getOption('fullScreen')) cm.setOption('fullScreen', false);
-        }
+function getXmlFileItems() {
+  return Array.from(document.querySelectorAll('#fileTree li.file[data-ext="xml"]'));
+}
+
+function updateXmlWorkflow() {
+  const files = getXmlFileItems();
+  const currentIndex = selectedFileItem ? files.indexOf(selectedFileItem) : -1;
+  const nextItem = currentIndex >= 0 ? files[currentIndex + 1] : null;
+
+  if (elements.xmlWorkflow) elements.xmlWorkflow.hidden = currentIndex < 0;
+  if (elements.currentXmlName) {
+    elements.currentXmlName.textContent = currentIndex >= 0
+      ? selectedFileItem.querySelector('.label')?.textContent || 'Selected XML'
+      : 'No XML selected';
+  }
+  if (elements.nextXmlName) {
+    elements.nextXmlName.textContent = nextItem
+      ? nextItem.querySelector('.label')?.textContent || 'Next XML'
+      : 'End of list';
+  }
+  if (elements.xmlWorkflowProgress) {
+    elements.xmlWorkflowProgress.textContent = currentIndex >= 0
+      ? `${currentIndex + 1} / ${files.length}`
+      : `0 / ${files.length}`;
+  }
+  if (elements.nextXmlBtn) {
+    elements.nextXmlBtn.disabled = !nextItem;
+    elements.nextXmlBtn.title = nextItem ? 'Save pending changes and open the next XML file' : 'No next XML file';
+  }
+  if (elements.previousXmlBtn) {
+    const previousItem = currentIndex > 0 ? files[currentIndex - 1] : null;
+    elements.previousXmlBtn.disabled = !previousItem;
+    elements.previousXmlBtn.title = previousItem ? 'Save pending changes and open the previous XML file' : 'No previous XML file';
+  }
+}
+
+async function openAdjacentXml(offset) {
+  const files = getXmlFileItems();
+  const currentIndex = selectedFileItem ? files.indexOf(selectedFileItem) : -1;
+  const targetItem = currentIndex >= 0 ? files[currentIndex + offset] : null;
+  if (!targetItem) return;
+
+  if (hasUnsavedChanges) {
+    await performSave();
+  }
+
+  await selectFile(targetItem, targetItem._fileHandle);
+  scrollFileItemInTree(targetItem);
+}
+
+function scrollFileItemInTree(item) {
+  const scrollContainer = document.querySelector('.sidebar-body');
+  if (!item || !scrollContainer) return;
+
+  const itemTop = item.offsetTop;
+  const itemBottom = itemTop + item.offsetHeight;
+  const visibleTop = scrollContainer.scrollTop;
+  const visibleBottom = visibleTop + scrollContainer.clientHeight;
+
+  if (itemTop < visibleTop) {
+    scrollContainer.scrollTop = itemTop;
+  } else if (itemBottom > visibleBottom) {
+    scrollContainer.scrollTop = itemBottom - scrollContainer.clientHeight;
+  }
+}
+
+function setFileStatus(state, label) {
+  if (!elements.fileStatus) return;
+  elements.fileStatus.dataset.state = state;
+  elements.fileStatus.textContent = label;
+}
+
+function setWorkspaceEnabled(enabled) {
+  if (elements.workspaceEmptyState) elements.workspaceEmptyState.hidden = enabled;
+  if (elements.configControls) elements.configControls.classList.toggle('is-disabled', !enabled);
+  [elements.campaignIdInput, elements.subjectInput, elements.linkInput].forEach(input => {
+    if (input) input.disabled = !enabled;
+  });
+  if (elements.toggleUatBtn) elements.toggleUatBtn.disabled = !enabled;
+}
+
+const editableConfigFields = [
+  elements.campaignIdInput,
+  elements.subjectInput,
+  elements.linkInput
+].filter(Boolean);
+
+function setFieldLocked(input, locked) {
+  if (!input) return;
+  input.readOnly = locked;
+  input.classList.toggle('is-locked', locked);
+  input.setAttribute('aria-readonly', String(locked));
+  input.title = locked ? 'Double-click to edit this field.' : '';
+}
+
+function updateEnvironmentToggle() {
+  if (!elements.toggleUatBtn || !elements.campaignIdInput) return;
+  const campaignId = elements.campaignIdInput.value.trim();
+  const isUat = /-UAT_\d{3,4}$/.test(campaignId);
+  elements.toggleUatBtn.textContent = isUat ? 'UAT' : 'PROD';
+  elements.toggleUatBtn.dataset.environment = isUat ? 'uat' : 'prod';
+  elements.toggleUatBtn.title = isUat
+    ? 'Current environment: UAT. Click to change to PROD.'
+    : 'Current environment: PROD. Click to change to UAT.';
+}
+
+function lockAllConfigFields() {
+  editableConfigFields.forEach(input => setFieldLocked(input, true));
+}
+
+function unlockAllConfigFields() {
+  editableConfigFields.forEach(input => setFieldLocked(input, false));
+}
+
+function initializeFieldLocking() {
+  editableConfigFields.forEach(input => {
+    input.addEventListener('dblclick', () => {
+      if (input.disabled) return;
+      setFieldLocked(input, false);
+      input.focus();
+      input.select();
+    });
+
+    input.addEventListener('blur', () => {
+      if (!input.disabled && input.value.trim()) {
+        setFieldLocked(input, true);
       }
     });
-    
-    // Hide the original textarea
-    textarea.style.display = 'none';
-    
-    // Update elements.editor to reference CodeMirror instance
-    elements.editor = editor;
-    
-    // Add change event listener for save state
-    editor.on('change', () => {
-      debouncedSaveState();
+
+    input.addEventListener('paste', () => {
+      setTimeout(() => {
+        if (document.activeElement !== input && input.value.trim()) {
+          setFieldLocked(input, true);
+        }
+      }, 0);
+    });
+  });
+
+  if (elements.toggleUatBtn) {
+    elements.toggleUatBtn.addEventListener('mousedown', event => {
+      event.preventDefault();
+    });
+    elements.toggleUatBtn.addEventListener('click', () => {
+      if (!elements.campaignIdInput || elements.campaignIdInput.disabled) return;
+
+      const currentValue = elements.campaignIdInput.value.trim();
+      const match = currentValue.match(/^(\d{8}[A-Z]?_)(.+)(_\d{3,4})$/);
+      if (!match) {
+        elements.campaignIdInput.focus();
+        return;
+      }
+
+      const campaignName = match[2].endsWith('-UAT')
+        ? match[2].slice(0, -4)
+        : `${match[2]}-UAT`;
+
+      setFieldLocked(elements.campaignIdInput, false);
+      elements.campaignIdInput.value = `${match[1]}${campaignName}${match[3]}`;
+      elements.campaignIdInput.dispatchEvent(new Event('input', { bubbles: true }));
+      updateEnvironmentToggle();
+      setFieldLocked(elements.campaignIdInput, true);
     });
   }
+}
+
+function updateValidationSummary() {
+  if (!elements.validationSummary) return;
+  if (!window.fileHandle) {
+    elements.validationSummary.dataset.state = 'empty';
+    elements.validationSummary.innerHTML = '<i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Select an XML file to validate campaign fields.</span>';
+    return;
+  }
+
+  const fields = [
+    ['Campaign ID', elements.campaignIdInput],
+    ['Subject', elements.subjectInput],
+    ['Link', elements.linkInput]
+  ];
+  const invalid = fields
+    .filter(([, input]) => input && (input.classList.contains('error') || !input.value.trim()))
+    .map(([label]) => label);
+
+  if (invalid.length) {
+    elements.validationSummary.dataset.state = 'error';
+    elements.validationSummary.innerHTML = `<i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i><span>Check ${invalid.join(', ')}.</span>`;
+  } else {
+    elements.validationSummary.dataset.state = 'valid';
+    elements.validationSummary.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>All 3 campaign fields are valid.</span>';
+  }
+}
+
+function updateWorkspaceStatus() {
+  if (!window.fileHandle) {
+    setFileStatus('empty', 'No file selected');
+    setWorkspaceEnabled(false);
+  } else if (hasUnsavedChanges) {
+    setFileStatus('modified', 'Modified');
+    setWorkspaceEnabled(true);
+  } else {
+    const isSaved = typeof campaignIndicatorState !== 'undefined' && campaignIndicatorState === 'saved';
+    setFileStatus(isSaved ? 'saved' : 'ready', isSaved ? 'Saved' : 'Ready');
+    setWorkspaceEnabled(true);
+  }
+  updateValidationSummary();
+}
+
+function updateFileTreeStats() {
+  const xmlFiles = Array.from(document.querySelectorAll('#fileTree li.file'))
+    .filter(item => item.dataset.ext === 'xml');
+  if (elements.fileCountBadge) {
+    elements.fileCountBadge.textContent = String(xmlFiles.length);
+    elements.fileCountBadge.title = `${xmlFiles.length} XML file${xmlFiles.length === 1 ? '' : 's'}`;
+  }
+}
+
+function filterFileTree(query) {
+  const normalized = query.trim().toLowerCase();
+  document.querySelectorAll('#fileTree li.file').forEach(item => {
+    item.hidden = Boolean(normalized) && !item.textContent.toLowerCase().includes(normalized);
+  });
+  document.querySelectorAll('#fileTree li.folder').forEach(folder => {
+    const files = Array.from(folder.querySelectorAll('li.file'));
+    folder.hidden = Boolean(normalized) && files.length > 0 && files.every(file => file.hidden);
+    if (normalized && !folder.hidden) folder.classList.add('open');
+  });
+}
+
+function confirmDiscardChanges() {
+  return !hasUnsavedChanges || window.confirm('This file has unsaved changes. Discard them and continue?');
+}
+
+function buildAppliedXmlName(fileName, campaignId) {
+  const campaignDate = (campaignId.match(/^\d{8}/) || [''])[0];
+  const campaignCode = (campaignId.match(/_(\d{3,4})$/) || [null, ''])[1];
+  const safeCampaignCode = (campaignCode || campaignId)
+    .trim()
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '-')
+    .replace(/\s+/g, '-');
+  const suffix = campaignDate ? `${safeCampaignCode}-${campaignDate}` : safeCampaignCode;
+  const baseName = fileName
+    .replace(/\.xml$/i, '')
+    .replace(/\s+\([^()]+-\d{8}\)$/i, '');
+
+  return `${baseName} (${suffix}).xml`;
+}
+
+async function renameAppliedXml() {
+  if (!selectedFileItem || !elements.editor || !elements.campaignIdInput) return;
+
+  const parentHandle = selectedFileItem._parentHandle;
+  const currentHandle = selectedFileItem._fileHandle;
+  if (!parentHandle || !currentHandle) return;
+
+  const currentFile = await currentHandle.getFile();
+  const campaignId = elements.campaignIdInput.value.trim();
+  if (!campaignId) return;
+
+  const targetName = buildAppliedXmlName(currentFile.name, campaignId);
+
+  if (targetName === currentFile.name) {
+    await performSave();
+    return;
+  }
+
+  // getFileHandle(create:true) returns the existing target when present, so
+  // applying again replaces that file instead of creating numbered copies.
+  const targetHandle = await parentHandle.getFileHandle(targetName, { create: true });
+  const writable = await targetHandle.createWritable();
+  await writable.write(elements.editor.getValue());
+  await writable.close();
+  await parentHandle.removeEntry(currentFile.name);
+
+  window.fileHandle = targetHandle;
+  fileHandle = targetHandle;
+  hasUnsavedChanges = false;
+  setCampaignIndicatorState('saved');
+
+  await loadFileTree(currentDirHandle);
+  const renamedItem = getXmlFileItems().find(item =>
+    item.querySelector('.label')?.textContent === targetName
+  );
+
+  if (renamedItem) {
+    renamedItem.classList.add('selected');
+    selectedFileItem = renamedItem;
+    updateBreadcrumb(`${currentDirHandle.name}\\${targetName}`);
+    updateXmlWorkflow();
+    scrollFileItemInTree(renamedItem);
+  }
+
+  setFileStatus('saved', 'Applied & renamed');
+  lockAllConfigFields();
+  updateSaveAndApplyButtons();
+}
+
+// Keep XML content available to the existing configuration workflow without
+// rendering a source editor in the interface.
+function initializeXmlStorage() {
+  const textarea = document.getElementById('editor');
+  if (!textarea) return;
+
+  const changeListeners = [];
+  elements.editor = {
+    getValue: () => textarea.value,
+    setValue: (value) => {
+      textarea.value = value ?? '';
+      changeListeners.forEach(listener => listener());
+    },
+    on: (eventName, listener) => {
+      if (eventName === 'change' && typeof listener === 'function') {
+        changeListeners.push(listener);
+      }
+    }
+  };
+
+  elements.editor.on('change', () => {
+    debouncedSaveState();
+  });
 }
 
 // Util: label tombol dengan ikon FA - Optimized
@@ -816,14 +905,7 @@ async function performSave() {
   
   if (!currentFileHandle) {
     console.log("No file opened");
-    if (window.toastManager) {
-      window.toastManager.warning("Tidak ada file yang dibuka. Silakan buka file terlebih dahulu.", {
-        duration: 3000,
-        position: 'top-right'
-      });
-    } else {
-      console.log("Tidak ada file yang dibuka. Silakan buka file terlebih dahulu.");
-    }
+    setFileStatus('empty', 'No file selected');
     return;
   }
   
@@ -879,16 +961,10 @@ async function performSave() {
 
     // Set indicator to saved state
     setCampaignIndicatorState('saved');
+    lockAllConfigFields();
   } catch (err) {
     console.error("Error saving file:", err);
-    if (window.toastManager) {
-      window.toastManager.error('Gagal menyimpan file: ' + err.message, {
-        duration: 5000,
-        position: 'top-right'
-      });
-    } else {
-      console.log('Gagal menyimpan file: ' + err.message);
-    }
+    setFileStatus('error', 'Save failed');
     throw err; // Re-throw error to be handled by caller
   }
 }
@@ -1035,6 +1111,7 @@ const debouncedUpdateCampaignCount = debounce(updateCampaignCountIndicator, 100)
 // Single event listener for campaignIdInput
 if (elements.campaignIdInput) {
   elements.campaignIdInput.addEventListener('input', (event) => {
+    updateEnvironmentToggle();
     // DEBUG: Log input event
     console.log('\ud83d\udd25 CAMPAIGN ID INPUT EVENT:', {
       value: elements.campaignIdInput.value,
@@ -2048,7 +2125,7 @@ function manageTooltipCollision(fieldContainer) {
       // Disable button and show loading state
       applyUpdateBtn.disabled = true;
       const originalContent = applyUpdateBtn.innerHTML;
-      applyUpdateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Applying...';
+      applyUpdateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Applying & Saving...';
       
       let allValid = true;
       let updateCount = 0;
@@ -2209,6 +2286,13 @@ function manageTooltipCollision(fieldContainer) {
           
           // Disable apply button after successful use
           updateSaveAndApplyButtons();
+          lockAllConfigFields();
+          try {
+            await renameAppliedXml();
+          } catch (renameError) {
+            console.error('Failed to rename applied XML:', renameError);
+            setFileStatus('error', 'Rename failed');
+          }
         } else {
           console.log('No valid updates to apply');
         }
@@ -2278,31 +2362,10 @@ async function autoSave() {
     console.log('Auto saving...');
     await performSave();
     
-    // Show success toast
-    if (window.toastManager) {
-      window.toastManager.success('File berhasil disimpan otomatis', {
-        duration: 3000,
-        position: 'top-right'
-      });
-    } else {
-      // Fallback to console if toast not available
-      console.log('File berhasil disimpan otomatis');
-    }
-    
     setCampaignIndicatorState('saved');
   } catch (error) {
     console.error('Auto save failed:', error);
-    
-    // Show error toast
-    if (window.toastManager) {
-      window.toastManager.error('Gagal menyimpan file: ' + error.message, {
-        duration: 5000,
-        position: 'top-right'
-      });
-    } else {
-      // Fallback to console if toast not available
-      console.log('Gagal menyimpan file: ' + error.message);
-    }
+    setFileStatus('error', 'Save failed');
   }
 }
 
@@ -2368,6 +2431,8 @@ function updateSaveAndApplyButtons() {
       applyBtn.style.cursor = 'pointer';
     }
   }
+
+  updateWorkspaceStatus();
 }
 
 // Store original values when file is loaded
@@ -2380,6 +2445,7 @@ function storeOriginalValues() {
   };
   // Reset unsaved changes flag when storing original values
   hasUnsavedChanges = false;
+  updateWorkspaceStatus();
 }
 
 // Reset original values when no file is loaded
@@ -2391,6 +2457,7 @@ function resetOriginalValues() {
     xmlContent: ''
   };
   hasUnsavedChanges = false;
+  updateWorkspaceStatus();
 }
 
 // Check if content has changed from original
@@ -2445,8 +2512,8 @@ if (elements.editor) {
 
 // Initialize on page load
 window.addEventListener('load', () => {
-  // Initialize CodeMirror first
-  initializeCodeMirror();
+  initializeXmlStorage();
+  initializeFieldLocking();
   
   // Check if no folder is active
   if (typeof currentDirHandle === 'undefined' || currentDirHandle === null) {
@@ -2496,14 +2563,7 @@ window.addEventListener('load', () => {
       
       // Check if file is opened
       if (!window.fileHandle) {
-        if (window.toastManager) {
-          window.toastManager.warning('Tidak ada file yang dibuka. Silakan buka file terlebih dahulu.', {
-            duration: 3000,
-            position: 'top-right'
-          });
-        } else {
-          console.log("Tidak ada file yang dibuka. Silakan buka file terlebih dahulu.");
-        }
+        setFileStatus('empty', 'No file selected');
         return;
       }
       
@@ -2531,29 +2591,10 @@ window.addEventListener('load', () => {
           await new Promise(resolve => setTimeout(resolve, minLoadingDuration - elapsedTime));
         }
         
-        // Show success toast
-        if (window.toastManager) {
-          window.toastManager.success('File berhasil disimpan!', {
-            duration: 3000,
-            position: 'top-right'
-          });
-        } else {
-          console.log("File berhasil disimpan!");
-        }
-        
         setCampaignIndicatorState('saved');
       } catch (error) {
         console.error("Error saving file:", error);
-        
-        // Show error toast
-        if (window.toastManager) {
-          window.toastManager.error('Gagal menyimpan file: ' + error.message, {
-            duration: 5000,
-            position: 'top-right'
-          });
-        } else {
-          console.log("Gagal menyimpan file: " + error.message);
-        }
+        setFileStatus('error', 'Save failed');
         
         // Re-enable button on error since save failed
         updateSaveAndApplyButtons();
@@ -2588,6 +2629,11 @@ function clearContentWhenNoFolder() {
   
   // Clear XML document
   xmlDoc = null;
+  window.fileHandle = null;
+  fileHandle = null;
+  selectedFileItem = null;
+  if (elements.fileMetadata) elements.fileMetadata.textContent = 'Open a folder to begin';
+  updateXmlWorkflow();
   
   // Clear localStorage to prevent reload of old values
   localStorage.removeItem('config_state');
@@ -2623,6 +2669,40 @@ function initializeFileTree() {
   
   if (refreshTreeBtn) {
     refreshTreeBtn.addEventListener('click', refreshFileTree);
+  }
+
+  if (elements.fileTreeFilter) {
+    elements.fileTreeFilter.addEventListener('input', event => {
+      filterFileTree(event.target.value);
+    });
+  }
+
+  if (elements.nextXmlBtn) {
+    elements.nextXmlBtn.addEventListener('click', async () => {
+      elements.nextXmlBtn.disabled = true;
+      try {
+        await openAdjacentXml(1);
+      } catch (error) {
+        console.error('Failed to open next XML:', error);
+        setFileStatus('error', 'Next XML failed');
+      } finally {
+        updateXmlWorkflow();
+      }
+    });
+  }
+
+  if (elements.previousXmlBtn) {
+    elements.previousXmlBtn.addEventListener('click', async () => {
+      elements.previousXmlBtn.disabled = true;
+      try {
+        await openAdjacentXml(-1);
+      } catch (error) {
+        console.error('Failed to open previous XML:', error);
+        setFileStatus('error', 'Back failed');
+      } finally {
+        updateXmlWorkflow();
+      }
+    });
   }
   
   // Initialize resizable sidebar
@@ -2710,11 +2790,15 @@ function initializeResizableSidebar() {
 
 // Open folder using File System Access API
 async function openFolder() {
+  if (!confirmDiscardChanges()) return;
+
   try {
     if ('showDirectoryPicker' in window) {
       const dirHandle = await window.showDirectoryPicker();
+      clearContentWhenNoFolder();
       currentDirHandle = dirHandle;
       updateBreadcrumb(dirHandle.name);
+      if (elements.fileMetadata) elements.fileMetadata.textContent = 'Select an XML file';
       await loadFileTree(dirHandle);
       console.log(`Folder "${dirHandle.name}" opened successfully`);
     } else {
@@ -2798,6 +2882,11 @@ async function loadFileTree(dirHandle) {
     }
 
     // Removed event delegation setup since we're using direct onclick handlers
+    updateFileTreeStats();
+    updateXmlWorkflow();
+    if (elements.fileTreeFilter) {
+      filterFileTree(elements.fileTreeFilter.value);
+    }
 
   } catch (error) {
     console.log('Failed to load file tree');
@@ -2840,7 +2929,7 @@ async function loadDirectoryChildren(dirHandle, container) {
     });
 
     for (const entry of entries) {
-      const item = createTreeItem(entry.name, entry.handle.kind, entry.handle, false);
+      const item = createTreeItem(entry.name, entry.handle.kind, entry.handle, false, dirHandle);
       container.appendChild(item);
 
       if (entry.handle.kind === 'directory') {
@@ -2855,7 +2944,7 @@ async function loadDirectoryChildren(dirHandle, container) {
 }
 
 // Create tree item element
-function createTreeItem(name, type, handle, isRoot = false) {
+function createTreeItem(name, type, handle, isRoot = false, parentHandle = null) {
   const item = document.createElement('li');
   // Fix class name - use 'folder' instead of 'directory' for consistency
   item.className = type === 'directory' ? 'folder' : type;
@@ -2880,6 +2969,7 @@ function createTreeItem(name, type, handle, isRoot = false) {
   // Store handle for files (used by event delegation)
   if (type === 'file') {
     item._fileHandle = handle;
+    item._parentHandle = parentHandle;
   }
 
   return item;
@@ -2892,16 +2982,14 @@ function toggleFolder(folderItem) {
 
 // Select and load file
 async function selectFile(fileItem, fileHandle) {
+  if (fileItem !== selectedFileItem && !confirmDiscardChanges()) return;
+
   console.log('\ud83d\udcc2 SELECT FILE CALLED - ENABLING TOOLTIPS');
-  
-  // Show loading overlay BEFORE starting file load
-  if (elements.overlay) {
-    elements.overlay.removeAttribute('hidden');
-  }
-  
+
+  setFileStatus('loading', 'Loading');
+
   // ENABLE TOOLTIPS when XML file is opened
   setTooltipsEnabled(true);
-  const sidebar = document.querySelector('.sidebar');
 
   // Remove previous selection
   if (selectedFileItem) {
@@ -2910,7 +2998,8 @@ async function selectFile(fileItem, fileHandle) {
 
   // Add selection to current file
   fileItem.classList.add('selected');
-  selectedFileItem = fileItem;
+    selectedFileItem = fileItem;
+    updateXmlWorkflow();
 
   // Load file content
   try {
@@ -2922,28 +3011,36 @@ async function selectFile(fileItem, fileHandle) {
 
     // Load XML content
     loadXmlFromText(content);
+    unlockAllConfigFields();
 
     // Update breadcrumb with file name - reset to folder + file instead of concatenating
     const folderName = elements.breadcrumb ? elements.breadcrumb.textContent.split('\\')[0] : 'No folder';
     updateBreadcrumb(`${folderName}\\${file.name}`);
+    if (elements.fileMetadata) {
+      const size = file.size < 1024
+        ? `${file.size} B`
+        : `${(file.size / 1024).toFixed(file.size < 10240 ? 1 : 0)} KB`;
+      const modified = new Intl.DateTimeFormat('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(file.lastModified);
+      elements.fileMetadata.textContent = `${size} · Modified ${modified}`;
+    }
+    updateWorkspaceStatus();
     
-    // Trigger validation after loading file - ALWAYS run when file is opened
-    setTimeout(() => {
-      console.log('🔍 TRIGGERING VALIDATION AFTER FILE LOAD');
-      validateFormFields();
-      // Hide loading overlay AFTER file is fully loaded and validated
-      if (elements.overlay) {
-        elements.overlay.setAttribute('hidden', '');
-      }
-    }, 100);
+    // Validate immediately without flashing a page-level loading overlay.
+    validateFormFields();
+    updateValidationSummary();
+    updateXmlWorkflow();
+    updateWorkspaceStatus();
 
   } catch (error) {
     console.error('Error loading file:', error);
     console.log('Failed to load file: ' + error.message);
-    // Hide overlay on error too
-    if (elements.overlay) {
-      elements.overlay.setAttribute('hidden', '');
-    }
+    setFileStatus('error', 'Load failed');
   }
 }
 
@@ -3138,4 +3235,10 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('\ud83c\udfc1 PAGE INITIALIZATION COMPLETE - TOOLTIPS REMAIN DISABLED');
   
   if (typeof decorateButtons === 'function') decorateButtons();
+});
+
+window.addEventListener('beforeunload', event => {
+  if (!hasUnsavedChanges) return;
+  event.preventDefault();
+  event.returnValue = '';
 });

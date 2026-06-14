@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.6.0 · 14 June 2026** - Redesigned Config eDM into a compact file workflow with field locking, PROD/UAT campaign toggles, Apply & Save, automatic XML renaming, file filtering and status, validation summaries, and Back/Next XML navigation.
 - **v6.5.0 · 14 June 2026** - Redesigned Database Generator with compact Campaign controls, always-visible statistics and bulk paste, removable KRHRED chips, denser sticky customer tables, and responsive two-column desktop workflows.
 - **v6.4.2 · 14 June 2026** - Refreshed Bookmarklet with reliable embedded scrolling, a cleaner flat layout, compact search and controls, consistent tool cards, responsive spacing, and hidden duplicate navigation inside the eDM Helper shell.
 - **v6.4.1 · 14 June 2026** - Polished Database Generator UI with compact numeric KRHRED unit input, shorter toolbar labels, aligned compact actions, clearer summary badges, smaller empty states, and collapsible file previews.
@@ -38,7 +39,6 @@ category: Home
 - **v6.2.0 · 14 June 2026** - Added Database-to-Layout Test with automatic HTML loading, random or manual customer selection, KRHRED personalization and highlighting, subject normalization, coverage alerts, full-screen preview, and temporary URL/subject drafts.
 - **v6.1.0 · 14 June 2026** - Upgraded Database Checker with four-file package validation, static/dynamic detection, grouped anomaly findings, raw-line inspection, CSV export, and a compact package workspace.
 - **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
-- **v5.0.0 · 12 April 2026** - Released version 5.
 
 ## Useful Links
 

@@ -28,9 +28,9 @@
   
 
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.3.1">
-  <link rel="stylesheet" href="../css/pages-config.css">
-  <link rel="stylesheet" href="../css/controls.css?v=6.3.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.6.0">
+  <link rel="stylesheet" href="../css/pages-config.css?v=6.6.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.6.0">
 
   <title>Config eDM - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -38,10 +38,6 @@
   <!-- Font Awesome - Non-blocking load -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/monokai.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/dialog/dialog.min.css" />
 
 </head>
 
@@ -70,6 +66,14 @@
 
     <aside class="sidebar flex flex-col">
 
+      <div class="sidebar-title">
+        <div>
+          <span class="panel-eyebrow">Project files</span>
+          <strong>Configuration files</strong>
+        </div>
+        <span id="fileCountBadge" class="file-count-badge">0</span>
+      </div>
+
       <div class="sidebar-header">
 
         <button id="openFolderBtn" class="btn" title="Open Folder">
@@ -86,6 +90,11 @@
 
       </div>
 
+      <div class="file-filter">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input id="fileTreeFilter" type="search" placeholder="Filter XML files" aria-label="Filter configuration files">
+      </div>
+
       <div class="sidebar-body flex-1">
 
         <div id="fileTree" class="file-tree"></div>
@@ -100,17 +109,30 @@
 
       <div class="content-header">
 
-        <div class="breadcrumb" id="breadcrumb">No folder</div>
+        <div class="file-context">
+          <span class="panel-eyebrow">Current file</span>
+          <div class="breadcrumb" id="breadcrumb">No folder</div>
+          <div id="fileMetadata" class="file-metadata">Open a folder to begin</div>
+        </div>
 
-        <div id="campaignCountIndicator" class="campaign-count-indicator">0/7</div>
+        <div class="header-status">
+          <span id="fileStatus" class="file-status" data-state="empty">No file selected</span>
+          <div id="campaignCountIndicator" class="campaign-count-indicator">0/7</div>
+        </div>
 
       </div>
 
       
 
-      <div class="controls">
+      <div id="workspaceEmptyState" class="workspace-empty-state">
+        <i class="fa-regular fa-file-code" aria-hidden="true"></i>
+        <strong>Select a configuration file</strong>
+        <span>Open a folder, then choose an XML file from the explorer.</span>
+      </div>
 
-        <div class="field campaign-id-field">
+      <div class="controls is-disabled" id="configControls">
+
+        <div class="field campaign-id-field primary-field">
 
           <label for="campaignId">
 
@@ -123,6 +145,10 @@
             <div class="input-wrapper campaign-id-field">
 
               <input id="campaignId" type="text" placeholder="YYYYMMDD[X]_nama-campaign_XXX atau XXXX" />
+
+              <button id="toggleUatBtn" class="campaign-id-toggle" type="button" title="Add or remove -UAT">
+                UAT
+              </button>
 
               <span id="campaignIdWarningTooltip" class="warning-tooltip"></span>
 
@@ -194,27 +220,53 @@
 
 
 
-        <div class="buttons">
+        <div class="buttons config-actions">
 
-          <button id="applyUpdateBtn" class="btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply Update</button>
+          <button id="applyUpdateBtn" class="btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Apply &amp; Save
+          </button>
 
-          <button id="saveFileBtn" class="btn" title="Save File">
+          <button id="previousXmlBtn" class="btn secondary previous-xml-btn" type="button" disabled>
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
 
-            <i class="fa-solid fa-save"></i> Save
-
+          <button id="nextXmlBtn" class="btn secondary next-xml-btn" type="button" disabled>
+            Next XML <i class="fa-solid fa-arrow-right"></i>
           </button>
 
         </div>
 
+        <div id="validationSummary" class="validation-summary" data-state="empty" role="status" aria-live="polite">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <span>Select an XML file to validate campaign fields.</span>
+        </div>
+
+      </div>
+
+      <div id="xmlWorkflow" class="xml-workflow" hidden>
+        <div class="xml-workflow-heading">
+          <div>
+            <span class="panel-eyebrow">XML workflow</span>
+            <strong>Loaded configuration</strong>
+          </div>
+          <span id="xmlWorkflowProgress" class="xml-workflow-progress">0 / 0</span>
+        </div>
+        <div class="xml-workflow-grid">
+          <div class="xml-workflow-item">
+            <span>Current XML</span>
+            <strong id="currentXmlName">No XML selected</strong>
+          </div>
+          <div class="xml-workflow-item">
+            <span>Next XML</span>
+            <strong id="nextXmlName">End of list</strong>
+          </div>
+        </div>
+        <p>Apply and save your campaign values, then use Back or Next XML to continue.</p>
       </div>
 
 
 
-      <div class="editor-container">
-
-        <textarea id="editor" class="editor" aria-label="XML editor"></textarea>
-
-      </div>
+      <textarea id="editor" hidden aria-hidden="true" tabindex="-1"></textarea>
 
     </section>
 
@@ -267,22 +319,6 @@
 
 
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/xml-fold.min.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/matchtags.min.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/search/searchcursor.min.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/search/search.min.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/search/jump-to-line.min.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/dialog/dialog.min.js" defer></script>
-
 
 
   <!-- Include Settings Modal -->
@@ -295,14 +331,14 @@
 
   <script src="../js/footer.js" defer></script>
 
-  <script src="../js/version-config.js" defer></script>
+  <script src="../js/version-config.js?v=6.6.0" defer></script>
 
   
-  <script src="../js/url-fetcher.js" defer></script>
+  <script src="../js/url-fetcher.js?v=6.6.0" defer></script>
 
   <!-- Page Scripts (Load Last) -->
 
-  <script src="../js/pages-config.js" defer></script>
+  <script src="../js/pages-config.js?v=6.6.0" defer></script>
 
 </body>
 
