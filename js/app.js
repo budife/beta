@@ -1,4 +1,11 @@
-const BASE_PATH = window.location.hostname.includes('github.io') ? '/beta-uat' : '';
+const PROJECT_PATH = '/beta';
+const isProjectPath = (
+  window.location.pathname === PROJECT_PATH
+  || window.location.pathname.startsWith(`${PROJECT_PATH}/`)
+);
+const BASE_PATH = window.location.hostname.includes('github.io') || isProjectPath
+  ? PROJECT_PATH
+  : '';
 
 const ROUTES = {
   '/': {
@@ -83,7 +90,7 @@ const TOOL_META = {
 };
 
 function getVersion() {
-  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.3.0';
+  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.3.1';
 }
 
 function withBasePath(path) {

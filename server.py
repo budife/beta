@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 PORT = 8000
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-    project_prefix = "/beta-uat"
+    project_prefix = "/beta"
 
     app_routes = {
         "/",

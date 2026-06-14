@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.3.1 · 14 June 2026** - Moved the primary repository and GitHub Pages base path from `beta-uat` to `beta`.
 - **v6.3.0 · 14 June 2026** - Added the shared UI style guide, reusable design tokens, consistent 12px form controls across all tools, regular-weight typography, and responsive Database Checker modal and workspace refinements.
 - **v6.2.0 · 14 June 2026** - Added Database-to-Layout Test with automatic HTML loading, random or manual customer selection, KRHRED personalization and highlighting, subject normalization, coverage alerts, full-screen preview, and temporary URL/subject drafts.
 - **v6.1.0 · 14 June 2026** - Upgraded Database Checker with four-file package validation, static/dynamic detection, grouped anomaly findings, raw-line inspection, CSV export, and a compact package workspace.
@@ -44,8 +45,8 @@ category: Home
 
 ## Useful Links
 
-- [GitHub Repository](https://github.com/budife/beta-uat) - Source code and project history.
-- [Report an Issue](https://github.com/budife/beta-uat/issues) - Submit a bug or improvement request.
+- [GitHub Repository](https://github.com/budife/beta) - Source code and project history.
+- [Report an Issue](https://github.com/budife/beta/issues) - Submit a bug or improvement request.
 - [Tool Sitemap](#tool-sitemap) - Browse every available eDM Helper tool.
 
 ## System Info
