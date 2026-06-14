@@ -83,7 +83,7 @@ const TOOL_META = {
 };
 
 function getVersion() {
-  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.2.0';
+  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.3.0';
 }
 
 function withBasePath(path) {
