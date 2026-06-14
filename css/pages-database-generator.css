@@ -1221,6 +1221,15 @@ legend.form-label {
   flex: 0 0 auto;
 }
 
+.email-input-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.email-input-stack #addEmail {
+  justify-self: start;
+}
+
 .krhred-section {
   align-self: start;
   min-height: 100%;

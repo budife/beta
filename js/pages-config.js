@@ -162,6 +162,7 @@ const elements = {
   saveFileBtn: null,
   editor: null,
   campaignIdInput: document.getElementById('campaignId'),
+  setTodayBtn: document.getElementById('setTodayBtn'),
   toggleUatBtn: document.getElementById('toggleUatBtn'),
   subjectInput: document.getElementById('subject'),
   linkInput: document.getElementById('link'),
@@ -262,6 +263,7 @@ function setWorkspaceEnabled(enabled) {
   [elements.campaignIdInput, elements.subjectInput, elements.linkInput].forEach(input => {
     if (input) input.disabled = !enabled;
   });
+  if (elements.setTodayBtn) elements.setTodayBtn.disabled = !enabled;
   if (elements.toggleUatBtn) elements.toggleUatBtn.disabled = !enabled;
 }
 
@@ -321,6 +323,34 @@ function initializeFieldLocking() {
       }, 0);
     });
   });
+
+  if (elements.setTodayBtn) {
+    elements.setTodayBtn.addEventListener('mousedown', event => {
+      event.preventDefault();
+    });
+    elements.setTodayBtn.addEventListener('click', () => {
+      if (!elements.campaignIdInput || elements.campaignIdInput.disabled) return;
+
+      const currentValue = elements.campaignIdInput.value.trim();
+      if (!/^\d{8}/.test(currentValue)) {
+        setFieldLocked(elements.campaignIdInput, false);
+        elements.campaignIdInput.focus();
+        return;
+      }
+
+      const now = new Date();
+      const today = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0')
+      ].join('');
+
+      setFieldLocked(elements.campaignIdInput, false);
+      elements.campaignIdInput.value = currentValue.replace(/^\d{8}/, today);
+      elements.campaignIdInput.dispatchEvent(new Event('input', { bubbles: true }));
+      setFieldLocked(elements.campaignIdInput, true);
+    });
+  }
 
   if (elements.toggleUatBtn) {
     elements.toggleUatBtn.addEventListener('mousedown', event => {
@@ -413,70 +443,6 @@ function filterFileTree(query) {
 
 function confirmDiscardChanges() {
   return !hasUnsavedChanges || window.confirm('This file has unsaved changes. Discard them and continue?');
-}
-
-function buildAppliedXmlName(fileName, campaignId) {
-  const campaignDate = (campaignId.match(/^\d{8}/) || [''])[0];
-  const campaignCode = (campaignId.match(/_(\d{3,4})$/) || [null, ''])[1];
-  const safeCampaignCode = (campaignCode || campaignId)
-    .trim()
-    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '-')
-    .replace(/\s+/g, '-');
-  const suffix = campaignDate ? `${safeCampaignCode}-${campaignDate}` : safeCampaignCode;
-  const baseName = fileName
-    .replace(/\.xml$/i, '')
-    .replace(/\s+\([^()]+-\d{8}\)$/i, '');
-
-  return `${baseName} (${suffix}).xml`;
-}
-
-async function renameAppliedXml() {
-  if (!selectedFileItem || !elements.editor || !elements.campaignIdInput) return;
-
-  const parentHandle = selectedFileItem._parentHandle;
-  const currentHandle = selectedFileItem._fileHandle;
-  if (!parentHandle || !currentHandle) return;
-
-  const currentFile = await currentHandle.getFile();
-  const campaignId = elements.campaignIdInput.value.trim();
-  if (!campaignId) return;
-
-  const targetName = buildAppliedXmlName(currentFile.name, campaignId);
-
-  if (targetName === currentFile.name) {
-    await performSave();
-    return;
-  }
-
-  // getFileHandle(create:true) returns the existing target when present, so
-  // applying again replaces that file instead of creating numbered copies.
-  const targetHandle = await parentHandle.getFileHandle(targetName, { create: true });
-  const writable = await targetHandle.createWritable();
-  await writable.write(elements.editor.getValue());
-  await writable.close();
-  await parentHandle.removeEntry(currentFile.name);
-
-  window.fileHandle = targetHandle;
-  fileHandle = targetHandle;
-  hasUnsavedChanges = false;
-  setCampaignIndicatorState('saved');
-
-  await loadFileTree(currentDirHandle);
-  const renamedItem = getXmlFileItems().find(item =>
-    item.querySelector('.label')?.textContent === targetName
-  );
-
-  if (renamedItem) {
-    renamedItem.classList.add('selected');
-    selectedFileItem = renamedItem;
-    updateBreadcrumb(`${currentDirHandle.name}\\${targetName}`);
-    updateXmlWorkflow();
-    scrollFileItemInTree(renamedItem);
-  }
-
-  setFileStatus('saved', 'Applied & renamed');
-  lockAllConfigFields();
-  updateSaveAndApplyButtons();
 }
 
 // Keep XML content available to the existing configuration workflow without
@@ -2288,10 +2254,11 @@ function manageTooltipCollision(fieldContainer) {
           updateSaveAndApplyButtons();
           lockAllConfigFields();
           try {
-            await renameAppliedXml();
-          } catch (renameError) {
-            console.error('Failed to rename applied XML:', renameError);
-            setFileStatus('error', 'Rename failed');
+            await performSave();
+            setFileStatus('saved', 'Applied & saved');
+          } catch (saveError) {
+            console.error('Failed to save applied XML:', saveError);
+            setFileStatus('error', 'Save failed');
           }
         } else {
           console.log('No valid updates to apply');

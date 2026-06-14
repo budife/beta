@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.8.1 · 14 June 2026** - Moved the Database Generator Add action below the email field and streamlined Config eDM with same-file saving plus a NOW shortcut for today's Campaign ID date.
 - **v6.8.0 · 14 June 2026** - Corrected the four-file database package standard to use `EmailCustMast`, including package validation, raw-data inspection, layout testing, and generated database filenames.
 - **v6.7.3 · 14 June 2026** - Fixed Layout Checker KRHRED highlighting to match Database Checker previews and enlarged the primary Apply action.
 - **v6.7.2 · 14 June 2026** - Restored the complete release timeline from Alpha Sensei through every eDM Helper version.

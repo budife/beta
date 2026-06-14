@@ -3219,9 +3219,10 @@ main .layout {
 }
 
 .input-wrapper.campaign-id-field input {
-  padding-right: 96px;
+  padding-right: 142px;
 }
 
+.campaign-date-toggle,
 .campaign-id-toggle {
   position: absolute;
   top: 50%;
@@ -3238,6 +3239,35 @@ main .layout {
   background: #fff0f1;
   border: 1px solid #fecdd3;
   cursor: pointer;
+}
+
+.campaign-date-toggle {
+  right: 86px;
+  z-index: 2;
+  min-width: 40px;
+  height: 24px;
+  padding: 0 7px;
+  transform: translateY(-50%);
+  color: #52525b;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  background: #ffffff;
+  border: 1px solid #d4d4d8;
+  cursor: pointer;
+}
+
+.campaign-date-toggle:hover {
+  color: #9f3f45;
+  background: #fff1f1;
+  border-color: #f27f86;
+}
+
+.campaign-date-toggle:disabled {
+  color: #a1a1aa;
+  background: #f7f7f8;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
 }
 
 .campaign-id-toggle:hover {
