@@ -63,12 +63,21 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   function preparePreviewHtml(html, sourceUrl = '') {
     if (!html) return '';
     const baseHref = getPreviewBaseHref(sourceUrl);
-    if (!baseHref) return html;
-    const baseTag = `<base href="${baseHref}">`;
+    const baseTag = baseHref ? `<base href="${baseHref}">` : '';
+    const highlightStyle = `<style>
+      .edm-krhred-highlight {
+        padding: 1px 3px !important;
+        color: inherit !important;
+        background: #fff3a3 !important;
+        outline: 1px solid #f18c8e !important;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+    </style>`;
     if (/<head[^>]*>/i.test(html)) {
-      return html.replace(/<head([^>]*)>/i, `<head$1>${baseTag}`);
+      return html.replace(/<head([^>]*)>/i, `<head$1>${baseTag}${highlightStyle}`);
     }
-    return `${baseTag}${html}`;
+    return `${baseTag}${highlightStyle}${html}`;
   }
 
   function renderPreview(html, statusText = 'Preview ready', sourceUrl = '') {
@@ -242,31 +251,43 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   }
 
   function replaceKrhredPlaceholders(html, values, shouldHighlight) {
-    const placeholderPattern = /<%\s*\[\s*(KRHRED_Unit_\d+)\s*\]\s*\|?\s*%>/g;
-    const highlightStyle = [
-      'background:#fff0f1',
-      'border:1px solid #f27f86',
-      'color:#991b1b',
-      'padding:1px 3px',
-      'box-decoration-break:clone',
-      '-webkit-box-decoration-break:clone'
-    ].join(';');
+    const source = String(html || '');
+    let insideTag = false;
+    let quote = '';
+    let output = '';
 
-    if (!shouldHighlight) {
-      return html.replace(placeholderPattern, (_, unit) => values[unit] || '');
+    for (let index = 0; index < source.length;) {
+      const placeholder = source.slice(index).match(
+        /^<%\s*\[\s*KRHRED(?:_Unit)?_(\d+)\s*\]\s*\|?\s*%>/i
+      );
+
+      if (placeholder) {
+        const unit = `KRHRED_Unit_${placeholder[1]}`;
+        const value = Object.prototype.hasOwnProperty.call(values, unit) ? values[unit] : '';
+        output += String(value).trim() === ''
+          ? ''
+          : shouldHighlight && !insideTag
+            ? `<mark class="edm-krhred-highlight" title="${unit}">${value}</mark>`
+            : value;
+        index += placeholder[0].length;
+        continue;
+      }
+
+      const character = source[index];
+      output += character;
+      if (insideTag && quote) {
+        if (character === quote) quote = '';
+      } else if (insideTag && (character === '"' || character === "'")) {
+        quote = character;
+      } else if (!insideTag && character === '<' && /[a-z!/]/i.test(source[index + 1] || '')) {
+        insideTag = true;
+      } else if (insideTag && character === '>') {
+        insideTag = false;
+      }
+      index += 1;
     }
 
-    const chunks = html.split(/(<[^>]+>)/g);
-    const visibleHighlighted = chunks.map(chunk => {
-      if (!chunk || chunk.startsWith('<')) return chunk;
-      return chunk.replace(placeholderPattern, (_, unit) => {
-        const value = values[unit] || '';
-        if (!value) return '';
-        return `<mark class="lc-krhred-highlight" style="${highlightStyle}" title="${escapeHtml(unit)}">${escapeHtml(value)}</mark>`;
-      });
-    }).join('');
-
-    return visibleHighlighted.replace(placeholderPattern, (_, unit) => values[unit] || '');
+    return output;
   }
 
   function renderLayoutWithKrhredValues() {

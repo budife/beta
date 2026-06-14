@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.7.3 · 14 June 2026** - Fixed Layout Checker KRHRED highlighting to match Database Checker previews and enlarged the primary Apply action.
 - **v6.7.2 · 14 June 2026** - Restored the complete release timeline from Alpha Sensei through every eDM Helper version.
 - **v6.7.1 · 14 June 2026** - Preserved the complete Recent Updates history while keeping the timeline compact and scrollable.
 - **v6.7.0 · 14 June 2026** - Refined Layout Checker with faster URL loading, embedded code/preview tabs, full-height workspace panels, reliable image base paths, manual and bulk KRHRED application, reset-to-source preview, and optional KRHRED highlighting.

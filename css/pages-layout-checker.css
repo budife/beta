@@ -2673,6 +2673,12 @@ body *::after {
   flex: 0 0 auto;
 }
 
+#applyKrhredBtn {
+  min-width: 84px;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
 .lc-panel .lc-textarea {
   width: 100%;
   min-height: 110px;
