@@ -5,8 +5,8 @@ const MAX_RENDER_ROWS  = 1000; // Reduced from 2000
 const VIRTUAL_BUFFER_SIZE = 50; // Increased back to 50 for better visibility
 const OBJECT_POOL_SIZE = 200; // Reduced from 500
 const DEBOUNCE_DELAY = 100; // Added for scroll events
-const PACKAGE_FILE_TYPES = ['CustMast', 'CustPref', 'CustSubs', 'CustAttr'];
-const PACKAGE_FILE_PATTERN = /^(.*)-(CustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
+const PACKAGE_FILE_TYPES = ['EmailCustMast', 'CustPref', 'CustSubs', 'CustAttr'];
+const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PACKAGE_FINDINGS_BATCH_SIZE = 20;
 const MAX_STORED_PACKAGE_FINDINGS = 10000;
@@ -590,7 +590,7 @@ class DatabaseChecker {
     this.activeLayoutTestCustomer = null;
     this.layoutSourceFetchTimer = null;
     this.layoutSourceAbortController = null;
-    this.rawDataFileType = 'CustMast';
+    this.rawDataFileType = 'EmailCustMast';
     
     // Performance mode detection
     this.performanceMode = this.detectPerformanceMode();
@@ -1099,10 +1099,10 @@ class DatabaseChecker {
 
   async findLayoutTestCustomer(query) {
     const normalizedQuery = query.trim().toLowerCase();
-    const mastHandle = this.selectedPackage?.files.get('CustMast');
+    const mastHandle = this.selectedPackage?.files.get('EmailCustMast');
     const attrHandle = this.selectedPackage?.files.get('CustAttr');
     if (!mastHandle || !attrHandle) {
-      throw new Error('CustMast and CustAttr are required for a layout test.');
+      throw new Error('EmailCustMast and CustAttr are required for a layout test.');
     }
 
     let customer = null;
@@ -1119,7 +1119,7 @@ class DatabaseChecker {
     });
 
     if (!customer) {
-      throw new Error('Customer ID or email was not found in CustMast.');
+      throw new Error('Customer ID or email was not found in EmailCustMast.');
     }
 
     const attrFile = await attrHandle.getFile();
@@ -2133,14 +2133,14 @@ class DatabaseChecker {
     });
 
     const records = {
-      CustMast: await this.parsePackageFile(files.CustMast, 20, findings, signal),
+      EmailCustMast: await this.parsePackageFile(files.EmailCustMast, 20, findings, signal),
       CustPref: await this.parsePackageFile(files.CustPref, 5, findings, signal),
       CustSubs: await this.parsePackageFile(files.CustSubs, 5, findings, signal),
       CustAttr: await this.parsePackageFile(files.CustAttr, 5, findings, signal)
     };
     this.updatePercent(1, 4, 'Validating file formats...');
 
-    this.addDuplicateFindings(records.CustMast, (row) => row.id, 'customer ID', findings);
+    this.addDuplicateFindings(records.EmailCustMast, (row) => row.id, 'customer ID', findings);
     this.addDuplicateFindings(records.CustPref, (row) => row.id, 'customer ID', findings);
     this.addDuplicateFindings(records.CustSubs, (row) => row.id, 'customer ID', findings);
     this.addDuplicateFindings(
@@ -2220,7 +2220,7 @@ class DatabaseChecker {
     }
     this.updatePercent(2, 4, 'Validating KRHRED attributes...');
 
-    const mastById = new Map(records.CustMast.filter((row) => row.id).map((row) => [row.id, row]));
+    const mastById = new Map(records.EmailCustMast.filter((row) => row.id).map((row) => [row.id, row]));
     const baselineIds = [...mastById.keys()];
 
     ['CustPref', 'CustSubs', 'CustAttr'].forEach((type) => {
@@ -2234,14 +2234,14 @@ class DatabaseChecker {
       baselineIds.forEach((id) => {
         const relatedRows = rowsById.get(id);
         if (!relatedRows?.length) {
-          findings.push(this.createFinding('Missing Customer', type, 0, id, `${id} exists in CustMast but is missing from ${type}.`));
+          findings.push(this.createFinding('Missing Customer', type, 0, id, `${id} exists in EmailCustMast but is missing from ${type}.`));
           return;
         }
 
         relatedRows.forEach((row) => {
           const expectedEmail = mastById.get(id).email;
           if (row.email !== expectedEmail) {
-            findings.push(this.createFinding('Email Mismatch', type, row.lineNumber, id, 'Email does not match CustMast.', expectedEmail, row.email));
+            findings.push(this.createFinding('Email Mismatch', type, row.lineNumber, id, 'Email does not match EmailCustMast.', expectedEmail, row.email));
           }
         });
       });
@@ -2249,7 +2249,7 @@ class DatabaseChecker {
       rowsById.forEach((relatedRows, id) => {
         if (id && !mastById.has(id)) {
           const row = relatedRows[0];
-          findings.push(this.createFinding('Extra Customer', type, row.lineNumber, id, `${id} does not exist in CustMast.`));
+          findings.push(this.createFinding('Extra Customer', type, row.lineNumber, id, `${id} does not exist in EmailCustMast.`));
         }
       });
     });
@@ -2279,7 +2279,7 @@ class DatabaseChecker {
       errors: findings.fileCounts.get(type) || 0
     }));
     const layoutTestCustomers = databaseType === 'Dynamic'
-      ? this.buildLayoutTestCustomers(records.CustMast, records.CustAttr, attrById)
+      ? this.buildLayoutTestCustomers(records.EmailCustMast, records.CustAttr, attrById)
       : [];
 
     return {

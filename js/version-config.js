@@ -16,7 +16,7 @@ function generateBuildNumber() {
 // Version Configuration
 // \u26a0\ufe0f UBAH BAGIAN INI SAAT UPDATE VERSI MANUAL \u26a0\ufe0f
 const VERSION_CONFIG = {
-  version: '6.7.3',                    // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
+  version: '6.8.0',                    // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
   buildDate: new Date().toISOString(),        // ← OTOMATIS, tidak perlu diganti
   buildNumber: generateBuildNumber(),           // ← OTOMATIS, tidak perlu diganti
   environment: 'development',                 // ← GANTI JIKA PERLU (production/development)
@@ -127,14 +127,15 @@ function updateFooterVersion() {
   
   // Update year
   if (yearElement) {
-    yearElement.textContent = versionInfo.currentYear;
+    yearElement.textContent = '2025';
   }
   
   // Update footer text
   if (footerText) {
     footerText.innerHTML = 
-      `© ${versionInfo.currentYear} ${versionInfo.appName} <span class="footer-version" data-version>v${versionInfo.version}</span>. ` +
-      `crafted with <i class="fa-solid fa-heart"></i>`;
+      `© 2025 ${versionInfo.appName} crafted by ` +
+      `<a class="creator-link" href="https://budd.my.id/" target="_blank" rel="noreferrer">budd` +
+      `<span class="creator-popover" role="tooltip"><strong>Creator</strong><small>budd.my.id</small></span></a>`;
   }
 }
 

@@ -48,7 +48,7 @@ function checker() {
 
 function packageFiles(rows = {}) {
   const defaults = {
-    CustMast: ['20260101_TEST-000001|user@example.com||||||||||||||||||'],
+    EmailCustMast: ['20260101_TEST-000001|user@example.com||||||||||||||||||'],
     CustPref: ['20260101_TEST-000001|user@example.com|CMPG_ID|20260101_TEST|'],
     CustSubs: ['20260101_TEST-000001|user@example.com|Marketing|Y|'],
     CustAttr: ['20260101_TEST-000001|user@example.com|CMPG_ID|20260101_TEST|']
@@ -84,6 +84,19 @@ test('missing file is reported', async () => {
   delete files.CustSubs;
   const result = await checker().validateDatabasePackage(files, { key: '20260101_TEST' });
   assert.ok(result.findings.some((finding) => finding.category === 'Missing File' && finding.file === 'CustSubs'));
+});
+
+test('EmailCustMast is the required customer master file', async () => {
+  const files = packageFiles();
+  files.CustMast = files.EmailCustMast;
+  delete files.EmailCustMast;
+
+  const result = await checker().validateDatabasePackage(files, { key: '20260101_TEST' });
+
+  assert.ok(result.findings.some((finding) => (
+    finding.category === 'Missing File'
+    && finding.file === 'EmailCustMast'
+  )));
 });
 
 test('email mismatch is reported across files', async () => {
@@ -405,7 +418,7 @@ test('manual layout customer lookup accepts exact email', async () => {
   });
   instance.selectedPackage = {
     files: new Map([
-      ['CustMast', makeHandle(['20260101_TEST-000001|user@example.com||||||||||||||||||'])],
+      ['EmailCustMast', makeHandle(['20260101_TEST-000001|user@example.com||||||||||||||||||'])],
       ['CustAttr', makeHandle([
         '20260101_TEST-000001|user@example.com|CMPG_ID|20260101_TEST|',
         '20260101_TEST-000001|user@example.com|KRHRED_Unit_31|Budi|'

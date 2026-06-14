@@ -406,6 +406,54 @@ html {
   font-size: var(--font-size-base);
 }
 
+.footer-text .creator-link {
+  position: relative;
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-text .creator-link:hover,
+.footer-text .creator-link:focus-visible {
+  color: var(--accent-hover);
+}
+
+.footer-text .creator-popover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 30;
+  display: grid;
+  min-width: 124px;
+  gap: 2px;
+  padding: 8px 10px;
+  color: var(--text);
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--border);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.footer-text .creator-popover strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.footer-text .creator-popover small {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.footer-text .creator-link:hover .creator-popover,
+.footer-text .creator-link:focus-visible .creator-popover {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .footer-version {
   color: #6C757D;
   font-size: var(--font-size-xs);

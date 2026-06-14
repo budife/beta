@@ -59,7 +59,7 @@ test('static generator creates the expected four files', () => {
   const files = sandbox.buildAllFiles(campaignId, ['tester@example.com'], false);
 
   assert.deepEqual(Object.keys(files), [
-    `${campaignId}-CustMast.txt`,
+    `${campaignId}-EmailCustMast.txt`,
     `${campaignId}-CustPref.txt`,
     `${campaignId}-CustSubs.txt`,
     `${campaignId}-CustAttr.txt`
@@ -111,7 +111,7 @@ test('record IDs remain sequential and zero padded', () => {
     ['first@example.com', 'second@example.com'],
     false
   );
-  const mastLines = files[`${campaignId}-CustMast.txt`].trim().split('\n');
+  const mastLines = files[`${campaignId}-EmailCustMast.txt`].trim().split('\n');
 
   assert.match(mastLines[0], new RegExp(`^${campaignId}-000001\\|`));
   assert.match(mastLines[1], new RegExp(`^${campaignId}-000002\\|`));

@@ -254,7 +254,7 @@ const $ = (sel) => document.querySelector(sel);
     }
 
     function recordId(campaignId, i) { return `${campaignId}-${String(i + 1).padStart(6, '0')}`; }
-    function rowCustMast(id, email) { const emptyCount = 17; const empties = Array(emptyCount).fill('').join('|'); return `${id}|${email}|${empties}|\n`; }
+    function rowEmailCustMast(id, email) { const emptyCount = 17; const empties = Array(emptyCount).fill('').join('|'); return `${id}|${email}|${empties}|\n`; }
     function rowCustPref(id, email, campaignId) { return `${id}|${email}|CMPG_ID|${campaignId}|\n`; }
     function rowCustSubs(id, email) { return `${id}|${email}|IMO Marketing|Y|\n`; }
     function rowsCustAttrStatic(id, email, campaignId) { return `${id}|${email}|CMPG_ID|${campaignId}|\n`; }
@@ -274,7 +274,7 @@ const $ = (sel) => document.querySelector(sel);
       emailList.forEach((entry, i) => {
         const email = getEmailValue(entry);
         const id = recordId(campaignId, i);
-        mast += rowCustMast(id, email);
+        mast += rowEmailCustMast(id, email);
         pref += rowCustPref(id, email, campaignId);
         subs += rowCustSubs(id, email);
       });
@@ -308,7 +308,7 @@ const $ = (sel) => document.querySelector(sel);
       }
       
       return {
-        [`${campaignId}-CustMast.txt`]: mast,
+        [`${campaignId}-EmailCustMast.txt`]: mast,
         [`${campaignId}-CustPref.txt`]: pref,
         [`${campaignId}-CustSubs.txt`]: subs,
         [`${campaignId}-CustAttr.txt`]: attr,

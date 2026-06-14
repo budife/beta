@@ -1,6 +1,9 @@
 // Campaign Counter Script with Supabase Integration
 
 const supabaseClient = window.supabase.createClient('https://neuyjcotcmjnndjyzbcq.supabase.co', 'sb_publishable_BGon7fPsvXNe59meFE9F4Q_SbjCa-Dp');
+const campaignIdCore = window.CampaignIdCore;
+const allocationCache = new Map();
+let allocationTableAvailable = true;
 
 const counters = {
   campaign1: { value: 1, color: 'primary', name: 'Name 1' },
@@ -12,6 +15,248 @@ const counters = {
 let currentTab = 'campaign1';
 let currentEditCounter = null;
 let currentEditTab = null;
+
+function createCampaignDirectories() {
+  document.querySelectorAll('.tab-pane').forEach(pane => {
+    const historyContainer = pane.querySelector('.history-container');
+    if (!historyContainer || pane.querySelector('.campaign-directory')) return;
+
+    const directory = document.createElement('section');
+    directory.className = 'campaign-directory';
+    directory.innerHTML = `
+      <div class="campaign-directory-header">
+        <div>
+          <span class="campaign-directory-eyebrow">Monday / Supabase</span>
+          <h2>Campaign counters</h2>
+        </div>
+        <span class="campaign-directory-count">${Object.keys(counters).length} counters</span>
+      </div>
+      <div class="campaign-card-grid">
+        ${Object.keys(counters).map(type => `
+          <button type="button" class="campaign-summary-card" data-campaign-select="${type}">
+            <span class="campaign-summary-topline">
+              <strong data-campaign-name="${type}">${counters[type].name}</strong>
+              <span class="campaign-summary-status">Ready</span>
+            </span>
+            <span class="campaign-summary-values">
+              <span>
+                <small>Current</small>
+                <b data-campaign-current="${type}">----</b>
+              </span>
+              <span>
+                <small>Next available</small>
+                <b data-campaign-next="${type}">----</b>
+              </span>
+            </span>
+            <span class="campaign-summary-updated" data-campaign-updated="${type}">Waiting for sync</span>
+          </button>
+        `).join('')}
+      </div>
+    `;
+    historyContainer.insertAdjacentElement('beforebegin', directory);
+  });
+
+  document.querySelectorAll('[data-campaign-select]').forEach(card => {
+    card.addEventListener('click', () => selectCampaign(card.dataset.campaignSelect));
+  });
+  renderCampaignDirectory();
+}
+
+function renderCampaignDirectory() {
+  Object.keys(counters).forEach(type => {
+    const state = allocationCache.get(type);
+    document.querySelectorAll(`[data-campaign-name="${type}"]`).forEach(element => {
+      element.textContent = counters[type].name;
+    });
+    document.querySelectorAll(`[data-campaign-current="${type}"]`).forEach(element => {
+      element.textContent = campaignIdCore.formatSequence(counters[type].value);
+    });
+    document.querySelectorAll(`[data-campaign-next="${type}"]`).forEach(element => {
+      element.textContent = state?.next ? campaignIdCore.formatSequence(state.next) : '----';
+    });
+    document.querySelectorAll(`[data-campaign-updated="${type}"]`).forEach(element => {
+      const updated = counters[type].lastUpdated
+        ? `Updated ${formatDateTime(counters[type].lastUpdated)}`
+        : 'Waiting for sync';
+      element.textContent = state
+        ? `${updated} · ${state.used.length} IDs`
+        : updated;
+    });
+  });
+
+  document.querySelectorAll('[data-campaign-select]').forEach(card => {
+    const isActive = card.dataset.campaignSelect === currentTab;
+    card.classList.toggle('is-active', isActive);
+    card.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function selectCampaign(tabName) {
+  switchTab(tabName);
+  document.querySelectorAll('.counter-tabs').forEach(container => {
+    container.querySelectorAll('.tab-btn').forEach(button => {
+      button.classList.toggle('active', button.dataset.tab === tabName);
+    });
+  });
+}
+
+function createAllocationPanels() {
+  Object.keys(counters).forEach(type => {
+    const container = document.querySelector(`#${type}-tab .counter-container`);
+    if (!container || container.querySelector('.campaign-allocation-panel')) return;
+
+    const panel = document.createElement('section');
+    panel.className = 'campaign-allocation-panel';
+    panel.innerHTML = `
+      <div class="allocation-heading">
+        <div>
+          <span>Next available</span>
+          <strong id="${type}-next-available">----</strong>
+        </div>
+        <button type="button" class="allocation-copy-btn" data-copy-next="${type}">
+          <i class="fa-regular fa-copy"></i> Copy
+        </button>
+      </div>
+      <div class="allocation-used">
+        <span class="allocation-label">Used nearby</span>
+        <div id="${type}-used-numbers" class="used-number-list"></div>
+      </div>
+      <p id="${type}-allocation-status" class="allocation-status">Synchronizing campaign IDs...</p>
+    `;
+    container.querySelector('.buttons')?.insertAdjacentElement('afterend', panel);
+  });
+
+  document.querySelectorAll('[data-copy-next]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const type = button.dataset.copyNext;
+      const state = allocationCache.get(type);
+      if (!state || !state.next) return;
+      await copyCampaignSequence(state.next);
+      button.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+      setTimeout(() => {
+        button.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+      }, 1200);
+    });
+  });
+}
+
+async function copyCampaignSequence(value) {
+  const formatted = campaignIdCore.formatSequence(value);
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(formatted);
+    return;
+  }
+  const textarea = document.createElement('textarea');
+  textarea.value = formatted;
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  textarea.remove();
+}
+
+async function loadAllocationRows(campaignType) {
+  if (allocationTableAvailable) {
+    const { data, error } = await supabaseClient
+      .from('campaign_id_allocations')
+      .select('sequence_number, campaign_name, monday_item_id, monday_board_id, source, status, created_at')
+      .eq('campaign_type', campaignType)
+      .in('status', ['reserved', 'used'])
+      .order('sequence_number', { ascending: true });
+
+    if (!error) return data || [];
+    if (['42P01', 'PGRST205'].includes(error.code)) {
+      allocationTableAvailable = false;
+      console.warn('Campaign allocation migration is not installed; using campaign history fallback.');
+    } else {
+      console.error('Unable to load campaign allocations:', error);
+    }
+  }
+
+  const { data, error } = await supabaseClient
+    .from('campaign_history')
+    .select('value, action, created_at')
+    .eq('campaign_type', campaignType)
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.error('Unable to load legacy campaign IDs:', error);
+    return [];
+  }
+  return (data || [])
+    .filter(entry => !['reverted', 'released'].includes(entry.action))
+    .map(entry => ({
+      sequence_number: entry.value,
+      source: 'legacy-history',
+      status: 'used',
+      created_at: entry.created_at
+    }));
+}
+
+async function refreshAllocationState(campaignType) {
+  const rows = await loadAllocationRows(campaignType);
+  const values = rows.map(row => row.sequence_number);
+  if (counters[campaignType].value > 1) values.push(counters[campaignType].value);
+  const state = campaignIdCore.getAllocationState(values, counters[campaignType].value);
+  state.rows = rows;
+  allocationCache.set(campaignType, state);
+  renderAllocationState(campaignType, state);
+  renderCampaignDirectory();
+  return state;
+}
+
+function renderAllocationState(campaignType, state) {
+  const nextElement = document.getElementById(`${campaignType}-next-available`);
+  const usedContainer = document.getElementById(`${campaignType}-used-numbers`);
+  const statusElement = document.getElementById(`${campaignType}-allocation-status`);
+  if (nextElement) nextElement.textContent = campaignIdCore.formatSequence(state.next);
+  if (statusElement) {
+    statusElement.textContent = allocationTableAvailable
+      ? `${state.used.length} IDs synchronized with Supabase`
+      : `${state.used.length} IDs loaded from legacy history`;
+  }
+  if (!usedContainer) return;
+
+  usedContainer.innerHTML = state.nearbyUsed.length
+    ? state.nearbyUsed.map(value => {
+        const row = state.rows.find(item => Number(item.sequence_number) === value);
+        const detail = row?.campaign_name || row?.source || 'Used campaign ID';
+        return `<button type="button" class="used-number-btn" data-used-number="${value}" title="${detail}">${campaignIdCore.formatSequence(value)}</button>`;
+      }).join('')
+    : '<span class="allocation-empty">No used campaign IDs yet</span>';
+
+  usedContainer.querySelectorAll('[data-used-number]').forEach(button => {
+    button.addEventListener('click', () => copyCampaignSequence(button.dataset.usedNumber));
+  });
+}
+
+async function reserveNextCampaignId(campaignType, source = 'campaign-counter') {
+  const state = await refreshAllocationState(campaignType);
+  if (!state.next) throw new Error('No campaign IDs are available.');
+
+  if (allocationTableAvailable) {
+    const { data, error } = await supabaseClient.rpc('reserve_next_campaign_id', {
+      p_campaign_type: campaignType,
+      p_floor: state.floor,
+      p_campaign_name: counters[campaignType].name,
+      p_monday_item_id: null,
+      p_monday_board_id: null,
+      p_source: source
+    });
+
+    if (!error && data) return Array.isArray(data) ? data[0] : data;
+    if (!['42883', 'PGRST202'].includes(error?.code)) throw error;
+    allocationTableAvailable = false;
+    console.warn('Campaign allocation RPC is not installed; using legacy fallback.');
+  }
+
+  return {
+    sequence_number: state.next,
+    campaign_type: campaignType,
+    source: 'legacy-history',
+    status: 'used'
+  };
+}
 
 async function loadCounterFromSupabase(campaignType) {
   try {
@@ -80,6 +325,8 @@ async function loadHistoryFromSupabase(campaignType) {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+  createAllocationPanels();
+  createCampaignDirectories();
   try {
     for (const type of Object.keys(counters)) {
       const savedData = await loadCounterFromSupabase(type);
@@ -96,7 +343,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   Object.keys(counters).forEach(type => {
     updateCounterDisplay(type);
     updateHistoryDisplay(type);
+    refreshAllocationState(type);
   });
+  subscribeToCampaignAllocations();
 });
 
 function loadTabNames() {
@@ -114,6 +363,7 @@ function loadTabNames() {
       tabBtn.title = `${counters[type].name} - Double click to edit`;
     });
   });
+  renderCampaignDirectory();
 }
 
 function openTabNameModal(type) {
@@ -149,6 +399,7 @@ async function confirmTabName() {
     document.querySelectorAll(`[data-tab="${currentEditTab}"]`).forEach(tabBtn => {
       tabBtn.title = `${newName} - Double click to edit`;
     });
+    renderCampaignDirectory();
     closeTabNameModal();
   }
 }
@@ -158,11 +409,7 @@ function setupTabs() {
   tabBtns.forEach(btn => {
     btn.addEventListener('click', function() {
       const tabName = this.dataset.tab;
-      switchTab(tabName);
-      document.querySelectorAll('.counter-tabs').forEach(container => {
-        container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        container.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-      });
+      selectCampaign(tabName);
     });
     btn.addEventListener('dblclick', function(e) {
       e.stopPropagation();
@@ -175,16 +422,18 @@ function switchTab(tabName) {
   document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
   document.getElementById(`${tabName}-tab`).classList.add('active');
   currentTab = tabName;
+  renderCampaignDirectory();
 }
 
 async function updateCounterDisplay(type) {
   const counter = counters[type];
+  counter.lastUpdated = new Date();
   document.getElementById(`${type}-number`).textContent = String(counter.value).padStart(4, '0');
   const progress = ((counter.value % 100) / 100) * 100;
   document.getElementById(`${type}-progress`).style.width = progress + '%';
   const updatedEl = document.getElementById(`${type}-updated`);
   if (updatedEl) {
-    updatedEl.textContent = 'Last updated: ' + formatDateTime(new Date());
+    updatedEl.textContent = 'Last updated: ' + formatDateTime(counter.lastUpdated);
   }
   try {
     const history = await loadHistoryFromSupabase(type);
@@ -195,18 +444,32 @@ async function updateCounterDisplay(type) {
   } catch (error) {
     console.error('Error loading history count:', error);
   }
+  renderCampaignDirectory();
 }
 
 async function addCounter(type) {
+  const button = document.querySelector(`#${type}-tab .add-btn`);
   try {
-    counters[type].value++;
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Reserving';
+    }
+    const allocation = await reserveNextCampaignId(type);
+    counters[type].value = Number(allocation.sequence_number);
     await saveCounterToSupabase(type, counters[type].value);
     await updateCounterDisplay(type);
     await addToHistory(type, counters[type].value, 'generated');
+    await refreshAllocationState(type);
+    await copyCampaignSequence(counters[type].value);
     console.log(`New ${type} ID: ` + String(counters[type].value).padStart(4, '0'));
   } catch (error) {
     console.error('Error in addCounter:', error);
-    counters[type].value--;
+    alert(error.message || 'Unable to reserve the next campaign ID.');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = '<i class="fa-solid fa-plus"></i> Use Next ID';
+    }
   }
 }
 
@@ -255,6 +518,8 @@ async function confirmEditCounter() {
       await saveCounterToSupabase(currentEditCounter, counters[currentEditCounter].value);
       await updateCounterDisplay(currentEditCounter);
       await addToHistory(currentEditCounter, counters[currentEditCounter].value, 'manual_edit');
+      await saveManualAllocation(currentEditCounter, counters[currentEditCounter].value);
+      await refreshAllocationState(currentEditCounter);
       console.log(`${counters[currentEditCounter].name} ID updated to ` + String(counters[currentEditCounter].value).padStart(4, '0'));
       closeEditModal();
     } catch (error) {
@@ -264,6 +529,38 @@ async function confirmEditCounter() {
     alert('Please enter a valid number (1-9999)');
     input.focus();
   }
+}
+
+async function saveManualAllocation(campaignType, sequenceNumber) {
+  if (!allocationTableAvailable) return;
+  const { error } = await supabaseClient
+    .from('campaign_id_allocations')
+    .insert({
+      campaign_type: campaignType,
+      sequence_number: sequenceNumber,
+      campaign_name: counters[campaignType].name,
+      source: 'manual-edit',
+      status: 'used',
+      updated_at: new Date().toISOString()
+    });
+  if (error && !['23505', '42P01', 'PGRST205'].includes(error.code)) {
+    console.error('Unable to save manual campaign allocation:', error);
+  }
+}
+
+function subscribeToCampaignAllocations() {
+  if (!supabaseClient.channel) return;
+  supabaseClient
+    .channel('campaign-id-allocations')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'campaign_id_allocations'
+    }, payload => {
+      const type = payload.new?.campaign_type || payload.old?.campaign_type;
+      if (type && counters[type]) refreshAllocationState(type);
+    })
+    .subscribe();
 }
 
 async function addToHistory(type, value, action) {

@@ -384,9 +384,11 @@ function styleEmbeddedTool(frame) {
     if (!frameDocument || !frameWindow) return;
     const scrollableToolPaths = [
       '/bookmarklet.html',
+      '/campaign-counter.html',
       '/database-generator.html',
     ];
     const allowsPageScroll = scrollableToolPaths.some((path) => frameWindow.location.pathname.endsWith(path));
+    const isCampaignCounter = frameWindow.location.pathname.endsWith('/campaign-counter.html');
 
     const style = frameDocument.createElement('style');
     style.textContent = `
@@ -416,6 +418,21 @@ function styleEmbeddedTool(frame) {
       .panel-body {
         min-height: 0 !important;
       }
+      ${isCampaignCounter ? `
+        .campaign-section {
+          height: auto !important;
+          min-height: 100% !important;
+        }
+        .campaign-section .container,
+        .tab-content,
+        .tab-pane.active {
+          height: auto !important;
+        }
+        .history-container,
+        .history-list {
+          overflow: visible !important;
+        }
+      ` : ''}
     `;
     frameDocument.head.appendChild(style);
     frameWindow.history.scrollRestoration = 'manual';
@@ -610,7 +627,7 @@ menuToggle.addEventListener('click', () => {
 
 backdrop.addEventListener('click', closeSidebar);
 
-document.getElementById('footer-year').textContent = new Date().getFullYear();
+document.getElementById('footer-year').textContent = '2025';
 
 configureRouteLinks();
 

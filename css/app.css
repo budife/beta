@@ -166,6 +166,54 @@ a {
   font-size: 12px;
 }
 
+.creator-link {
+  position: relative;
+  color: var(--app-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.creator-link:hover,
+.creator-link:focus-visible {
+  color: var(--ui-accent-dark);
+}
+
+.creator-popover {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  z-index: 30;
+  display: grid;
+  min-width: 120px;
+  gap: 2px;
+  padding: 8px 10px;
+  color: #27272a;
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--app-border);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.creator-popover strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.creator-popover small {
+  color: var(--app-muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.creator-link:hover .creator-popover,
+.creator-link:focus-visible .creator-popover {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .sidebar-socials {
   display: flex;
   gap: 6px;
