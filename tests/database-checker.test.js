@@ -24,7 +24,17 @@ const sandbox = {
   URL,
   TextDecoder,
   DOMException,
+  AbortController,
   performance
+};
+const sessionValues = new Map();
+sandbox.sessionStorage = {
+  getItem(key) {
+    return sessionValues.has(key) ? sessionValues.get(key) : null;
+  },
+  setItem(key, value) {
+    sessionValues.set(key, String(value));
+  }
 };
 
 vm.createContext(sandbox);
@@ -229,4 +239,181 @@ test('KRHRED value anomalies use specific categories', () => {
     Array.from(instance.describeInvalidKrhredValue('hello  world').anomalies, (item) => item.category),
     ['Repeated Spaces']
   );
+});
+
+test('layout test substitutes customer values and reports unresolved KRHRED units', () => {
+  const result = checker().applyKrhredTemplate(
+    '<p><%[KRHRED_Unit_30]|%></p><p><%[KRHRED_31]|%></p>',
+    { KRHRED_Unit_30: 'Hello Budi' }
+  );
+
+  assert.equal(result.content, '<p>Hello Budi</p><p></p>');
+  assert.deepEqual(Array.from(result.usedUnits), ['KRHRED_Unit_30', 'KRHRED_Unit_31']);
+  assert.deepEqual(Array.from(result.missingUnits), ['KRHRED_Unit_31']);
+});
+
+test('layout highlight marks visible KRHRED text without breaking attributes', () => {
+  const result = checker().applyHighlightedKrhredTemplate(
+    '<a href="?name=<%[KRHRED_Unit_30]|%>">Hello <%[KRHRED_Unit_30]|%></a>',
+    { KRHRED_Unit_30: 'Budi' }
+  );
+
+  assert.equal(
+    result,
+    '<a href="?name=Budi">Hello <mark class="edm-krhred-highlight" title="KRHRED_Unit_30">Budi</mark></a>'
+  );
+});
+
+test('layout highlight marks every visible KRHRED unit and removes empty values', () => {
+  const result = checker().applyHighlightedKrhredTemplate(
+    '<p><%[KRHRED_Unit_30]|%> / <%[KRHRED_Unit_31]|%> / <%[KRHRED_Unit_32]|%></p>',
+    {
+      KRHRED_Unit_30: 'First',
+      KRHRED_Unit_31: 'Second',
+      KRHRED_Unit_32: ''
+    }
+  );
+
+  assert.match(result, /title="KRHRED_Unit_30">First<\/mark>/);
+  assert.match(result, /title="KRHRED_Unit_31">Second<\/mark>/);
+  assert.doesNotMatch(result, /KRHRED_Unit_32/);
+});
+
+test('layout coverage is based on resolved layout units', () => {
+  const instance = checker();
+  const html = '<%[KRHRED_Unit_30]|%><%[KRHRED_Unit_31]|%><%[KRHRED_Unit_32]|%>';
+  const result = instance.applyKrhredTemplate(html, {
+    KRHRED_Unit_30: 'A',
+    KRHRED_Unit_31: '',
+    KRHRED_Unit_32: 'C'
+  });
+
+  const total = instance.extractKrhredPlaceholders(html).length;
+  assert.equal(total - result.missingUnits.length, 2);
+  assert.equal(total, 3);
+});
+
+test('subject KRHRED normalizer follows Config eDM token format', () => {
+  const instance = checker();
+  assert.equal(
+    instance.normalizeSubjectKrhredTokens('Untuk KRHRED-unit-31'),
+    'Untuk <%[KRHRED_Unit_31]|%>'
+  );
+  assert.equal(
+    instance.normalizeSubjectKrhredTokens('Untuk KRHRED_unit_salah'),
+    'Untuk <%[KRHRED_Unit_XX]|%>'
+  );
+  assert.equal(instance.normalizeSubjectKrhredTokens('Plain subject'), 'Plain subject');
+  assert.equal(instance.normalizeSubjectKrhredTokens(''), '');
+});
+
+test('layout test extracts unique KRHRED placeholders in numeric order', () => {
+  const units = checker().extractKrhredPlaceholders(
+    '<%[KRHRED_Unit_32]|%> <%[KRHRED_Unit_7]|%> <%[KRHRED_Unit_32]|%>'
+  );
+
+  assert.deepEqual(Array.from(units), ['KRHRED_Unit_7', 'KRHRED_Unit_32']);
+});
+
+test('layout HTML title can still be extracted for reference', () => {
+  assert.equal(
+    checker().extractHtmlTitle('<html><head><title> RFM Spend Boost | HSBC Indonesia </title></head></html>'),
+    'RFM Spend Boost | HSBC Indonesia'
+  );
+});
+
+test('layout preview injects a base URL for relative campaign assets', () => {
+  const result = checker().prepareLayoutPreviewHtml(
+    '<html><head></head><body><img src="images/banner.jpg"></body></html>',
+    'https://mail.example.com/campaign/layout.html'
+  );
+
+  assert.match(result, /<base href="https:\/\/mail\.example\.com\/campaign\/">/);
+});
+
+test('layout test customer samples include checked dynamic values', () => {
+  const instance = checker();
+  const mastRecords = [{
+    id: '20260101_TEST-000001',
+    email: 'user@example.com'
+  }];
+  const attrRecords = [{
+    id: '20260101_TEST-000001',
+    attribute: 'KRHRED_Unit_31',
+    valueRaw: 'Budi'
+  }];
+  const attrById = new Map([
+    ['20260101_TEST-000001', new Set(['CMPG_ID', 'KRHRED_Unit_31'])]
+  ]);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(instance.buildLayoutTestCustomers(mastRecords, attrRecords, attrById))),
+    [{
+      id: '20260101_TEST-000001',
+      email: 'user@example.com',
+      campaignId: '20260101_TEST',
+      values: { KRHRED_Unit_31: 'Budi' }
+    }]
+  );
+});
+
+test('layout test accepts pasted HTML without a network request', async () => {
+  const html = '<!doctype html><html><head><title>Test</title></head><body>Layout</body></html>';
+  assert.equal(await checker().fetchLayoutTemplate('https://example.com/layout.html', null, html), html);
+});
+
+test('layout source fetch accepts the first valid parallel proxy response', async () => {
+  const calls = [];
+  sandbox.fetch = async (url) => {
+    calls.push(url);
+    if (url.includes('api.codetabs.com')) {
+      return {
+        ok: true,
+        text: async () => '<!doctype html><html><body>Proxy layout</body></html>'
+      };
+    }
+    throw new Error('Unavailable');
+  };
+
+  const result = await checker().fetchRemoteLayoutTemplate('https://example.com/layout.html');
+  assert.equal(result.via, 'CodeTabs');
+  assert.match(result.html, /Proxy layout/);
+  assert.equal(calls.length, 9);
+  delete sandbox.fetch;
+});
+
+test('layout test draft temporarily stores URL and subject', () => {
+  const instance = checker();
+  instance.layoutTestUrl = { value: 'https://example.com/layout.html' };
+  instance.layoutTestSubject = { value: 'Hello <%[KRHRED_Unit_31]|%>' };
+  instance.saveLayoutTestDraft();
+
+  instance.layoutTestUrl.value = '';
+  instance.layoutTestSubject.value = '';
+  instance.restoreLayoutTestDraft();
+
+  assert.equal(instance.layoutTestUrl.value, 'https://example.com/layout.html');
+  assert.equal(instance.layoutTestSubject.value, 'Hello <%[KRHRED_Unit_31]|%>');
+});
+
+test('manual layout customer lookup accepts exact email', async () => {
+  const instance = checker();
+  const makeHandle = (lines) => ({
+    async getFile() {
+      return new Blob([lines.join('\n')]);
+    }
+  });
+  instance.selectedPackage = {
+    files: new Map([
+      ['CustMast', makeHandle(['20260101_TEST-000001|user@example.com||||||||||||||||||'])],
+      ['CustAttr', makeHandle([
+        '20260101_TEST-000001|user@example.com|CMPG_ID|20260101_TEST|',
+        '20260101_TEST-000001|user@example.com|KRHRED_Unit_31|Budi|'
+      ])]
+    ])
+  };
+
+  const customer = await instance.findLayoutTestCustomer('user@example.com');
+  assert.equal(customer.id, '20260101_TEST-000001');
+  assert.equal(customer.values.KRHRED_Unit_31, 'Budi');
 });

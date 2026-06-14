@@ -29,7 +29,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css">
-  <link rel="stylesheet" href="../css/pages-database-checker.css?v=6.1.0">
+  <link rel="stylesheet" href="../css/pages-database-checker.css?v=6.2.0">
 
   
 
@@ -167,6 +167,12 @@
         <button id="exportReportBtn" class="btn btn-secondary" type="button" title="Export validation report" disabled>
 
           <i class="fa-solid fa-download"></i><span>Export</span>
+
+        </button>
+
+        <button id="openLayoutTestBtn" class="btn btn-secondary" type="button" title="Test package data against an email layout" disabled>
+
+          <i class="fa-solid fa-envelope-open-text"></i><span>Layout Test</span>
 
         </button>
 
@@ -349,6 +355,107 @@
     </div>
   </div>
   <!-- ===== End Raw Data Modal ===== -->
+
+  <!-- ===== Modal: Database-to-Layout Test ===== -->
+  <div class="modal layout-test-modal" id="layoutTestModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="layoutTestBackdrop"></div>
+    <div class="modal-dialog layout-test-dialog" role="document">
+      <button class="modal-close" id="layoutTestCloseBtn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <h2 class="modal-title">
+        <i class="fa-solid fa-envelope-open-text"></i>
+        <span id="layoutTestTitle">Campaign Layout Test</span>
+      </h2>
+
+      <div class="layout-test-controls">
+        <label>
+          <span>Layout URL</span>
+          <input id="layoutTestUrl" type="url" placeholder="https://mail.example.com/campaign/layout.html">
+        </label>
+        <label>
+          <span>Customer email or ID</span>
+          <div class="layout-test-customer-picker">
+            <input id="layoutTestCustomer" type="search" placeholder="Enter exact email or customer ID">
+            <button id="useLayoutCustomerBtn" class="btn btn-secondary" type="button">
+              <i class="fa-solid fa-magnifying-glass"></i><span>Use</span>
+            </button>
+            <button id="randomLayoutCustomerBtn" class="btn btn-secondary" type="button">
+              <i class="fa-solid fa-shuffle"></i><span>Random</span>
+            </button>
+          </div>
+        </label>
+        <label class="layout-test-subject-field">
+          <span>Subject template (optional)</span>
+          <input id="layoutTestSubject" type="text" placeholder="Enter campaign subject (optional)">
+        </label>
+        <button id="runLayoutTestBtn" class="btn btn-primary" type="button">
+          <i class="fa-solid fa-flask"></i><span>Test Layout</span>
+        </button>
+        <details class="layout-test-fallback">
+          <summary>Advanced source fallback</summary>
+          <div>
+            <label class="layout-test-file-field">
+              <span>Downloaded layout HTML</span>
+              <input id="layoutTestFile" type="file" accept=".html,.htm,text/html">
+            </label>
+            <label class="layout-test-source-field">
+              <span>HTML source (auto-generated)</span>
+              <textarea id="layoutTestSource" rows="3" placeholder="Paste a layout URL to load its HTML source automatically"></textarea>
+            </label>
+          </div>
+        </details>
+      </div>
+
+      <div id="layoutTestStatus" class="layout-test-status">
+        Enter a public layout URL. A checked customer is selected automatically.
+      </div>
+
+      <section id="layoutTestResult" class="layout-test-result" hidden>
+        <div class="layout-test-summary">
+          <div>
+            <span>Email</span>
+            <strong id="layoutTestCustomerResult">-</strong>
+          </div>
+          <div>
+            <span>Total KRHRED</span>
+            <strong id="layoutTestCoverage" class="layout-test-coverage">-</strong>
+          </div>
+          <div class="layout-test-summary-subject">
+            <span>Subject</span>
+            <strong id="layoutTestSubjectResult">-</strong>
+          </div>
+          <div class="layout-test-summary-values">
+            <span>KRHRED Values</span>
+            <div id="layoutTestValues">-</div>
+          </div>
+        </div>
+        <div id="layoutTestIssues" class="layout-test-issues"></div>
+        <div id="layoutTestPreviewStage" class="layout-test-preview-stage">
+          <div class="layout-test-preview-toolbar">
+            <span>Layout Preview</span>
+            <div class="layout-test-preview-actions">
+              <label class="layout-test-highlight-toggle">
+                <input id="layoutTestHighlight" type="checkbox">
+                <span>Highlight KRHRED</span>
+              </label>
+              <button id="layoutTestFullscreenBtn" class="layout-test-fullscreen-btn" type="button">
+                <i class="fa-solid fa-expand"></i><span>Full Screen</span>
+              </button>
+            </div>
+          </div>
+          <iframe
+            id="layoutTestPreview"
+            class="layout-test-preview"
+            title="Personalized email layout preview"
+            sandbox=""
+          ></iframe>
+        </div>
+      </section>
+    </div>
+  </div>
+  <!-- ===== End Database-to-Layout Test ===== -->
 </main>
 
   <!-- Footer -->
@@ -380,7 +487,7 @@
 
 <script src="../js/footer.js" defer></script>
 <script src="../js/version-config.js" defer></script>
-<script src="../js/pages-database-checker.js?v=6.1.0" defer></script>
+<script src="../js/pages-database-checker.js?v=6.2.0" defer></script>
 
 </body>
 

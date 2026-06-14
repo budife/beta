@@ -12,6 +12,8 @@ const PACKAGE_FINDINGS_BATCH_SIZE = 20;
 const MAX_STORED_PACKAGE_FINDINGS = 10000;
 const PACKAGE_TYPE_SCAN_BYTES = 512 * 1024;
 const RAW_DATA_MAX_ROWS = 300;
+const LAYOUT_TEST_SAMPLE_SIZE = 20;
+const LAYOUT_TEST_SESSION_KEY = 'edm-helper-layout-test-draft';
 
 // Make constants configurable for performance mode
 Object.defineProperty(window, 'LINES_PER_PAGE', { value: LINES_PER_PAGE, writable: true });
@@ -584,6 +586,10 @@ class DatabaseChecker {
     this.packageValidationToken = 0;
     this.packageAbortController = null;
     this.lastPackageFiles = null;
+    this.layoutTestCustomerSamples = [];
+    this.activeLayoutTestCustomer = null;
+    this.layoutSourceFetchTimer = null;
+    this.layoutSourceAbortController = null;
     this.rawDataFileType = 'CustMast';
     
     // Performance mode detection
@@ -606,6 +612,18 @@ class DatabaseChecker {
     this.rawDataContent = document.getElementById('rawDataContent');
     this.rawDataStatus = document.getElementById('rawDataStatus');
     this.rawDataQuery = document.getElementById('rawDataQuery');
+    this.layoutTestModal = document.getElementById('layoutTestModal');
+    this.layoutTestUrl = document.getElementById('layoutTestUrl');
+    this.layoutTestCustomer = document.getElementById('layoutTestCustomer');
+    this.layoutTestFile = document.getElementById('layoutTestFile');
+    this.layoutTestSource = document.getElementById('layoutTestSource');
+    this.layoutTestSubject = document.getElementById('layoutTestSubject');
+    this.layoutTestHighlight = document.getElementById('layoutTestHighlight');
+    this.layoutTestStatus = document.getElementById('layoutTestStatus');
+    this.layoutTestResult = document.getElementById('layoutTestResult');
+    this.layoutTestPreview = document.getElementById('layoutTestPreview');
+    this.layoutTestPreviewStage = document.getElementById('layoutTestPreviewStage');
+    this.restoreLayoutTestDraft();
 
     // Initialize table header FIRST
     this.initializeTableHeader();
@@ -729,6 +747,27 @@ class DatabaseChecker {
     document.getElementById('rawDataCloseBtn').addEventListener('click', ()=>this.closeRawDataModal());
     document.getElementById('rawDataBackdrop').addEventListener('click', ()=>this.closeRawDataModal());
     document.getElementById('rawDataSearchBtn').addEventListener('click', ()=>this.searchRawData());
+    document.getElementById('openLayoutTestBtn').addEventListener('click', ()=>this.openLayoutTestModal());
+    document.getElementById('layoutTestCloseBtn').addEventListener('click', ()=>this.closeLayoutTestModal());
+    document.getElementById('layoutTestBackdrop').addEventListener('click', ()=>this.closeLayoutTestModal());
+    document.getElementById('runLayoutTestBtn').addEventListener('click', ()=>this.runLayoutTest());
+    document.getElementById('useLayoutCustomerBtn').addEventListener('click', ()=>this.useManualLayoutTestCustomer());
+    document.getElementById('randomLayoutCustomerBtn').addEventListener('click', ()=>this.pickRandomLayoutTestCustomer());
+    document.getElementById('layoutTestFullscreenBtn').addEventListener('click', ()=>this.toggleLayoutPreviewFullscreen());
+    this.layoutTestUrl.addEventListener('input', ()=>{
+      this.saveLayoutTestDraft();
+      this.scheduleLayoutSourceFetch();
+    });
+    this.layoutTestHighlight.addEventListener('change', ()=>this.refreshLayoutTestPreview());
+    this.layoutTestSubject.addEventListener('input', ()=>this.saveLayoutTestDraft());
+    this.layoutTestSubject.addEventListener('blur', ()=>{
+      this.normalizeLayoutTestSubject();
+      this.saveLayoutTestDraft();
+    });
+    this.layoutTestCustomer.addEventListener('keydown', (event)=>{
+      if (event.key === 'Enter') this.useManualLayoutTestCustomer();
+    });
+    document.addEventListener('fullscreenchange', ()=>this.updateLayoutFullscreenButton());
     this.rawDataQuery.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') this.searchRawData();
     });
@@ -773,6 +812,7 @@ class DatabaseChecker {
     window.addEventListener('keydown', (e)=>{
       if (e.key === 'Escape' && this.modalIsOpen()) this.closeSearchModal();
       if (e.key === 'Escape' && this.rawDataModal?.classList.contains('show')) this.closeRawDataModal();
+      if (e.key === 'Escape' && this.layoutTestModal?.classList.contains('show')) this.closeLayoutTestModal();
     });
   }
 
@@ -803,6 +843,155 @@ class DatabaseChecker {
   closeRawDataModal() {
     this.rawDataModal.classList.remove('show');
     this.rawDataModal.removeAttribute('open');
+  }
+
+  openLayoutTestModal() {
+    if (!this.selectedPackage || !this.layoutTestCustomerSamples.length) return;
+    this.pickRandomLayoutTestCustomer();
+    this.layoutTestModal.classList.add('show');
+    this.layoutTestModal.setAttribute('open', '');
+    this.layoutTestResult.hidden = true;
+    this.layoutTestPreview.removeAttribute('srcdoc');
+    this.layoutTestStatus.className = 'layout-test-status';
+    this.layoutTestStatus.textContent = `Testing package ${this.selectedPackage.key} with a random checked customer.`;
+    if (this.layoutTestUrl.value.trim() && !this.layoutTestSource.value.trim()) {
+      this.scheduleLayoutSourceFetch();
+    }
+    setTimeout(() => this.layoutTestUrl.focus(), 0);
+  }
+
+  closeLayoutTestModal() {
+    this.layoutTestModal.classList.remove('show');
+    this.layoutTestModal.removeAttribute('open');
+  }
+
+  pickRandomLayoutTestCustomer() {
+    if (!this.layoutTestCustomerSamples.length) return null;
+    const previousId = this.activeLayoutTestCustomer?.id;
+    const alternatives = this.layoutTestCustomerSamples.filter((customer) => {
+      return this.layoutTestCustomerSamples.length === 1 || customer.id !== previousId;
+    });
+    const customer = alternatives[Math.floor(Math.random() * alternatives.length)];
+    this.activeLayoutTestCustomer = customer;
+    this.layoutTestCustomer.value = customer.email;
+    const title = document.getElementById('layoutTestTitle');
+    if (title) title.textContent = customer.campaignId || this.selectedPackage?.key || 'Campaign Layout Test';
+    return customer;
+  }
+
+  async useManualLayoutTestCustomer() {
+    const query = this.layoutTestCustomer.value.trim();
+    if (!query) return;
+
+    this.layoutTestStatus.className = 'layout-test-status loading';
+    this.layoutTestStatus.textContent = 'Finding customer in the selected package...';
+    try {
+      const customer = await this.findLayoutTestCustomer(query);
+      customer.campaignId = customer.id.replace(/-\d{6}$/, '');
+      this.activeLayoutTestCustomer = customer;
+      this.layoutTestCustomer.value = customer.email;
+      document.getElementById('layoutTestTitle').textContent =
+        customer.campaignId || this.selectedPackage?.key || 'Campaign Layout Test';
+      const filledCount = Object.values(customer.values)
+        .filter((value) => String(value).trim()).length;
+      this.layoutTestStatus.className = 'layout-test-status valid';
+      this.layoutTestStatus.textContent =
+        `${customer.email} selected with ${filledCount} filled KRHRED value${filledCount === 1 ? '' : 's'}.`;
+    } catch (error) {
+      this.activeLayoutTestCustomer = null;
+      this.layoutTestStatus.className = 'layout-test-status invalid';
+      this.layoutTestStatus.textContent = error.message;
+    }
+  }
+
+  saveLayoutTestDraft() {
+    try {
+      sessionStorage.setItem(LAYOUT_TEST_SESSION_KEY, JSON.stringify({
+        url: this.layoutTestUrl.value,
+        subject: this.layoutTestSubject.value
+      }));
+    } catch {}
+  }
+
+  restoreLayoutTestDraft() {
+    try {
+      const draft = JSON.parse(sessionStorage.getItem(LAYOUT_TEST_SESSION_KEY) || '{}');
+      this.layoutTestUrl.value = draft.url || '';
+      this.layoutTestSubject.value = draft.subject || '';
+    } catch {}
+  }
+
+  async toggleLayoutPreviewFullscreen() {
+    try {
+      if (document.fullscreenElement === this.layoutTestPreviewStage) {
+        await document.exitFullscreen();
+        return;
+      }
+      if (!this.layoutTestPreviewStage.requestFullscreen) {
+        throw new Error('Full-screen mode is not supported by this browser.');
+      }
+      await this.layoutTestPreviewStage.requestFullscreen();
+    } catch (error) {
+      this.layoutTestStatus.className = 'layout-test-status invalid';
+      this.layoutTestStatus.textContent = error.message;
+    }
+  }
+
+  updateLayoutFullscreenButton() {
+    const button = document.getElementById('layoutTestFullscreenBtn');
+    const active = document.fullscreenElement === this.layoutTestPreviewStage;
+    button.innerHTML = active
+      ? '<i class="fa-solid fa-compress"></i><span>Exit Full Screen</span>'
+      : '<i class="fa-solid fa-expand"></i><span>Full Screen</span>';
+  }
+
+  scheduleLayoutSourceFetch() {
+    clearTimeout(this.layoutSourceFetchTimer);
+    this.layoutSourceAbortController?.abort();
+
+    const url = this.layoutTestUrl.value.trim();
+    if (!url) return;
+
+    try {
+      const parsedUrl = new URL(url);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) return;
+    } catch {
+      return;
+    }
+
+    this.layoutSourceFetchTimer = setTimeout(() => {
+      this.loadLayoutSourceFromUrl(url);
+    }, 350);
+  }
+
+  async loadLayoutSourceFromUrl(url) {
+    this.layoutSourceAbortController?.abort();
+    this.layoutSourceAbortController = new AbortController();
+    const { signal } = this.layoutSourceAbortController;
+
+    this.layoutTestStatus.className = 'layout-test-status loading';
+    this.layoutTestStatus.textContent = 'Fetching HTML source from the layout URL...';
+    this.layoutTestSource.value = '';
+    this.layoutTestSource.placeholder = 'Fetching HTML source...';
+
+    try {
+      const result = await this.fetchRemoteLayoutTemplate(url, signal);
+      if (this.layoutTestUrl.value.trim() !== url) return;
+
+      this.layoutTestSource.value = result.html;
+      this.layoutTestSource.placeholder = 'HTML source loaded automatically';
+      const units = this.extractKrhredPlaceholders(result.html);
+      this.layoutTestStatus.className = 'layout-test-status valid';
+      this.layoutTestStatus.textContent =
+        `HTML source loaded via ${result.via}. ${units.length} KRHRED unit${units.length === 1 ? '' : 's'} detected.`;
+
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+      this.layoutTestSource.placeholder = 'Automatic fetch failed; paste HTML source here';
+      this.layoutTestStatus.className = 'layout-test-status invalid';
+      this.layoutTestStatus.textContent =
+        `Automatic source fetch failed (${error.message}). Paste the HTML source or select the downloaded file.`;
+    }
   }
 
   renderRawDataTabs() {
@@ -891,7 +1080,11 @@ class DatabaseChecker {
         let newlineIndex = buffer.indexOf('\n');
         while (newlineIndex !== -1) {
           lineNumber += 1;
-          onLine(buffer.slice(0, newlineIndex).replace(/\r$/, ''), lineNumber);
+          const shouldContinue = onLine(buffer.slice(0, newlineIndex).replace(/\r$/, ''), lineNumber);
+          if (shouldContinue === false) {
+            await reader.cancel();
+            return;
+          }
           buffer = buffer.slice(newlineIndex + 1);
           newlineIndex = buffer.indexOf('\n');
         }
@@ -901,6 +1094,394 @@ class DatabaseChecker {
       if (buffer !== '') onLine(buffer.replace(/\r$/, ''), lineNumber + 1);
     } finally {
       reader.releaseLock();
+    }
+  }
+
+  async findLayoutTestCustomer(query) {
+    const normalizedQuery = query.trim().toLowerCase();
+    const mastHandle = this.selectedPackage?.files.get('CustMast');
+    const attrHandle = this.selectedPackage?.files.get('CustAttr');
+    if (!mastHandle || !attrHandle) {
+      throw new Error('CustMast and CustAttr are required for a layout test.');
+    }
+
+    let customer = null;
+    const mastFile = await mastHandle.getFile();
+    await this.scanFileLines(mastFile, (line) => {
+      const fields = line.split('|');
+      const id = (fields[0] || '').trim();
+      const email = (fields[1] || '').trim();
+      if (id.toLowerCase() === normalizedQuery || email.toLowerCase() === normalizedQuery) {
+        customer = { id, email, values: {} };
+        return false;
+      }
+      return true;
+    });
+
+    if (!customer) {
+      throw new Error('Customer ID or email was not found in CustMast.');
+    }
+
+    const attrFile = await attrHandle.getFile();
+    await this.scanFileLines(attrFile, (line) => {
+      const fields = line.split('|');
+      if ((fields[0] || '').trim() !== customer.id) return true;
+      const attribute = (fields[2] || '').trim();
+      if (unitRegex.test(attribute)) {
+        const normalizedUnit = attribute.replace(/^KRHRED(?:_Unit)?_/i, 'KRHRED_Unit_');
+        customer.values[normalizedUnit] = fields[3] || '';
+      }
+      return true;
+    });
+
+    return customer;
+  }
+
+  extractKrhredPlaceholders(template) {
+    const units = new Set();
+    String(template || '').replace(/<%\[KRHRED(?:_Unit)?_(\d+)\]\|%>/gi, (_, unitNumber) => {
+      units.add(`KRHRED_Unit_${unitNumber}`);
+      return _;
+    });
+    return [...units].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }
+
+  applyKrhredTemplate(template, values) {
+    const usedUnits = new Set();
+    const missingUnits = new Set();
+    const content = String(template || '').replace(
+      /<%\[KRHRED(?:_Unit)?_(\d+)\]\|%>/gi,
+      (placeholder, unitNumber) => {
+        const unit = `KRHRED_Unit_${unitNumber}`;
+        usedUnits.add(unit);
+        if (!Object.prototype.hasOwnProperty.call(values, unit) || String(values[unit]).trim() === '') {
+          missingUnits.add(unit);
+          return '';
+        }
+        return values[unit];
+      }
+    );
+
+    return {
+      content,
+      usedUnits: [...usedUnits].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+      missingUnits: [...missingUnits].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    };
+  }
+
+  normalizeSubjectKrhredTokens(text) {
+    if (!text || !/krhred/i.test(text)) return text || '';
+
+    return String(text).replace(
+      /(\s*)<?%?\s*\[?\s*KRHRED(?:[\s_-]*Unit)?(?:[\s_-]*([A-Za-z0-9]+))?\s*\]?\s*\|?\s*%?>?/gi,
+      (token, leadingSpace, rawUnit) => {
+        const normalizedUnit = String(rawUnit || '')
+          .replace(/[oO]/g, '0')
+          .replace(/[lI]/g, '1');
+        const validUnit = /^\d{1,2}$/.test(normalizedUnit)
+          ? normalizedUnit.padStart(2, '0')
+          : 'XX';
+        return `${leadingSpace}<%[KRHRED_Unit_${validUnit}]|%>`;
+      }
+    );
+  }
+
+  normalizeLayoutTestSubject() {
+    const normalized = this.normalizeSubjectKrhredTokens(this.layoutTestSubject.value);
+    this.layoutTestSubject.value = normalized;
+    this.saveLayoutTestDraft();
+    return normalized;
+  }
+
+  applyHighlightedKrhredTemplate(template, values) {
+    const html = String(template || '');
+    let insideTag = false;
+    let quote = '';
+    let output = '';
+
+    for (let index = 0; index < html.length;) {
+      const placeholder = html.slice(index).match(/^<%\[KRHRED(?:_Unit)?_(\d+)\]\|%>/i);
+      if (placeholder) {
+        const unit = `KRHRED_Unit_${placeholder[1]}`;
+        const value = Object.prototype.hasOwnProperty.call(values, unit) ? values[unit] : '';
+        output += String(value).trim() === ''
+          ? ''
+          : insideTag
+            ? value
+            : `<mark class="edm-krhred-highlight" title="${unit}">${value}</mark>`;
+        index += placeholder[0].length;
+        continue;
+      }
+
+      const character = html[index];
+      output += character;
+      if (insideTag && quote) {
+        if (character === quote) quote = '';
+      } else if (insideTag && (character === '"' || character === "'")) {
+        quote = character;
+      } else if (!insideTag && character === '<' && /[a-z!/]/i.test(html[index + 1] || '')) {
+        insideTag = true;
+      } else if (insideTag && character === '>') {
+        insideTag = false;
+      }
+      index += 1;
+    }
+
+    return output;
+  }
+
+  buildLayoutTestCustomers(mastRecords, attrRecords, attrById, sampleSize = LAYOUT_TEST_SAMPLE_SIZE) {
+    const samples = [];
+    let eligibleCount = 0;
+
+    mastRecords.forEach((record) => {
+      const attributes = attrById.get(record.id);
+      const hasKrhred = attributes && [...attributes].some((attribute) => unitRegex.test(attribute));
+      if (!record.id || !EMAIL_REGEX.test(record.email) || !hasKrhred) return;
+
+      eligibleCount += 1;
+      const candidate = {
+        id: record.id,
+        email: record.email,
+        campaignId: record.campaignId || record.id.replace(/-\d{6}$/, ''),
+        values: {}
+      };
+      if (samples.length < sampleSize) {
+        samples.push(candidate);
+        return;
+      }
+
+      const replacementIndex = Math.floor(Math.random() * eligibleCount);
+      if (replacementIndex < sampleSize) samples[replacementIndex] = candidate;
+    });
+
+    const samplesById = new Map(samples.map((customer) => [customer.id, customer]));
+    attrRecords.forEach((record) => {
+      const customer = samplesById.get(record.id);
+      const attribute = record.attribute.trim();
+      if (!customer) return;
+      if (attribute === 'CMPG_ID' && record.valueRaw.trim()) {
+        customer.campaignId = record.valueRaw.trim();
+        return;
+      }
+      if (!unitRegex.test(attribute)) return;
+      const normalizedUnit = attribute.replace(/^KRHRED(?:_Unit)?_/i, 'KRHRED_Unit_');
+      customer.values[normalizedUnit] = record.valueRaw;
+    });
+
+    return samples;
+  }
+
+  extractHtmlTitle(html) {
+    const match = String(html || '').match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    return match
+      ? match[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+      : '';
+  }
+
+  prepareLayoutPreviewHtml(html, sourceUrl) {
+    const baseHref = new URL('.', sourceUrl).href.replace(/"/g, '&quot;');
+    const baseTag = `<base href="${baseHref}">`;
+    const highlightStyle = `<style>
+      .edm-krhred-highlight {
+        padding: 1px 3px !important;
+        color: inherit !important;
+        background: #fff3a3 !important;
+        outline: 1px solid #f18c8e !important;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+    </style>`;
+    if (/<head[^>]*>/i.test(html)) {
+      return html.replace(/<head([^>]*)>/i, `<head$1>${baseTag}${highlightStyle}`);
+    }
+    return `${baseTag}${highlightStyle}${html}`;
+  }
+
+  refreshLayoutTestPreview() {
+    if (!this.layoutTestPreviewSource || !this.activeLayoutTestCustomer) return;
+    const html = this.layoutTestHighlight.checked
+      ? this.applyHighlightedKrhredTemplate(
+          this.layoutTestPreviewSource.html,
+          this.activeLayoutTestCustomer.values
+        )
+      : this.applyKrhredTemplate(
+          this.layoutTestPreviewSource.html,
+          this.activeLayoutTestCustomer.values
+        ).content;
+    this.layoutTestPreview.srcdoc = this.prepareLayoutPreviewHtml(
+      html,
+      this.layoutTestPreviewSource.url
+    );
+  }
+
+  async fetchLayoutTemplate(url, localFile = null, pastedSource = '') {
+    if (pastedSource.trim()) {
+      const html = pastedSource.trim();
+      if (!/<html|<!doctype/i.test(html)) {
+        throw new Error('The pasted source is not a valid HTML document.');
+      }
+      return html;
+    }
+
+    if (localFile) {
+      const html = await localFile.text();
+      if (!/<html|<!doctype/i.test(html)) {
+        throw new Error('The selected file is not a valid HTML document.');
+      }
+      return html;
+    }
+
+    const result = await this.fetchRemoteLayoutTemplate(url);
+    return result.html;
+  }
+
+  async fetchRemoteLayoutTemplate(url, externalSignal = null) {
+    const cleanUrl = url.replace(/^https?:\/\//, '');
+    const attempts = [
+      { url, via: 'direct' },
+      { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, via: 'AllOrigins', json: true },
+      { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, via: 'CodeTabs' },
+      { url: `https://r.jina.ai/http://${cleanUrl}`, via: 'Jina HTTP' },
+      { url: `https://r.jina.ai/https://${cleanUrl}`, via: 'Jina HTTPS' },
+      { url: `https://corsproxy.io/?${encodeURIComponent(url)}`, via: 'CorsProxy' },
+      { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, via: 'AllOrigins Raw' },
+      { url: `https://thingproxy.freeboard.io/fetch/${url}`, via: 'ThingProxy' },
+      { url: `https://cors-anywhere.herokuapp.com/${url}`, via: 'CORS Anywhere' }
+    ];
+    const controllers = [];
+    const fetchAttempt = async (attempt) => {
+      const controller = new AbortController();
+      controllers.push(controller);
+      const abortFromExternal = () => controller.abort();
+      externalSignal?.addEventListener('abort', abortFromExternal, { once: true });
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      try {
+        const response = await fetch(attempt.url, {
+          signal: controller.signal,
+          headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const html = attempt.json
+          ? (await response.json()).contents || ''
+          : await response.text();
+        if (!/<html|<!doctype/i.test(html)) throw new Error('Response is not an HTML document.');
+        return { html, via: attempt.via };
+      } finally {
+        clearTimeout(timeoutId);
+        externalSignal?.removeEventListener('abort', abortFromExternal);
+      }
+    };
+
+    try {
+      const result = await Promise.any(attempts.map(fetchAttempt));
+      controllers.forEach((controller) => controller.abort());
+      return result;
+    } catch (error) {
+      controllers.forEach((controller) => controller.abort());
+      if (externalSignal?.aborted) throw new DOMException('Fetch cancelled', 'AbortError');
+      const lastError = error.errors?.findLast?.((item) => item?.message) || error;
+      throw new Error(lastError?.message || 'all fetch attempts failed');
+    }
+  }
+
+  async runLayoutTest() {
+    const url = this.layoutTestUrl.value.trim();
+    const customer = this.activeLayoutTestCustomer;
+    const subjectTemplate = this.normalizeLayoutTestSubject().trim();
+    if (!url || !customer) {
+      this.layoutTestStatus.className = 'layout-test-status invalid';
+      this.layoutTestStatus.textContent = 'Layout URL and a checked customer are required.';
+      return;
+    }
+
+    try {
+      const parsedUrl = new URL(url);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) throw new Error('Unsupported protocol');
+    } catch {
+      this.layoutTestStatus.className = 'layout-test-status invalid';
+      this.layoutTestStatus.textContent = 'Enter a valid public HTTP or HTTPS URL.';
+      return;
+    }
+
+    const runButton = document.getElementById('runLayoutTestBtn');
+    runButton.disabled = true;
+    this.layoutTestResult.hidden = true;
+    this.layoutTestStatus.className = 'layout-test-status loading';
+    this.layoutTestStatus.textContent = 'Loading customer data and email layout...';
+
+    try {
+      const html = await this.fetchLayoutTemplate(
+        url,
+        this.layoutTestFile.files[0] || null,
+        this.layoutTestSource.value
+      );
+      const htmlResult = this.applyKrhredTemplate(html, customer.values);
+      const subjectResult = this.applyKrhredTemplate(subjectTemplate, customer.values);
+      const layoutUnits = this.extractKrhredPlaceholders(html);
+      const allUsedUnits = [...new Set([...htmlResult.usedUnits, ...subjectResult.usedUnits])]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      const allMissingUnits = [...new Set([...htmlResult.missingUnits, ...subjectResult.missingUnits])]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      const unusedCustomerUnits = Object.keys(customer.values)
+        .filter((unit) => !allUsedUnits.includes(unit))
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      document.getElementById('layoutTestCustomerResult').textContent = customer.email;
+      document.getElementById('layoutTestSubjectResult').textContent = subjectTemplate
+        ? subjectResult.content
+        : '(not provided)';
+      const coverageElement = document.getElementById('layoutTestCoverage');
+      const resolvedLayoutCount = layoutUnits.length - htmlResult.missingUnits.length;
+      coverageElement.textContent = `${resolvedLayoutCount}/${layoutUnits.length}`;
+      coverageElement.classList.toggle('invalid', htmlResult.missingUnits.length > 0);
+      coverageElement.tabIndex = htmlResult.missingUnits.length ? 0 : -1;
+      if (htmlResult.missingUnits.length) {
+        coverageElement.dataset.tooltip =
+          `Empty database values: ${htmlResult.missingUnits.join(', ')}`;
+        coverageElement.setAttribute('aria-label', coverageElement.dataset.tooltip);
+      } else {
+        delete coverageElement.dataset.tooltip;
+        coverageElement.removeAttribute('aria-label');
+      }
+      document.getElementById('layoutTestValues').innerHTML = Object.entries(customer.values)
+        .sort(([unitA], [unitB]) => unitA.localeCompare(unitB, undefined, { numeric: true }))
+        .map(([unit, value]) => `
+          <span class="layout-test-value" title="${escapeHtml(String(value || '(empty)'))}">
+            <b>${escapeHtml(unit.replace('KRHRED_Unit_', ''))}</b>: ${escapeHtml(String(value || '(empty)'))}
+          </span>
+        `).join('') || '<span class="layout-test-value">(no KRHRED values)</span>';
+
+      const issueItems = [];
+      if (subjectTemplate.includes('<%[KRHRED_Unit_XX]|%>')) {
+        issueItems.push('<span class="invalid">Subject contains an invalid KRHRED unit</span>');
+      }
+      if (subjectTemplate && subjectResult.content.length > 60) {
+        issueItems.push(`<span>Subject length: ${subjectResult.content.length} characters</span>`);
+      }
+      if (subjectResult.missingUnits.length) {
+        issueItems.push(`<span class="invalid">Subject missing: ${subjectResult.missingUnits.map(escapeHtml).join(', ')}</span>`);
+      }
+      if (htmlResult.missingUnits.length) {
+        issueItems.push(`<span class="invalid">Layout missing: ${htmlResult.missingUnits.map(escapeHtml).join(', ')}</span>`);
+      }
+      if (unusedCustomerUnits.length) issueItems.push(`<span>Unused database values: ${unusedCustomerUnits.map(escapeHtml).join(', ')}</span>`);
+      if (!allUsedUnits.length) issueItems.push('<span class="invalid">No KRHRED placeholders found in layout or subject</span>');
+      document.getElementById('layoutTestIssues').innerHTML = issueItems.length
+        ? issueItems.join('')
+        : '<span class="valid">All detected placeholders are resolved.</span>';
+
+      this.layoutTestPreviewSource = { html, url };
+      this.refreshLayoutTestPreview();
+      this.layoutTestResult.hidden = false;
+      this.layoutTestStatus.className = `layout-test-status ${allMissingUnits.length ? 'invalid' : 'valid'}`;
+      this.layoutTestStatus.textContent = allMissingUnits.length
+        ? `Preview generated with ${allMissingUnits.length} unresolved placeholder(s).`
+        : 'Preview and subject generated successfully.';
+    } catch (error) {
+      this.layoutTestStatus.className = 'layout-test-status invalid';
+      this.layoutTestStatus.textContent = error.message;
+    } finally {
+      runButton.disabled = false;
     }
   }
 
@@ -1697,6 +2278,9 @@ class DatabaseChecker {
       rows: records[type].length,
       errors: findings.fileCounts.get(type) || 0
     }));
+    const layoutTestCustomers = databaseType === 'Dynamic'
+      ? this.buildLayoutTestCustomers(records.CustMast, records.CustAttr, attrById)
+      : [];
 
     return {
       packageName: packageInfo.key,
@@ -1708,7 +2292,8 @@ class DatabaseChecker {
       fileStats,
       categoryCounts: [...findings.categoryCounts.entries()].sort((a, b) => b[1] - a[1]),
       unitCounts: [...findings.unitCounts.entries()].sort((a, b) => b[1] - a[1]),
-      dynamicUnits: dynamicUnits.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      dynamicUnits: dynamicUnits.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+      layoutTestCustomers
     };
   }
 
@@ -1740,9 +2325,16 @@ class DatabaseChecker {
 
       this.lastPackageResult = result;
       this.lastPackageFiles = files;
+      this.layoutTestCustomerSamples = result.layoutTestCustomers;
+      this.activeLayoutTestCustomer = null;
       this.renderPackageResults(result);
       this.updatePackageStatus(result);
       document.getElementById('exportReportBtn').disabled = false;
+      const layoutTestButton = document.getElementById('openLayoutTestBtn');
+      layoutTestButton.disabled = result.layoutTestCustomers.length === 0;
+      layoutTestButton.title = result.layoutTestCustomers.length
+        ? `Test with one of ${result.layoutTestCustomers.length} sampled customers`
+        : 'Layout Test requires a checked dynamic database';
     } catch (error) {
       if (error.name === 'AbortError') {
         this.showToast('Validation cancelled.', 'warning');
@@ -2740,9 +3332,12 @@ class DatabaseChecker {
     this.selectedPackage = packageInfo;
     this.lastPackageResult = null;
     this.lastPackageFiles = null;
+    this.layoutTestCustomerSamples = [];
+    this.activeLayoutTestCustomer = null;
     this.checkBtn.disabled = false;
     document.getElementById('openRawDataBtn').disabled = false;
     document.getElementById('exportReportBtn').disabled = true;
+    document.getElementById('openLayoutTestBtn').disabled = true;
     this.updateCheckButton();
     this.showLoading(false);
 
