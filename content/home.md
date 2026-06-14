@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.7.2 · 14 June 2026** - Restored the complete release timeline from Alpha Sensei through every eDM Helper version.
 - **v6.7.1 · 14 June 2026** - Preserved the complete Recent Updates history while keeping the timeline compact and scrollable.
 - **v6.7.0 · 14 June 2026** - Refined Layout Checker with faster URL loading, embedded code/preview tabs, full-height workspace panels, reliable image base paths, manual and bulk KRHRED application, reset-to-source preview, and optional KRHRED highlighting.
 - **v6.6.0 · 14 June 2026** - Redesigned Config eDM into a compact file workflow with field locking, PROD/UAT campaign toggles, Apply & Save, automatic XML renaming, file filtering and status, validation summaries, and Back/Next XML navigation.
@@ -41,6 +42,14 @@ category: Home
 - **v6.2.0 · 14 June 2026** - Added Database-to-Layout Test with automatic HTML loading, random or manual customer selection, KRHRED personalization and highlighting, subject normalization, coverage alerts, full-screen preview, and temporary URL/subject drafts.
 - **v6.1.0 · 14 June 2026** - Upgraded Database Checker with four-file package validation, static/dynamic detection, grouped anomaly findings, raw-line inspection, CSV export, and a compact package workspace.
 - **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
+- **v5.0.0 · 12 April 2026** - Released version 5.
+- **v4.0.0 · 14 March 2026** - Released version 4.
+- **v3.0.0 · 20 February 2026** - Released version 3.
+- **v2.0.0 · 13 October 2025** - Renamed the application to **eDM Helper** and released version 2.
+- **v1.0.0 · 17 August 2025** - Released version 1.
+- **29 June 2025** - Added Layout Checker and Database Counter.
+- **v0.0.0 Beta Live · 27 May 2025** - The first public beta went live.
+- **April 2025** - The application was first created under the name **Alpha Sensei**.
 
 ## Useful Links
 
