@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.4.0">
-  <link rel="stylesheet" href="../css/pages-database-generator.css?v=6.4.0">
-  <link rel="stylesheet" href="../css/controls.css?v=6.4.0">
+  <link rel="stylesheet" href="../css/theme.css?v=6.4.1">
+  <link rel="stylesheet" href="../css/pages-database-generator.css?v=6.4.1">
+  <link rel="stylesheet" href="../css/controls.css?v=6.4.1">
   
   <title>Database Generator - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -98,12 +98,12 @@
         <div class="section-heading workspace-heading">
           <div>
             <p class="section-eyebrow">Customer data</p>
-            <h2 id="data-title">Email and KRHRED values</h2>
+            <h2 id="data-title">Customers & KRHRED</h2>
           </div>
           <div class="data-summary" aria-label="Data summary">
-            <span><strong id="emailCount">0</strong> emails</span>
-            <span><strong id="validCount">0</strong> valid</span>
-            <span><strong id="krhredCount">0</strong> KRHRED</span>
+            <span><b>Customers</b><strong id="emailCount">0</strong></span>
+            <span><b>Valid</b><strong id="validCount">0</strong></span>
+            <span><b>KRHRED</b><strong id="krhredCount">0</strong></span>
           </div>
         </div>
 
@@ -111,7 +111,7 @@
           <div class="toolbar-field toolbar-email">
             <label for="newEmail" class="form-label">
               <i class="fa-solid fa-envelope form-label-icon" aria-hidden="true"></i>
-              Tambah email
+              Customer email
             </label>
             <div class="input-button-group">
               <input id="newEmail" class="form-input" type="email" placeholder="email@contoh.com" aria-describedby="emailError" />
@@ -126,21 +126,26 @@
           <div id="krhredSection" class="toolbar-field krhred-section">
             <label for="newKey" class="form-label">
               <i class="fa-solid fa-table-columns form-label-icon" aria-hidden="true"></i>
-              Tambah kolom KRHRED
+              KRHRED unit
             </label>
-            <div class="input-button-group">
-              <input id="newKey" class="form-input font-mono" placeholder="KRHRED_Unit_30" aria-describedby="keyHint keyError" />
-              <button id="addKey" class="btn secondary" type="button">Tambah kolom</button>
+            <div class="krhred-control-group">
+              <div class="krhred-number-field">
+                <span class="krhred-prefix" aria-hidden="true">KRHRED_Unit_</span>
+                <input id="newKey" class="form-input font-mono" type="number" min="1" step="1" inputmode="numeric" placeholder="30" aria-label="Nomor KRHRED Unit" aria-describedby="keyHint keyError" />
+              </div>
+              <button id="addKey" class="btn secondary icon-btn" type="button" title="Tambah kolom KRHRED" aria-label="Tambah kolom KRHRED">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              </button>
             </div>
-            <p id="keyHint" class="form-hint">Kosongkan untuk nomor berikutnya.</p>
+            <p id="keyHint" class="form-hint">Kosongkan untuk auto-next.</p>
             <p id="keyError" class="field-error hidden" role="alert"></p>
           </div>
 
           <div class="toolbar-action">
-            <span class="form-label toolbar-action-spacer" aria-hidden="true">Bulk action</span>
-            <button id="bulkBtn" class="btn secondary" type="button" aria-expanded="false" aria-controls="bulkBox">
+            <span class="form-label toolbar-action-spacer" aria-hidden="true">Bulk paste</span>
+            <button id="bulkBtn" class="btn secondary compact-btn" type="button" aria-expanded="false" aria-controls="bulkBox">
               <i class="fa-solid fa-paste" aria-hidden="true"></i>
-              Tempel banyak email
+              Bulk paste
             </button>
           </div>
         </div>
@@ -148,7 +153,7 @@
         <div id="bulkBox" class="bulk-box hidden">
           <label for="bulkEmails" class="form-label">
             <i class="fa-solid fa-paste form-label-icon" aria-hidden="true"></i>
-            Tempel banyak email
+            Bulk paste emails
           </label>
           <p class="form-hint">Pisahkan dengan baris baru, koma, titik koma, atau spasi.</p>
           <textarea id="bulkEmails" placeholder="email1@a.com&#10;email2@a.com, email3@a.com"></textarea>
@@ -162,9 +167,9 @@
         <div class="table-meta">
           <div>
             <span id="countInfo">Total: 0</span>
-            <span id="invalidInfo" class="hidden error-text"></span>
+          <span id="invalidInfo" class="hidden error-text"></span>
           </div>
-          <span class="table-help">Klik nilai di tabel untuk mengedit langsung.</span>
+          <span class="table-help">Edit langsung di tabel.</span>
         </div>
 
         <div class="data-table-wrap" tabindex="0" aria-label="Customer database values">
@@ -192,7 +197,7 @@
         <div class="section-heading output-heading">
           <div>
             <p class="section-eyebrow">Output</p>
-            <h2 id="output-title">Generated files</h2>
+            <h2 id="output-title">Files</h2>
           </div>
           <div class="output-actions">
             <button id="btnDownload" class="btn primary" type="button" disabled>
@@ -258,7 +263,7 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.4.0" defer></script>
-<script src="../js/pages-database-generator.js?v=6.4.0" defer></script>
+<script src="../js/version-config.js?v=6.4.1" defer></script>
+<script src="../js/pages-database-generator.js?v=6.4.1" defer></script>
 </body>
 </html>

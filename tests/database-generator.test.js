@@ -6,6 +6,9 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'js/pages-database-generator.js'), 'utf8');
+const normalizeStart = source.indexOf('function normalizeKey');
+const normalizeEnd = source.indexOf('function createEmailRow', normalizeStart);
+const normalizeFunction = source.slice(normalizeStart, normalizeEnd);
 const functionStart = source.indexOf('function recordId');
 const functionEnd = source.indexOf('function downloadText', functionStart);
 const generatorFunctions = source.slice(functionStart, functionEnd);
@@ -15,6 +18,7 @@ vm.createContext(sandbox);
 vm.runInContext(`
   let krKeys = [];
   const krValues = new Map();
+  ${normalizeFunction}
   ${generatorFunctions}
   this.setDynamicData = (keys, values) => {
     krKeys = keys;
@@ -30,8 +34,25 @@ vm.runInContext(`
       krValues.set(row.id, new Map(Object.entries(row.values)));
     }
   };
+  this.setKrKeys = (keys) => {
+    krKeys = keys;
+  };
+  this.normalizeKey = normalizeKey;
   this.buildAllFiles = buildAllFiles;
 `, sandbox);
+
+test('numeric KRHRED input converts to the full unit key', () => {
+  assert.equal(sandbox.normalizeKey('30'), 'KRHRED_Unit_30');
+  assert.equal(sandbox.normalizeKey('0031'), 'KRHRED_Unit_31');
+  assert.equal(sandbox.normalizeKey('0'), '');
+  assert.equal(sandbox.normalizeKey('-1'), '');
+  assert.equal(sandbox.normalizeKey('Unit 30'), '');
+});
+
+test('empty KRHRED input selects the next available unit number', () => {
+  sandbox.setKrKeys(['KRHRED_Unit_30', 'KRHRED_Unit_32']);
+  assert.equal(sandbox.normalizeKey(''), 'KRHRED_Unit_33');
+});
 
 test('static generator creates the expected four files', () => {
   const campaignId = '20260614_TEST_1400';

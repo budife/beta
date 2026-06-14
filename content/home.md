@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.4.1 · 14 June 2026** - Polished Database Generator UI with compact numeric KRHRED unit input, shorter toolbar labels, aligned compact actions, clearer summary badges, smaller empty states, and collapsible file previews.
 - **v6.4.0 · 14 June 2026** - Refactored Database Generator into a compact workspace with inline validation, stable embedded scrolling, aligned controls, duplicate-email support, responsive data tables, clearer file previews, and generator regression tests.
 - **v6.3.1 · 14 June 2026** - Moved the primary repository and GitHub Pages base path from `beta-uat` to `beta`.
 - **v6.3.0 · 14 June 2026** - Added the shared UI style guide, reusable design tokens, consistent 12px form controls across all tools, regular-weight typography, and responsive Database Checker modal and workspace refinements.
@@ -37,7 +38,6 @@ category: Home
 - **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
 - **v5.0.0 · 12 April 2026** - Released version 5.
 - **v4.0.0 · 14 March 2026** - Released version 4.
-- **v3.0.0 · 20 February 2026** - Released version 3.
 - **v2.0.0 · 13 October 2025** - Renamed the application to **eDM Helper** and released version 2.
 
 ## Useful Links

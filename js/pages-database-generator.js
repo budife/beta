@@ -88,11 +88,12 @@ const $ = (sel) => document.querySelector(sel);
     }
 
     function normalizeKey(k) {
-      if (k && k.trim()) {
-        let key = k.trim();
-        if (!/^KRHRED_/i.test(key)) key = 'KRHRED_' + key;
-        key = key.replace(/\s+/g, '_');
-        return key;
+      const raw = String(k ?? '').trim();
+      if (raw) {
+        if (!/^\d+$/.test(raw)) return '';
+        const unitNumber = Number.parseInt(raw, 10);
+        if (!Number.isSafeInteger(unitNumber) || unitNumber < 1) return '';
+        return `KRHRED_Unit_${unitNumber}`;
       }
       // auto-generate KRHRED_Unit_N starting at 30
       const nums = krKeys
@@ -154,7 +155,8 @@ const $ = (sel) => document.querySelector(sel);
         emptyRow.innerHTML = `
           <td colspan="100%" class="table-empty-state">
             <i class="fa-solid fa-inbox"></i>
-            <p>Belum ada email ditambahkan</p>
+            <p class="table-empty-title">No customer data yet</p>
+            <p class="table-empty-copy">Add one email or use bulk paste.</p>
           </td>
         `;
         krBody.appendChild(emptyRow);
@@ -387,16 +389,16 @@ const $ = (sel) => document.querySelector(sel);
       const files = buildAllFiles(campaignIdVal, emails, useKrVal);
       
       for (const [name, content] of Object.entries(files)) {
-        const card = document.createElement('div');
-        card.className = 'preview-card';
-        
         // Count lines and show file info
         const lines = content.split('\n').filter(line => line.trim()).length;
         const isKrFile = name.includes('CustAttr');
         const fileSize = (new Blob([content]).size / 1024).toFixed(1);
+        const card = document.createElement('details');
+        card.className = `preview-card${isKrFile ? ' is-primary' : ''}`;
+        card.open = isKrFile;
         
         card.innerHTML = `
-          <div class="preview-header">
+          <summary class="preview-header">
             <div class="preview-title">
               <i class="fa-solid fa-file-lines"></i>
               <span title="${escapeHtml(name)}">${escapeHtml(name)}</span>
@@ -404,8 +406,9 @@ const $ = (sel) => document.querySelector(sel);
             <div class="preview-badge">
               <span class="preview-lines">${lines} baris</span>
               <span class="preview-size">${fileSize} KB</span>
+              <span class="preview-toggle" aria-hidden="true"></span>
             </div>
-          </div>
+          </summary>
           <div class="preview-content">
             <pre>${escapeHtml(content.substring(0, 500))}${content.length > 500 ? '\n\n...' : ''}</pre>
           </div>
@@ -482,7 +485,11 @@ const $ = (sel) => document.querySelector(sel);
     addKeyBtn.addEventListener('click', () => {
       const key = normalizeKey(newKeyEl.value.trim());
       setFieldError(keyError);
-      if (!key) return;
+      if (!key) {
+        setFieldError(keyError, 'Masukkan nomor KRHRED yang valid, contoh: 30.');
+        newKeyEl.focus();
+        return;
+      }
       if (krKeys.includes(key)) {
         setFieldError(keyError, 'Kolom KRHRED tersebut sudah ada.');
         newKeyEl.focus();
