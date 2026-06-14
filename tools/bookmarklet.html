@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.3.1">
-  <link rel="stylesheet" href="../css/pages-bookmarklet.css">
-  <link rel="stylesheet" href="../css/controls.css?v=6.3.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.4.2">
+  <link rel="stylesheet" href="../css/pages-bookmarklet.css?v=6.4.2">
+  <link rel="stylesheet" href="../css/controls.css?v=6.4.2">
   
   <title>Bookmarklet - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -355,11 +355,15 @@
   <div id="settings-container"></div>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js" defer></script>
+<script src="../js/version-config.js?v=6.4.2" defer></script>
 <!-- All functionality in one inline script -->
 <script>
 // Search functionality
 document.addEventListener('DOMContentLoaded', function() {
+    if (new URLSearchParams(window.location.search).get('embed') === '1') {
+        document.body.classList.add('is-embedded');
+    }
+
     const searchInput = document.getElementById('bookmarkletSearch');
     const cards = document.querySelectorAll('.bookmarklet-card');
     
@@ -369,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cards.forEach(card => {
                 const title = card.querySelector('h3').textContent.toLowerCase();
                 const desc = card.querySelector('p').textContent.toLowerCase();
-                card.style.display = (title.includes(term) || desc.includes(term)) ? 'block' : 'none';
+                card.style.display = (title.includes(term) || desc.includes(term)) ? '' : 'none';
             });
         });
     }

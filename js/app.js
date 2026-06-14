@@ -90,7 +90,7 @@ const TOOL_META = {
 };
 
 function getVersion() {
-  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.4.1';
+  return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.4.2';
 }
 
 function withBasePath(path) {
@@ -383,7 +383,11 @@ function styleEmbeddedTool(frame) {
     const frameDocument = frame.contentDocument;
     const frameWindow = frame.contentWindow;
     if (!frameDocument || !frameWindow) return;
-    const allowsPageScroll = frameWindow.location.pathname.endsWith('/database-generator.html');
+    const scrollableToolPaths = [
+      '/bookmarklet.html',
+      '/database-generator.html',
+    ];
+    const allowsPageScroll = scrollableToolPaths.some((path) => frameWindow.location.pathname.endsWith(path));
 
     const style = frameDocument.createElement('style');
     style.textContent = `

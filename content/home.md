@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.4.2 · 14 June 2026** - Refreshed Bookmarklet with reliable embedded scrolling, a cleaner flat layout, compact search and controls, consistent tool cards, responsive spacing, and hidden duplicate navigation inside the eDM Helper shell.
 - **v6.4.1 · 14 June 2026** - Polished Database Generator UI with compact numeric KRHRED unit input, shorter toolbar labels, aligned compact actions, clearer summary badges, smaller empty states, and collapsible file previews.
 - **v6.4.0 · 14 June 2026** - Refactored Database Generator into a compact workspace with inline validation, stable embedded scrolling, aligned controls, duplicate-email support, responsive data tables, clearer file previews, and generator regression tests.
 - **v6.3.1 · 14 June 2026** - Moved the primary repository and GitHub Pages base path from `beta-uat` to `beta`.
@@ -38,7 +39,6 @@ category: Home
 - **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
 - **v5.0.0 · 12 April 2026** - Released version 5.
 - **v4.0.0 · 14 March 2026** - Released version 4.
-- **v2.0.0 · 13 October 2025** - Renamed the application to **eDM Helper** and released version 2.
 
 ## Useful Links
 
