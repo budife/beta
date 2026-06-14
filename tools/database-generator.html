@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.4.1">
-  <link rel="stylesheet" href="../css/pages-database-generator.css?v=6.4.1">
-  <link rel="stylesheet" href="../css/controls.css?v=6.4.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.5.0">
+  <link rel="stylesheet" href="../css/pages-database-generator.css?v=6.5.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.5.0">
   
   <title>Database Generator - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -52,14 +52,14 @@
       <section class="generator-card setup-card" aria-labelledby="setup-title">
         <div class="section-heading">
           <div>
-            <p class="section-eyebrow">Setup</p>
+            <p class="section-eyebrow">Campaign</p>
             <h2 id="setup-title">Campaign details</h2>
           </div>
           <p class="section-copy">Campaign ID determines every generated filename and record ID.</p>
         </div>
 
         <div class="setup-grid">
-          <div class="form-field">
+          <div class="form-field campaign-id-field">
             <label for="campaignId" class="form-label">
               <i class="fa-solid fa-tag form-label-icon" aria-hidden="true"></i>
               Campaign ID
@@ -69,99 +69,93 @@
             <p id="campaignError" class="field-error hidden" role="alert"></p>
           </div>
 
-          <fieldset class="form-field campaign-type-field">
-            <legend class="form-label">
-              <i class="fa-solid fa-sliders form-label-icon" aria-hidden="true"></i>
-              Tipe Campaign
-            </legend>
-            <div class="campaign-type-selector">
-              <label class="radio-option">
-                <input type="radio" name="campaignType" value="static" checked>
-                <span>
+          <div class="campaign-row">
+            <fieldset class="form-field campaign-type-field">
+              <legend class="form-label">
+                <i class="fa-solid fa-sliders form-label-icon" aria-hidden="true"></i>
+                Campaign Type
+              </legend>
+              <div class="campaign-type-selector">
+                <label class="radio-option">
+                  <input type="radio" name="campaignType" value="static" checked>
                   <span class="radio-label">Static</span>
-                  <span class="radio-hint">Tanpa personalisasi KRHRED</span>
-                </span>
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="campaignType" value="dynamic">
-                <span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="campaignType" value="dynamic">
                   <span class="radio-label">Dynamic</span>
-                  <span class="radio-hint">Dengan kolom KRHRED</span>
-                </span>
-              </label>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="data-summary" aria-label="Data summary">
+              <span><b>Customers</b><strong id="emailCount">0</strong></span>
+              <span><b>Valid</b><strong id="validCount">0</strong></span>
+              <span><b>KRHRED</b><strong id="krhredCount">0</strong></span>
             </div>
-          </fieldset>
+          </div>
         </div>
       </section>
 
       <section id="krPanel" class="generator-card workspace-card" aria-labelledby="data-title">
         <div class="section-heading workspace-heading">
           <div>
-            <p class="section-eyebrow">Customer data</p>
-            <h2 id="data-title">Customers & KRHRED</h2>
+            <p class="section-eyebrow">Input</p>
+            <h2 id="data-title">Customer input</h2>
           </div>
-          <div class="data-summary" aria-label="Data summary">
-            <span><b>Customers</b><strong id="emailCount">0</strong></span>
-            <span><b>Valid</b><strong id="validCount">0</strong></span>
-            <span><b>KRHRED</b><strong id="krhredCount">0</strong></span>
-          </div>
+          <p class="section-copy">Add customers one by one or paste multiple emails below.</p>
         </div>
 
         <div class="workspace-toolbar">
-          <div class="toolbar-field toolbar-email">
-            <label for="newEmail" class="form-label">
-              <i class="fa-solid fa-envelope form-label-icon" aria-hidden="true"></i>
-              Customer email
-            </label>
-            <div class="input-button-group">
-              <input id="newEmail" class="form-input" type="email" placeholder="email@contoh.com" aria-describedby="emailError" />
-              <button id="addEmail" class="btn primary" type="button">
-                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                Tambah
-              </button>
+          <div class="customer-source-column">
+            <div class="toolbar-field toolbar-email">
+              <label for="newEmail" class="form-label">
+                <i class="fa-solid fa-envelope form-label-icon" aria-hidden="true"></i>
+                Customer email
+              </label>
+              <div class="input-button-group">
+                <input id="newEmail" class="form-input" type="email" placeholder="email@contoh.com" aria-describedby="emailError" />
+                <button id="addEmail" class="btn primary" type="button">
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                  Add
+                </button>
+              </div>
+              <p id="emailError" class="field-error hidden" role="alert"></p>
             </div>
-            <p id="emailError" class="field-error hidden" role="alert"></p>
+
+            <div id="bulkBox" class="bulk-box">
+              <label for="bulkEmails" class="form-label">
+                <i class="fa-solid fa-paste form-label-icon" aria-hidden="true"></i>
+                Bulk Paste Emails
+              </label>
+              <p class="form-hint">Pisahkan dengan baris baru, koma, titik koma, atau spasi.</p>
+              <textarea id="bulkEmails" placeholder="email1@a.com&#10;email2@a.com, email3@a.com"></textarea>
+              <div class="bulk-actions">
+                <button id="applyBulk" class="btn primary" type="button">
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                  Add All Emails
+                </button>
+              </div>
+              <p id="bulkInfo" class="inline-feedback" role="status" aria-live="polite"></p>
+            </div>
           </div>
 
           <div id="krhredSection" class="toolbar-field krhred-section">
             <label for="newKey" class="form-label">
               <i class="fa-solid fa-table-columns form-label-icon" aria-hidden="true"></i>
-              KRHRED unit
+              KRHRED Units
             </label>
             <div class="krhred-control-group">
               <div class="krhred-number-field">
-                <span class="krhred-prefix" aria-hidden="true">KRHRED_Unit_</span>
                 <input id="newKey" class="form-input font-mono" type="number" min="1" step="1" inputmode="numeric" placeholder="30" aria-label="Nomor KRHRED Unit" aria-describedby="keyHint keyError" />
               </div>
               <button id="addKey" class="btn secondary icon-btn" type="button" title="Tambah kolom KRHRED" aria-label="Tambah kolom KRHRED">
                 <i class="fa-solid fa-plus" aria-hidden="true"></i>
               </button>
             </div>
+            <div id="krhredChips" class="krhred-chip-list" aria-label="KRHRED units"></div>
             <p id="keyHint" class="form-hint">Kosongkan untuk auto-next.</p>
             <p id="keyError" class="field-error hidden" role="alert"></p>
           </div>
-
-          <div class="toolbar-action">
-            <span class="form-label toolbar-action-spacer" aria-hidden="true">Bulk paste</span>
-            <button id="bulkBtn" class="btn secondary compact-btn" type="button" aria-expanded="false" aria-controls="bulkBox">
-              <i class="fa-solid fa-paste" aria-hidden="true"></i>
-              Bulk paste
-            </button>
-          </div>
-        </div>
-
-        <div id="bulkBox" class="bulk-box hidden">
-          <label for="bulkEmails" class="form-label">
-            <i class="fa-solid fa-paste form-label-icon" aria-hidden="true"></i>
-            Bulk paste emails
-          </label>
-          <p class="form-hint">Pisahkan dengan baris baru, koma, titik koma, atau spasi.</p>
-          <textarea id="bulkEmails" placeholder="email1@a.com&#10;email2@a.com, email3@a.com"></textarea>
-          <div class="bulk-actions">
-            <button id="applyBulk" class="btn primary" type="button">Tambahkan email valid</button>
-            <button id="cancelBulk" class="btn quiet" type="button">Batal</button>
-          </div>
-          <p id="bulkInfo" class="inline-feedback" role="status" aria-live="polite"></p>
         </div>
 
         <div class="table-meta">
@@ -263,7 +257,7 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.4.1" defer></script>
-<script src="../js/pages-database-generator.js?v=6.4.1" defer></script>
+<script src="../js/version-config.js?v=6.5.0" defer></script>
+<script src="../js/pages-database-generator.js?v=6.5.0" defer></script>
 </body>
 </html>

@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.5.0 · 14 June 2026** - Redesigned Database Generator with compact Campaign controls, always-visible statistics and bulk paste, removable KRHRED chips, denser sticky customer tables, and responsive two-column desktop workflows.
 - **v6.4.2 · 14 June 2026** - Refreshed Bookmarklet with reliable embedded scrolling, a cleaner flat layout, compact search and controls, consistent tool cards, responsive spacing, and hidden duplicate navigation inside the eDM Helper shell.
 - **v6.4.1 · 14 June 2026** - Polished Database Generator UI with compact numeric KRHRED unit input, shorter toolbar labels, aligned compact actions, clearer summary badges, smaller empty states, and collapsible file previews.
 - **v6.4.0 · 14 June 2026** - Refactored Database Generator into a compact workspace with inline validation, stable embedded scrolling, aligned controls, duplicate-email support, responsive data tables, clearer file previews, and generator regression tests.
@@ -38,7 +39,6 @@ category: Home
 - **v6.1.0 · 14 June 2026** - Upgraded Database Checker with four-file package validation, static/dynamic detection, grouped anomaly findings, raw-line inspection, CSV export, and a compact package workspace.
 - **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
 - **v5.0.0 · 12 April 2026** - Released version 5.
-- **v4.0.0 · 14 March 2026** - Released version 4.
 
 ## Useful Links
 

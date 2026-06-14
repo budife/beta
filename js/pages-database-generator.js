@@ -21,6 +21,7 @@ const $ = (sel) => document.querySelector(sel);
 
     const newKeyEl = $('#newKey');
     const addKeyBtn = $('#addKey');
+    const krhredChips = $('#krhredChips');
     const krHeadRow = $('#krHeadRow');
     const krBody = $('#krBody');
 
@@ -131,7 +132,47 @@ const $ = (sel) => document.querySelector(sel);
       updateUI();
     }
 
+    function renderKrhredChips() {
+      if (!krhredChips) return;
+      krhredChips.innerHTML = '';
+
+      if (campaignType !== 'dynamic') {
+        krhredChips.classList.add('is-empty');
+        krhredChips.innerHTML = '<span class="krhred-chip-empty">Switch to Dynamic to add KRHRED units.</span>';
+        return;
+      }
+
+      if (!krKeys.length) {
+        krhredChips.classList.add('is-empty');
+        krhredChips.innerHTML = '<span class="krhred-chip-empty">No KRHRED units yet.</span>';
+        return;
+      }
+
+      krhredChips.classList.remove('is-empty');
+      for (const key of krKeys) {
+        const unitNumber = key.replace(/^KRHRED_Unit_/i, '');
+        const chip = document.createElement('button');
+        chip.className = 'krhred-chip';
+        chip.type = 'button';
+        chip.title = `Hapus ${key}`;
+        chip.setAttribute('aria-label', `Hapus ${key}`);
+        chip.dataset.removeKey = key;
+        chip.innerHTML = `
+          <span>${escapeHtml(unitNumber)}</span>
+          <i class="fa-solid fa-times" aria-hidden="true"></i>
+        `;
+        chip.addEventListener('click', () => {
+          krKeys = krKeys.filter(item => item !== key);
+          for (const m of krValues.values()) m.delete(key);
+          renderTable();
+          updateUI();
+        });
+        krhredChips.appendChild(chip);
+      }
+    }
+
     function renderTable() {
+      renderKrhredChips();
       // Header: hapus kolom KR lama
       krHeadRow.querySelectorAll('th[data-key]').forEach(th => th.remove());
       for (const key of krKeys) {
@@ -322,6 +363,7 @@ const $ = (sel) => document.querySelector(sel);
     }
 
     function updateUI() {
+      renderKrhredChips();
       const campaignIdVal = campaignIdEl.value.trim();
       const useKrVal = campaignType === 'dynamic' && krKeys.length > 0;
       const dynamicReady = campaignType === 'static' || krKeys.length > 0;
@@ -447,18 +489,22 @@ const $ = (sel) => document.querySelector(sel);
     });
 
     // Bulk handlers
-    bulkBtn.addEventListener('click', () => {
-      bulkBox.classList.toggle('hidden');
-      bulkBtn.setAttribute('aria-expanded', String(!bulkBox.classList.contains('hidden')));
-      bulkInfo.textContent = '';
-      if (!bulkBox.classList.contains('hidden')) bulkEmailsEl.focus();
-    });
-    cancelBulkBtn.addEventListener('click', () => {
-      bulkBox.classList.add('hidden');
-      bulkBtn.setAttribute('aria-expanded', 'false');
-      bulkEmailsEl.value = '';
-      bulkInfo.textContent = '';
-    });
+    if (bulkBtn) {
+      bulkBtn.addEventListener('click', () => {
+        bulkBox.classList.toggle('hidden');
+        bulkBtn.setAttribute('aria-expanded', String(!bulkBox.classList.contains('hidden')));
+        bulkInfo.textContent = '';
+        if (!bulkBox.classList.contains('hidden')) bulkEmailsEl.focus();
+      });
+    }
+    if (cancelBulkBtn) {
+      cancelBulkBtn.addEventListener('click', () => {
+        bulkBox.classList.add('hidden');
+        if (bulkBtn) bulkBtn.setAttribute('aria-expanded', 'false');
+        bulkEmailsEl.value = '';
+        bulkInfo.textContent = '';
+      });
+    }
     applyBulkBtn.addEventListener('click', () => {
       const list = parseManyEmails(bulkEmailsEl.value);
       const valid = [];
@@ -549,9 +595,10 @@ const $ = (sel) => document.querySelector(sel);
 
     // Toggle KRHRED section visibility
     function toggleKRHREDSection() {
+      document.body.classList.toggle('is-dynamic-generator', campaignType === 'dynamic');
       if (krhredSection) {
         if (campaignType === 'dynamic') {
-          krhredSection.style.display = 'block';
+          krhredSection.style.display = '';
         } else {
           krhredSection.style.display = 'none';
         }
