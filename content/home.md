@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.1.0 · 14 June 2026** - Upgraded Database Checker with four-file package validation, static/dynamic detection, grouped anomaly findings, raw-line inspection, CSV export, and a compact package workspace.
 - **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
 - **v5.0.0 · 12 April 2026** - Released version 5.
 - **v4.0.0 · 14 March 2026** - Released version 4.
