@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.3.1">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css">
-  <link rel="stylesheet" href="../css/controls.css?v=6.3.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.7.0">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.7.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.7.0">
   
   <title>Layout Checker - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -44,94 +44,101 @@
 
 <!-- Main Content -->
 <main id="main-content" role="main">
-  <div class="container">
-    <h1 class="lc-hero"><i class="fa-solid fa-magnifying-glass-chart"></i> Layout Checker</h1>
-    <p class="lc-subtitle">Advanced HTML Layout Analysis Tool</p>
-
-<div class="lc-input-group">
-  <input type="text" id="originalUrlInput" placeholder="Enter full URL of the HTML file" class="lc-input" />
-  <button id="downloadBtn" class="lc-btn lc-btn-success hidden">Download</button>
-  <button id="manualPasteBtn" class="lc-btn lc-btn-info hidden">Open in New Tab</button>
-  <button id="textModeBtn" class="lc-btn lc-btn-warning hidden">Text Mode</button>
-  
-  <!-- Progress Indicator -->
-  <div id="progressContainer" class="lc-progress-container hidden">
-    <div class="lc-progress-content">
-      <div class="lc-progress-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="spin">
-          <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/>
-        </svg>
-      </div>
-      <span id="progressText" class="lc-progress-text">Processing...</span>
-      <button id="stopBtn" class="lc-btn lc-btn-error lc-btn-sm">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18,18H6V6H18V18Z"/>
-        </svg>
-        Stop
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="lc-main-layout">
-  <!-- Left Column: KRHRED Values -->
-  <div class="lc-sidebar">
-    <label for="krhredInput" class="lc-label">KRHRED Values:</label>
-    <textarea id="krhredInput" placeholder="Check database di brickstreet dan generate value sampai muncul, ctrl + A, lalu paste ke sini!" class="lc-textarea"></textarea>
-    <div class="lc-button-group">
-      <button id="applyKrhredBtn" class="lc-btn lc-btn-success">Apply values</button>
-      <button id="checkLayoutBtn" class="lc-btn lc-btn-primary">Check Layout</button>
-      <button id="addKrhredBtn" class="lc-btn lc-btn-info">Add Unit</button>
-      <button id="clearAllBtn" class="lc-btn lc-btn-error">Clear Values</button>
-    </div>
-  </div>
-
-  <!-- Right Column: CodeMirror + KRHRED Units -->
-  <div class="lc-content">
-    <div class="lc-content-section">
-      <!-- HTML Content (CodeMirror) -->
+  <div class="lc-workspace">
+    <header class="lc-page-header">
       <div>
-        <label for="htmlInput" class="lc-label">HTML Content:</label>
-        <textarea id="htmlInput" placeholder="Paste your HTML content here" class="lc-textarea lc-textarea-sm"></textarea>
+        <span class="lc-eyebrow">Layout validation</span>
+        <h1><i class="fa-solid fa-ruler-combined"></i> Layout Checker</h1>
+        <p>Load HTML, populate KRHRED values, and inspect the personalized layout before publishing.</p>
+      </div>
+      <span id="layoutStatus" class="lc-status" data-state="empty">No layout loaded</span>
+    </header>
+
+    <section class="lc-source-bar" aria-label="Layout source">
+      <div class="lc-source-field">
+        <label for="originalUrlInput">Layout URL</label>
+        <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+      </div>
+      <div class="lc-source-actions">
+        <label for="htmlFileInput" class="lc-btn lc-btn-secondary">
+          <i class="fa-regular fa-file-code"></i> Open HTML
+        </label>
+        <input id="htmlFileInput" type="file" accept=".html,.htm,text/html" hidden>
+        <button id="downloadBtn" class="lc-btn lc-btn-primary hidden"><i class="fa-solid fa-cloud-arrow-down"></i> Load URL</button>
+        <button id="manualPasteBtn" class="lc-btn lc-btn-secondary hidden">Open URL</button>
+        <button id="textModeBtn" class="lc-btn lc-btn-secondary hidden">Text Mode</button>
       </div>
 
-      <!-- KRHRED Units Container (4x2 grid) -->
-      <div id="krhredUnitsContainer" class="lc-units-container">
-        <div class="lc-units-header">
-          <label class="lc-units-label">KRHRED Units</label>
-          <div id="inputGrid" class="lc-input-grid">
-            <!-- Row 1 -->
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_30" name="krhred_unit_30" placeholder="30" class="lc-input-field" />
+      <div id="progressContainer" class="lc-inline-status hidden">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span id="progressText">Processing...</span>
+        <button id="stopBtn" class="lc-stop-btn" type="button">Stop</button>
+      </div>
+    </section>
+
+    <div class="lc-main-layout">
+      <aside class="lc-sidebar">
+        <section class="lc-panel">
+          <div class="lc-panel-heading">
+            <div>
+              <span class="lc-eyebrow">Customer data</span>
+              <strong>Bulk KRHRED values</strong>
             </div>
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_31" name="krhred_unit_31" placeholder="31" class="lc-input-field" />
-            </div>
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_32" name="krhred_unit_32" placeholder="32" class="lc-input-field" />
-            </div>
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_33" name="krhred_unit_33" placeholder="33" class="lc-input-field" />
-            </div>
-            <!-- Row 2 -->
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_34" name="krhred_unit_34" placeholder="34" class="lc-input-field" />
-            </div>
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_35" name="krhred_unit_35" placeholder="35" class="lc-input-field" />
-            </div>
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_36" name="krhred_unit_36" placeholder="36" class="lc-input-field" />
-            </div>
-            <div class="lc-input-col">
-              <input type="text" id="krhred_unit_37" name="krhred_unit_37" placeholder="37" class="lc-input-field" />
+            <div class="lc-panel-actions">
+              <button id="resetKrhredBtn" class="lc-btn lc-btn-secondary lc-btn-sm">Reset</button>
+              <button id="applyKrhredBtn" class="lc-btn lc-btn-primary lc-btn-sm">Apply</button>
             </div>
           </div>
+          <textarea id="krhredInput" placeholder="Paste attr:KRHRED_Unit_XX and its value here." class="lc-textarea"></textarea>
+        </section>
+
+        <section id="krhredUnitsContainer" class="lc-panel lc-units-container">
+          <div class="lc-panel-heading">
+            <div>
+              <span class="lc-eyebrow">Detected placeholders</span>
+              <strong>KRHRED Units</strong>
+            </div>
+            <button id="addKrhredBtn" class="lc-btn lc-btn-secondary lc-btn-sm"><i class="fa-solid fa-plus"></i> Unit</button>
+          </div>
+          <div id="inputGrid" class="lc-input-grid">
+            <div><input type="text" id="krhred_unit_30" name="krhred_unit_30" placeholder="30" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_31" name="krhred_unit_31" placeholder="31" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_32" name="krhred_unit_32" placeholder="32" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_33" name="krhred_unit_33" placeholder="33" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_34" name="krhred_unit_34" placeholder="34" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_35" name="krhred_unit_35" placeholder="35" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_36" name="krhred_unit_36" placeholder="36" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_37" name="krhred_unit_37" placeholder="37" class="lc-input-field" /></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="lc-editor-panel">
+        <div class="lc-editor-toolbar">
+          <div>
+            <span class="lc-eyebrow">Source</span>
+            <strong>HTML Content</strong>
+          </div>
+          <div class="lc-view-tabs" role="tablist" aria-label="Layout view">
+            <button id="codeTabBtn" class="lc-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="codePanel">Code</button>
+            <button id="previewTabBtn" class="lc-tab" type="button" role="tab" aria-selected="false" aria-controls="previewPanel">Preview</button>
+          </div>
+          <div class="lc-editor-actions">
+            <label class="lc-toggle" for="highlightKrhredToggle">
+              <input id="highlightKrhredToggle" type="checkbox">
+              <span>Highlight KRHRED</span>
+            </label>
+          </div>
         </div>
-      </div>
+        <div id="codePanel" class="lc-editor-body lc-view-panel is-active" role="tabpanel" aria-labelledby="codeTabBtn">
+          <textarea id="htmlInput" placeholder="Paste HTML content here" class="lc-textarea lc-textarea-sm"></textarea>
+        </div>
+        <div id="previewPanel" class="lc-preview-panel lc-view-panel" role="tabpanel" aria-labelledby="previewTabBtn" hidden>
+          <iframe id="layoutPreviewFrame" title="Layout preview" sandbox="allow-same-origin allow-popups"></iframe>
+        </div>
+      </section>
     </div>
   </div>
-</div>
 </main>
 
 <!-- Footer -->
@@ -168,7 +175,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js" defer></script>
-<script src="../js/pages-layout-checker.js" defer></script>
+<script src="../js/version-config.js?v=6.7.0" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.7.0" defer></script>
 </body>
 </html>

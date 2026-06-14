@@ -1,215 +1,7 @@
-/* ===================================
-   TOAST UTILITY - Merged from toast.js
-   =================================== */
-
-/* ===================================
-   SHARED TOAST UTILITY
-   =================================== */
-
-// Global Toast Manager Class
-class ToastManager {
-  constructor() {
-    this.container = null;
-    this.init();
-  }
-  
-  init() {
-    // Create toast container if it doesn't exist
-    if (!document.getElementById('toast-container')) {
-      this.container = document.createElement('div');
-      this.container.id = 'toast-container';
-      this.container.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        z-index: 10000;
-        pointer-events: none;
-      `;
-      // Append to layout area
-      const layoutArea = document.querySelector('main.layout');
-      if (layoutArea) {
-        layoutArea.appendChild(this.container);
-      } else {
-        // Fallback to body
-        document.body.appendChild(this.container);
-      }
-    } else {
-      this.container = document.getElementById('toast-container');
-    }
-  }
-  
-  show(message, type = 'info', options = {}) {
-    const {
-      duration = 3000,
-      position = 'top-right'
-    } = options;
-    
-    // Update container position
-    this.updatePosition(position);
-    
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.style.cssText = `
-      background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : type === 'warning' ? '#eab308' : '#3b82f6'};
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      pointer-events: auto;
-      cursor: pointer;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      max-width: 300px;
-      word-wrap: break-word;
-    `;
-    toast.textContent = message;
-    
-    this.container.appendChild(toast);
-    
-    // Animate in
-    requestAnimationFrame(() => {
-      toast.style.transform = 'translateX(0)';
-    });
-    
-    // Remove on click
-    toast.addEventListener('click', () => {
-      this.remove(toast);
-    });
-    
-    // Auto remove
-    setTimeout(() => {
-      this.remove(toast);
-    }, duration);
-  }
-  
-  updatePosition(position) {
-    const positions = {
-      'top-right': 'top: 80px; right: 20px;',
-      'top-left': 'top: 80px; left: 20px;',
-      'bottom-right': 'bottom: 20px; right: 20px;',
-      'bottom-left': 'bottom: 20px; left: 20px;'
-    };
-    
-    this.container.style.cssText = `
-      position: fixed;
-      z-index: 10000;
-      pointer-events: none;
-      ${positions[position] || positions['top-right']}
-    `;
-  }
-  
-  remove(toast) {
-    toast.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  }
-  
-  success(message, options = {}) {
-    this.show(message, 'success', options);
-  }
-  
-  error(message, options = {}) {
-    this.show(message, 'error', options);
-  }
-  
-  warning(message, options = {}) {
-    this.show(message, 'warning', options);
-  }
-  
-  info(message, options = {}) {
-    this.show(message, 'info', options);
-  }
-}
-
-// Shared showToast function
-function showToast(message, type = 'info', title = '') {
-  // Use global toast system if available
-  if (type === 'success' && window.toastSuccess) {
-    window.toastSuccess(message, title);
-    return;
-  } else if (type === 'error' && window.toastError) {
-    window.toastError(message, title);
-    return;
-  } else if (type === 'warning' && window.toastWarning) {
-    window.toastWarning(message, title);
-    return;
-  } else if (window.toastInfo) {
-    window.toastInfo(message, title);
-    return;
-  }
-  
-  // Fallback - create simple toast
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-    color: white;
-    padding: 12px 20px;
-    border-radius: 5px;
-    z-index: 10000;
-    font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  `;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  
-  // Animate in
-  setTimeout(() => toast.style.opacity = '1', 100);
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  }, 3000);
-}
-
-// Initialize global toast manager
-window.toastManager = new ToastManager();
-
-// Global toast functions for compatibility
-window.toastSuccess = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.success(message);
-  }
-};
-
-window.toastError = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.error(message);
-  }
-};
-
-window.toastWarning = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.warning(message);
-  }
-};
-
-window.toastInfo = function(message, title = '') {
-  if (window.toastManager) {
-    window.toastManager.info(message);
-  }
-};
-
-// Export for module usage
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { ToastManager, showToast };
-}
-
-
-// Initialize Toast Manager
 document.addEventListener('DOMContentLoaded', () => {
-  window.toastManager = new ToastManager();
+  if (new URLSearchParams(window.location.search).get('embed') === '1') {
+    document.body.classList.add('is-embedded');
+  }
 });
 
 /* ===================================
@@ -230,33 +22,96 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 const originalUrlInput = document.getElementById('originalUrlInput');
+  const htmlFileInput = document.getElementById('htmlFileInput');
+  const layoutStatus = document.getElementById('layoutStatus');
+  const codeTabBtn = document.getElementById('codeTabBtn');
+  const previewTabBtn = document.getElementById('previewTabBtn');
+  const codePanel = document.getElementById('codePanel');
+  const previewPanel = document.getElementById('previewPanel');
+  const layoutPreviewFrame = document.getElementById('layoutPreviewFrame');
   const downloadBtn = document.getElementById('downloadBtn');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
   const textModeBtn = document.getElementById('textModeBtn');
-  const checkLayoutBtn = document.getElementById('checkLayoutBtn');
-  const clearAllBtn = document.getElementById('clearAllBtn');
+  const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
+  const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
   // AbortController for stopping operations
   let abortController = null;
   let currentOperation = null;
+  let krhredPreviewTimer = null;
 
-  // Toast notification - using global toast manager
-  function showToast(message, type = 'info') {
-    if (type === 'success' && window.toastSuccess) {
-      window.toastSuccess(message);
-    } else if (type === 'error' && window.toastError) {
-      window.toastError(message);
-    } else if (type === 'warning' && window.toastWarning) {
-      window.toastWarning(message);
-    } else if (window.toastInfo) {
-      window.toastInfo(message);
-    } else {
-      console.log(`[${type.toUpperCase()}] ${message}`);
+  function setLayoutStatus(state, text) {
+    if (!layoutStatus) return;
+    layoutStatus.dataset.state = state;
+    layoutStatus.textContent = text;
+  }
+
+  function getPreviewBaseHref(url) {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      return parsed.origin + parsed.pathname.replace(/\/[^\/]*$/, '/');
+    } catch {
+      return '';
     }
+  }
+
+  function preparePreviewHtml(html, sourceUrl = '') {
+    if (!html) return '';
+    const baseHref = getPreviewBaseHref(sourceUrl);
+    if (!baseHref) return html;
+    const baseTag = `<base href="${baseHref}">`;
+    if (/<head[^>]*>/i.test(html)) {
+      return html.replace(/<head([^>]*)>/i, `<head$1>${baseTag}`);
+    }
+    return `${baseTag}${html}`;
+  }
+
+  function renderPreview(html, statusText = 'Preview ready', sourceUrl = '') {
+    if (!layoutPreviewFrame) return;
+    layoutPreviewFrame.srcdoc = preparePreviewHtml(html || '', sourceUrl);
+    setLayoutStatus(html ? 'ready' : 'empty', html ? statusText : 'No layout loaded');
+  }
+
+  function setLayoutView(view) {
+    const showPreview = view === 'preview';
+    if (codeTabBtn) {
+      codeTabBtn.classList.toggle('is-active', !showPreview);
+      codeTabBtn.setAttribute('aria-selected', String(!showPreview));
+    }
+    if (previewTabBtn) {
+      previewTabBtn.classList.toggle('is-active', showPreview);
+      previewTabBtn.setAttribute('aria-selected', String(showPreview));
+    }
+    if (codePanel) {
+      codePanel.hidden = showPreview;
+      codePanel.classList.toggle('is-active', !showPreview);
+    }
+    if (previewPanel) {
+      previewPanel.hidden = !showPreview;
+      previewPanel.classList.toggle('is-active', showPreview);
+    }
+    if (!showPreview) {
+      setTimeout(() => editor.refresh(), 0);
+    }
+  }
+
+  if (codeTabBtn) codeTabBtn.addEventListener('click', () => setLayoutView('code'));
+  if (previewTabBtn) {
+    previewTabBtn.addEventListener('click', () => {
+      const currentHtml = editor.getValue();
+      if (currentHtml.trim()) {
+        const rendered = renderLayoutWithKrhredValues();
+        if (!rendered) {
+          renderPreview(currentHtml, 'Preview ready', originalUrlInput.value.trim());
+        }
+      }
+      setLayoutView('preview');
+    });
   }
 
   // Progress indicator functions
@@ -265,12 +120,15 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     progressContainer.classList.remove('hidden');
     currentOperation = operation;
     abortController = new AbortController();
+    setLayoutStatus('loading', text);
   }
 
   function hideProgress() {
     progressContainer.classList.add('hidden');
     currentOperation = null;
     abortController = null;
+    const hasContent = editor.getValue().trim().length > 0;
+    setLayoutStatus(hasContent ? 'ready' : 'empty', hasContent ? 'Layout ready' : 'No layout loaded');
   }
 
   // Stop button functionality
@@ -292,37 +150,143 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     }
   }
 
-  // Helper function to validate URLholders <%[KRHRED_Unit_XX]|%> with textbox values or remove if empty
-  checkLayoutBtn.addEventListener('click', () => {
-    console.log('Check Layout button clicked');
-    let content = editor.getValue();
+  function getKrhredInputs() {
+    return krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
+  }
+
+  function updateKrhredInputFeedback(input) {
+    const length = input.value.trim().length;
+    if (length > 60) {
+      input.style.backgroundColor = 'red';
+    } else if (length > 0) {
+      input.style.backgroundColor = 'lightgreen';
+    } else {
+      input.style.backgroundColor = '';
+    }
+  }
+
+  function bindKrhredInput(input) {
+    if (!input || input.dataset.bound === 'true') return;
+    input.dataset.bound = 'true';
+    input.addEventListener('input', () => {
+      updateKrhredInputFeedback(input);
+      if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
+      clearTimeout(krhredPreviewTimer);
+      krhredPreviewTimer = setTimeout(() => {
+        renderLayoutWithKrhredValues();
+      }, 180);
+    });
+  }
+
+  function ensureKrhredInput(unitNumber) {
+    const cleanNumber = String(unitNumber).replace(/\D/g, '');
+    if (!cleanNumber) return null;
+
+    const existing = document.getElementById(`krhred_unit_${cleanNumber}`);
+    if (existing) {
+      bindKrhredInput(existing);
+      return existing;
+    }
+
+    const inputGrid = krhredUnitsContainer.querySelector('#inputGrid');
+    if (!inputGrid) return null;
+
+    const div = document.createElement('div');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = `krhred_unit_${cleanNumber}`;
+    input.name = `krhred_unit_${cleanNumber}`;
+    input.placeholder = cleanNumber;
+    input.className = 'lc-input-field';
+    div.appendChild(input);
+
+    const existingWrappers = [...inputGrid.querySelectorAll('div')];
+    const newNumber = Number(cleanNumber);
+    const insertBefore = existingWrappers.find(wrapper => {
+      const wrapperInput = wrapper.querySelector('input[id^="krhred_unit_"]');
+      if (!wrapperInput) return false;
+      return Number(wrapperInput.id.replace('krhred_unit_', '')) > newNumber;
+    });
+
+    if (insertBefore) {
+      inputGrid.insertBefore(div, insertBefore);
+    } else {
+      inputGrid.appendChild(div);
+    }
+
+    bindKrhredInput(input);
+    return input;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function collectKrhredValues() {
+    const values = {};
+    let hasValue = false;
+
+    getKrhredInputs().forEach(input => {
+      const unit = `KRHRED_Unit_${input.id.replace('krhred_unit_', '')}`;
+      const value = input.value ? input.value.trim() : '';
+      values[unit] = value;
+      if (value) hasValue = true;
+    });
+
+    return { values, hasValue };
+  }
+
+  function replaceKrhredPlaceholders(html, values, shouldHighlight) {
+    const placeholderPattern = /<%\s*\[\s*(KRHRED_Unit_\d+)\s*\]\s*\|?\s*%>/g;
+    const highlightStyle = [
+      'background:#fff0f1',
+      'border:1px solid #f27f86',
+      'color:#991b1b',
+      'padding:1px 3px',
+      'box-decoration-break:clone',
+      '-webkit-box-decoration-break:clone'
+    ].join(';');
+
+    if (!shouldHighlight) {
+      return html.replace(placeholderPattern, (_, unit) => values[unit] || '');
+    }
+
+    const chunks = html.split(/(<[^>]+>)/g);
+    const visibleHighlighted = chunks.map(chunk => {
+      if (!chunk || chunk.startsWith('<')) return chunk;
+      return chunk.replace(placeholderPattern, (_, unit) => {
+        const value = values[unit] || '';
+        if (!value) return '';
+        return `<mark class="lc-krhred-highlight" style="${highlightStyle}" title="${escapeHtml(unit)}">${escapeHtml(value)}</mark>`;
+      });
+    }).join('');
+
+    return visibleHighlighted.replace(placeholderPattern, (_, unit) => values[unit] || '');
+  }
+
+  function renderLayoutWithKrhredValues() {
+    const content = editor.getValue();
     console.log('Editor content length:', content.length);
     console.log('Editor content preview:', content.substring(0, 200));
     
-    const inputs = krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
-    console.log('KRHRED inputs found:', inputs.length);
+    const { values, hasValue } = collectKrhredValues();
+    const shouldHighlight = Boolean(highlightKrhredToggle && highlightKrhredToggle.checked);
+    const processedValues = replaceKrhredPlaceholders(
+      content,
+      values,
+      shouldHighlight
+    );
     
-    let hasValidKrhred = false;
+    console.log('Has valid KRHRED:', hasValue);
     
-    inputs.forEach(input => {
-      const num = input.id.replace('krhred_unit_', '');
-      const regex = new RegExp(`<%\\[KRHRED_Unit_${num}\\]\\|%>`, 'g');
-      if (input.value && input.value.trim() !== '') {
-        content = content.replace(regex, input.value);
-        hasValidKrhred = true;
-        console.log(`Replaced KRHRED_Unit_${num} with: ${input.value}`);
-      } else {
-        // Remove empty KRHRED placeholders completely
-        content = content.replace(regex, '');
-        console.log(`Removed empty KRHRED_Unit_${num}`);
-      }
-    });
-    
-    console.log('Has valid KRHRED:', hasValidKrhred);
-    
-    if (!hasValidKrhred) {
+    if (!hasValue) {
       console.log('No KRHRED values to apply. Please fill in KRHRED values first.');
-      return;
+      return false;
     }
     
     // Fix image URLs to absolute URLs if original URL is provided
@@ -330,14 +294,14 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     console.log('Original URL:', originalUrlValue);
     
     // Convert relative image URLs to absolute URLs
-    let processedContent = content;
+    let processedContent = processedValues;
     if (originalUrlValue) {
       try {
         const baseUrl = new URL(originalUrlValue);
         const baseUrlString = baseUrl.origin + baseUrl.pathname.replace(/\/[^\/]*$/, '/');
         
         // Convert relative URLs to absolute
-        processedContent = content.replace(/src="(?!https?:\/\/)([^"]+)"/g, (match, p1) => {
+        processedContent = processedValues.replace(/src="(?!https?:\/\/)([^"]+)"/g, (match, p1) => {
           const relativePath = p1.replace(/"/g, '');
           // Don't convert if already absolute, data URL, or protocol-relative
           if (relativePath.startsWith('data:') || relativePath.startsWith('//')) {
@@ -348,23 +312,49 @@ const originalUrlInput = document.getElementById('originalUrlInput');
         console.log('Processed content with absolute URLs');
       } catch (e) {
         console.error('Error processing URLs:', e);
-        processedContent = content; // Fallback to original content
+        processedContent = processedValues; // Fallback to original content
       }
     }
     
-    console.log('Opening processed content in new tab');
-    
-    // Save content as a Blob and open in new tab
-    const blob = new Blob([processedContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    
-    console.log('Layout checked successfully! Opening in new tab...');
-  });
+    renderPreview(processedContent, shouldHighlight ? 'Preview ready - KRHRED highlighted' : 'Preview ready', originalUrlValue);
+    setLayoutView('preview');
+
+    console.log('Layout checked successfully! Preview updated.');
+    return true;
+  }
+
+  if (highlightKrhredToggle) {
+    highlightKrhredToggle.addEventListener('change', () => {
+      if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
+      renderLayoutWithKrhredValues();
+    });
+  }
+
+  if (htmlFileInput) {
+    htmlFileInput.addEventListener('change', async () => {
+      const file = htmlFileInput.files && htmlFileInput.files[0];
+      if (!file) return;
+
+      try {
+        setLayoutStatus('loading', 'Loading HTML file');
+        const content = await file.text();
+        editor.setValue(content);
+        generateKrhredColumns(content);
+        renderPreview(content, `${file.name} loaded`);
+        originalUrlInput.value = '';
+        setLayoutStatus('ready', `${file.name} loaded`);
+      } catch (error) {
+        console.error('Failed to read HTML file:', error);
+        setLayoutStatus('error', 'Unable to read HTML');
+      } finally {
+        htmlFileInput.value = '';
+      }
+    });
+  }
 
   addKrhredBtn.addEventListener('click', () => {
     // Find the highest current krhred_unit number
-    const inputs = krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
+    const inputs = getKrhredInputs();
     let maxNum = 29;
     inputs.forEach(input => {
       const num = parseInt(input.id.replace('krhred_unit_', ''), 10);
@@ -372,68 +362,16 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     });
     const newNum = maxNum + 1;
 
-    // Get input grid container
-    const inputGrid = krhredUnitsContainer.querySelector('#inputGrid');
-    if (!inputGrid) return;
-
-    // Calculate position for 4 columns, unlimited rows
-    const totalExisting = inputs.length; // Should be 8 initially
-    const columnIndex = totalExisting % 4; // Which column (0-3)
-    const rowIndex = Math.floor(totalExisting / 4); // Which row (0, 1, 2, etc.)
-
-    // Create new input
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.flexDirection = 'column';
-    div.style.alignItems = 'flex-start';
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.id = `krhred_unit_${newNum}`;
-    input.name = `krhred_unit_${newNum}`;
-    input.placeholder = newNum.toString();
-    input.className = 'lc-input-field';
-    div.appendChild(input);
-
-    // Insert in correct position for 4 columns layout
-    const existingDivs = inputGrid.querySelectorAll('div');
-    const insertIndex = rowIndex * 4 + columnIndex;
-    
-    if (insertIndex < existingDivs.length) {
-      inputGrid.insertBefore(div, existingDivs[insertIndex]);
-    } else {
-      inputGrid.appendChild(div);
-    }
-
-    // Add input color feedback
-    input.addEventListener('input', () => {
-      const length = input.value.trim().length;
-      if (length > 60) {
-        input.style.backgroundColor = 'red';
-      } else if (length > 0) {
-        input.style.backgroundColor = 'lightgreen';
-      } else {
-        input.style.backgroundColor = '';
-      }
-    });
+    ensureKrhredInput(newNum);
 
     // Show success message
     console.log(`Unit ${newNum} added successfully!`);
   });
 
   // Input color feedback for existing inputs
-  const existingInputs = krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
+  const existingInputs = getKrhredInputs();
   existingInputs.forEach(input => {
-    input.addEventListener('input', () => {
-      const length = input.value.trim().length;
-      if (length > 60) {
-        input.style.backgroundColor = 'red';
-      } else if (length > 0) {
-        input.style.backgroundColor = 'lightgreen';
-      } else {
-        input.style.backgroundColor = '';
-      }
-    });
+    bindKrhredInput(input);
   });
 
   // Show/hide download button based on URL input
@@ -670,146 +608,90 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       downloadBtn.disabled = true;
       downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px; animation: spin 1s linear infinite;"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg>Fetching...';
 
-      // List of working CORS proxy servers - prioritized by reliability
-      const corsProxies = [
-        'https://api.allorigins.win/get?url=',
-        'https://api.codetabs.com/v1/proxy?quest=',
-        'https://r.jina.ai/http://', // Jina AI proxy - very reliable
-        'https://r.jina.ai/https://', // Jina AI proxy for HTTPS
-        'https://corsproxy.io/?',
-        'https://api.allorigins.win/raw?url=', // Alternative allorigins endpoint
-        'https://thingproxy.freeboard.io/fetch/',
-        'https://cors-anywhere.herokuapp.com/'
-      ];
-
-      let htmlContent = null;
-      let usedProxy = null;
-      let lastError = null;
-
-      // Try direct fetch first with timeout
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-        const response = await fetch(url, { 
-          signal: abortController ? abortController.signal : controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (response.ok) {
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('text/html')) {
-            htmlContent = await response.text();
-            console.log('Direct connection successful!');
-          }
-        }
-      } catch (error) {
-        lastError = error;
-        // Continue to try proxies
-      }
-
-      // If direct fetch failed, try CORS proxies sequentially
-      if (!htmlContent) {
-        for (let i = 0; i < corsProxies.length; i++) {
-          const proxy = corsProxies[i];
-          
-          try {
-            console.log(`Trying proxy ${i + 1}/${corsProxies.length}: ${proxy}`);
-            
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout per proxy
-            
-            let proxyUrl;
-            let response;
-            
-            // Special handling for different proxy formats
-            if (proxy.includes('r.jina.ai')) {
-              // Jina AI proxy - remove protocol from URL first
-              const cleanUrl = url.replace(/^https?:\/\//, '');
-              proxyUrl = proxy + cleanUrl;
-              response = await fetch(proxyUrl, {
-                signal: controller.signal,
-                headers: {
-                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                }
-              });
-            } else if (proxy.includes('raw?url=')) {
-              // Raw endpoint
-              proxyUrl = proxy + encodeURIComponent(url);
-              response = await fetch(proxyUrl, {
-                signal: controller.signal,
-                headers: {
-                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                }
-              });
-            } else {
-              // Standard proxy
-              proxyUrl = proxy + encodeURIComponent(url);
-              response = await fetch(proxyUrl, {
-                signal: controller.signal,
-                headers: {
-                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                }
-              });
-            }
-            
-            clearTimeout(timeoutId);
-            
-            if (response.ok) {
-              let content;
-              if (proxy.includes('allorigins')) {
-                const data = await response.json();
-                content = data.contents || data.contents;
-              } else {
-                content = await response.text();
-              }
-              
-              // Validate content
-              if (content && content.length > 100 && (content.includes('<') || content.includes('<html'))) {
-                htmlContent = content;
-                usedProxy = proxy;
-                console.log(`Success with proxy: ${proxy}`);
-                break;
-              } else {
-                console.log(`Proxy returned invalid content (${content?.length || 0} chars): ${proxy}`);
-              }
-            } else {
-              console.log(`Proxy returned status ${response.status}: ${proxy}`);
-              // If proxy returns 403, it might be blocked for this domain
-              if (response.status === 403) {
-                console.log(`Proxy blocked for this domain: ${proxy}`);
-              }
-            }
-          } catch (proxyError) {
-            console.log(`Proxy ${proxy} failed:`, proxyError.message);
-            lastError = proxyError;
-            continue;
-          }
-        }
-      }
-
-      if (htmlContent) {
-        editor.setValue(htmlContent);
-        // Directly call generateKrhredColumns to create input fields
-        generateKrhredColumns(htmlContent);
-      } else {
-        throw new Error(lastError?.message || 'All fetch attempts failed');
-      }
+      const result = await fetchRemoteHtmlFast(url);
+      editor.setValue(result.html);
+      renderPreview(result.html, `Layout loaded via ${result.via}`, url);
+      setLayoutView('preview');
+      generateKrhredColumns(result.html);
 
     } catch (error) {
       console.error('Error fetching HTML:', error);
       console.log('Failed to fetch HTML content. Please try again or use Manual Paste option.');
     } finally {
       downloadBtn.disabled = false;
-      downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Download';
+      downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
       hideProgress();
     }
   });
 
+  async function fetchRemoteHtmlFast(url) {
+    const cleanUrl = url.replace(/^https?:\/\//, '');
+    const attempts = [
+      { url, via: 'direct' },
+      { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, via: 'AllOrigins', json: true },
+      { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, via: 'CodeTabs' },
+      { url: `https://r.jina.ai/http://${cleanUrl}`, via: 'Jina HTTP' },
+      { url: `https://r.jina.ai/https://${cleanUrl}`, via: 'Jina HTTPS' },
+      { url: `https://corsproxy.io/?${encodeURIComponent(url)}`, via: 'CorsProxy' },
+      { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, via: 'AllOrigins Raw' },
+      { url: `https://thingproxy.freeboard.io/fetch/${url}`, via: 'ThingProxy' }
+    ];
+    const controllers = [];
+
+    const fetchAttempt = async (attempt) => {
+      const controller = new AbortController();
+      controllers.push(controller);
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const abortFromGlobal = () => controller.abort();
+      abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
+
+      try {
+        const response = await fetch(attempt.url, {
+          signal: controller.signal,
+          headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
+        });
+        if (!response.ok) throw new Error(`${attempt.via} HTTP ${response.status}`);
+        const html = attempt.json
+          ? (await response.json()).contents || ''
+          : await response.text();
+        if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
+          throw new Error(`${attempt.via} response is not valid HTML`);
+        }
+        return { html, via: attempt.via };
+      } finally {
+        clearTimeout(timeoutId);
+        abortController?.signal?.removeEventListener('abort', abortFromGlobal);
+      }
+    };
+
+    try {
+      const result = await Promise.any(attempts.map(fetchAttempt));
+      controllers.forEach(controller => controller.abort());
+      return result;
+    } catch (error) {
+      controllers.forEach(controller => controller.abort());
+      const lastError = error.errors?.findLast?.(item => item?.message) || error;
+      throw new Error(lastError?.message || 'All fetch attempts failed');
+    }
+  }
+
   // Apply krhred values functionality
   const applyKrhredBtn = document.getElementById('applyKrhredBtn');
   const krhredInput = document.getElementById('krhredInput');
+
+  if (resetKrhredBtn) {
+    resetKrhredBtn.addEventListener('click', () => {
+      performClearAll();
+      const sourceHtml = editor.getValue();
+      if (sourceHtml.trim()) {
+        renderPreview(sourceHtml, 'Preview reset', originalUrlInput.value.trim());
+        setLayoutView('preview');
+      } else {
+        renderPreview('', 'No layout loaded');
+      }
+      console.log('KRHRED preview reset to source HTML.');
+    });
+  }
 
   applyKrhredBtn.addEventListener('click', () => {
     console.log('Apply KRHRED button clicked');
@@ -818,7 +700,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     console.log('KRHRED text preview:', krhredText.substring(0, 200));
     
     if (!krhredText) {
-      console.log('Please paste krhred values first.');
+      console.log('No bulk KRHRED text. Applying manual KRHRED input fields.');
+      if (editor.getValue().trim()) {
+        renderLayoutWithKrhredValues();
+      }
       return;
     }
 
@@ -829,12 +714,17 @@ const originalUrlInput = document.getElementById('originalUrlInput');
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      if (line.startsWith('attr:KRHRED_Unit_')) {
-        const key = line.replace('attr:', '').replace(' :', '').replace(':', '');
-        const value = lines[i + 1] ? lines[i + 1].trim() : '';
+      const match = line.match(/^attr:\s*(KRHRED_Unit_\d+)\s*:?\s*$/i);
+      if (match) {
+        const key = match[1];
+        const nextLine = lines[i + 1] ? lines[i + 1].trim() : '';
+        const nextIsAttr = /^attr:\s*KRHRED_Unit_\d+\s*:?\s*$/i.test(nextLine);
+        const value = nextIsAttr ? '' : nextLine;
         krhredValues[key] = value;
         console.log(`Parsed: ${key} = ${value}`);
-        i++; // skip value line
+        if (!nextIsAttr) {
+          i++; // skip value line
+        }
       }
     }
     
@@ -843,7 +733,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     // Apply values to corresponding input fields
     Object.keys(krhredValues).forEach(key => {
       const unitNumber = key.replace('KRHRED_Unit_', '');
-      const inputField = document.getElementById(`krhred_unit_${unitNumber}`);
+      const inputField = ensureKrhredInput(unitNumber);
       console.log(`Looking for input: krhred_unit_${unitNumber}`);
       if (inputField) {
         inputField.value = krhredValues[key];
@@ -855,15 +745,8 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     });
     
     console.log('KRHRED values applied successfully!');
-  });
-
-  // Clear All functionality
-  clearAllBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to clear all KRHRED values?')) {
-      performClearAll();
-      console.log('KRHRED values cleared successfully!');
-    } else {
-      console.log('Clear action cancelled.');
+    if (Object.keys(krhredValues).length && editor.getValue().trim()) {
+      renderLayoutWithKrhredValues();
     }
   });
 
@@ -958,6 +841,9 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     const content = editor.getValue();
     if (content.trim()) {
       generateKrhredColumns(content, false);
+      setLayoutStatus('ready', 'Layout ready');
+    } else {
+      setLayoutStatus('empty', 'No layout loaded');
     }
     //  // DISABLED
   });
