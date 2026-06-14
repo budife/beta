@@ -335,7 +335,6 @@ function enhanceHomeDashboard(container) {
   const updates = container.querySelector('[data-section="recent-updates"]');
   if (updates) {
     const updateItems = Array.from(updates.querySelectorAll('li'));
-    updateItems.slice(10).forEach((item) => item.remove());
     updateItems[0]?.classList.add('latest-update');
   }
 

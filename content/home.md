@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.7.1 · 14 June 2026** - Preserved the complete Recent Updates history while keeping the timeline compact and scrollable.
 - **v6.7.0 · 14 June 2026** - Refined Layout Checker with faster URL loading, embedded code/preview tabs, full-height workspace panels, reliable image base paths, manual and bulk KRHRED application, reset-to-source preview, and optional KRHRED highlighting.
 - **v6.6.0 · 14 June 2026** - Redesigned Config eDM into a compact file workflow with field locking, PROD/UAT campaign toggles, Apply & Save, automatic XML renaming, file filtering and status, validation summaries, and Back/Next XML navigation.
 - **v6.5.0 · 14 June 2026** - Redesigned Database Generator with compact Campaign controls, always-visible statistics and bulk paste, removable KRHRED chips, denser sticky customer tables, and responsive two-column desktop workflows.
@@ -39,6 +40,7 @@ category: Home
 - **v6.3.0 · 14 June 2026** - Added the shared UI style guide, reusable design tokens, consistent 12px form controls across all tools, regular-weight typography, and responsive Database Checker modal and workspace refinements.
 - **v6.2.0 · 14 June 2026** - Added Database-to-Layout Test with automatic HTML loading, random or manual customer selection, KRHRED personalization and highlighting, subject normalization, coverage alerts, full-screen preview, and temporary URL/subject drafts.
 - **v6.1.0 · 14 June 2026** - Upgraded Database Checker with four-file package validation, static/dynamic detection, grouped anomaly findings, raw-line inspection, CSV export, and a compact package workspace.
+- **v6.0.1 · 13 June 2026** - Introduced the wiki-style layout, refreshed the Home dashboard, improved GitHub Pages deployment, and fixed the embedded Database Generator layout.
 
 ## Useful Links
 
