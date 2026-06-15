@@ -13,9 +13,9 @@
   
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.8.0">
-  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=6.8.0">
-  <link rel="stylesheet" href="../css/controls.css?v=6.8.0">
+  <link rel="stylesheet" href="../css/theme.css?v=6.9.0">
+  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=6.9.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.9.0">
   
   <title>Campaign Counter - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -25,6 +25,7 @@
   
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <!-- Navigation Bar -->
@@ -43,278 +44,41 @@
   <main id="main-content" role="main">
     <section class="campaign-section">
       <div class="container">
-        <div class="tab-content">
-          <!-- Campaign 1 Tab -->
-          <div class="tab-pane active" id="campaign1-tab">
-            <div class="counter-container campaign1-counter">
-              <div class="counter-tabs">
-                <button class="tab-btn active" data-tab="campaign1" data-color="primary" title="Name 1 - Double click to edit">
-                  <i class="fa-solid fa-chart-line"></i>
-                  <span class="tab-name">Name 1</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign2" data-color="success" title="Name 2 - Double click to edit">
-                  <i class="fa-solid fa-ticket"></i>
-                  <span class="tab-name">Name 2</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign3" data-color="warning" title="Name 3 - Double click to edit">
-                  <i class="fa-solid fa-gift"></i>
-                  <span class="tab-name">Name 3</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign4" data-color="info" title="Name 4 - Double click to edit">
-                  <i class="fa-solid fa-tag"></i>
-                  <span class="tab-name">Name 4</span>
-                </button>
-              </div>
-              <h2>Name 1 Counter
-                <button class="edit-icon" onclick="editCounter('campaign1')" title="Edit manually">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-              </h2>
-              <div class="counter-value">
-                <span id="campaign1-number">0001</span>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" id="campaign1-progress"></div>
-              </div>
-              <div class="sync-status">Ready</div>
-              <div class="last-updated" id="campaign1-updated"></div>
-              <div class="cache-status">
-                <i class="fa-solid fa-database"></i> Browser Cache: <span id="campaign1-cache">0</span> items
-              </div>
-              <div class="buttons">
-                <button onclick="addCounter('campaign1')" class="add-btn">
-                  <i class="fa-solid fa-plus"></i> Use Next ID
-                </button>
-                <button onclick="decrementCounter('campaign1')" class="decrement-btn">
-                  <i class="fa-solid fa-rotate-left"></i> Revert
-                </button>
-              </div>
-            </div>
-            <div class="history-container">
-              <h2>History</h2>
-              <div id="campaign1-history" class="history-list"></div>
-              <button onclick="loadMoreHistory('campaign1')" class="load-more-btn-custom">Load More</button>
-            </div>
+        <section class="counter-toolbar" aria-labelledby="counter-import-title">
+          <div>
+            <span class="counter-eyebrow">Monday synchronization</span>
+            <h1 id="counter-import-title">Campaign ID ranges</h1>
+            <p>Import a Monday XLSX export to update every used Campaign ID in Supabase.</p>
           </div>
-          
-          <!-- Campaign 2 Tab -->
-          <div class="tab-pane" id="campaign2-tab">
-            <div class="counter-container campaign2-counter">
-              <div class="counter-tabs">
-                <button class="tab-btn active" data-tab="campaign1" data-color="primary" title="Name 1 - Double click to edit">
-                  <i class="fa-solid fa-chart-line"></i>
-                  <span class="tab-name">Name 1</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign2" data-color="success" title="Name 2 - Double click to edit">
-                  <i class="fa-solid fa-ticket"></i>
-                  <span class="tab-name">Name 2</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign3" data-color="warning" title="Name 3 - Double click to edit">
-                  <i class="fa-solid fa-gift"></i>
-                  <span class="tab-name">Name 3</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign4" data-color="info" title="Name 4 - Double click to edit">
-                  <i class="fa-solid fa-tag"></i>
-                  <span class="tab-name">Name 4</span>
-                </button>
-              </div>
-              <h2>Name 2 Counter
-                <button class="edit-icon" onclick="editCounter('campaign2')" title="Edit manually">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-              </h2>
-              <div class="counter-value">
-                <span id="campaign2-number">0001</span>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" id="campaign2-progress"></div>
-              </div>
-              <div class="sync-status">Ready</div>
-              <div class="last-updated" id="campaign2-updated"></div>
-              <div class="cache-status">
-                <i class="fa-solid fa-database"></i> Browser Cache: <span id="campaign2-cache">0</span> items
-              </div>
-              <div class="buttons">
-                <button onclick="addCounter('campaign2')" class="add-btn">
-                  <i class="fa-solid fa-plus"></i> Use Next ID
-                </button>
-                <button onclick="decrementCounter('campaign2')" class="decrement-btn">
-                  <i class="fa-solid fa-rotate-left"></i> Revert
-                </button>
-              </div>
-            </div>
-            <div class="history-container">
-              <h2>History</h2>
-              <div id="campaign2-history" class="history-list"></div>
-              <button onclick="loadMoreHistory('campaign2')" class="load-more-btn-custom">Load More</button>
-            </div>
+          <div class="counter-import-actions">
+            <span class="counter-total" id="counter-total">Loading IDs</span>
+            <button type="button" class="used-id-upload" id="import-xlsx">
+              <i class="fa-solid fa-file-excel"></i> Import XLSX
+            </button>
+            <input id="xlsx-input" type="file" accept=".xlsx,.xls" hidden>
           </div>
-          
-          <!-- Campaign 3 Tab -->
-          <div class="tab-pane" id="campaign3-tab">
-            <div class="counter-container campaign3-counter">
-              <div class="counter-tabs">
-                <button class="tab-btn active" data-tab="campaign1" data-color="primary" title="Name 1 - Double click to edit">
-                  <i class="fa-solid fa-chart-line"></i>
-                  <span class="tab-name">Name 1</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign2" data-color="success" title="Name 2 - Double click to edit">
-                  <i class="fa-solid fa-ticket"></i>
-                  <span class="tab-name">Name 2</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign3" data-color="warning" title="Name 3 - Double click to edit">
-                  <i class="fa-solid fa-gift"></i>
-                  <span class="tab-name">Name 3</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign4" data-color="info" title="Name 4 - Double click to edit">
-                  <i class="fa-solid fa-tag"></i>
-                  <span class="tab-name">Name 4</span>
-                </button>
-              </div>
-              <h2>Name 3 Counter
-                <button class="edit-icon" onclick="editCounter('campaign3')" title="Edit manually">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-              </h2>
-              <div class="counter-value">
-                <span id="campaign3-number">0001</span>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" id="campaign3-progress"></div>
-              </div>
-              <div class="sync-status">Ready</div>
-              <div class="last-updated" id="campaign3-updated"></div>
-              <div class="cache-status">
-                <i class="fa-solid fa-database"></i> Browser Cache: <span id="campaign3-cache">0</span> items
-              </div>
-              <div class="buttons">
-                <button onclick="addCounter('campaign3')" class="add-btn">
-                  <i class="fa-solid fa-plus"></i> Use Next ID
-                </button>
-                <button onclick="decrementCounter('campaign3')" class="decrement-btn">
-                  <i class="fa-solid fa-rotate-left"></i> Revert
-                </button>
-              </div>
+        </section>
+        <p class="used-id-import-status" id="import-status" role="status" aria-live="polite"></p>
+
+        <section class="series-counter-panel" aria-labelledby="series-counter-title">
+          <div class="series-counter-header">
+            <div>
+              <h2 id="series-counter-title">Campaign ID Counters</h2>
+              <p>Latest used, candidate navigation, and allocation for every series.</p>
             </div>
-            <div class="history-container">
-              <h2>History</h2>
-              <div id="campaign3-history" class="history-list"></div>
-              <button onclick="loadMoreHistory('campaign3')" class="load-more-btn-custom">Load More</button>
-            </div>
+            <span class="series-counter-legend">Red = already used</span>
           </div>
-          
-          <!-- Campaign 4 Tab -->
-          <div class="tab-pane" id="campaign4-tab">
-            <div class="counter-container campaign4-counter">
-              <div class="counter-tabs">
-                <button class="tab-btn active" data-tab="campaign1" data-color="primary" title="Name 1 - Double click to edit">
-                  <i class="fa-solid fa-chart-line"></i>
-                  <span class="tab-name">Name 1</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign2" data-color="success" title="Name 2 - Double click to edit">
-                  <i class="fa-solid fa-ticket"></i>
-                  <span class="tab-name">Name 2</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign3" data-color="warning" title="Name 3 - Double click to edit">
-                  <i class="fa-solid fa-gift"></i>
-                  <span class="tab-name">Name 3</span>
-                </button>
-                <button class="tab-btn" data-tab="campaign4" data-color="info" title="Name 4 - Double click to edit">
-                  <i class="fa-solid fa-tag"></i>
-                  <span class="tab-name">Name 4</span>
-                </button>
-              </div>
-              <h2>Name 4 Counter
-                <button class="edit-icon" onclick="editCounter('campaign4')" title="Edit manually">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-              </h2>
-              <div class="counter-value">
-                <span id="campaign4-number">0001</span>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" id="campaign4-progress"></div>
-              </div>
-              <div class="sync-status">Ready</div>
-              <div class="last-updated" id="campaign4-updated"></div>
-              <div class="cache-status">
-                <i class="fa-solid fa-database"></i> Browser Cache: <span id="campaign4-cache">0</span> items
-              </div>
-              <div class="buttons">
-                <button onclick="addCounter('campaign4')" class="add-btn">
-                  <i class="fa-solid fa-plus"></i> Use Next ID
-                </button>
-                <button onclick="decrementCounter('campaign4')" class="decrement-btn">
-                  <i class="fa-solid fa-rotate-left"></i> Revert
-                </button>
-              </div>
-            </div>
-            <div class="history-container">
-              <h2>History</h2>
-              <div id="campaign4-history" class="history-list"></div>
-              <button onclick="loadMoreHistory('campaign4')" class="load-more-btn-custom">Load More</button>
-            </div>
+          <div class="series-counter-columns" aria-hidden="true">
+            <span>Series</span>
+            <span>Latest used</span>
+            <span>Candidate</span>
+            <span>Action</span>
           </div>
-        </div>
+          <div class="series-counter-list" id="series-counter-list" aria-live="polite"></div>
+        </section>
       </div>
     </section>
   </main>
-
-  <!-- Modal Edit Counter -->
-  <div class="modal-overlay" id="edit-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modal-title">Edit Campaign ID</h3>
-        <button class="modal-close-btn" onclick="closeEditModal()">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Enter the new counter number</p>
-        <div class="input-group">
-          <label for="modal-input">Counter ID</label>
-          <input type="number" id="modal-input" min="1" placeholder="Enter counter ID" autocomplete="off">
-          <small class="input-hint">Minimum value: 1</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeEditModal()">
-          <i class="fa-solid fa-xmark"></i> Cancel
-        </button>
-        <button class="btn-confirm" onclick="confirmEditCounter()">
-          <i class="fa-solid fa-check"></i> Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Edit Tab Name -->
-  <div class="modal-overlay" id="tab-name-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Edit Tab Name</h3>
-        <button class="modal-close-btn" onclick="closeTabNameModal()">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Enter the new tab name</p>
-        <div class="input-group">
-          <label for="tab-name-input">Tab Name</label>
-          <input type="text" id="tab-name-input" placeholder="Enter tab name" autocomplete="off" maxlength="30">
-          <small class="input-hint">Maximum 30 characters</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeTabNameModal()">
-          <i class="fa-solid fa-xmark"></i> Cancel
-        </button>
-        <button class="btn-confirm" onclick="confirmTabName()">
-          <i class="fa-solid fa-check"></i> Confirm
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer class="footer" role="contentinfo">
@@ -343,9 +107,9 @@
     </div>
   </footer>
 
-  <script src="../js/footer.js?v=6.8.0" defer></script>
-  <script src="../js/version-config.js?v=6.8.0" defer></script>
-  <script src="../js/campaign-id-core.js?v=6.8.0" defer></script>
-  <script src="../js/pages-campaign-counter.js?v=6.8.0" defer></script>
+  <script src="../js/footer.js?v=6.9.0" defer></script>
+  <script src="../js/version-config.js?v=6.9.0" defer></script>
+  <script src="../js/campaign-id-core.js?v=6.9.0" defer></script>
+  <script src="../js/pages-campaign-counter.js?v=6.9.0" defer></script>
 </body>
 </html>

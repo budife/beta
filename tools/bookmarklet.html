@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.4.2">
-  <link rel="stylesheet" href="../css/pages-bookmarklet.css?v=6.4.2">
-  <link rel="stylesheet" href="../css/controls.css?v=6.4.2">
+  <link rel="stylesheet" href="../css/theme.css?v=6.9.0">
+  <link rel="stylesheet" href="../css/pages-bookmarklet.css?v=6.9.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.9.0">
   
   <title>Bookmarklet - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -88,10 +88,11 @@
                     <i class="fa-solid fa-hashtag"></i>
                     <h3>Monday Campaign ID</h3>
                 </div>
-                <p>Open a synchronized, gap-aware Campaign ID panel directly on Monday.com.</p>
-                <a href="javascript:(function(){var old=document.getElementById('edm-campaign-bookmarklet-loader');if(old)old.remove();var s=document.createElement('script');s.id='edm-campaign-bookmarklet-loader';s.src='https://budife.github.io/beta/js/monday-campaign-bookmarklet.js?v=6.8.0';document.head.appendChild(s);})();"
+                <p>Open the lightweight Regular-to-9000 Series allocator directly on Monday.com.</p>
+                <a href="javascript:alert('Bookmarklet is still preparing. Please try again.');"
                    class="bookmarklet-btn"
                    draggable="true"
+                   data-bookmarklet-source="../js/monday-campaign-bookmarklet.js"
                    data-tool="Monday Campaign ID">
                     <i class="fa-solid fa-play"></i>
                     <span class="btn-text">Monday Campaign ID</span>
@@ -371,7 +372,7 @@
   <div id="settings-container"></div>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.4.2" defer></script>
+<script src="../js/version-config.js?v=6.9.0" defer></script>
 <!-- All functionality in one inline script -->
 <script>
 // Search functionality
@@ -382,6 +383,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const searchInput = document.getElementById('bookmarkletSearch');
     const cards = document.querySelectorAll('.bookmarklet-card');
+
+    document.querySelectorAll('[data-bookmarklet-source]').forEach(async button => {
+        try {
+            const sourceUrl = new URL(button.dataset.bookmarkletSource, window.location.href);
+            const response = await fetch(sourceUrl, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const source = await response.text();
+            const compactSource = source
+                .replace(/^\s*\/\/.*$/gm, '')
+                .replace(/\r?\n/g, ' ')
+                .trim();
+            button.setAttribute('href', `javascript:${compactSource}`);
+            button.dataset.bookmarkletReady = 'true';
+            button.title = 'Drag to the bookmark bar, then run it on Monday.com';
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                alert('Drag tombol ini ke bookmark bar. Setelah itu buka Monday.com dan klik bookmark dari bookmark bar.');
+            });
+        } catch (error) {
+            console.error('Unable to prepare Monday Campaign ID bookmarklet:', error);
+            button.dataset.bookmarkletReady = 'false';
+            button.title = 'Unable to prepare bookmarklet. Refresh this page.';
+        }
+    });
     
     if (searchInput) {
         searchInput.addEventListener('input', function(e) {

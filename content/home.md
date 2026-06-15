@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.9.0 · 15 June 2026** - Rebuilt Campaign Counter around Regular-to-9000 ID series, added Monday XLSX synchronization, introduced the compact Monday allocator bookmarklet, and added a GitHub Pages data bridge for environments that block direct Supabase requests.
 - **v6.8.1 · 14 June 2026** - Moved the Database Generator Add action below the email field, streamlined Config eDM with same-file saving and a NOW date shortcut, and added the hoverable `budd` creator footer with website and social links.
 - **v6.8.0 · 14 June 2026** - Corrected the four-file database package standard to use `EmailCustMast`, including package validation, raw-data inspection, layout testing, and generated database filenames.
 - **v6.7.3 · 14 June 2026** - Fixed Layout Checker KRHRED highlighting to match Database Checker previews and enlarged the primary Apply action.

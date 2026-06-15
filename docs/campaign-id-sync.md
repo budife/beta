@@ -18,8 +18,9 @@ The migration imports existing values from `campaign_history` and
 
 ## Allocation Rules
 
-- The sequence starts from the active counter value for that campaign type.
-- The allocator returns the smallest available gap.
+- IDs are grouped into Regular `0001-0999`, then one range for every thousand
+  through `9000-9999`.
+- Each range shows its latest used ID and the next number after it.
 - Numbers with `reserved` or `used` status are skipped automatically.
 - A released record remains in the audit trail but can become available again.
 - Atomic reservation prevents two users from receiving the same number.
@@ -27,26 +28,36 @@ The migration imports existing values from `campaign_history` and
 Example:
 
 ```text
-Used: 0228, 0229, 0231, 0235
-Next: 0230
+Regular used: 0244, 0245, 0246
+Regular next: 0247
+
+1000 Series used: 1111-1116
+1000 Series next: 1117
 ```
 
-After `0230` is used, the next number becomes `0232`.
+Higher ranges do not move the next number in lower ranges.
+
+## Monday XLSX Import
+
+Export the Monday board as XLSX, then import it on Campaign Counter. The tool
+scans Campaign ID values, skips duplicates, and stores new IDs in the existing
+`campaign_id_allocations` table.
 
 ## Monday Bookmarklet
 
-Install **Monday Campaign ID** from the Bookmarklet page, then run it while a
-Monday item is open.
+Install **Monday Campaign ID** from the Bookmarklet page, then run it on
+Monday. A lightweight allocator opens without loading the full Campaign
+Counter page.
 
-The panel:
+The allocator:
 
-- Detects the current board and item when available.
-- Reads the same campaign types used by Campaign Counter.
-- Shows the next available number and nearby used numbers.
-- Saves the selected number to Supabase.
-- Copies the reserved four-digit number to the clipboard.
-
-Clicking a used-number button copies that number for reference.
+- Shows Regular and every thousand series together in compact rows.
+- Shows the latest used ID from Supabase.
+- Marks an already-used candidate in red.
+- Supports Previous and Next independently for every series.
+- Reserves and copies an available ID with Use.
+- Uses a hidden data-only bridge if Monday blocks direct Supabase requests;
+  the visible panel never embeds the eDM Helper application.
 
 ## Compatibility Fallback
 

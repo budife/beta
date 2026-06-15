@@ -2,49 +2,54 @@
   const PANEL_ID = 'edm-campaign-id-panel';
   const SUPABASE_URL = 'https://neuyjcotcmjnndjyzbcq.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_BGon7fPsvXNe59meFE9F4Q_SbjCa-Dp';
+  const CAMPAIGN_TYPE = 'campaign1';
+  const BRIDGE_ORIGIN = 'https://budife.github.io';
+  const BRIDGE_URL = `${BRIDGE_ORIGIN}/beta/tools/campaign-id-bridge.html?v=6.9.0`;
   const existing = document.getElementById(PANEL_ID);
 
   if (existing) {
+    existing.__edmCleanup?.();
     existing.remove();
     return;
   }
 
-  const core = {
-    normalize(values) {
-      return [...new Set((values || [])
-        .map(value => Number.parseInt(String(value), 10))
-        .filter(value => Number.isInteger(value) && value >= 1 && value <= 9999))]
-        .sort((a, b) => a - b);
-    },
-    next(values, requestedFloor) {
-      const used = this.normalize(values);
-      const parsedFloor = Number.parseInt(String(requestedFloor), 10);
-      const floor = Number.isInteger(parsedFloor) && parsedFloor >= 1 && parsedFloor <= 9999
-        ? parsedFloor
-        : used[0] || 1;
-      const usedSet = new Set(used);
-      for (let value = floor; value <= 9999; value += 1) {
-        if (!usedSet.has(value)) return value;
-      }
-      return null;
-    },
-    format(value) {
-      return value ? String(value).padStart(4, '0') : '----';
-    }
-  };
-  const campaignFloors = new Map();
+  const seriesList = Array.from({ length: 10 }, (_, index) => ({
+    key: index === 0 ? 'regular' : `series-${index}000`,
+    label: index === 0 ? 'REG' : String(index * 1000),
+    name: index === 0 ? 'Regular' : `${index}000 Series`,
+    start: index === 0 ? 1 : index * 1000,
+    end: index === 0 ? 999 : (index * 1000) + 999
+  }));
+  const candidates = new Map();
+  const bridgeRequests = new Map();
+  let used = [];
+  let bridgeRequestId = 0;
 
-  const mondayContext = (() => {
-    const boardMatch = location.pathname.match(/\/boards\/(\d+)/i);
-    const itemMatch = location.pathname.match(/\/(?:pulses|items)\/(\d+)/i);
-    const title = document.querySelector('h1')?.textContent?.trim()
-      || document.title.replace(/\s*-\s*monday\.com.*$/i, '').trim();
-    return {
-      boardId: boardMatch ? boardMatch[1] : '',
-      itemId: itemMatch ? itemMatch[1] : '',
-      campaignName: title || ''
-    };
-  })();
+  function format(value) {
+    return Number.isInteger(value) ? String(value).padStart(4, '0') : '----';
+  }
+
+  function normalize(values) {
+    return [...new Set((values || [])
+      .map(value => Number.parseInt(String(value), 10))
+      .filter(value => Number.isInteger(value) && value >= 1 && value <= 9999))]
+      .sort((a, b) => a - b);
+  }
+
+  function seriesState(series) {
+    const seriesUsed = used.filter(value => value >= series.start && value <= series.end);
+    const latest = seriesUsed.length ? seriesUsed[seriesUsed.length - 1] : null;
+    const usedSet = new Set(seriesUsed);
+    let next = latest === null ? series.start : latest + 1;
+    while (next <= series.end && usedSet.has(next)) next += 1;
+    return { used: seriesUsed, latest, next: next <= series.end ? next : null };
+  }
+
+  function candidateFor(series) {
+    const state = seriesState(series);
+    if (!candidates.has(series.key)) candidates.set(series.key, state.next ?? series.end);
+    return candidates.get(series.key);
+  }
 
   const host = document.createElement('div');
   host.id = PANEL_ID;
@@ -53,60 +58,52 @@
   shadow.innerHTML = `
     <style>
       *{box-sizing:border-box}
-      .panel{width:330px;color:#27272a;font:400 13px/1.45 "Segoe UI",Arial,sans-serif;background:#fff;border:1px solid #d4d4d8}
-      .header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #e5e7eb}
-      .header strong{font-size:14px;font-weight:600}
-      .close{width:28px;height:28px;color:#71717a;background:#fff;border:0;cursor:pointer}
-      .body{display:grid;gap:12px;padding:14px}
-      label{display:grid;gap:4px;color:#52525b;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
-      input,select{width:100%;height:34px;padding:7px 9px;color:#27272a;font:400 12px "Segoe UI",Arial,sans-serif;background:#fff;border:1px solid #d4d4d8;border-radius:0;outline:0}
-      input:focus,select:focus{border-color:#f27f86;outline:2px solid #fff0f1}
-      .next{display:flex;align-items:end;justify-content:space-between;padding:12px;background:#fafafa;border:1px solid #e5e7eb}
-      .next span{display:block;color:#71717a;font-size:10px;font-weight:600;text-transform:uppercase}
-      .next strong{font:600 30px Consolas,monospace}
-      .used{display:flex;flex-wrap:wrap;gap:6px}
-      .used button{min-width:52px;height:28px;color:#9f3f45;font:500 11px Consolas,monospace;background:#fff0f1;border:1px solid #fecdd3;cursor:pointer}
-      .primary{height:38px;color:#fff;font:600 12px "Segoe UI",Arial,sans-serif;background:#f27f86;border:1px solid #f27f86;cursor:pointer}
-      .primary:disabled{cursor:wait;opacity:.65}
-      .status{min-height:16px;margin:0;color:#71717a;font-size:10px}
-      .status.error{color:#b4232d}
-      .meta{color:#a1a1aa;font-size:10px}
+      .panel{width:410px;max-width:calc(100vw - 24px);max-height:calc(100vh - 92px);overflow:auto;color:#27272a;font:400 12px/1.4 "Segoe UI",Arial,sans-serif;background:#fff;border:1px solid #d4d4d8}
+      .header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:#fff;border-bottom:1px solid #e4e4e7}
+      .header strong{font-size:14px;font-weight:600}.close{width:28px;height:28px;padding:0;color:#71717a;font-size:18px;background:#fff;border:0;cursor:pointer}
+      .body{display:grid;gap:10px;padding:12px}
+      label{display:grid;gap:4px;color:#52525b;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+      input{width:100%;height:32px;padding:6px 8px;color:#27272a;font:400 12px "Segoe UI",Arial,sans-serif;background:#fff;border:1px solid #d4d4d8;outline:0}
+      input:focus{border-color:#f18c8e;outline:2px solid #fff1f1}
+      .columns,.row{display:grid;grid-template-columns:54px 58px 1fr 48px;align-items:center;gap:7px}
+      .columns{padding:0 4px;color:#71717a;font-size:8px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+      .rows{display:grid;border:1px solid #e4e4e7;border-bottom:0}
+      .row{padding:6px;border-bottom:1px solid #e4e4e7}
+      .row.is-used{background:#fef2f2}
+      .series{font:500 11px Consolas,monospace}.latest{color:#b91c1c;font:400 11px Consolas,monospace}
+      .nav{display:grid;grid-template-columns:26px 1fr 26px;align-items:center;border:1px solid #d4d4d8}
+      .nav button{width:26px;height:28px;padding:0;color:#52525b;background:#fff;border:0;cursor:pointer}
+      .nav button:first-child{border-right:1px solid #e4e4e7}.nav button:last-child{border-left:1px solid #e4e4e7}
+      .nav strong{font:400 12px Consolas,monospace;text-align:center}
+      .row.is-used .nav{border-color:#f18c8e}.row.is-used .nav strong{color:#b91c1c}
+      .use{height:28px;padding:4px 6px;color:#fff;font:500 10px "Segoe UI",Arial,sans-serif;background:#f18c8e;border:1px solid #f18c8e;cursor:pointer}
+      button:disabled{color:#a1a1aa!important;background:#f4f4f5!important;border-color:#e4e4e7!important;cursor:not-allowed!important}
+      .status{min-height:14px;margin:0;color:#71717a;font-size:9px}.status.error{color:#b91c1c}.status.success{color:#166534}
     </style>
     <section class="panel">
-      <header class="header">
-        <strong>Campaign ID Tracker</strong>
-        <button class="close" type="button" aria-label="Close">×</button>
-      </header>
+      <header class="header"><strong>Campaign ID Tracker</strong><button class="close" type="button" aria-label="Close">&times;</button></header>
       <div class="body">
-        <label>Campaign type<select id="type"></select></label>
-        <label>Campaign name<input id="name" type="text"></label>
-        <div class="next">
-          <div><span>Next available</span><strong id="next">----</strong></div>
-          <span id="sync">Loading</span>
-        </div>
-        <div>
-          <label>Used nearby</label>
-          <div id="used" class="used"></div>
-        </div>
-        <button id="use" class="primary" type="button">Use & Copy</button>
-        <p id="status" class="status"></p>
-        <div class="meta">Board ${mondayContext.boardId || 'unknown'} · Item ${mondayContext.itemId || 'unknown'}</div>
+        <label>Campaign name<input id="name" type="text" placeholder="Optional campaign name"></label>
+        <div class="columns"><span>Series</span><span>Latest</span><span>Candidate</span><span>Use</span></div>
+        <div id="rows" class="rows"></div>
+        <p id="status" class="status">Loading Campaign IDs...</p>
       </div>
-    </section>
-  `;
+    </section>`;
   document.body.appendChild(host);
 
+  const bridge = document.createElement('iframe');
+  bridge.id = `${PANEL_ID}-bridge`;
+  bridge.src = BRIDGE_URL;
+  bridge.title = 'Campaign ID data connection';
+  bridge.hidden = true;
+  const bridgeReady = new Promise(resolve => bridge.addEventListener('load', resolve, { once: true }));
+  document.body.appendChild(bridge);
+
   const elements = {
-    type: shadow.getElementById('type'),
+    rows: shadow.getElementById('rows'),
     name: shadow.getElementById('name'),
-    next: shadow.getElementById('next'),
-    used: shadow.getElementById('used'),
-    use: shadow.getElementById('use'),
-    status: shadow.getElementById('status'),
-    sync: shadow.getElementById('sync')
+    status: shadow.getElementById('status')
   };
-  let allocationTableAvailable = true;
-  let currentState = { used: [], next: null };
 
   function headers(extra) {
     return Object.assign({
@@ -116,148 +113,183 @@
     }, extra || {});
   }
 
-  async function request(path, options) {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-      ...options,
-      headers: headers(options?.headers)
-    });
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
-    if (!response.ok) {
-      const error = new Error(data?.message || `HTTP ${response.status}`);
-      error.code = data?.code;
-      throw error;
-    }
-    return data;
-  }
-
-  async function loadTypes() {
+  async function request(path, options = {}) {
     try {
-      const rows = await request('campaign_counters?select=campaign_type,name,value&order=campaign_type.asc');
-      const types = rows?.length ? rows : [
-        { campaign_type: 'campaign1', name: 'Name 1' },
-        { campaign_type: 'campaign2', name: 'Name 2' },
-        { campaign_type: 'campaign3', name: 'Name 3' },
-        { campaign_type: 'campaign4', name: 'Name 4' }
-      ];
-      elements.type.innerHTML = types.map(row => {
-        campaignFloors.set(row.campaign_type, Number(row.value) || 1);
-        return `<option value="${row.campaign_type}">${row.name || row.campaign_type}</option>`;
-      }).join('');
-    } catch {
-      elements.type.innerHTML = ['campaign1', 'campaign2', 'campaign3', 'campaign4']
-        .map((type, index) => `<option value="${type}">Name ${index + 1}</option>`)
-        .join('');
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        ...options,
+        headers: headers(options.headers)
+      });
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : null;
+      if (!response.ok) {
+        const error = new Error(data?.message || `HTTP ${response.status}`);
+        error.code = data?.code;
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      const action = options.method === 'POST' ? 'reserve' : 'load';
+      const payload = action === 'reserve' ? JSON.parse(options.body || '{}') : {};
+      return bridgeRequest(action, {
+        sequenceNumber: payload.sequence_number,
+        campaignName: payload.campaign_name
+      }, error);
     }
   }
 
-  async function loadUsed(campaignType) {
-    if (allocationTableAvailable) {
-      try {
-        const rows = await request(
-          `campaign_id_allocations?select=sequence_number,campaign_name,source,status&campaign_type=eq.${encodeURIComponent(campaignType)}&status=in.(reserved,used)&order=sequence_number.asc`
-        );
-        return rows || [];
-      } catch (error) {
-        if (!['42P01', 'PGRST205'].includes(error.code)) throw error;
-        allocationTableAvailable = false;
-      }
-    }
+  async function bridgeRequest(action, payload, originalError) {
+    await bridgeReady;
+    const id = ++bridgeRequestId;
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        bridgeRequests.delete(id);
+        reject(originalError);
+      }, 7000);
+      bridgeRequests.set(id, { resolve, reject, timeout });
+      bridge.contentWindow?.postMessage({
+        source: 'edm-campaign-id-panel',
+        id,
+        action,
+        payload
+      }, BRIDGE_ORIGIN);
+    });
+  }
 
+  function handleBridgeMessage(event) {
+    if (event.origin !== BRIDGE_ORIGIN || event.source !== bridge.contentWindow
+      || event.data?.source !== 'edm-campaign-id-bridge') return;
+    const pending = bridgeRequests.get(event.data.id);
+    if (!pending) return;
+    clearTimeout(pending.timeout);
+    bridgeRequests.delete(event.data.id);
+    if (event.data.ok) pending.resolve(event.data.data);
+    else {
+      const error = new Error(event.data.error || 'Campaign ID bridge failed.');
+      error.code = event.data.code;
+      pending.reject(error);
+    }
+  }
+  window.addEventListener('message', handleBridgeMessage);
+  host.__edmCleanup = () => {
+    window.removeEventListener('message', handleBridgeMessage);
+    bridgeRequests.forEach(pending => clearTimeout(pending.timeout));
+    bridgeRequests.clear();
+    bridge.remove();
+  };
+
+  function setStatus(message, type = '') {
+    elements.status.textContent = message;
+    elements.status.className = `status${type ? ` ${type}` : ''}`;
+  }
+
+  function render() {
+    const usedSet = new Set(used);
+    elements.rows.innerHTML = seriesList.map(series => {
+      const state = seriesState(series);
+      const candidate = candidateFor(series);
+      const isUsed = usedSet.has(candidate);
+      return `
+        <div class="row${isUsed ? ' is-used' : ''}">
+          <span class="series" title="${series.name}">${series.label}</span>
+          <span class="latest">${state.latest === null ? 'None' : format(state.latest)}</span>
+          <div class="nav">
+            <button type="button" data-prev="${series.key}" ${candidate <= series.start ? 'disabled' : ''}>&lsaquo;</button>
+            <strong title="${isUsed ? 'Already used in Supabase' : 'Available'}">${format(candidate)}</strong>
+            <button type="button" data-next="${series.key}" ${candidate >= series.end ? 'disabled' : ''}>&rsaquo;</button>
+          </div>
+          <button type="button" class="use" data-use="${series.key}" ${isUsed ? 'disabled' : ''}>Use</button>
+        </div>`;
+    }).join('');
+
+    elements.rows.querySelectorAll('[data-prev]').forEach(button => {
+      button.addEventListener('click', () => move(button.dataset.prev, -1));
+    });
+    elements.rows.querySelectorAll('[data-next]').forEach(button => {
+      button.addEventListener('click', () => move(button.dataset.next, 1));
+    });
+    elements.rows.querySelectorAll('[data-use]').forEach(button => {
+      button.addEventListener('click', () => reserve(button.dataset.use, button));
+    });
+  }
+
+  function move(seriesKey, amount) {
+    const series = seriesList.find(item => item.key === seriesKey);
+    candidates.set(seriesKey, Math.min(series.end, Math.max(series.start, candidateFor(series) + amount)));
+    render();
+  }
+
+  async function loadIds() {
+    setStatus('Synchronizing with Supabase...');
     const rows = await request(
-      `campaign_history?select=value,action&campaign_type=eq.${encodeURIComponent(campaignType)}&order=created_at.asc`
+      `campaign_id_allocations?select=sequence_number&campaign_type=eq.${CAMPAIGN_TYPE}&status=in.(reserved,used)&order=sequence_number.asc`
     );
-    return (rows || [])
-      .filter(row => !['reverted', 'released'].includes(row.action))
-      .map(row => ({ sequence_number: row.value, source: 'legacy-history', status: 'used' }));
-  }
-
-  function render(rows) {
-    const used = core.normalize(rows.map(row => row.sequence_number));
-    const floor = campaignFloors.get(elements.type.value) || used[0] || 1;
-    const next = core.next(used, floor);
-    currentState = { used, next, rows };
-    elements.next.textContent = core.format(next);
-    elements.sync.textContent = allocationTableAvailable ? 'Supabase' : 'Legacy';
-    const nearby = used.filter(value => next && Math.abs(value - next) <= 5);
-    const visible = nearby.length ? nearby : used.slice(-12);
-    elements.used.innerHTML = visible.length
-      ? visible.map(value => `<button type="button" data-value="${value}">${core.format(value)}</button>`).join('')
-      : '<span class="status">No used IDs yet</span>';
-    elements.used.querySelectorAll('button').forEach(button => {
-      button.addEventListener('click', () => navigator.clipboard?.writeText(core.format(button.dataset.value)));
+    used = normalize((rows || []).map(row => row.sequence_number));
+    seriesList.forEach(series => {
+      const current = candidates.get(series.key);
+      if (current === undefined || current < series.start || current > series.end) {
+        candidates.set(series.key, seriesState(series).next ?? series.end);
+      }
     });
+    render();
+    setStatus(`${used.length} used Campaign IDs loaded.`);
   }
 
-  async function refresh() {
-    elements.status.className = 'status';
-    elements.status.textContent = 'Synchronizing campaign IDs...';
+  async function copy(value) {
+    const text = format(value);
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  }
+
+  async function reserve(seriesKey, button) {
+    const series = seriesList.find(item => item.key === seriesKey);
+    const candidate = candidateFor(series);
+    if (used.includes(candidate)) return;
+    button.disabled = true;
+    button.textContent = '...';
+    setStatus(`Saving ${format(candidate)}...`);
     try {
-      render(await loadUsed(elements.type.value));
-      elements.status.textContent = `${currentState.used.length} used IDs detected`;
+      const result = await request('campaign_id_allocations?select=sequence_number', {
+        method: 'POST',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({
+          campaign_type: CAMPAIGN_TYPE,
+          sequence_number: candidate,
+          campaign_name: elements.name.value.trim() || series.name,
+          source: 'monday-bookmarklet',
+          status: 'used'
+        })
+      });
+      await copy(Number(result?.[0]?.sequence_number || candidate));
+      await loadIds();
+      candidates.set(seriesKey, seriesState(series).next ?? series.end);
+      render();
+      setStatus(`${format(candidate)} saved and copied.`, 'success');
     } catch (error) {
-      elements.status.className = 'status error';
-      elements.status.textContent = error.message;
+      if (error.code === '23505') {
+        await loadIds();
+        candidates.set(seriesKey, seriesState(series).next ?? series.end);
+        render();
+        setStatus('ID already used. Moved to the next available number.', 'error');
+      } else {
+        setStatus(error.message || 'Unable to save Campaign ID.', 'error');
+        render();
+      }
     }
   }
 
-  async function reserve() {
-    if (!currentState.next) return;
-    elements.use.disabled = true;
-    elements.use.textContent = 'Reserving...';
-    elements.status.className = 'status';
-    try {
-      let reserved = currentState.next;
-      if (allocationTableAvailable) {
-        try {
-          const result = await request('rpc/reserve_next_campaign_id', {
-            method: 'POST',
-            body: JSON.stringify({
-              p_campaign_type: elements.type.value,
-              p_floor: campaignFloors.get(elements.type.value) || currentState.used[0] || 1,
-              p_campaign_name: elements.name.value.trim() || null,
-              p_monday_item_id: mondayContext.itemId || null,
-              p_monday_board_id: mondayContext.boardId || null,
-              p_source: 'monday-bookmarklet'
-            })
-          });
-          reserved = Number(Array.isArray(result) ? result[0]?.sequence_number : result?.sequence_number);
-        } catch (error) {
-          if (!['42883', 'PGRST202'].includes(error.code)) throw error;
-          allocationTableAvailable = false;
-        }
-      }
-
-      if (!allocationTableAvailable) {
-        await request('campaign_history', {
-          method: 'POST',
-          headers: { Prefer: 'return=minimal' },
-          body: JSON.stringify({
-            campaign_type: elements.type.value,
-            action: 'monday_used',
-            value: reserved,
-            created_at: new Date().toISOString()
-          })
-        });
-      }
-
-      await navigator.clipboard?.writeText(core.format(reserved));
-      elements.status.textContent = `${core.format(reserved)} marked as used and copied`;
-      await refresh();
-    } catch (error) {
-      elements.status.className = 'status error';
-      elements.status.textContent = error.message;
-      await refresh();
-    } finally {
-      elements.use.disabled = false;
-      elements.use.textContent = 'Use & Copy';
-    }
-  }
-
-  shadow.querySelector('.close').addEventListener('click', () => host.remove());
-  elements.type.addEventListener('change', refresh);
-  elements.use.addEventListener('click', reserve);
-  elements.name.value = mondayContext.campaignName;
-
-  loadTypes().then(refresh);
+  shadow.querySelector('.close').addEventListener('click', () => {
+    host.__edmCleanup();
+    host.remove();
+  });
+  loadIds().catch(error => setStatus(error.message || 'Unable to connect to Supabase.', 'error'));
 })();
