@@ -6,7 +6,8 @@ const VIRTUAL_BUFFER_SIZE = 50; // Increased back to 50 for better visibility
 const OBJECT_POOL_SIZE = 200; // Reduced from 500
 const DEBOUNCE_DELAY = 100; // Added for scroll events
 const PACKAGE_FILE_TYPES = ['EmailCustMast', 'CustPref', 'CustSubs', 'CustAttr'];
-const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
+const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|CustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
+const CUSTOMER_MASTER_ALIASES = ['EmailCustMast', 'CustMast'];
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PACKAGE_FINDINGS_BATCH_SIZE = 20;
 const MAX_STORED_PACKAGE_FINDINGS = 10000;
@@ -14,6 +15,7 @@ const PACKAGE_TYPE_SCAN_BYTES = 512 * 1024;
 const RAW_DATA_MAX_ROWS = 300;
 const LAYOUT_TEST_SAMPLE_SIZE = 20;
 const LAYOUT_TEST_SESSION_KEY = 'edm-helper-layout-test-draft';
+const DATABASE_CHECKER_FOLDER_STATE_KEY = 'databaseChecker';
 
 // Make constants configurable for performance mode
 Object.defineProperty(window, 'LINES_PER_PAGE', { value: LINES_PER_PAGE, writable: true });
@@ -22,6 +24,12 @@ Object.defineProperty(window, 'OBJECT_POOL_SIZE', { value: OBJECT_POOL_SIZE, wri
 
 /* ========= Regex ========= */
 const unitRegex  = /^KRHRED(?:_Unit)?_\d+$/i;
+
+function normalizePackageFileType(type) {
+  return CUSTOMER_MASTER_ALIASES.some(alias => alias.toLowerCase() === String(type).toLowerCase())
+    ? 'EmailCustMast'
+    : PACKAGE_FILE_TYPES.find(name => name.toLowerCase() === String(type).toLowerCase()) || null;
+}
 
 /* ========= File reader ========= */
 class FileProcessor {
@@ -647,6 +655,55 @@ class DatabaseChecker {
     });
 
     this.bindEvents();
+    window.setTimeout(() => this.restoreOpenFolderState(), 0);
+  }
+
+  getShellStateRegistry() {
+    try {
+      const host = window.parent && window.parent !== window ? window.parent : window;
+      if (!host.__edmHelperToolState) host.__edmHelperToolState = {};
+      return host.__edmHelperToolState;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  saveOpenFolderState(dirHandle) {
+    const registry = this.getShellStateRegistry();
+    if (!registry) return;
+    registry[DATABASE_CHECKER_FOLDER_STATE_KEY] = {
+      dirHandle,
+      selectedPackageKey: this.selectedPackageKey || ''
+    };
+  }
+
+  saveSelectedPackageState() {
+    const registry = this.getShellStateRegistry();
+    const state = registry?.[DATABASE_CHECKER_FOLDER_STATE_KEY];
+    if (state) state.selectedPackageKey = this.selectedPackageKey || '';
+  }
+
+  async restoreOpenFolderState() {
+    const state = this.getShellStateRegistry()?.[DATABASE_CHECKER_FOLDER_STATE_KEY];
+    if (!state?.dirHandle) return;
+    const selectedPackageKey = state.selectedPackageKey;
+
+    try {
+      const permission = typeof state.dirHandle.queryPermission === 'function'
+        ? await state.dirHandle.queryPermission({ mode: 'read' })
+        : 'granted';
+      if (permission !== 'granted') return;
+
+      this.showLoading(true, 'Restoring database packages...');
+      await this.buildFileTree(state.dirHandle);
+      if (selectedPackageKey && this.databasePackages.has(selectedPackageKey)) {
+        await this.selectPackage(selectedPackageKey);
+      }
+    } catch (error) {
+      console.warn('Unable to restore the previously opened database folder.', error);
+    } finally {
+      this.showLoading(false);
+    }
   }
   
   detectPerformanceMode() {
@@ -763,6 +820,30 @@ class DatabaseChecker {
     this.layoutTestSubject.addEventListener('blur', ()=>{
       this.normalizeLayoutTestSubject();
       this.saveLayoutTestDraft();
+    });
+    [
+      this.layoutTestUrl,
+      this.layoutTestCustomer,
+      this.layoutTestSubject,
+      this.layoutTestSource
+    ].forEach((field) => {
+      let preserveInitialSelection = false;
+      field?.addEventListener('mousedown', () => {
+        preserveInitialSelection = document.activeElement !== field;
+      });
+      field?.addEventListener('focus', () => {
+        if (field.value) field.select();
+      });
+      field?.addEventListener('mouseup', (event) => {
+        if (preserveInitialSelection
+          && document.activeElement === field
+          && field.value
+          && field.selectionStart === 0
+          && field.selectionEnd === field.value.length) {
+          event.preventDefault();
+        }
+        preserveInitialSelection = false;
+      });
     });
     this.layoutTestCustomer.addEventListener('keydown', (event)=>{
       if (event.key === 'Enter') this.useManualLayoutTestCustomer();
@@ -1102,7 +1183,7 @@ class DatabaseChecker {
     const mastHandle = this.selectedPackage?.files.get('EmailCustMast');
     const attrHandle = this.selectedPackage?.files.get('CustAttr');
     if (!mastHandle || !attrHandle) {
-      throw new Error('EmailCustMast and CustAttr are required for a layout test.');
+      throw new Error('EmailCustMast or CustMast, plus CustAttr, are required for a layout test.');
     }
 
     let customer = null;
@@ -1119,7 +1200,7 @@ class DatabaseChecker {
     });
 
     if (!customer) {
-      throw new Error('Customer ID or email was not found in EmailCustMast.');
+      throw new Error('Customer ID or email was not found in the customer master file.');
     }
 
     const attrFile = await attrHandle.getFile();
@@ -2125,15 +2206,18 @@ class DatabaseChecker {
 
   async validateDatabasePackage(files, packageInfo, signal = null) {
     const findings = this.createFindingsCollector();
+    const customerMasterFile = files.EmailCustMast || files.CustMast;
 
     PACKAGE_FILE_TYPES.forEach((type) => {
-      if (!files[type]) {
-        findings.push(this.createFinding('Missing File', type, 0, '', `${type}.txt is missing from this package.`));
+      const file = type === 'EmailCustMast' ? customerMasterFile : files[type];
+      if (!file) {
+        const expectedName = type === 'EmailCustMast' ? 'EmailCustMast or CustMast' : type;
+        findings.push(this.createFinding('Missing File', type, 0, '', `${expectedName}.txt is missing from this package.`));
       }
     });
 
     const records = {
-      EmailCustMast: await this.parsePackageFile(files.EmailCustMast, 20, findings, signal),
+      EmailCustMast: await this.parsePackageFile(customerMasterFile, 20, findings, signal),
       CustPref: await this.parsePackageFile(files.CustPref, 5, findings, signal),
       CustSubs: await this.parsePackageFile(files.CustSubs, 5, findings, signal),
       CustAttr: await this.parsePackageFile(files.CustAttr, 5, findings, signal)
@@ -2234,14 +2318,14 @@ class DatabaseChecker {
       baselineIds.forEach((id) => {
         const relatedRows = rowsById.get(id);
         if (!relatedRows?.length) {
-          findings.push(this.createFinding('Missing Customer', type, 0, id, `${id} exists in EmailCustMast but is missing from ${type}.`));
+          findings.push(this.createFinding('Missing Customer', type, 0, id, `${id} exists in the customer master file but is missing from ${type}.`));
           return;
         }
 
         relatedRows.forEach((row) => {
           const expectedEmail = mastById.get(id).email;
           if (row.email !== expectedEmail) {
-            findings.push(this.createFinding('Email Mismatch', type, row.lineNumber, id, 'Email does not match EmailCustMast.', expectedEmail, row.email));
+            findings.push(this.createFinding('Email Mismatch', type, row.lineNumber, id, 'Email does not match the customer master file.', expectedEmail, row.email));
           }
         });
       });
@@ -2249,7 +2333,7 @@ class DatabaseChecker {
       rowsById.forEach((relatedRows, id) => {
         if (id && !mastById.has(id)) {
           const row = relatedRows[0];
-          findings.push(this.createFinding('Extra Customer', type, row.lineNumber, id, `${id} does not exist in EmailCustMast.`));
+          findings.push(this.createFinding('Extra Customer', type, row.lineNumber, id, `${id} does not exist in the customer master file.`));
         }
       });
     });
@@ -2274,9 +2358,11 @@ class DatabaseChecker {
 
     const fileStats = PACKAGE_FILE_TYPES.map((type) => ({
       type,
-      present: Boolean(files[type]),
+      present: type === 'EmailCustMast' ? Boolean(customerMasterFile) : Boolean(files[type]),
       rows: records[type].length,
-      errors: findings.fileCounts.get(type) || 0
+      errors: type === 'EmailCustMast'
+        ? CUSTOMER_MASTER_ALIASES.reduce((total, alias) => total + (findings.fileCounts.get(alias) || 0), 0)
+        : findings.fileCounts.get(type) || 0
     }));
     const layoutTestCustomers = databaseType === 'Dynamic'
       ? this.buildLayoutTestCustomers(records.EmailCustMast, records.CustAttr, attrById)
@@ -3098,8 +3184,21 @@ class DatabaseChecker {
 
   /* ===== Folder & file ===== */
   async openFolder(){
+    const button = document.getElementById('folderOpenBtn');
+    const setButtonState = (loading, label = 'Open Folder') => {
+      if (!button) return;
+      button.disabled = loading;
+      button.setAttribute('aria-busy', String(loading));
+      button.innerHTML = loading
+        ? `<i class="fa-solid fa-spinner fa-spin"></i><span>${label}</span>`
+        : '<i class="fa-solid fa-folder-open"></i><span>Open Folder</span>';
+    };
+
+    setButtonState(true, 'Opening...');
     try{
       const dirHandle = await window.showDirectoryPicker();
+      this.saveOpenFolderState(dirHandle);
+      setButtonState(true, 'Scanning...');
       this.showLoading(true, 'Scanning database packages...');
       await this.buildFileTree(dirHandle);
     } catch(err){
@@ -3116,6 +3215,7 @@ class DatabaseChecker {
       }
     } finally {
       this.showLoading(false);
+      setButtonState(false);
     }
   }
 
@@ -3132,11 +3232,17 @@ class DatabaseChecker {
       if (!match) continue;
 
       const key = match[1];
-      const type = PACKAGE_FILE_TYPES.find((name) => name.toLowerCase() === match[2].toLowerCase());
+      const sourceType = match[2];
+      const type = normalizePackageFileType(sourceType);
       if (!this.databasePackages.has(key)) {
         this.databasePackages.set(key, { key, files: new Map() });
       }
-      this.databasePackages.get(key).files.set(type, entry);
+      const packageFiles = this.databasePackages.get(key).files;
+      const existing = packageFiles.get(type);
+      const shouldReplace = !existing
+        || sourceType.toLowerCase() === 'emailcustmast'
+        || !existing.name.toLowerCase().endsWith('-emailcustmast.txt');
+      if (shouldReplace) packageFiles.set(type, entry);
     }
 
     const packages = [...this.databasePackages.values()];
@@ -3330,6 +3436,7 @@ class DatabaseChecker {
     this.isChecking = false;
     this.selectedPackageKey = packageKey;
     this.selectedPackage = packageInfo;
+    this.saveSelectedPackageState();
     this.lastPackageResult = null;
     this.lastPackageFiles = null;
     this.layoutTestCustomerSamples = [];

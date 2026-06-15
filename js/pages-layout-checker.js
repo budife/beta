@@ -163,6 +163,28 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     return krhredUnitsContainer.querySelectorAll('input[id^="krhred_unit_"]');
   }
 
+  function bindReplaceOnFocus(field) {
+    if (!field || field.dataset.replaceOnFocus === 'true') return;
+    field.dataset.replaceOnFocus = 'true';
+    let preserveInitialSelection = false;
+    field.addEventListener('mousedown', () => {
+      preserveInitialSelection = document.activeElement !== field;
+    });
+    field.addEventListener('focus', () => {
+      if (field.value) field.select();
+    });
+    field.addEventListener('mouseup', (event) => {
+      if (preserveInitialSelection
+        && document.activeElement === field
+        && field.value
+        && field.selectionStart === 0
+        && field.selectionEnd === field.value.length) {
+        event.preventDefault();
+      }
+      preserveInitialSelection = false;
+    });
+  }
+
   function updateKrhredInputFeedback(input) {
     const length = input.value.trim().length;
     if (length > 60) {
@@ -177,6 +199,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   function bindKrhredInput(input) {
     if (!input || input.dataset.bound === 'true') return;
     input.dataset.bound = 'true';
+    bindReplaceOnFocus(input);
     input.addEventListener('input', () => {
       updateKrhredInputFeedback(input);
       if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
@@ -699,6 +722,8 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   // Apply krhred values functionality
   const applyKrhredBtn = document.getElementById('applyKrhredBtn');
   const krhredInput = document.getElementById('krhredInput');
+  bindReplaceOnFocus(originalUrlInput);
+  bindReplaceOnFocus(krhredInput);
 
   if (resetKrhredBtn) {
     resetKrhredBtn.addEventListener('click', () => {

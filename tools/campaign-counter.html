@@ -14,7 +14,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.9.0">
-  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=6.9.0">
+  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=6.10.0">
   <link rel="stylesheet" href="../css/controls.css?v=6.9.0">
   
   <title>Campaign Counter - eDM Helper</title>
@@ -23,8 +23,6 @@
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
   
-  <!-- Supabase Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -46,12 +44,26 @@
       <div class="container">
         <section class="counter-toolbar" aria-labelledby="counter-import-title">
           <div>
-            <span class="counter-eyebrow">Monday synchronization</span>
+            <span class="counter-eyebrow">Local Monday import</span>
             <h1 id="counter-import-title">Campaign ID ranges</h1>
-            <p>Import a Monday XLSX export to update every used Campaign ID in Supabase.</p>
+            <p>Import a Monday XLSX export. Campaign data stays in this browser only.</p>
           </div>
           <div class="counter-import-actions">
+            <span class="counter-local-status" id="counter-local-status">Local only</span>
             <span class="counter-total" id="counter-total">Loading IDs</span>
+            <label class="counter-import-mode">
+              <span>Import mode</span>
+              <select id="import-mode" aria-label="XLSX import mode">
+                <option value="merge">Merge</option>
+                <option value="replace">Replace XLSX data</option>
+              </select>
+            </label>
+            <button type="button" class="counter-export-local" id="export-local">
+              <i class="fa-solid fa-download"></i> Export JSON
+            </button>
+            <button type="button" class="counter-reset-local" id="reset-local">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
             <button type="button" class="used-id-upload" id="import-xlsx">
               <i class="fa-solid fa-file-excel"></i> Import XLSX
             </button>
@@ -59,21 +71,20 @@
           </div>
         </section>
         <p class="used-id-import-status" id="import-status" role="status" aria-live="polite"></p>
+        <div class="counter-import-summary" id="import-summary" hidden></div>
+        <p class="counter-local-note">
+          Stored only in this browser. Campaign Counter and the Monday bookmarklet use separate local storage because they run on different domains.
+        </p>
 
         <section class="series-counter-panel" aria-labelledby="series-counter-title">
           <div class="series-counter-header">
             <div>
               <h2 id="series-counter-title">Campaign ID Counters</h2>
-              <p>Latest used, candidate navigation, and allocation for every series.</p>
+              <p>Each used number can contain multiple campaign dates, including reblasts.</p>
             </div>
-            <span class="series-counter-legend">Red = already used</span>
+            <span class="series-counter-legend">Hover an ID for campaign details</span>
           </div>
-          <div class="series-counter-columns" aria-hidden="true">
-            <span>Series</span>
-            <span>Latest used</span>
-            <span>Candidate</span>
-            <span>Action</span>
-          </div>
+          <div class="series-tabs" id="series-tabs" role="tablist" aria-label="Campaign ID series"></div>
           <div class="series-counter-list" id="series-counter-list" aria-live="polite"></div>
         </section>
       </div>
@@ -107,9 +118,10 @@
     </div>
   </footer>
 
-  <script src="../js/footer.js?v=6.9.0" defer></script>
-  <script src="../js/version-config.js?v=6.9.0" defer></script>
-  <script src="../js/campaign-id-core.js?v=6.9.0" defer></script>
-  <script src="../js/pages-campaign-counter.js?v=6.9.0" defer></script>
+  <script src="../js/footer.js?v=6.10.0" defer></script>
+  <script src="../js/version-config.js?v=6.10.0" defer></script>
+  <script src="../js/campaign-id-core.js?v=6.10.0" defer></script>
+  <script src="../js/campaign-id-local-store.js?v=6.10.0" defer></script>
+  <script src="../js/pages-campaign-counter.js?v=6.10.0" defer></script>
 </body>
 </html>

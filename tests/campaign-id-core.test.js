@@ -1,6 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const core = require('../js/campaign-id-core.js');
+const localStore = require('../js/campaign-id-local-store.js');
 
 test('normalizes and sorts used campaign sequences', () => {
   assert.deepEqual(core.normalizeUsedSequences(['0231', 228, '0229', 228, 'x']), [228, 229, 231]);
@@ -62,4 +65,106 @@ test('extracts Campaign IDs from Monday worksheet cell text', () => {
       { campaignId: '20260614_sub1_1117', sequenceNumber: 1117 }
     ]
   );
+});
+
+test('parses blast date and sequence from a full Campaign ID', () => {
+  assert.deepEqual(
+    core.parseCampaignId('20260614_edm-reblast_0246'),
+    {
+      campaignId: '20260614_edm-reblast_0246',
+      sequenceNumber: 246,
+      campaignLabel: 'edm-reblast',
+      blastDate: '2026-06-14'
+    }
+  );
+  assert.equal(core.parseCampaignId('20260230_invalid_0246').blastDate, null);
+});
+
+test('groups reblasts under the same sequence and sorts newest first', () => {
+  const groups = core.groupCampaignRecords([
+    { sequenceNumber: 246, campaignId: 'A', blastDate: '2026-06-14' },
+    { sequenceNumber: 246, campaignId: 'B', blastDate: '2026-06-20' },
+    { sequenceNumber: 1111, campaignId: 'C', blastDate: '2026-06-15' }
+  ]);
+  assert.deepEqual(groups.get(246).map(record => record.campaignId), ['B', 'A']);
+  assert.equal(groups.get(1111).length, 1);
+});
+
+test('pairs Monday item and subitem names with their Campaign IDs', () => {
+  const records = core.extractCampaignRecordsFromRows([
+    ['Task', 'Campaign ID'],
+    ['EDM 4', '20260614_edm4_0247'],
+    ['Subitem', 'Owner', 'Campaign ID (sub)'],
+    ['Reblast A', '', '20260620_reblast-a_0247'],
+    ['Reblast B', '', '20260621_reblast-b_1117']
+  ], 'Board');
+
+  assert.deepEqual(records, [
+    {
+      fullCampaignId: '20260614_edm4_0247',
+      sequenceNumber: 247,
+      itemName: 'EDM 4',
+      itemType: 'item',
+      blastDate: '2026-06-14',
+      sheetName: 'Board',
+      sourceRow: 2
+    },
+    {
+      fullCampaignId: '20260620_reblast-a_0247',
+      sequenceNumber: 247,
+      itemName: 'Reblast A',
+      itemType: 'subitem',
+      blastDate: '2026-06-20',
+      sheetName: 'Board',
+      sourceRow: 4
+    },
+    {
+      fullCampaignId: '20260621_reblast-b_1117',
+      sequenceNumber: 1117,
+      itemName: 'Reblast B',
+      itemType: 'subitem',
+      blastDate: '2026-06-21',
+      sheetName: 'Board',
+      sourceRow: 5
+    }
+  ]);
+});
+
+test('local Campaign ID store exposes the required browser operations', () => {
+  assert.deepEqual(
+    Object.keys(localStore).sort(),
+    ['importRecords', 'load', 'reserve', 'reset']
+  );
+});
+
+test('Campaign Counter and Monday bookmarklet do not contain cloud endpoints', () => {
+  const files = [
+    path.join(__dirname, '../js/pages-campaign-counter.js'),
+    path.join(__dirname, '../js/monday-campaign-bookmarklet.js'),
+    path.join(__dirname, '../tools/campaign-counter.html')
+  ];
+  const source = files.map(file => fs.readFileSync(file, 'utf8')).join('\n');
+  assert.equal(/supabase|campaign-id-bridge|neuyjcotcmjnndjyzbcq/i.test(source), false);
+});
+
+test('local campaign tools expose backup and merge or replace controls', () => {
+  const counterSource = fs.readFileSync(
+    path.join(__dirname, '../tools/campaign-counter.html'),
+    'utf8'
+  );
+  const counterScript = fs.readFileSync(
+    path.join(__dirname, '../js/pages-campaign-counter.js'),
+    'utf8'
+  );
+  const bookmarkletSource = fs.readFileSync(
+    path.join(__dirname, '../js/monday-campaign-bookmarklet.js'),
+    'utf8'
+  );
+
+  assert.match(counterSource, /id="import-mode"/);
+  assert.match(counterSource, /id="export-local"/);
+  assert.match(counterScript, /campaign-id-box\.is-open/);
+  assert.match(bookmarkletSource, /<option value="merge">Merge<\/option>/);
+  assert.match(bookmarkletSource, /<option value="replace">Replace<\/option>/);
+  assert.match(bookmarkletSource, /Local backup downloaded/);
 });

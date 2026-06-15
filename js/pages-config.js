@@ -144,6 +144,42 @@ let fileHandle;
 let xmlDoc;
 let currentDirfileHandle = null;
 let currentDirHandle = null;
+const CONFIG_FOLDER_STATE_KEY = 'configEdm';
+
+function getShellToolState() {
+  try {
+    const host = window.parent && window.parent !== window ? window.parent : window;
+    if (!host.__edmHelperToolState) host.__edmHelperToolState = {};
+    return host.__edmHelperToolState;
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveConfigFolderState(dirHandle) {
+  const registry = getShellToolState();
+  if (!registry) return;
+  registry[CONFIG_FOLDER_STATE_KEY] = { dirHandle };
+}
+
+async function restoreConfigFolderState() {
+  const state = getShellToolState()?.[CONFIG_FOLDER_STATE_KEY];
+  if (!state?.dirHandle) return;
+
+  try {
+    const permission = typeof state.dirHandle.queryPermission === 'function'
+      ? await state.dirHandle.queryPermission({ mode: 'readwrite' })
+      : 'granted';
+    if (permission !== 'granted') return;
+
+    currentDirHandle = state.dirHandle;
+    updateBreadcrumb(state.dirHandle.name);
+    if (elements.fileMetadata) elements.fileMetadata.textContent = 'Select an XML file';
+    await loadFileTree(state.dirHandle);
+  } catch (error) {
+    console.warn('Unable to restore the previously opened Config eDM folder.', error);
+  }
+}
 let isPageInitializing = true; // Flag to prevent tooltips during initialization
 
 // Track original values when file is loaded
@@ -302,11 +338,32 @@ function unlockAllConfigFields() {
 
 function initializeFieldLocking() {
   editableConfigFields.forEach(input => {
+    let preserveInitialSelection = false;
+    input.addEventListener('mousedown', () => {
+      preserveInitialSelection = document.activeElement !== input;
+    });
+
+    input.addEventListener('focus', () => {
+      if (input.disabled) return;
+      setFieldLocked(input, false);
+      if (input.value) input.select();
+    });
+
+    input.addEventListener('mouseup', event => {
+      if (preserveInitialSelection
+        && document.activeElement === input
+        && input.value
+        && input.selectionStart === 0
+        && input.selectionEnd === input.value.length) {
+        event.preventDefault();
+      }
+      preserveInitialSelection = false;
+    });
+
     input.addEventListener('dblclick', () => {
       if (input.disabled) return;
       setFieldLocked(input, false);
       input.focus();
-      input.select();
     });
 
     input.addEventListener('blur', () => {
@@ -2490,6 +2547,7 @@ window.addEventListener('load', () => {
   // Note: loadState() is already called in DOMContentLoaded, don't call it again
   updateSaveAndApplyButtons();
   initializeFileTree();
+  restoreConfigFolderState();
 
   // CRITICAL: Clear tooltips again after all initialization is complete
   // This prevents any tooltips that might have appeared during input restoration
@@ -2759,11 +2817,24 @@ function initializeResizableSidebar() {
 async function openFolder() {
   if (!confirmDiscardChanges()) return;
 
+  const openFolderBtn = document.getElementById('openFolderBtn');
+  const setButtonState = (loading, label = 'Open Folder') => {
+    if (!openFolderBtn) return;
+    openFolderBtn.disabled = loading;
+    openFolderBtn.setAttribute('aria-busy', String(loading));
+    openFolderBtn.innerHTML = loading
+      ? `<i class="fa-solid fa-spinner fa-spin"></i> ${label}`
+      : '<i class="fa-solid fa-folder-open"></i> Open Folder';
+  };
+
+  setButtonState(true, 'Opening...');
   try {
     if ('showDirectoryPicker' in window) {
       const dirHandle = await window.showDirectoryPicker();
+      setButtonState(true, 'Loading...');
       clearContentWhenNoFolder();
       currentDirHandle = dirHandle;
+      saveConfigFolderState(dirHandle);
       updateBreadcrumb(dirHandle.name);
       if (elements.fileMetadata) elements.fileMetadata.textContent = 'Select an XML file';
       await loadFileTree(dirHandle);
@@ -2775,6 +2846,8 @@ async function openFolder() {
     if (error.name !== 'AbortError') {
       console.log('Failed to open folder');
     }
+  } finally {
+    setButtonState(false);
   }
 }
 

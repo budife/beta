@@ -1,66 +1,47 @@
-# Campaign ID Sync
+# Campaign ID Local Workflow
 
-Campaign Counter and the Monday Campaign ID bookmarklet share one gap-aware
-sequence stored in Supabase.
+Campaign Counter and the Monday Campaign ID bookmarklet intentionally use
+separate browser-local databases. No Campaign ID, campaign name, blast date,
+or XLSX content is sent to Supabase or another application server.
 
-## Supabase Setup
+## Campaign Counter
 
-1. Open the Supabase SQL Editor for the eDM Helper project.
-2. Run [`supabase/campaign-id-allocator.sql`](../supabase/campaign-id-allocator.sql).
-3. Confirm that `campaign_id_allocations` exists.
-4. Confirm that the `reserve_next_campaign_id` RPC is available.
+1. Export the Monday board as XLSX.
+2. Choose **Merge** to retain prior XLSX data or **Replace XLSX data** to
+   replace imported records while keeping manually reserved IDs.
+3. Open Campaign Counter and select **Import XLSX**.
+4. The browser reads `Task` / `Campaign ID` and `Subitem` /
+   `Campaign ID (sub)`.
+5. Records are stored in IndexedDB for the eDM Helper origin.
 
-Do not paste the schema export for `campaign_counters` or `campaign_history`.
-Those existing tables are referenced and preserved by the migration.
+Campaign Counter stores full Campaign IDs, item names, item type, blast dates,
+and four-digit sequence numbers. Reblasts with the same four-digit number are
+grouped under one ID box and shown in its tooltip.
+The import summary reports campaigns, unique IDs, reblasts, and malformed
+campaign rows. Click an ID box to keep its detail popup open while scrolling.
 
-The migration imports existing values from `campaign_history` and
-`campaign_counters`, so previously used numbers remain unavailable.
-
-## Allocation Rules
-
-- IDs are grouped into Regular `0001-0999`, then one range for every thousand
-  through `9000-9999`.
-- Each range shows its latest used ID and the next number after it.
-- Numbers with `reserved` or `used` status are skipped automatically.
-- A released record remains in the audit trail but can become available again.
-- Atomic reservation prevents two users from receiving the same number.
-
-Example:
-
-```text
-Regular used: 0244, 0245, 0246
-Regular next: 0247
-
-1000 Series used: 1111-1116
-1000 Series next: 1117
-```
-
-Higher ranges do not move the next number in lower ranges.
-
-## Monday XLSX Import
-
-Export the Monday board as XLSX, then import it on Campaign Counter. The tool
-scans Campaign ID values, skips duplicates, and stores new IDs in the existing
-`campaign_id_allocations` table.
+Use **Reset** to remove all Campaign Counter data stored by the current
+browser. Reset does not contact or modify any remote database.
+Use **Export JSON** to download a local backup before clearing browser data.
 
 ## Monday Bookmarklet
 
-Install **Monday Campaign ID** from the Bookmarklet page, then run it on
-Monday. A lightweight allocator opens without loading the full Campaign
-Counter page.
+1. Install **Monday Campaign ID** from the Bookmarklet page.
+2. Run it on Monday.
+3. Choose **Merge** or **Replace**, then select **Upload XLSX** inside the
+   bookmarklet panel.
+4. Used four-digit numbers are stored in IndexedDB for the Monday origin.
 
-The allocator:
+The bookmarklet has its own series tabs, local candidate allocator, and Reset
+button. Its ID list scrolls independently so the panel stays compact. Use
+**Export** to back up the bookmarklet's local allocation data. It does not read
+Campaign Counter storage because browser same-origin rules keep the two
+databases separate.
 
-- Shows Regular and every thousand series together in compact rows.
-- Shows the latest used ID from Supabase.
-- Marks an already-used candidate in red.
-- Supports Previous and Next independently for every series.
-- Reserves and copies an available ID with Use.
-- Uses a hidden data-only bridge if Monday blocks direct Supabase requests;
-  the visible panel never embeds the eDM Helper application.
+## Storage Boundaries
 
-## Compatibility Fallback
-
-Before the migration is installed, both tools fall back to the existing
-`campaign_history` table. The UI remains usable, but atomic conflict protection
-requires the migration and RPC.
+- Campaign Counter data belongs to the eDM Helper website origin.
+- Bookmarklet data belongs to the current Monday hostname.
+- Upload the XLSX separately in each tool.
+- Clearing browser site data also clears the corresponding Campaign ID data.
+- Data does not synchronize between browsers, devices, or Monday hostnames.

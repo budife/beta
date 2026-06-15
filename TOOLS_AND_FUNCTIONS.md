@@ -19,12 +19,16 @@ eDM Helper adalah kumpulan tools berguna untuk email marketing dan produktivitas
 ### 2. **Campaign Counter**
 - **File:** `campaign-counter.html`
 - **Icon:** 📈
-- **Fungsi:** Melacak dan menghitung campaign marketing
+- **Fungsi:** Mengelola nomor Campaign ID dari export Monday secara lokal
 - **Fitur:**
-  - Real-time statistics
-  - History tracking
-  - Analytics dashboard
-  - Export data
+  - Import XLSX langsung di browser
+  - Mode Merge / Replace untuk data XLSX
+  - Ringkasan campaign, ID unik, reblast, dan baris gagal
+  - Tab Regular hingga 9000 Series
+  - Detail nama campaign, tanggal blast, dan reblast dengan popup klik
+  - Export JSON sebagai backup lokal
+  - Penyimpanan IndexedDB lokal dan Reset Local Data
+  - Bookmarklet Monday memiliki database lokal terpisah
 
 ### 3. **Config eDM**
 - **File:** `config.html`
@@ -137,7 +141,7 @@ Beta/
 
 1. **Bookmarklet** - Drag bookmarklet ke browser toolbar untuk akses cepat
 2. **Database Tools** - Gunakan generator untuk membuat test data, checker untuk validasi
-3. **Campaign Counter** - Track setiap campaign untuk analytics yang baik
+3. **Campaign Counter** - Import XLSX Monday untuk melihat nomor terpakai dan next ID
 4. **Layout Checker** - Test di berbagai email client untuk memastikan compatibility
 
 ---

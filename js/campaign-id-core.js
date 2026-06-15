@@ -103,6 +103,116 @@
     return records;
   }
 
+  function parseCampaignId(campaignId) {
+    const match = String(campaignId || '').trim()
+      .match(/^(20\d{6})_([A-Za-z0-9._-]+)_(\d{4})$/);
+    if (!match) return null;
+
+    const year = Number(match[1].slice(0, 4));
+    const month = Number(match[1].slice(4, 6));
+    const day = Number(match[1].slice(6, 8));
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const validDate = date.getUTCFullYear() === year
+      && date.getUTCMonth() === month - 1
+      && date.getUTCDate() === day;
+
+    return {
+      campaignId: match[0],
+      sequenceNumber: Number(match[3]),
+      campaignLabel: match[2],
+      blastDate: validDate ? match[1].replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3') : null
+    };
+  }
+
+  function groupCampaignRecords(records) {
+    const groups = new Map();
+    (records || []).forEach(record => {
+      const sequence = normalizeSequence(record.sequenceNumber ?? record.sequence_number);
+      if (sequence === null) return;
+      if (!groups.has(sequence)) groups.set(sequence, []);
+      groups.get(sequence).push(record);
+    });
+    groups.forEach(items => items.sort((a, b) => {
+      const dateA = String(a.blastDate ?? a.blast_date ?? '');
+      const dateB = String(b.blastDate ?? b.blast_date ?? '');
+      return dateB.localeCompare(dateA);
+    }));
+    return groups;
+  }
+
+  function normalizeHeader(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+  }
+
+  function findFallbackItemName(row, campaignColumn) {
+    for (let index = campaignColumn - 1; index >= 0; index -= 1) {
+      const value = String(row[index] || '').trim();
+      if (!value || extractCampaignIds(value).length) continue;
+      if (/^(campaign id|campaign id \(sub\)|task|item|subitem|sub item)$/i.test(value)) continue;
+      return value;
+    }
+    return '';
+  }
+
+  function extractCampaignRecordsFromRows(rows, sheetName = '') {
+    const records = new Map();
+    let activeItemType = 'item';
+    const columns = {
+      item: { name: null, campaign: null },
+      subitem: { name: null, campaign: null }
+    };
+
+    (rows || []).forEach((row, rowIndex) => {
+      row.forEach((value, columnIndex) => {
+        const header = normalizeHeader(value);
+        if (header === 'task' || header === 'item') columns.item.name = columnIndex;
+        if (header === 'campaign id') {
+          columns.item.campaign = columnIndex;
+          activeItemType = 'item';
+        }
+        if (header === 'subitem' || header === 'sub item') columns.subitem.name = columnIndex;
+        if (header === 'campaign id (sub)' || header === 'campaign id sub') {
+          columns.subitem.campaign = columnIndex;
+          activeItemType = 'subitem';
+        }
+      });
+
+      row.forEach((value, columnIndex) => {
+        extractCampaignIds(value).forEach(found => {
+          const parsed = parseCampaignId(found.campaignId);
+          if (!parsed) return;
+          const itemName = columns.item.name !== null
+            ? String(row[columns.item.name] || '').trim()
+            : '';
+          const subitemName = columns.subitem.name !== null
+            ? String(row[columns.subitem.name] || '').trim()
+            : '';
+          let itemType = activeItemType;
+          if (columnIndex === columns.subitem.campaign && subitemName) itemType = 'subitem';
+          else if (columnIndex === columns.item.campaign && itemName) itemType = 'item';
+          const nameColumn = columns[itemType].name;
+          const resolvedName = nameColumn !== null
+            ? String(row[nameColumn] || '').trim()
+            : findFallbackItemName(row, columnIndex);
+          records.set(parsed.campaignId, {
+            fullCampaignId: parsed.campaignId,
+            sequenceNumber: parsed.sequenceNumber,
+            itemName: resolvedName || parsed.campaignLabel,
+            itemType,
+            blastDate: parsed.blastDate,
+            sheetName,
+            sourceRow: rowIndex + 1
+          });
+        });
+      });
+    });
+
+    return [...records.values()];
+  }
+
   return {
     MIN_SEQUENCE,
     MAX_SEQUENCE,
@@ -115,6 +225,9 @@
     getAllocationState,
     getSeries,
     getSeriesState,
-    extractCampaignIds
+    extractCampaignIds,
+    parseCampaignId,
+    groupCampaignRecords,
+    extractCampaignRecordsFromRows
   };
 });

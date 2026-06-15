@@ -1230,6 +1230,11 @@ legend.form-label {
   justify-self: start;
 }
 
+.email-input-stack #addEmail,
+.bulk-actions #applyBulk {
+  width: 136px;
+}
+
 .krhred-section {
   align-self: start;
   min-height: 100%;

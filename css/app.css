@@ -259,6 +259,14 @@ a {
   min-height: 100%;
 }
 
+.content-page[hidden] {
+  display: none !important;
+}
+
+[data-transient-view] {
+  height: 100%;
+}
+
 .content-page--tool {
   height: 100%;
   min-height: 0;
@@ -587,6 +595,15 @@ a {
 
 .markdown-section[data-section="recent-updates"] li.latest-update strong {
   color: #9f3f45;
+}
+
+.markdown-section[data-section="recent-updates"] .recent-creator-link {
+  display: inline-block;
+}
+
+.markdown-section[data-section="recent-updates"] .recent-creator-link .creator-popover {
+  top: calc(100% + 6px);
+  bottom: auto;
 }
 
 .markdown-section[data-section="useful-links"] a i {

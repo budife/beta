@@ -86,17 +86,28 @@ test('missing file is reported', async () => {
   assert.ok(result.findings.some((finding) => finding.category === 'Missing File' && finding.file === 'CustSubs'));
 });
 
-test('EmailCustMast is the required customer master file', async () => {
+test('CustMast is accepted as a customer master alias', async () => {
   const files = packageFiles();
   files.CustMast = files.EmailCustMast;
+  files.CustMast.type = 'CustMast';
   delete files.EmailCustMast;
 
   const result = await checker().validateDatabasePackage(files, { key: '20260101_TEST' });
 
-  assert.ok(result.findings.some((finding) => (
-    finding.category === 'Missing File'
-    && finding.file === 'EmailCustMast'
-  )));
+  assert.equal(result.findingCount, 0);
+  assert.equal(result.fileStats.find((item) => item.type === 'EmailCustMast').present, true);
+});
+
+test('customer master filename pattern accepts both supported names', () => {
+  assert.equal(
+    vm.runInContext("PACKAGE_FILE_PATTERN.test('20260101_TEST-EmailCustMast.txt')", sandbox),
+    true
+  );
+  assert.equal(
+    vm.runInContext("PACKAGE_FILE_PATTERN.test('20260101_TEST-CustMast.txt')", sandbox),
+    true
+  );
+  assert.equal(vm.runInContext("normalizePackageFileType('CustMast')", sandbox), 'EmailCustMast');
 });
 
 test('email mismatch is reported across files', async () => {

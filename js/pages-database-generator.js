@@ -344,9 +344,14 @@ const $ = (sel) => document.querySelector(sel);
 
     async function saveAllToFolder(files) {
       errorEl.classList.add('hidden');
+      const originalButtonHtml = btnSave.innerHTML;
+      btnSave.disabled = true;
+      btnSave.setAttribute('aria-busy', 'true');
+      btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Opening...';
       try {
         if (!('showDirectoryPicker' in window)) throw new Error("Browser Anda tidak mendukung 'Save to folder'. Coba Chrome/Edge desktop.");
         const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
         for (const [name, content] of Object.entries(files)) {
           const fileHandle = await dirHandle.getFileHandle(name, { create: true });
           const writable = await fileHandle.createWritable();
@@ -359,6 +364,10 @@ const $ = (sel) => document.querySelector(sel);
         errorEl.textContent = e?.message || 'Gagal menyimpan ke folder.';
         errorEl.classList.remove('hidden');
         setStatus('File belum tersimpan. Periksa pesan error di bawah.', 'error');
+      } finally {
+        btnSave.removeAttribute('aria-busy');
+        btnSave.innerHTML = originalButtonHtml;
+        updateUI();
       }
     }
 

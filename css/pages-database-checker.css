@@ -4789,6 +4789,15 @@ main#main-content {
   grid-column: 1 / 3;
 }
 
+#runLayoutTestBtn {
+  align-self: end;
+  min-height: var(--ui-control-min-height);
+  height: var(--ui-control-min-height);
+  padding: 4px 10px;
+  font-size: 11px;
+  line-height: var(--ui-control-line-height);
+}
+
 .layout-test-highlight-toggle {
   display: flex !important;
   flex-direction: row;

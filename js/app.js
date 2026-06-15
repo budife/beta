@@ -57,6 +57,10 @@ const viewport = document.getElementById('content-viewport');
 const sidebar = document.getElementById('app-sidebar');
 const backdrop = document.getElementById('sidebar-backdrop');
 const menuToggle = document.getElementById('menu-toggle');
+const routePageCache = new Map();
+const routeScrollPositions = new Map();
+const PERSISTENT_TOOL_ROUTES = new Set(['/database-checker', '/config-edm']);
+let activeRoutePath = '';
 
 const TOOL_META = {
   '/bookmarklet': {
@@ -336,6 +340,16 @@ function enhanceHomeDashboard(container) {
   if (updates) {
     const updateItems = Array.from(updates.querySelectorAll('li'));
     updateItems[0]?.classList.add('latest-update');
+    updates.querySelectorAll('code').forEach((code) => {
+      if (code.textContent.trim().toLowerCase() !== 'budd') return;
+      const creatorLink = document.createElement('a');
+      creatorLink.className = 'creator-link recent-creator-link';
+      creatorLink.href = 'https://budd.my.id/';
+      creatorLink.target = '_blank';
+      creatorLink.rel = 'noreferrer';
+      creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>Creator</strong><small>budd.my.id</small></span>';
+      code.replaceWith(creatorLink);
+    });
   }
 
   const usefulLinks = container.querySelector('[data-section="useful-links"]');
@@ -453,7 +467,48 @@ function styleEmbeddedTool(frame) {
   }
 }
 
-function renderPage(route, markdown) {
+function clearTransientViews() {
+  viewport.querySelectorAll('[data-transient-view]').forEach(element => element.remove());
+}
+
+function deactivateRoutePages() {
+  if (activeRoutePath) routeScrollPositions.set(activeRoutePath, viewport.scrollTop);
+  viewport.querySelectorAll('[data-route-page]').forEach(page => {
+    const path = page.dataset.routePage;
+    if (PERSISTENT_TOOL_ROUTES.has(path)) {
+      page.hidden = true;
+      return;
+    }
+    page.remove();
+    routePageCache.delete(path);
+    routeScrollPositions.delete(path);
+  });
+}
+
+function activateRoutePage(path) {
+  const page = routePageCache.get(path);
+  if (!page) return false;
+  clearTransientViews();
+  deactivateRoutePages();
+  page.hidden = false;
+  activeRoutePath = path;
+  document.title = page.dataset.documentTitle || `${ROUTES[path]?.label || 'eDM Helper'} | eDM Helper`;
+  viewport.scrollTop = routeScrollPositions.get(path) || 0;
+  viewport.focus({ preventScroll: true });
+  return true;
+}
+
+function showTransientView(markup) {
+  clearTransientViews();
+  deactivateRoutePages();
+  const transient = document.createElement('div');
+  transient.dataset.transientView = 'true';
+  transient.innerHTML = markup;
+  viewport.appendChild(transient);
+  activeRoutePath = '';
+}
+
+function renderPage(path, route, markdown) {
   const { attributes, body } = parseFrontmatter(markdown);
   const title = attributes.title || route.label;
   const description = attributes.description || '';
@@ -462,7 +517,8 @@ function renderPage(route, markdown) {
   const tool = attributes.tool ? withBasePath(attributes.tool) : '';
   const isHome = route.content === 'home.md';
 
-  document.title = `${title} | eDM Helper`;
+  const documentTitle = `${title} | eDM Helper`;
+  document.title = documentTitle;
 
   const intro = `
     <header class="content-intro">
@@ -502,9 +558,18 @@ function renderPage(route, markdown) {
     : '';
 
   const pageClass = tool ? 'content-page content-page--tool' : 'content-page';
-  viewport.innerHTML = `<div class="${pageClass}">${intro}${markdownContent}${toolFrame}</div>`;
+  clearTransientViews();
+  deactivateRoutePages();
+  const page = document.createElement('div');
+  page.className = pageClass;
+  page.dataset.routePage = path;
+  page.dataset.documentTitle = documentTitle;
+  page.innerHTML = `${intro}${markdownContent}${toolFrame}`;
+  viewport.appendChild(page);
+  if (PERSISTENT_TOOL_ROUTES.has(path)) routePageCache.set(path, page);
+  activeRoutePath = path;
 
-  const markdownContainer = viewport.querySelector('.markdown-content');
+  const markdownContainer = page.querySelector('.markdown-content');
   if (markdownContainer) {
     configureMarkdownLinks(markdownContainer);
     if (isHome) {
@@ -513,7 +578,7 @@ function renderPage(route, markdown) {
     }
   }
 
-  const frame = viewport.querySelector('.tool-frame');
+  const frame = page.querySelector('.tool-frame');
   if (frame) {
     frame.addEventListener('load', () => styleEmbeddedTool(frame));
   }
@@ -521,36 +586,36 @@ function renderPage(route, markdown) {
 
 function renderNotFound() {
   document.title = 'Page Not Found | eDM Helper';
-  viewport.innerHTML = `
+  showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">404</p>
       <h1>Page not found</h1>
       <p>The requested eDM Helper tool does not exist.</p>
       <a href="${withBasePath('/')}" data-route data-route-path="/">Back to overview</a>
     </section>
-  `;
+  `);
 }
 
 function renderLocalServerWarning() {
   document.title = 'Local Server Required | eDM Helper';
-  viewport.innerHTML = `
+  showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">Local file</p>
       <h1>Unable to load this tool</h1>
       <p>Please run eDM Helper through its local server instead of opening the HTML file directly.</p>
     </section>
-  `;
+  `);
 }
 
 function renderContentError(error) {
   document.title = 'Content Error | eDM Helper';
-  viewport.innerHTML = `
+  showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">Content error</p>
       <h1>Unable to load this tool</h1>
       <p>The tool content could not be loaded. Please refresh the page and try again.</p>
     </section>
-  `;
+  `);
   console.error(error);
 }
 
@@ -569,12 +634,14 @@ async function loadRoute(path) {
     return;
   }
 
-  viewport.innerHTML = `
+  if (activateRoutePage(path)) return;
+
+  showTransientView(`
     <div class="content-loading" role="status">
       <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
       <span>Loading ${escapeHtml(route.label)}...</span>
     </div>
-  `;
+  `);
 
   try {
     const contentUrl = `${BASE_PATH}/content/${route.content}`;
@@ -582,7 +649,7 @@ async function loadRoute(path) {
     if (!response.ok) {
       throw new Error(`Unable to load ${contentUrl}: ${response.status}`);
     }
-    renderPage(route, await response.text());
+    renderPage(path, route, await response.text());
     viewport.scrollTop = 0;
     viewport.focus({ preventScroll: true });
   } catch (error) {
@@ -630,6 +697,7 @@ backdrop.addEventListener('click', closeSidebar);
 document.getElementById('footer-year').textContent = '2025';
 
 configureRouteLinks();
+viewport.replaceChildren();
 
 const initialPath = getCurrentPath();
 const initialBrowserPath = withBasePath(initialPath);
