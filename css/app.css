@@ -372,6 +372,31 @@ a {
   max-width: none;
 }
 
+.markdown-content.docs-content {
+  max-width: 920px;
+  font-family: var(--ui-font);
+  font-size: 13px;
+  font-weight: var(--ui-weight-regular);
+  line-height: 1.55;
+}
+
+.markdown-content.docs-content h2 {
+  margin-top: 1.4em;
+  font-size: 18px;
+  font-weight: var(--ui-weight-semibold);
+}
+
+.markdown-content.docs-content h3 {
+  font-size: 14px;
+  font-weight: var(--ui-weight-semibold);
+}
+
+.markdown-content.docs-content p,
+.markdown-content.docs-content li {
+  color: var(--app-muted);
+  font-size: 13px;
+}
+
 .markdown-section {
   padding: 0 0 30px;
   border-bottom: 1px solid var(--app-border);

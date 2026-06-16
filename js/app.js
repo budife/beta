@@ -542,6 +542,7 @@ function renderPage(path, route, markdown) {
   const category = attributes.category || 'eDM Helper';
   const tool = attributes.tool ? withQueryParam(withBasePath(attributes.tool), 'embed', '1') : '';
   const isHome = route.content === 'home.md';
+  const isDocs = route.source === 'docs';
 
   const documentTitle = `${title} | eDM Helper`;
   document.title = documentTitle;
@@ -598,6 +599,7 @@ function renderPage(path, route, markdown) {
   const markdownContainer = page.querySelector('.markdown-content');
   if (markdownContainer) {
     configureMarkdownLinks(markdownContainer);
+    if (isDocs) markdownContainer.classList.add('docs-content');
     if (isHome) {
       markdownContainer.classList.add('home-dashboard');
       enhanceHomeDashboard(markdownContainer);

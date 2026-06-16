@@ -30,6 +30,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.11.1 · 16 June 2026** - Added the missing repository changelog file and aligned Documentation typography with the main eDM Helper markdown style.
 - **v6.11.0 · 16 June 2026** - Added TNC Uploader with local PDF queueing, replace-link mode, generated public links and live checks, added lazy Docs, and upgraded WFH Tracker with browser-local marks plus auto-updating Indonesian holiday/cuti bersama data with fallback caching.
 - **v6.10.2 · 16 June 2026** - Matched creator hover popovers across Home and footer areas, normalized Recent Updates version colors, and expanded the full changelog history.
 - **v6.10.1 · 16 June 2026** - Added maintainer polish: centralized footer rendering, a release helper script, full changelog notes, clearer local backup guidance, refreshed cache-busters, and a smaller `budd` hover label.
