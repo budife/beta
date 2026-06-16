@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.12.1 · 17 June 2026** - Refined Layout Slicer with top/left rulers, Photoshop-like guide lines, and slimmer markdown content with detailed notes moved to Documentation.
 - **v6.12.0 · 17 June 2026** - Added Layout Slicer for local JPG/PNG slicing, email-safe HTML generation, optional slice links, preview, downloads, and save-to-folder export.
 - **v6.11.8 · 16 June 2026** - Expanded the creator Built with credits with GitHub Pages, CSS, Font Awesome, SheetJS/XLSX, CodeMirror, File System Access, IndexedDB, localStorage, and browser APIs.
 - **v6.11.7 · 16 June 2026** - Added Fork the repo and Send feedback actions to the creator modal, including a local mailto feedback form for bug reports, requests, or complaints.

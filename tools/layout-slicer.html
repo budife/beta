@@ -6,9 +6,9 @@
   <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.12.0">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.0">
-  <link rel="stylesheet" href="../css/controls.css?v=6.12.0">
+  <link rel="stylesheet" href="../css/theme.css?v=6.12.1">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.1">
+  <link rel="stylesheet" href="../css/controls.css?v=6.12.1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <title>Layout Slicer - eDM Helper</title>
@@ -79,13 +79,19 @@
           <span id="image-meta">No image</span>
         </div>
         <div class="slicer-canvas-wrap" id="canvas-wrap">
-          <canvas id="source-canvas"></canvas>
+          <div class="slicer-ruler-corner"></div>
+          <div class="slicer-ruler slicer-ruler-top" id="ruler-top"></div>
+          <div class="slicer-ruler slicer-ruler-left" id="ruler-left"></div>
+          <div class="slicer-stage" id="slicer-stage">
+            <canvas id="source-canvas"></canvas>
+            <div class="slicer-guides" id="guide-layer"></div>
+          </div>
           <div class="slicer-empty" id="canvas-empty">
             <i class="fa-solid fa-image" aria-hidden="true"></i>
             <span>Load an image to start slicing</span>
           </div>
         </div>
-        <p class="slicer-help">Click the image to add a horizontal slice line. Drag a line to adjust it.</p>
+        <p class="slicer-help">Click once on the layout to add a guide. Drag guides to adjust. Generate will slice using those guides.</p>
       </div>
 
       <aside class="slicer-slices-panel">
@@ -127,7 +133,7 @@
     </section>
   </main>
 
-  <script src="../js/version-config.js?v=6.12.0" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.12.0" defer></script>
+  <script src="../js/version-config.js?v=6.12.1" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.12.1" defer></script>
 </body>
 </html>

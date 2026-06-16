@@ -23,7 +23,11 @@
     imageMeta: document.getElementById('image-meta'),
     sliceCount: document.getElementById('slice-count'),
     canvasWrap: document.getElementById('canvas-wrap'),
+    rulerTop: document.getElementById('ruler-top'),
+    rulerLeft: document.getElementById('ruler-left'),
+    stage: document.getElementById('slicer-stage'),
     canvas: document.getElementById('source-canvas'),
+    guideLayer: document.getElementById('guide-layer'),
     canvasEmpty: document.getElementById('canvas-empty'),
     sliceList: document.getElementById('slice-list'),
     htmlPreview: document.getElementById('html-preview'),
@@ -113,19 +117,48 @@
     ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
     ctx.drawImage(state.image, 0, 0);
 
-    ctx.save();
-    ctx.strokeStyle = '#f3838b';
-    ctx.lineWidth = Math.max(2, Math.round(state.image.naturalWidth / 300));
-    ctx.setLineDash([12, 8]);
-    state.lines.forEach((line) => {
-      ctx.beginPath();
-      ctx.moveTo(0, line);
-      ctx.lineTo(state.image.naturalWidth, line);
-      ctx.stroke();
-    });
-    ctx.restore();
-
     els.canvasEmpty.hidden = true;
+  }
+
+  function renderRulers() {
+    if (!state.image) {
+      els.rulerTop.innerHTML = '';
+      els.rulerLeft.innerHTML = '';
+      els.rulerTop.style.width = '0px';
+      els.rulerLeft.style.height = '0px';
+      return;
+    }
+
+    els.rulerTop.style.width = `${state.image.naturalWidth}px`;
+    els.rulerLeft.style.height = `${state.image.naturalHeight}px`;
+
+    els.rulerTop.innerHTML = buildRulerTicks(state.image.naturalWidth, 'x');
+    els.rulerLeft.innerHTML = buildRulerTicks(state.image.naturalHeight, 'y');
+  }
+
+  function buildRulerTicks(length, axis) {
+    const ticks = [];
+    for (let position = 0; position <= length; position += 50) {
+      const major = position % 100 === 0;
+      const label = major ? position : '';
+      const style = axis === 'x'
+        ? `left:${position}px;`
+        : `top:${position}px;`;
+      ticks.push(`<span class="slicer-ruler-tick${major ? ' is-major' : ''}" style="${style}">${label}</span>`);
+    }
+    return ticks.join('');
+  }
+
+  function renderGuides() {
+    if (!state.image) {
+      els.guideLayer.innerHTML = '';
+      return;
+    }
+    els.guideLayer.style.width = `${state.image.naturalWidth}px`;
+    els.guideLayer.style.height = `${state.image.naturalHeight}px`;
+    els.guideLayer.innerHTML = state.lines.map((line, index) => (
+      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${line}px"></div>`
+    )).join('');
   }
 
   function renderSlices() {
@@ -165,6 +198,8 @@
 
   function updateUi() {
     drawCanvas();
+    renderRulers();
+    renderGuides();
     renderSlices();
     const hasImage = Boolean(state.image);
     els.autoSlice.disabled = !hasImage;
@@ -400,16 +435,18 @@ ${rows}
   els.canvas.addEventListener('pointerdown', (event) => {
     if (!state.image) return;
     const y = canvasToImageY(event);
-    const nearest = findNearestLine(y);
-    if (nearest >= 0) {
-      state.draggingLine = nearest;
-      els.canvas.setPointerCapture(event.pointerId);
-      return;
-    }
     addLine(y);
   });
 
-  els.canvas.addEventListener('pointermove', (event) => {
+  els.guideLayer.addEventListener('pointerdown', (event) => {
+    const guide = event.target.closest('[data-guide-index]');
+    if (!guide) return;
+    event.preventDefault();
+    state.draggingLine = Number(guide.dataset.guideIndex);
+    guide.setPointerCapture(event.pointerId);
+  });
+
+  document.addEventListener('pointermove', (event) => {
     if (state.draggingLine === null || !state.image) return;
     const y = canvasToImageY(event);
     const nextLines = [...state.lines];
@@ -421,7 +458,7 @@ ${rows}
     updateUi();
   });
 
-  els.canvas.addEventListener('pointerup', () => {
+  document.addEventListener('pointerup', () => {
     state.draggingLine = null;
   });
 

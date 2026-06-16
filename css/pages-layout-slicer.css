@@ -267,6 +267,7 @@ select {
 .slicer-canvas-wrap {
   position: relative;
   min-height: 360px;
+  padding: 32px 0 0 32px;
   margin-top: 16px;
   overflow: auto;
   background:
@@ -280,11 +281,122 @@ select {
   border: 1px solid var(--border, #e5e7eb);
 }
 
+.slicer-ruler-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  width: 32px;
+  height: 32px;
+  background: #f7f7f8;
+  border-right: 1px solid var(--border, #d8dde5);
+  border-bottom: 1px solid var(--border, #d8dde5);
+}
+
+.slicer-ruler {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  background: #f7f7f8;
+}
+
+.slicer-ruler-top {
+  top: 0;
+  left: 32px;
+  height: 32px;
+  border-bottom: 1px solid var(--border, #d8dde5);
+}
+
+.slicer-ruler-left {
+  top: 32px;
+  left: 0;
+  width: 32px;
+  border-right: 1px solid var(--border, #d8dde5);
+}
+
+.slicer-ruler-tick {
+  position: absolute;
+  color: #6b7280;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.slicer-ruler-top .slicer-ruler-tick {
+  bottom: 0;
+  height: 8px;
+  padding-top: 10px;
+  border-left: 1px solid #c9ced6;
+}
+
+.slicer-ruler-top .slicer-ruler-tick.is-major {
+  height: 14px;
+  color: #374151;
+}
+
+.slicer-ruler-left .slicer-ruler-tick {
+  right: 0;
+  width: 8px;
+  padding-left: 2px;
+  border-top: 1px solid #c9ced6;
+  writing-mode: vertical-rl;
+}
+
+.slicer-ruler-left .slicer-ruler-tick.is-major {
+  width: 14px;
+  color: #374151;
+}
+
+.slicer-stage {
+  position: relative;
+  width: max-content;
+  min-width: 1px;
+}
+
 #source-canvas {
   display: block;
-  max-width: 100%;
   height: auto;
   cursor: crosshair;
+}
+
+.slicer-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.slicer-guide {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 0;
+  border-top: 1px solid #00a3ff;
+  cursor: row-resize;
+  pointer-events: auto;
+}
+
+.slicer-guide::before {
+  position: absolute;
+  top: -8px;
+  left: -28px;
+  width: 24px;
+  height: 16px;
+  color: #fff;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  content: attr(data-y);
+  background: #00a3ff;
+}
+
+.slicer-guide::after {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  content: "";
 }
 
 .slicer-empty {
@@ -295,6 +407,7 @@ select {
   place-content: center;
   color: var(--text-muted, #9ca3af);
   text-align: center;
+  pointer-events: none;
 }
 
 .slicer-empty i {

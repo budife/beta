@@ -246,14 +246,15 @@ If a layout URL is used, the tool may request the layout directly. If direct bro
 
 :::details Purpose
 
-Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple email-safe HTML table layout.
+Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple email-safe HTML table layout. It uses guide lines first, then slices only when output is generated.
 :::
 
 :::details Workflow
 
 - Drop or choose a JPG/PNG layout.
-- Click the preview to add horizontal slice lines.
-- Drag slice lines to adjust them.
+- Use the top and left rulers to read position.
+- Click the preview once to add a horizontal guide line.
+- Drag guide lines to adjust them.
 - Add optional URLs to slices that should become linked images.
 - Generate output.
 - Preview, download HTML/images, or save everything to a selected folder.

@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.1 - 17 June 2026
+
+- Refined Layout Slicer into a Photoshop-like guide workflow with top/left rulers and draggable blue guide lines.
+- Kept Layout Slicer markdown content minimal and moved detailed usage notes into Documentation.
+
 ## v6.12.0 - 17 June 2026
 
 - Added Layout Slicer as a new local tool for converting JPG/PNG layouts into sliced eDM HTML and image assets.
