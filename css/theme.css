@@ -428,7 +428,7 @@ html {
   gap: 2px;
   padding: 8px 10px;
   color: var(--text);
-  text-align: left;
+  text-align: center;
   background: #fff;
   border: 1px solid var(--border);
   opacity: 0;

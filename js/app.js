@@ -347,7 +347,7 @@ function enhanceHomeDashboard(container) {
       creatorLink.href = 'https://budd.my.id/';
       creatorLink.target = '_blank';
       creatorLink.rel = 'noreferrer';
-      creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>Creator</strong><small>budd.my.id</small></span>';
+      creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>si pemalas</strong></span>';
       code.replaceWith(creatorLink);
     });
   }

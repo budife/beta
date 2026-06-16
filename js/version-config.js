@@ -16,7 +16,7 @@ function generateBuildNumber() {
 // Version Configuration
 // \u26a0\ufe0f UBAH BAGIAN INI SAAT UPDATE VERSI MANUAL \u26a0\ufe0f
 const VERSION_CONFIG = {
-  version: '6.10.0',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
+  version: '6.10.1',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
   buildDate: new Date().toISOString(),        // ← OTOMATIS, tidak perlu diganti
   buildNumber: generateBuildNumber(),           // ← OTOMATIS, tidak perlu diganti
   environment: 'development',                 // ← GANTI JIKA PERLU (production/development)
@@ -119,10 +119,15 @@ function formatDate(dateString) {
   return date.toLocaleDateString('en-US', options);
 }
 
+function getCreatorFooterMarkup() {
+  const versionInfo = getVersionInfo();
+  return `© 2025 ${versionInfo.appName} crafted by ` +
+    `<a class="creator-link" href="https://budd.my.id/" target="_blank" rel="noreferrer">budd` +
+    `<span class="creator-popover" role="tooltip"><strong>si pemalas</strong></span></a>`;
+}
+
 // Update footer with dynamic version
 function updateFooterVersion() {
-  const versionInfo = getVersionInfo();
-  const footerText = document.querySelector('.footer-text');
   const yearElement = document.getElementById('footer-year');
   
   // Update year
@@ -131,12 +136,9 @@ function updateFooterVersion() {
   }
   
   // Update footer text
-  if (footerText) {
-    footerText.innerHTML = 
-      `© 2025 ${versionInfo.appName} crafted by ` +
-      `<a class="creator-link" href="https://budd.my.id/" target="_blank" rel="noreferrer">budd` +
-      `<span class="creator-popover" role="tooltip"><strong>Creator</strong><small>budd.my.id</small></span></a>`;
-  }
+  document.querySelectorAll('.footer-text').forEach((footerText) => {
+    footerText.innerHTML = getCreatorFooterMarkup();
+  });
 }
 
 // Update all version displays in the page
