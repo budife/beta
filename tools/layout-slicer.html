@@ -6,9 +6,9 @@
   <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.12.1">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.1">
-  <link rel="stylesheet" href="../css/controls.css?v=6.12.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.12.2">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.2">
+  <link rel="stylesheet" href="../css/controls.css?v=6.12.2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <title>Layout Slicer - eDM Helper</title>
@@ -39,8 +39,12 @@
           <input id="assets-folder" type="text" value="images" autocomplete="off">
         </label>
         <label>
-          <span>Email width</span>
+          <span>HTML display width</span>
           <input id="email-width" type="number" min="320" max="1200" value="600">
+        </label>
+        <label class="slicer-check-row">
+          <input id="use-source-width" type="checkbox">
+          <span>Use source width in HTML</span>
         </label>
         <label>
           <span>Image format</span>
@@ -50,6 +54,7 @@
           </select>
         </label>
       </div>
+      <p class="slicer-form-note">Slices export at the original image pixel width. HTML display width only controls how wide the email renders.</p>
 
       <div class="slicer-actions">
         <button id="auto-slice" type="button" class="slicer-secondary">
@@ -133,7 +138,7 @@
     </section>
   </main>
 
-  <script src="../js/version-config.js?v=6.12.1" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.12.1" defer></script>
+  <script src="../js/version-config.js?v=6.12.2" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.12.2" defer></script>
 </body>
 </html>

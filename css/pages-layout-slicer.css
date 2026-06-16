@@ -111,7 +111,7 @@ select {
 
 .slicer-form-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) 140px 120px;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) 140px minmax(180px, 220px) 120px;
   gap: 12px;
   align-items: end;
 }
@@ -145,6 +145,45 @@ select {
 .slicer-slice-card input:focus {
   outline: 1px solid var(--accent-primary, #f3838b);
   border-color: var(--accent-primary, #f3838b);
+}
+
+.slicer-form-grid input:disabled {
+  color: var(--text-muted, #6b7280);
+  background: #f7f7f8;
+}
+
+.slicer-check-row {
+  align-self: end;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border, #d8dde5);
+}
+
+.slicer-check-row input {
+  width: auto;
+  min-height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.slicer-form-grid .slicer-check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.slicer-form-grid .slicer-check-row span {
+  color: var(--text, #111827);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.slicer-form-note {
+  margin: 8px 0 0;
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
 }
 
 .slicer-actions,

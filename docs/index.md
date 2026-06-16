@@ -265,6 +265,15 @@ Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple 
 Image processing uses the browser Canvas API. Files stay in the browser unless you explicitly download them or save them to a chosen local folder.
 :::
 
+:::details Export quality and width
+
+Layout Slicer exports each slice at the original uploaded image pixel width. The HTML display width controls how wide the email renders, so a 1000px source can still render as a 600px email.
+
+Use **Use source width in HTML** when the generated HTML should render at the uploaded image width instead of the default email width.
+
+JPG export uses very high browser quality. Browser Canvas export does not reliably write 300dpi metadata, but email and webmail rendering depends on pixel dimensions, so keeping the source pixel width is the important part.
+:::
+
 ## TNC Uploader
 
 :::details Purpose

@@ -2,6 +2,13 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.2 - 17 June 2026
+
+- Increased Layout Slicer JPG export quality for cleaner sliced assets.
+- Clarified that slice images export at the original source pixel width while HTML display width controls rendered email width.
+- Added a Use source width in HTML option for layouts that should render at the full uploaded image width.
+- Documented the browser Canvas DPI limitation so export expectations stay clear.
+
 ## v6.12.1 - 17 June 2026
 
 - Refined Layout Slicer into a Photoshop-like guide workflow with top/left rulers and draggable blue guide lines.

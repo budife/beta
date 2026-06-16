@@ -15,6 +15,7 @@
     campaignName: document.getElementById('campaign-name'),
     assetsFolder: document.getElementById('assets-folder'),
     emailWidth: document.getElementById('email-width'),
+    useSourceWidth: document.getElementById('use-source-width'),
     imageFormat: document.getElementById('image-format'),
     autoSlice: document.getElementById('auto-slice'),
     clearLines: document.getElementById('clear-lines'),
@@ -37,6 +38,7 @@
   };
 
   const ctx = els.canvas.getContext('2d');
+  const JPEG_QUALITY = 0.98;
 
   function slugify(value) {
     return String(value || 'layout-edm')
@@ -53,6 +55,12 @@
   }
 
   function getEmailWidth() {
+    if (els.useSourceWidth?.checked && state.image) return state.image.naturalWidth;
+    const width = Number.parseInt(els.emailWidth.value, 10);
+    return Number.isFinite(width) && width > 0 ? width : 600;
+  }
+
+  function getAutoSliceStep() {
     const width = Number.parseInt(els.emailWidth.value, 10);
     return Number.isFinite(width) && width > 0 ? width : 600;
   }
@@ -209,6 +217,7 @@
     els.downloadHtml.disabled = !hasGenerated;
     els.downloadImages.disabled = !hasGenerated;
     els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
+    if (els.emailWidth) els.emailWidth.disabled = Boolean(els.useSourceWidth?.checked);
   }
 
   function syncLinksFromInputs() {
@@ -236,7 +245,7 @@
       state.generated = null;
       els.campaignName.value = slugify(file.name);
       els.imageMeta.textContent = `${image.naturalWidth} × ${image.naturalHeight}px · ${Math.round(file.size / 1024)} KB`;
-      setStatus('Image loaded. Click the preview to add slice lines.', 'success');
+      setStatus(`Image loaded at ${image.naturalWidth}px wide. Click the preview to add slice lines.`, 'success');
       updateUi();
     };
     image.onerror = () => setStatus('Unable to read this image.', 'error');
@@ -262,7 +271,7 @@
 
   function autoSlice() {
     if (!state.image) return;
-    const step = Math.max(100, getEmailWidth());
+    const step = Math.max(100, getAutoSliceStep());
     const lines = [];
     for (let y = step; y < state.image.naturalHeight; y += step) {
       lines.push(y);
@@ -294,7 +303,7 @@
 
   function canvasToBlob(canvas, type) {
     return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), type, type === 'image/jpeg' ? 0.92 : undefined);
+      canvas.toBlob((blob) => resolve(blob), type, type === 'image/jpeg' ? JPEG_QUALITY : undefined);
     });
   }
 
@@ -307,7 +316,7 @@
     for (const slice of state.slices) {
       const canvas = createSliceCanvas(slice);
       const blob = await canvasToBlob(canvas, type);
-      const dataUrl = canvas.toDataURL(type, type === 'image/jpeg' ? 0.92 : undefined);
+      const dataUrl = canvas.toDataURL(type, type === 'image/jpeg' ? JPEG_QUALITY : undefined);
       generatedSlices.push({ ...slice, blob, dataUrl });
     }
 
@@ -315,7 +324,7 @@
     const previewHtml = buildEmailHtml(generatedSlices, true);
     state.generated = { slices: generatedSlices, html, previewHtml };
     els.htmlPreview.srcdoc = previewHtml;
-    setStatus(`Generated ${generatedSlices.length} slice(s).`, 'success');
+    setStatus(`Generated ${generatedSlices.length} slice(s) at ${state.image.naturalWidth}px source width. HTML displays at ${getEmailWidth()}px.`, 'success');
     updateUi();
   }
 
@@ -492,7 +501,7 @@ ${rows}
     state.generated = null;
     updateUi();
   });
-  [els.campaignName, els.assetsFolder, els.emailWidth, els.imageFormat].forEach((input) => {
+  [els.campaignName, els.assetsFolder, els.emailWidth, els.useSourceWidth, els.imageFormat].forEach((input) => {
     input.addEventListener('input', () => {
       state.generated = null;
       updateUi();
