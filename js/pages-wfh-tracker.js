@@ -179,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadHolidayData(year) {
+      if (window.EDM_PRIVACY?.get?.('holidaySync') === false) {
+        setHolidaySyncStatus('Holiday source: auto-sync off', 'neutral');
+        return;
+      }
+
       const cached = getCachedHolidayMap(year);
       if (cached) {
         window.holidays = { ...defaultHolidays, ...cached };

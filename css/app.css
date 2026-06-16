@@ -375,26 +375,112 @@ a {
 .markdown-content.docs-content {
   max-width: 920px;
   font-family: var(--ui-font);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: var(--ui-weight-regular);
   line-height: 1.55;
 }
 
 .markdown-content.docs-content h2 {
   margin-top: 1.4em;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: var(--ui-weight-semibold);
 }
 
 .markdown-content.docs-content h3 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: var(--ui-weight-semibold);
 }
 
 .markdown-content.docs-content p,
 .markdown-content.docs-content li {
   color: var(--app-muted);
+  font-size: 14px;
+}
+
+.docs-details {
+  margin: 10px 0;
+  border: 1px solid var(--app-border);
+  background: #fff;
+}
+
+.docs-details summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  color: #18181b;
+  font-size: 14px;
+  font-weight: var(--ui-weight-semibold);
+  list-style: none;
+}
+
+.docs-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-details summary::after {
+  content: "+";
+  float: right;
+  color: var(--app-muted);
+  font-weight: var(--ui-weight-regular);
+}
+
+.docs-details[open] summary {
+  border-bottom: 1px solid var(--app-border);
+}
+
+.docs-details[open] summary::after {
+  content: "-";
+}
+
+.docs-details > p,
+.docs-details > ul,
+.docs-details > ol {
+  padding: 0 14px;
+}
+
+.docs-details > p:first-of-type,
+.docs-details > ul:first-of-type,
+.docs-details > ol:first-of-type {
+  margin-top: 12px;
+}
+
+.privacy-settings-panel {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+
+.privacy-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+}
+
+.privacy-setting strong,
+.privacy-setting small {
+  display: block;
+}
+
+.privacy-setting strong {
+  color: #18181b;
   font-size: 13px;
+  font-weight: var(--ui-weight-semibold);
+}
+
+.privacy-setting small {
+  margin-top: 3px;
+  color: var(--app-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.privacy-setting input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--app-accent);
 }
 
 .markdown-section {

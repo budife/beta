@@ -2,6 +2,14 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.2 - 16 June 2026
+
+- Expanded Documentation into a complete guide for every eDM Helper web app/tool.
+- Added collapsible documentation sections and a table of contents.
+- Added browser-local privacy/network toggles for external URL checks, proxy fallback, and holiday auto-sync.
+- Connected those toggles to WFH Tracker, Layout Checker, Database Checker Layout Test, and TNC Uploader link checks.
+- Aligned Documentation typography with the main app page sizing.
+
 ## v6.11.1 - 16 June 2026
 
 - Added the missing repository changelog file linked from Home.

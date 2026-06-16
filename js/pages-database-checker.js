@@ -1418,9 +1418,13 @@ class DatabaseChecker {
   }
 
   async fetchRemoteLayoutTemplate(url, externalSignal = null) {
+    if (window.EDM_PRIVACY?.get?.('externalChecks') === false) {
+      throw new Error('External URL checks are disabled in Documentation privacy settings.');
+    }
+
     const cleanUrl = url.replace(/^https?:\/\//, '');
-    const attempts = [
-      { url, via: 'direct' },
+    const directAttempt = { url, via: 'direct' };
+    const proxyAttempts = [
       { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, via: 'AllOrigins', json: true },
       { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, via: 'CodeTabs' },
       { url: `https://r.jina.ai/http://${cleanUrl}`, via: 'Jina HTTP' },
@@ -1430,6 +1434,9 @@ class DatabaseChecker {
       { url: `https://thingproxy.freeboard.io/fetch/${url}`, via: 'ThingProxy' },
       { url: `https://cors-anywhere.herokuapp.com/${url}`, via: 'CORS Anywhere' }
     ];
+    const attempts = window.EDM_PRIVACY?.get?.('proxyFallbacks') === false
+      ? [directAttempt]
+      : [directAttempt, ...proxyAttempts];
     const controllers = [];
     const fetchAttempt = async (attempt) => {
       const controller = new AbortController();

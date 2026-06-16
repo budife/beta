@@ -223,6 +223,7 @@ function renderMarkdown(source) {
   let listType = null;
   let sectionOpen = false;
   let subsectionOpen = false;
+  let detailsOpen = false;
 
   const flushParagraph = () => {
     if (!paragraph.length) return;
@@ -237,6 +238,33 @@ function renderMarkdown(source) {
   };
 
   lines.forEach((line) => {
+    const detailsStart = line.match(/^:::details\s+(.+)$/);
+    if (detailsStart) {
+      flushParagraph();
+      closeList();
+      if (detailsOpen) html.push('</details>');
+      html.push(`<details class="docs-details"><summary>${inlineMarkdown(detailsStart[1])}</summary>`);
+      detailsOpen = true;
+      return;
+    }
+
+    if (line.trim() === ':::') {
+      flushParagraph();
+      closeList();
+      if (detailsOpen) {
+        html.push('</details>');
+        detailsOpen = false;
+      }
+      return;
+    }
+
+    if (line.trim() === '{{privacy-settings}}') {
+      flushParagraph();
+      closeList();
+      html.push('<div class="privacy-settings-panel" data-privacy-settings></div>');
+      return;
+    }
+
     const heading = line.match(/^(#{2,3})\s+(.+)$/);
     const unordered = line.match(/^[-*]\s+(.+)$/);
     const ordered = line.match(/^\d+\.\s+(.+)$/);
@@ -289,6 +317,7 @@ function renderMarkdown(source) {
 
   flushParagraph();
   closeList();
+  if (detailsOpen) html.push('</details>');
   if (subsectionOpen) html.push('</div>');
   if (sectionOpen) html.push('</section>');
   return html.join('');
@@ -393,6 +422,32 @@ function enhanceHomeDashboard(container) {
       `<li><strong>Version:</strong> <code>${escapeHtml(getVersion())}</code></li>`
     );
   }
+}
+
+function renderPrivacySettings(container) {
+  const panel = container.querySelector('[data-privacy-settings]');
+  if (!panel || !window.EDM_PRIVACY) return;
+
+  const definitions = window.EDM_PRIVACY.definitions;
+  panel.innerHTML = Object.entries(definitions).map(([key, definition]) => `
+    <label class="privacy-setting">
+      <span>
+        <strong>${escapeHtml(definition.label)}</strong>
+        <small>${escapeHtml(definition.description)}</small>
+      </span>
+      <input type="checkbox" data-privacy-key="${escapeHtml(key)}" ${window.EDM_PRIVACY.get(key) ? 'checked' : ''}>
+    </label>
+  `).join('');
+
+  panel.addEventListener('change', (event) => {
+    const input = event.target.closest('[data-privacy-key]');
+    if (!input) return;
+    window.EDM_PRIVACY.set(input.dataset.privacyKey, input.checked);
+  });
+}
+
+function enhanceDocsPage(container) {
+  renderPrivacySettings(container);
 }
 
 function setActiveLink(path) {
@@ -599,7 +654,10 @@ function renderPage(path, route, markdown) {
   const markdownContainer = page.querySelector('.markdown-content');
   if (markdownContainer) {
     configureMarkdownLinks(markdownContainer);
-    if (isDocs) markdownContainer.classList.add('docs-content');
+    if (isDocs) {
+      markdownContainer.classList.add('docs-content');
+      enhanceDocsPage(markdownContainer);
+    }
     if (isHome) {
       markdownContainer.classList.add('home-dashboard');
       enhanceHomeDashboard(markdownContainer);

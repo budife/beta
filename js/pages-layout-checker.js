@@ -474,6 +474,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     showProgress('Fetching as plain text...', 'fetch-text');
     
     try {
+      if (window.EDM_PRIVACY?.get?.('externalChecks') === false) {
+        throw new Error('External URL checks are disabled in Documentation privacy settings.');
+      }
+
       const response = await fetch(url, {
         headers: {
           'Accept': 'text/plain,text/html,*/*;q=0.8'
@@ -669,9 +673,13 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   });
 
   async function fetchRemoteHtmlFast(url) {
+    if (window.EDM_PRIVACY?.get?.('externalChecks') === false) {
+      throw new Error('External URL checks are disabled in Documentation privacy settings.');
+    }
+
     const cleanUrl = url.replace(/^https?:\/\//, '');
-    const attempts = [
-      { url, via: 'direct' },
+    const directAttempt = { url, via: 'direct' };
+    const proxyAttempts = [
       { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, via: 'AllOrigins', json: true },
       { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, via: 'CodeTabs' },
       { url: `https://r.jina.ai/http://${cleanUrl}`, via: 'Jina HTTP' },
@@ -680,6 +688,9 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, via: 'AllOrigins Raw' },
       { url: `https://thingproxy.freeboard.io/fetch/${url}`, via: 'ThingProxy' }
     ];
+    const attempts = window.EDM_PRIVACY?.get?.('proxyFallbacks') === false
+      ? [directAttempt]
+      : [directAttempt, ...proxyAttempts];
     const controllers = [];
 
     const fetchAttempt = async (attempt) => {

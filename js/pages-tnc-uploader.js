@@ -641,6 +641,16 @@
   }
 
   async function verifyLink(url) {
+    if (window.EDM_PRIVACY?.get?.('externalChecks') === false) {
+      return {
+        ok: false,
+        status: '',
+        via: '',
+        cannotVerify: true,
+        disabled: true,
+      };
+    }
+
     try {
       const response = await fetchWithTimeout(url, {
         method: 'HEAD',
@@ -656,6 +666,15 @@
       }
     } catch (error) {
       console.warn('Direct HEAD check failed.', error);
+    }
+
+    if (window.EDM_PRIVACY?.get?.('proxyFallbacks') === false) {
+      return {
+        ok: false,
+        status: '',
+        via: '',
+        cannotVerify: true,
+      };
     }
 
     try {
@@ -695,7 +714,9 @@
       setStatus(`${item.targetName} was not found online.`, 'error');
     } else if (result.cannotVerify) {
       item.status = 'cannot_verify';
-      setStatus('Automatic check was blocked. Use Open to verify manually.', 'error');
+      setStatus(result.disabled
+        ? 'External URL checks are disabled in Documentation privacy settings.'
+        : 'Automatic check was blocked. Use Open to verify manually.', 'error');
     } else {
       item.status = 'error';
       setStatus(`${item.targetName} returned HTTP ${result.status || 'unknown'}.`, 'error');
