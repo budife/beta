@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.3 - 16 June 2026
+
+- Fixed Documentation table-of-contents anchors so they scroll inside the eDM Helper content viewport.
+- Added support for direct documentation section links such as `/docs#tnc-uploader`.
+
 ## v6.11.2 - 16 June 2026
 
 - Expanded Documentation into a complete guide for every eDM Helper web app/tool.

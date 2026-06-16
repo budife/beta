@@ -326,7 +326,12 @@ function renderMarkdown(source) {
 function configureMarkdownLinks(container) {
   container.querySelectorAll('a[href]').forEach((link) => {
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('#')) return;
+    if (!href) return;
+
+    if (href.startsWith('#')) {
+      link.dataset.anchor = href.slice(1);
+      return;
+    }
 
     const url = new URL(href, window.location.origin);
     if (url.origin !== window.location.origin) {
@@ -342,6 +347,23 @@ function configureMarkdownLinks(container) {
     link.dataset.routePath = routePath;
     link.setAttribute('href', withBasePath(routePath));
   });
+}
+
+function scrollToMarkdownAnchor(anchor, options = {}) {
+  if (!anchor) return false;
+  const id = decodeURIComponent(anchor).replace(/^#/, '');
+  if (!id) return false;
+
+  const target = document.getElementById(id) || document.querySelector(`[data-section="${CSS.escape(id)}"]`);
+  if (!target) return false;
+
+  const offset = Math.max(0, target.offsetTop - 18);
+  viewport.scrollTo({
+    top: offset,
+    behavior: options.instant ? 'auto' : 'smooth'
+  });
+  target.focus?.({ preventScroll: true });
+  return true;
 }
 
 function enhanceHomeDashboard(container) {
@@ -664,6 +686,12 @@ function renderPage(path, route, markdown) {
     }
   }
 
+  if (window.location.hash) {
+    window.requestAnimationFrame(() => {
+      scrollToMarkdownAnchor(window.location.hash.slice(1), { instant: true });
+    });
+  }
+
   const frame = page.querySelector('.tool-frame');
   if (frame) {
     frame.addEventListener('load', () => styleEmbeddedTool(frame));
@@ -756,6 +784,16 @@ function navigate(path, options = {}) {
 }
 
 document.addEventListener('click', (event) => {
+  const anchorLink = event.target.closest('a[data-anchor]');
+  if (anchorLink && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+    event.preventDefault();
+    const anchor = anchorLink.dataset.anchor;
+    if (scrollToMarkdownAnchor(anchor)) {
+      window.history.replaceState({}, '', `${window.location.pathname}#${anchor}`);
+    }
+    return;
+  }
+
   const link = event.target.closest('a[data-route]');
   if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
     return;
