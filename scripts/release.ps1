@@ -28,12 +28,12 @@ foreach ($file in $assetFiles) {
     Set-Content $path -NoNewline
 }
 
-$home = Join-Path $root 'content/home.md'
+$homeFile = Join-Path $root 'content/home.md'
 $today = Get-Date -Format 'dd MMMM yyyy'
 $entry = "- **v$Version · $today** - $UpdateNote"
-$homeText = Get-Content $home -Raw
+$homeText = Get-Content $homeFile -Raw
 $homeText = $homeText -replace "(## Recent Updates\r?\n\r?\n)", "`$1$entry`r`n"
-Set-Content $home $homeText -NoNewline
+Set-Content $homeFile $homeText -NoNewline
 
 Write-Host "Updated release metadata to v$Version."
 Write-Host "Run: node --test tests/*.test.js"

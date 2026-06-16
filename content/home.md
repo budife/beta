@@ -29,6 +29,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.10.2 · 16 June 2026** - Matched creator hover popovers across Home and footer areas, normalized Recent Updates version colors, and expanded the full changelog history.
 - **v6.10.1 · 16 June 2026** - Added maintainer polish: centralized footer rendering, a release helper script, full changelog notes, clearer local backup guidance, refreshed cache-busters, and a smaller `budd` hover label.
 - **v6.10.0 · 16 June 2026** - Moved Campaign Counter and the Monday bookmarklet to browser-local XLSX workflows, added series/reblast tooling, preserved folder sessions, and improved database/layout editing polish.
 - **v6.9.0 · 15 June 2026** - Rebuilt Campaign Counter around Regular-to-9000 ID series, added Monday XLSX synchronization, introduced the compact Monday allocator bookmarklet, and added a GitHub Pages data bridge for environments that block direct Supabase requests.
