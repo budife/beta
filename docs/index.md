@@ -13,6 +13,7 @@ category: Reference
 - [Tools](#bookmarklet)
 - [Maintenance](#release-workflow)
 - [Troubleshooting](#troubleshooting)
+- [Credits](#credits-dedication)
 
 ## Privacy & Network Behavior
 
@@ -352,4 +353,30 @@ Browser checks may be blocked even when the link is valid. Use Open to verify ma
 :::details WFH holiday data looks stale
 
 The tracker caches holiday data per year. Disable/enable holiday auto-sync or clear browser storage if you need a fresh fetch immediately.
+:::
+
+## Credits & Dedication
+
+:::details A small note
+
+Hi rakyat, terima kasih sudah menyempatkan waktu buat mengecek web app buatan saya.
+
+Tujuan web app ini dibuat karena saya malas dan biar kerja repetitif jadi lebih sat set. It should be a sederhana web, but here we are: jauh dari kata sempurna, but it is useful.
+
+100% aman untuk workflow lokal yang sensitif. Source code bisa dilihat di repo GitHub saya: [github.com/budife/beta](https://github.com/budife/beta).
+
+Enjoy bro n sis.
+
+Cheers,
+
+**budd the Lazy**
+:::
+
+:::details Credits
+
+- **budd the Lazy** - built, broke, fixed, tested, and kept going.
+- **The campaign workflow** - messy enough to deserve its own helper.
+- **Local-first tools** - because not every file needs to leave the browser.
+- **Deadline energy** - loud, stressful, but weirdly productive.
+- **All the strange bugs** - annoying at first, useful eventually.
 :::

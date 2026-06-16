@@ -422,12 +422,11 @@ function enhanceHomeDashboard(container) {
     updateItems[0]?.classList.add('latest-update');
     updates.querySelectorAll('code').forEach((code) => {
       if (code.textContent.trim().toLowerCase() !== 'budd') return;
-      const creatorLink = document.createElement('a');
+      const creatorLink = document.createElement('button');
       creatorLink.className = 'creator-link recent-creator-link';
-      creatorLink.href = 'https://budd.my.id/';
-      creatorLink.target = '_blank';
-      creatorLink.rel = 'noreferrer';
-      creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>si pemalas</strong></span>';
+      creatorLink.type = 'button';
+      creatorLink.dataset.creatorModal = '';
+      creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span>';
       code.replaceWith(creatorLink);
     });
   }

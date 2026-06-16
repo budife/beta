@@ -16,7 +16,7 @@ function generateBuildNumber() {
 // Version Configuration
 // \u26a0\ufe0f UBAH BAGIAN INI SAAT UPDATE VERSI MANUAL \u26a0\ufe0f
 const VERSION_CONFIG = {
-  version: '6.11.4',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
+  version: '6.11.5',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
   buildDate: new Date().toISOString(),        // ← OTOMATIS, tidak perlu diganti
   buildNumber: generateBuildNumber(),           // ← OTOMATIS, tidak perlu diganti
   environment: 'development',                 // ← GANTI JIKA PERLU (production/development)
@@ -122,8 +122,73 @@ function formatDate(dateString) {
 function getCreatorFooterMarkup() {
   const versionInfo = getVersionInfo();
   return `© 2025 ${versionInfo.appName} crafted by ` +
-    `<a class="creator-link" href="https://budd.my.id/" target="_blank" rel="noreferrer">budd` +
-    `<span class="creator-popover" role="tooltip"><strong>si pemalas</strong></span></a>`;
+    `<button class="creator-link" type="button" data-creator-modal>budd` +
+    `<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span></button>`;
+}
+
+function ensureCreatorModal() {
+  if (document.getElementById('creator-modal')) return;
+  const modal = document.createElement('div');
+  modal.id = 'creator-modal';
+  modal.className = 'creator-modal';
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="creator-modal-backdrop" data-creator-close></div>
+    <section class="creator-modal-card" role="dialog" aria-modal="true" aria-labelledby="creator-modal-title">
+      <button class="creator-modal-close" type="button" data-creator-close aria-label="Close creator note">×</button>
+      <div class="creator-modal-header">
+        <span class="creator-modal-mark">e</span>
+        <div>
+          <p class="creator-modal-kicker">Creator note</p>
+          <h2 id="creator-modal-title">Hi rakyat</h2>
+          <p class="creator-modal-subtitle">from budd the Lazy</p>
+        </div>
+      </div>
+      <div class="creator-modal-body">
+        <p>Terima kasih sudah menyempatkan waktu buat ngecek web app buatan saya.</p>
+        <p>Tujuan web app ini dibuat karena saya malas dan pengen kerja yang repetitif jadi lebih sat set. Harusnya ini cuma web sederhana, but here we are.</p>
+        <p>Masih jauh dari kata sempurna, but it is useful. Dan tenang, 100% aman: source code bisa dilihat langsung di repo GitHub saya.</p>
+      </div>
+      <a class="creator-modal-repo" href="https://github.com/budife/beta" target="_blank" rel="noreferrer">
+        View GitHub repo
+      </a>
+      <p class="creator-modal-note">Enjoy bro n sis.</p>
+      <p class="creator-modal-signoff">Cheers,<br><strong>budd the Lazy</strong></p>
+    </section>
+  `;
+  document.body.appendChild(modal);
+}
+
+function openCreatorModal() {
+  ensureCreatorModal();
+  const modal = document.getElementById('creator-modal');
+  modal.hidden = false;
+  document.body.classList.add('creator-modal-open');
+  modal.querySelector('[data-creator-close]')?.focus?.();
+}
+
+function closeCreatorModal() {
+  const modal = document.getElementById('creator-modal');
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove('creator-modal-open');
+}
+
+function initializeCreatorModal() {
+  ensureCreatorModal();
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('[data-creator-modal]')) {
+      event.preventDefault();
+      openCreatorModal();
+      return;
+    }
+    if (event.target.closest('[data-creator-close]')) {
+      closeCreatorModal();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeCreatorModal();
+  });
 }
 
 // Update footer with dynamic version
@@ -179,6 +244,7 @@ function getBuildInfo() {
 // Initialize version system when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
   updateAllVersionDisplays();
+  initializeCreatorModal();
   
   // Start auto-update system if enabled
   if (AUTO_UPDATE_ENABLED) {

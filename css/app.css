@@ -168,9 +168,15 @@ a {
 
 .creator-link {
   position: relative;
+  display: inline;
+  padding: 0;
   color: var(--accent-primary, var(--app-accent));
+  background: none;
+  border: 0;
+  font: inherit;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .creator-link:hover,

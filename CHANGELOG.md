@@ -2,6 +2,12 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.5 - 16 June 2026
+
+- Kept the `budd` hover interaction but changed the hover label to "meet the maker".
+- Added a creator note modal instead of opening the creator website from the `budd` name.
+- Added the personal "Hi rakyat" creator message, GitHub repository link, and Credits & Dedication to Documentation.
+
 ## v6.11.4 - 16 June 2026
 
 - Changed Documentation navigation from a long table of contents into a compact sticky tab bar.
