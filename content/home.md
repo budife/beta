@@ -30,6 +30,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.11.6 · 16 June 2026** - Cleaned up the creator note header and added compact Built with credits for OpenAI Codex, GitHub, Vanilla JS, and Markdown.
 - **v6.11.5 · 16 June 2026** - Kept the `budd` hover interaction but changed it into a "meet the maker" creator note with a personal message, GitHub repo link, and Credits & Dedication in Documentation.
 - **v6.11.4 · 16 June 2026** - Changed Documentation navigation from a long table of contents into a compact sticky tab bar with coral active state.
 - **v6.11.3 · 16 June 2026** - Fixed Documentation table-of-contents anchors so they scroll inside the eDM Helper content viewport and support direct `/docs#section` links.

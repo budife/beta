@@ -16,7 +16,7 @@ function generateBuildNumber() {
 // Version Configuration
 // \u26a0\ufe0f UBAH BAGIAN INI SAAT UPDATE VERSI MANUAL \u26a0\ufe0f
 const VERSION_CONFIG = {
-  version: '6.11.5',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
+  version: '6.11.6',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
   buildDate: new Date().toISOString(),        // ← OTOMATIS, tidak perlu diganti
   buildNumber: generateBuildNumber(),           // ← OTOMATIS, tidak perlu diganti
   environment: 'development',                 // ← GANTI JIKA PERLU (production/development)
@@ -141,7 +141,6 @@ function ensureCreatorModal() {
         <div>
           <p class="creator-modal-kicker">Creator note</p>
           <h2 id="creator-modal-title">Hi rakyat</h2>
-          <p class="creator-modal-subtitle">from budd the Lazy</p>
         </div>
       </div>
       <div class="creator-modal-body">
@@ -152,6 +151,13 @@ function ensureCreatorModal() {
       <a class="creator-modal-repo" href="https://github.com/budife/beta" target="_blank" rel="noreferrer">
         View GitHub repo
       </a>
+      <div class="creator-modal-built">
+        <span>Built with</span>
+        <strong>OpenAI Codex</strong>
+        <strong>GitHub</strong>
+        <strong>Vanilla JS</strong>
+        <strong>Markdown</strong>
+      </div>
       <p class="creator-modal-note">Enjoy bro n sis.</p>
       <p class="creator-modal-signoff">Cheers,<br><strong>budd the Lazy</strong></p>
     </section>

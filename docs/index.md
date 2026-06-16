@@ -375,6 +375,9 @@ Cheers,
 :::details Credits
 
 - **budd the Lazy** - built, broke, fixed, tested, and kept going.
+- **OpenAI Codex** - coding partner for planning, refactoring, debugging, and release notes.
+- **GitHub** - source repository, version history, and deployment flow.
+- **Vanilla JavaScript, CSS, and Markdown** - the simple stack behind the app.
 - **The campaign workflow** - messy enough to deserve its own helper.
 - **Local-first tools** - because not every file needs to leave the browser.
 - **Deadline energy** - loud, stressful, but weirdly productive.

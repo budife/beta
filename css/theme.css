@@ -566,12 +566,6 @@ html {
   font-weight: 600;
 }
 
-.creator-modal-subtitle {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
 .creator-modal-card p {
   margin: 0 0 12px;
   color: var(--text-muted);
@@ -609,6 +603,31 @@ html {
 .creator-modal-repo:focus-visible {
   color: #fff;
   background: var(--accent-primary);
+}
+
+.creator-modal-built {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0 0 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.creator-modal-built span {
+  margin-right: 2px;
+}
+
+.creator-modal-built strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  color: var(--text);
+  font-weight: 600;
+  background: #fff;
+  border: 1px solid var(--border);
 }
 
 .creator-modal-card .creator-modal-note {

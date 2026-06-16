@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.6 - 16 June 2026
+
+- Removed the extra "from budd the Lazy" subtitle from the creator modal.
+- Added compact Built with credits for OpenAI Codex, GitHub, Vanilla JS, and Markdown.
+
 ## v6.11.5 - 16 June 2026
 
 - Kept the `budd` hover interaction but changed the hover label to "meet the maker".
