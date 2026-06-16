@@ -36,6 +36,10 @@ const ROUTES = {
     content: 'layout-checker.md',
     label: 'Layout Checker'
   },
+  '/layout-slicer': {
+    content: 'layout-slicer.md',
+    label: 'Layout Slicer'
+  },
   '/tnc-uploader': {
     content: 'tnc-uploader.md',
     label: 'TNC Uploader'
@@ -59,6 +63,7 @@ const LEGACY_PATHS = {
   '/database-checker.html': '/database-checker',
   '/database-generator.html': '/database-generator',
   '/layout-checker.html': '/layout-checker',
+  '/layout-slicer.html': '/layout-slicer',
   '/tnc-uploader.html': '/tnc-uploader',
   '/wfh-tracker.html': '/wfh-tracker'
 };
@@ -96,6 +101,10 @@ const TOOL_META = {
   '/layout-checker': {
     icon: 'fa-solid fa-ruler-combined',
     label: 'Layout Checker'
+  },
+  '/layout-slicer': {
+    icon: 'fa-solid fa-scissors',
+    label: 'Layout Slicer'
   },
   '/tnc-uploader': {
     icon: 'fa-solid fa-file-pdf',
@@ -508,6 +517,7 @@ function styleEmbeddedTool(frame) {
       '/bookmarklet.html',
       '/campaign-counter.html',
       '/database-generator.html',
+      '/layout-slicer.html',
       '/tnc-uploader.html',
       '/wfh-tracker.html',
     ];

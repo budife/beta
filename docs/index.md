@@ -68,6 +68,7 @@ The app uses clean SPA routes with a fixed sidebar. Opening a tool changes only 
 - Campaign Counter: `/campaign-counter`
 - Config eDM: `/config-edm`
 - Layout Checker: `/layout-checker`
+- Layout Slicer: `/layout-slicer`
 - TNC Uploader: `/tnc-uploader`
 - WFH Tracker: `/wfh-tracker`
 
@@ -239,6 +240,28 @@ Layout Checker loads or accepts HTML source, detects KRHRED placeholders, applie
 :::details Network behavior
 
 If a layout URL is used, the tool may request the layout directly. If direct browser access is blocked and proxy fallback is enabled, it may try proxy services. Disable external checks or proxy fallback in Docs when working with restricted material.
+:::
+
+## Layout Slicer
+
+:::details Purpose
+
+Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple email-safe HTML table layout.
+:::
+
+:::details Workflow
+
+- Drop or choose a JPG/PNG layout.
+- Click the preview to add horizontal slice lines.
+- Drag slice lines to adjust them.
+- Add optional URLs to slices that should become linked images.
+- Generate output.
+- Preview, download HTML/images, or save everything to a selected folder.
+:::
+
+:::details Local behavior
+
+Image processing uses the browser Canvas API. Files stay in the browser unless you explicitly download them or save them to a chosen local folder.
 :::
 
 ## TNC Uploader

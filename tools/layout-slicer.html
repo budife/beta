@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
+  <meta name="author" content="eDM Helper">
+
+  <link rel="stylesheet" href="../css/theme.css?v=6.12.0">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.12.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <title>Layout Slicer - eDM Helper</title>
+</head>
+<body>
+  <main class="layout-slicer-app" id="layout-slicer-app">
+    <section class="slicer-control-panel">
+      <div class="slicer-panel-header">
+        <p class="slicer-kicker">Layout Slicer</p>
+        <h1><i class="fa-solid fa-scissors" aria-hidden="true"></i> Slice to eDM</h1>
+        <p>Drop JPG/PNG, add horizontal slices, then export email-safe HTML and assets.</p>
+      </div>
+
+      <div class="slicer-drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose layout image">
+        <i class="fa-solid fa-file-image" aria-hidden="true"></i>
+        <strong>Drop layout image here</strong>
+        <span>or click to choose JPG/PNG</span>
+        <input id="image-input" type="file" accept="image/png,image/jpeg" hidden>
+      </div>
+
+      <div class="slicer-form-grid">
+        <label>
+          <span>Campaign / file name</span>
+          <input id="campaign-name" type="text" value="layout-edm" autocomplete="off">
+        </label>
+        <label>
+          <span>Assets folder</span>
+          <input id="assets-folder" type="text" value="images" autocomplete="off">
+        </label>
+        <label>
+          <span>Email width</span>
+          <input id="email-width" type="number" min="320" max="1200" value="600">
+        </label>
+        <label>
+          <span>Image format</span>
+          <select id="image-format">
+            <option value="image/jpeg">JPG</option>
+            <option value="image/png">PNG</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="slicer-actions">
+        <button id="auto-slice" type="button" class="slicer-secondary">
+          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+          Auto 600px
+        </button>
+        <button id="clear-lines" type="button" class="slicer-secondary">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          Clear lines
+        </button>
+        <button id="generate-output" type="button" class="slicer-primary">
+          <i class="fa-solid fa-play" aria-hidden="true"></i>
+          Generate
+        </button>
+      </div>
+
+      <p class="slicer-status" id="slicer-status">No image loaded yet.</p>
+    </section>
+
+    <section class="slicer-workspace">
+      <div class="slicer-preview-panel">
+        <div class="slicer-panel-toolbar">
+          <div>
+            <p class="slicer-kicker">Preview</p>
+            <h2>Source Layout</h2>
+          </div>
+          <span id="image-meta">No image</span>
+        </div>
+        <div class="slicer-canvas-wrap" id="canvas-wrap">
+          <canvas id="source-canvas"></canvas>
+          <div class="slicer-empty" id="canvas-empty">
+            <i class="fa-solid fa-image" aria-hidden="true"></i>
+            <span>Load an image to start slicing</span>
+          </div>
+        </div>
+        <p class="slicer-help">Click the image to add a horizontal slice line. Drag a line to adjust it.</p>
+      </div>
+
+      <aside class="slicer-slices-panel">
+        <div class="slicer-panel-toolbar">
+          <div>
+            <p class="slicer-kicker">Slices</p>
+            <h2>Output pieces</h2>
+          </div>
+          <span id="slice-count">0 slices</span>
+        </div>
+        <div class="slicer-slice-list" id="slice-list">
+          <p class="slicer-muted">Slices will appear after you load an image.</p>
+        </div>
+      </aside>
+
+      <section class="slicer-output-panel">
+        <div class="slicer-panel-toolbar">
+          <div>
+            <p class="slicer-kicker">Output</p>
+            <h2>Generated eDM</h2>
+          </div>
+          <div class="slicer-output-actions">
+            <button id="download-html" type="button" class="slicer-secondary" disabled>
+              <i class="fa-solid fa-code" aria-hidden="true"></i>
+              HTML
+            </button>
+            <button id="download-images" type="button" class="slicer-secondary" disabled>
+              <i class="fa-solid fa-download" aria-hidden="true"></i>
+              Images
+            </button>
+            <button id="save-folder" type="button" class="slicer-primary" disabled>
+              <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+              Save folder
+            </button>
+          </div>
+        </div>
+        <iframe id="html-preview" title="Generated email HTML preview" sandbox=""></iframe>
+      </section>
+    </section>
+  </main>
+
+  <script src="../js/version-config.js?v=6.12.0" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.12.0" defer></script>
+</body>
+</html>

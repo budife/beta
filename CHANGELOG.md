@@ -2,6 +2,13 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.0 - 17 June 2026
+
+- Added Layout Slicer as a new local tool for converting JPG/PNG layouts into sliced eDM HTML and image assets.
+- Added horizontal slice lines, drag adjustment, optional link mapping per slice, generated preview, individual downloads, and save-to-folder export.
+- Added Layout Slicer route, sidebar menu item, markdown content page, and documentation entry.
+- Ignored the local reference folder `contoh jangan di deploy/` so sample source files are not deployed.
+
 ## v6.11.8 - 16 June 2026
 
 - Expanded the creator modal Built with credits to include GitHub Pages, CSS, Font Awesome, SheetJS/XLSX, CodeMirror, File System Access, IndexedDB, and localStorage.

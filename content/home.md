@@ -10,6 +10,7 @@ category: Home
 - [Database Checker](/database-checker) - Validate campaign databases before delivery.
 - [Config eDM](/config-edm) - Open and update eDM project configuration.
 - [Layout Checker](/layout-checker) - Review HTML structure and campaign layout.
+- [Layout Slicer](/layout-slicer) - Slice JPG/PNG layouts into email-ready HTML.
 - [Campaign Counter](/campaign-counter) - Track campaign totals, notes, and history.
 
 ## Tool Sitemap
@@ -25,11 +26,13 @@ category: Home
 - [Campaign Counter](/campaign-counter) - Campaign tracking workspace.
 - [Config eDM](/config-edm) - eDM configuration editor.
 - [Layout Checker](/layout-checker) - HTML and layout inspection.
+- [Layout Slicer](/layout-slicer) - Convert flat JPG/PNG layouts into sliced eDM HTML and image assets.
 - [TNC Uploader](/tnc-uploader) - Drop PDF terms and conditions into the server folder structure.
 - [WFH Tracker](/wfh-tracker) - WFH and office-day calendar.
 
 ## Recent Updates
 
+- **v6.12.0 · 17 June 2026** - Added Layout Slicer for local JPG/PNG slicing, email-safe HTML generation, optional slice links, preview, downloads, and save-to-folder export.
 - **v6.11.8 · 16 June 2026** - Expanded the creator Built with credits with GitHub Pages, CSS, Font Awesome, SheetJS/XLSX, CodeMirror, File System Access, IndexedDB, localStorage, and browser APIs.
 - **v6.11.7 · 16 June 2026** - Added Fork the repo and Send feedback actions to the creator modal, including a local mailto feedback form for bug reports, requests, or complaints.
 - **v6.11.6 · 16 June 2026** - Cleaned up the creator note header and added compact Built with credits for OpenAI Codex, GitHub, Vanilla JS, and Markdown.
