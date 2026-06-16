@@ -2,6 +2,12 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.7 - 16 June 2026
+
+- Added Fork the repo and Send feedback actions to the creator modal.
+- Added a local mailto feedback form for bug reports, requests, or complaints.
+- Updated Documentation credits with fork and feedback guidance.
+
 ## v6.11.6 - 16 June 2026
 
 - Removed the extra "from budd the Lazy" subtitle from the creator modal.

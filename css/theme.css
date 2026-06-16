@@ -584,25 +584,44 @@ html {
   margin-bottom: 0;
 }
 
-.creator-modal-repo {
+.creator-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.creator-modal-repo,
+.creator-modal-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 36px;
   padding: 0 14px;
-  margin-bottom: 14px;
   color: var(--accent-hover);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
   background: var(--ui-accent-soft, #fff1f2);
   border: 1px solid var(--accent-primary);
+  cursor: pointer;
 }
 
 .creator-modal-repo:hover,
-.creator-modal-repo:focus-visible {
+.creator-modal-repo:focus-visible,
+.creator-modal-secondary:hover,
+.creator-modal-secondary:focus-visible {
   color: #fff;
   background: var(--accent-primary);
+}
+
+.creator-modal-secondary {
+  color: var(--text);
+  background: #fff;
+  border-color: var(--border);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .creator-modal-built {
@@ -645,6 +664,62 @@ html {
 .creator-modal-signoff strong {
   color: var(--text);
   font-weight: 600;
+}
+
+.creator-feedback-modal .creator-modal-card {
+  width: min(520px, 100%);
+}
+
+.creator-feedback-intro {
+  margin-bottom: 16px;
+}
+
+.creator-feedback-form {
+  display: grid;
+  gap: 12px;
+}
+
+.creator-feedback-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.creator-feedback-form label span {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.creator-feedback-form input,
+.creator-feedback-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.creator-feedback-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.creator-feedback-form input:focus,
+.creator-feedback-form textarea:focus {
+  outline: 1px solid var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.creator-feedback-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
 }
 
 

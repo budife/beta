@@ -365,6 +365,8 @@ Tujuan web app ini dibuat karena saya malas dan biar kerja repetitif jadi lebih 
 
 100% aman untuk workflow lokal yang sensitif. Source code bisa dilihat di repo GitHub saya: [github.com/budife/beta](https://github.com/budife/beta).
 
+Kalau mau utak-atik sendiri, fork aja. Kalau ada bug, request, atau complain, pakai form feedback dari creator modal. Form itu hanya membuka draft email ke `budi.indra94@gmail.com`.
+
 Enjoy bro n sis.
 
 Cheers,
@@ -378,6 +380,7 @@ Cheers,
 - **OpenAI Codex** - coding partner for planning, refactoring, debugging, and release notes.
 - **GitHub** - source repository, version history, and deployment flow.
 - **Vanilla JavaScript, CSS, and Markdown** - the simple stack behind the app.
+- **Forks and feedback** - welcome, as long as it helps the workflow get less ribet.
 - **The campaign workflow** - messy enough to deserve its own helper.
 - **Local-first tools** - because not every file needs to leave the browser.
 - **Deadline energy** - loud, stressful, but weirdly productive.
