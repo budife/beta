@@ -483,6 +483,58 @@ a {
   accent-color: var(--app-accent);
 }
 
+.markdown-section[data-section="docs-navigation"] {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: -26px -32px 0;
+  padding: 14px 32px;
+  background: #fff;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.markdown-section[data-section="docs-navigation"] h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.markdown-section[data-section="docs-navigation"] ul {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-gutter: stable;
+}
+
+.markdown-section[data-section="docs-navigation"] li {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.markdown-section[data-section="docs-navigation"] a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 13px;
+  color: #3f3f46;
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+  font-size: 13px;
+  font-weight: var(--ui-weight-medium);
+}
+
+.markdown-section[data-section="docs-navigation"] a:hover,
+.markdown-section[data-section="docs-navigation"] a.is-active {
+  color: #9f3f45;
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent);
+  text-decoration: none;
+}
+
 .markdown-section {
   padding: 0 0 30px;
   border-bottom: 1px solid var(--app-border);

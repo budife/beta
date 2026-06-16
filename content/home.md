@@ -30,6 +30,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.11.4 · 16 June 2026** - Changed Documentation navigation from a long table of contents into a compact sticky tab bar with coral active state.
 - **v6.11.3 · 16 June 2026** - Fixed Documentation table-of-contents anchors so they scroll inside the eDM Helper content viewport and support direct `/docs#section` links.
 - **v6.11.2 · 16 June 2026** - Expanded Documentation into a complete tool guide with collapsible sections, added browser-local privacy/network toggles for external checks, proxy fallback, and holiday sync, and aligned Docs typography with the main app pages.
 - **v6.11.1 · 16 June 2026** - Added the missing repository changelog file and aligned Documentation typography with the main eDM Helper markdown style.

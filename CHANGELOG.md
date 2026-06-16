@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.4 - 16 June 2026
+
+- Changed Documentation navigation from a long table of contents into a compact sticky tab bar.
+- Added active tab styling for the selected documentation section.
+
 ## v6.11.3 - 16 June 2026
 
 - Fixed Documentation table-of-contents anchors so they scroll inside the eDM Helper content viewport.

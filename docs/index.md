@@ -5,21 +5,13 @@ icon: fa-solid fa-book-open
 category: Reference
 ---
 
-## Table of Contents
+## Docs Navigation
 
-- [Privacy & Network Behavior](#privacy-network-behavior)
-- [Network Settings](#network-settings)
-- [Global Navigation](#global-navigation)
-- [Database Checker](#database-checker)
-- [Database Generator](#database-generator)
-- [Bookmarklet](#bookmarklet)
-- [Campaign Counter](#campaign-counter)
-- [Config eDM](#config-edm)
-- [Layout Checker](#layout-checker)
-- [TNC Uploader](#tnc-uploader)
-- [WFH Tracker](#wfh-tracker)
-- [Release Workflow](#release-workflow)
-- [Local Data & Storage](#local-data-storage)
+- [Privacy](#privacy-network-behavior)
+- [Basics](#global-navigation)
+- [Database](#database-checker)
+- [Tools](#bookmarklet)
+- [Maintenance](#release-workflow)
 - [Troubleshooting](#troubleshooting)
 
 ## Privacy & Network Behavior

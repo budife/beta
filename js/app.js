@@ -366,6 +366,13 @@ function scrollToMarkdownAnchor(anchor, options = {}) {
   return true;
 }
 
+function setActiveDocsTab(container, anchor) {
+  if (!container || !anchor) return;
+  container.querySelectorAll('[data-section="docs-navigation"] a[data-anchor]').forEach((link) => {
+    link.classList.toggle('is-active', link.dataset.anchor === anchor);
+  });
+}
+
 function enhanceHomeDashboard(container) {
   const quickAccess = container.querySelector('[data-section="quick-access"]');
   quickAccess?.querySelectorAll('li').forEach((item) => {
@@ -470,6 +477,9 @@ function renderPrivacySettings(container) {
 
 function enhanceDocsPage(container) {
   renderPrivacySettings(container);
+  const currentAnchor = window.location.hash.slice(1);
+  const firstTab = container.querySelector('[data-section="docs-navigation"] a[data-anchor]');
+  setActiveDocsTab(container, currentAnchor || firstTab?.dataset.anchor);
 }
 
 function setActiveLink(path) {
@@ -789,6 +799,8 @@ document.addEventListener('click', (event) => {
     event.preventDefault();
     const anchor = anchorLink.dataset.anchor;
     if (scrollToMarkdownAnchor(anchor)) {
+      const markdownContainer = anchorLink.closest('.markdown-content');
+      setActiveDocsTab(markdownContainer, anchor);
       window.history.replaceState({}, '', `${window.location.pathname}#${anchor}`);
     }
     return;
