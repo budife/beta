@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.11.8 - 16 June 2026
+
+- Expanded the creator modal Built with credits to include GitHub Pages, CSS, Font Awesome, SheetJS/XLSX, CodeMirror, File System Access, IndexedDB, and localStorage.
+- Updated Documentation credits to explain the broader app stack and browser APIs.
+
 ## v6.11.7 - 16 June 2026
 
 - Added Fork the repo and Send feedback actions to the creator modal.

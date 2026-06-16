@@ -378,8 +378,12 @@ Cheers,
 
 - **budd the Lazy** - built, broke, fixed, tested, and kept going.
 - **OpenAI Codex** - coding partner for planning, refactoring, debugging, and release notes.
-- **GitHub** - source repository, version history, and deployment flow.
-- **Vanilla JavaScript, CSS, and Markdown** - the simple stack behind the app.
+- **GitHub & GitHub Pages** - source repository, version history, and deployment flow.
+- **Vanilla JavaScript, CSS, and Markdown** - the simple stack behind the app shell and documentation.
+- **Font Awesome** - icon set for the sidebar, buttons, and tool UI.
+- **SheetJS/XLSX** - local Monday XLSX imports for Campaign Counter.
+- **CodeMirror** - lightweight HTML editing in Layout Checker.
+- **Browser APIs** - File System Access, IndexedDB, localStorage, drag-and-drop, and clipboard helpers.
 - **Forks and feedback** - welcome, as long as it helps the workflow get less ribet.
 - **The campaign workflow** - messy enough to deserve its own helper.
 - **Local-first tools** - because not every file needs to leave the browser.

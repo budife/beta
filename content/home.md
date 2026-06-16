@@ -30,6 +30,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.11.8 · 16 June 2026** - Expanded the creator Built with credits with GitHub Pages, CSS, Font Awesome, SheetJS/XLSX, CodeMirror, File System Access, IndexedDB, localStorage, and browser APIs.
 - **v6.11.7 · 16 June 2026** - Added Fork the repo and Send feedback actions to the creator modal, including a local mailto feedback form for bug reports, requests, or complaints.
 - **v6.11.6 · 16 June 2026** - Cleaned up the creator note header and added compact Built with credits for OpenAI Codex, GitHub, Vanilla JS, and Markdown.
 - **v6.11.5 · 16 June 2026** - Kept the `budd` hover interaction but changed it into a "meet the maker" creator note with a personal message, GitHub repo link, and Credits & Dedication in Documentation.

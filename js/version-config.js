@@ -16,7 +16,7 @@ function generateBuildNumber() {
 // Version Configuration
 // \u26a0\ufe0f UBAH BAGIAN INI SAAT UPDATE VERSI MANUAL \u26a0\ufe0f
 const VERSION_CONFIG = {
-  version: '6.11.7',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
+  version: '6.11.8',                   // ← GANTI VERSI DI SINI (contoh: '1.2.0', '2.0.0')
   buildDate: new Date().toISOString(),        // ← OTOMATIS, tidak perlu diganti
   buildNumber: generateBuildNumber(),           // ← OTOMATIS, tidak perlu diganti
   environment: 'development',                 // ← GANTI JIKA PERLU (production/development)
@@ -160,8 +160,16 @@ function ensureCreatorModal() {
           <span>Built with</span>
           <strong>OpenAI Codex</strong>
           <strong>GitHub</strong>
+          <strong>GitHub Pages</strong>
           <strong>Vanilla JS</strong>
+          <strong>CSS</strong>
           <strong>Markdown</strong>
+          <strong>Font Awesome</strong>
+          <strong>SheetJS/XLSX</strong>
+          <strong>CodeMirror</strong>
+          <strong>File System Access</strong>
+          <strong>IndexedDB</strong>
+          <strong>localStorage</strong>
         </div>
         <p class="creator-modal-note">Enjoy bro n sis.</p>
         <p class="creator-modal-signoff">Cheers,<br><strong>budd the Lazy</strong></p>
