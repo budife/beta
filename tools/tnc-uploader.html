@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="eDM Helper TNC Uploader - Drop PDF files into emailblast TNC folders">
+  <meta name="keywords" content="edm, tnc, pdf, uploader, emailblast">
+  <meta name="author" content="eDM Helper">
+
+  <link rel="stylesheet" href="../css/theme.css?v=6.11.0">
+  <link rel="stylesheet" href="../css/pages-tnc-uploader.css?v=6.11.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.11.0">
+
+  <title>TNC Uploader - eDM Helper</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <header class="header" role="banner">
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <div class="nav-left">
+        <a href="../index.html" class="nav-link">
+          <i class="fa-solid fa-home"></i>
+          <span>Home</span>
+        </a>
+      </div>
+      <div class="nav-right"></div>
+    </nav>
+  </header>
+
+  <main id="main-content" role="main">
+    <section class="tnc-section">
+      <div class="tnc-shell">
+        <section class="tnc-panel tnc-setup" aria-labelledby="tnc-setup-title">
+          <div class="tnc-panel-header">
+            <span class="tnc-eyebrow" id="tnc-setup-title">PDF destination</span>
+            <span class="tnc-support-badge" id="supportBadge">Checking support</span>
+          </div>
+
+          <div class="tnc-form-grid">
+            <label class="tnc-field">
+              <span>Year</span>
+              <input id="yearInput" type="number" min="2020" max="2099" step="1" inputmode="numeric">
+            </label>
+            <label class="tnc-field">
+              <span>Market folder</span>
+              <input id="marketInput" type="text" value="MKT">
+            </label>
+            <label class="tnc-field tnc-field-wide">
+              <span>Optional file prefix</span>
+              <input id="prefixInput" type="text" placeholder="Example: 20260614_0244 or HV2400098">
+            </label>
+          </div>
+
+          <details class="tnc-advanced">
+            <summary>Advanced link settings</summary>
+            <label class="tnc-field">
+              <span>Link starts with</span>
+              <input id="baseUrlInput" type="url" value="https://mail.hsbc.com.hk/id/emailblast" placeholder="https://mail.hsbc.com.hk/id/emailblast">
+            </label>
+            <p>This is only used to generate the copyable public link after the PDF name and folder path are ready.</p>
+          </details>
+
+          <div class="tnc-target-card">
+            <div>
+              <span class="tnc-card-label">Target path</span>
+              <code id="targetPath">emailblast/MKT/2026/tnc</code>
+            </div>
+          </div>
+
+          <div class="tnc-mode-card" aria-label="Upload mode">
+            <div class="tnc-segmented" role="tablist" aria-label="TNC upload mode">
+              <button class="is-active" type="button" id="normalModeBtn" role="tab" aria-selected="true">
+                Normal upload
+              </button>
+              <button type="button" id="replaceModeBtn" role="tab" aria-selected="false">
+                Replace PDF link
+              </button>
+            </div>
+            <div class="tnc-replace-fields" id="replaceFields" hidden>
+              <label class="tnc-field">
+                <span>Old PDF link</span>
+                <input id="replaceLinkInput" type="url" placeholder="https://mail.hsbc.com.hk/id/emailblast/MKT/2025/tnc/file.pdf">
+              </label>
+              <p class="tnc-replace-summary" id="replaceSummary">Paste an existing PDF link to reuse its folder and file name.</p>
+            </div>
+          </div>
+
+          <div class="tnc-drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Drop PDF files or choose files">
+            <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple>
+            <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i>
+            <strong>Drop PDF files here</strong>
+            <span>or click to choose files from Monday/downloads</span>
+          </div>
+
+          <div class="tnc-actions">
+            <button class="tnc-button tnc-button-secondary" type="button" id="clearBtn">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+              Clear
+            </button>
+            <button class="tnc-button tnc-button-secondary" type="button" id="downloadBtn" disabled>
+              <i class="fa-solid fa-download" aria-hidden="true"></i>
+              Download renamed
+            </button>
+            <button class="tnc-button tnc-button-secondary" type="button" id="chooseFolderBtn">
+              <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+              Choose save folder
+            </button>
+            <button class="tnc-button tnc-button-primary" type="button" id="saveBtn" disabled>
+              <i class="fa-solid fa-upload" aria-hidden="true"></i>
+              Save to folder
+            </button>
+          </div>
+
+          <p class="tnc-status" id="statusText" role="status" aria-live="polite">
+            Choose files to begin.
+          </p>
+
+        </section>
+
+        <section class="tnc-panel tnc-preview" aria-labelledby="tnc-preview-title">
+          <div class="tnc-panel-title-row">
+            <div>
+              <span class="tnc-eyebrow">Upload queue</span>
+              <h2 id="tnc-preview-title">PDF files</h2>
+            </div>
+            <div class="tnc-preview-actions">
+              <span class="tnc-count" id="fileCount">0 files</span>
+              <button class="tnc-button tnc-button-secondary" type="button" id="copyAllLinksBtn" disabled>
+                <i class="fa-solid fa-copy" aria-hidden="true"></i>
+                Copy links
+              </button>
+              <button class="tnc-button tnc-button-secondary" type="button" id="checkAllBtn" disabled>
+                <i class="fa-solid fa-link" aria-hidden="true"></i>
+                Check all
+              </button>
+              <button class="tnc-button tnc-button-secondary" type="button" id="clearHistoryBtn">
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                Clear history
+              </button>
+            </div>
+          </div>
+          <div class="tnc-file-list" id="fileList">
+            <div class="tnc-empty">
+              <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+              <p>No PDF selected yet.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-left">
+          <p class="footer-text">&copy; <span id="footer-year">2025</span> eDM Helper crafted by <a class="creator-link" href="https://budd.my.id/" target="_blank" rel="noreferrer">budd<span class="creator-popover" role="tooltip"><strong>si pemalas</strong></span></a></p>
+        </div>
+        <div class="footer-right">
+          <nav class="footer-links" aria-label="Social media links">
+            <a href="https://budd.my.id/" target="_blank" class="footer-link" aria-label="Website">
+              <i class="fa-solid fa-globe"></i>
+            </a>
+            <a href="https://github.com/budife" target="_blank" class="footer-link" aria-label="GitHub">
+              <i class="fa-brands fa-github"></i>
+            </a>
+            <a href="https://instagram.com/budifeltn" target="_blank" class="footer-link" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+            <a href="https://linkedin.com/in/budifelt/" target="_blank" class="footer-link" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin"></i>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/footer.js" defer></script>
+  <script src="../js/version-config.js?v=6.11.0" defer></script>
+  <script src="../js/pages-tnc-uploader.js?v=6.11.0" defer></script>
+</body>
+</html>

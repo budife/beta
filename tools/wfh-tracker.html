@@ -12,9 +12,9 @@
   <meta name="author" content="eDM Helper">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.10.2">
+  <link rel="stylesheet" href="../css/theme.css?v=6.11.0">
   <link rel="stylesheet" href="../css/pages-wfh-tracker.css">
-  <link rel="stylesheet" href="../css/controls.css?v=6.10.2">
+  <link rel="stylesheet" href="../css/controls.css?v=6.11.0">
   
   <title>WFH Tracker - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
@@ -67,11 +67,12 @@
           <span class="legend-text">Akhir Pekan</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background: var(--warning-bg); border: 2px solid var(--warning); position: relative;">
-            <span style="position: absolute; top: -2px; right: -2px; font-size: 8px; font-weight: bold; color: var(--warning); background: white; width: 12px; height: 12px; display: flex; align-items: center; justify-content: center;">C</span>
+          <div class="legend-color joint-leave">
+            <span>C</span>
           </div>
           <span class="legend-text">Cuti Bersama</span>
         </div>
+        <div id="holiday-sync-status" class="holiday-sync-status" aria-live="polite">Holiday source: local fallback</div>
       </div>
       
       <div class="stars" id="stars"></div>
@@ -85,6 +86,7 @@
             <h1 id="month-year"></h1>
             <div class="header-buttons">
               <button id="today-btn" title="Go to Today">Today</button>
+              <button id="clear-month-btn" title="Clear this month">Clear</button>
               <button id="next-month">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
@@ -94,7 +96,7 @@
           </div>
           <div id="calendar-days" class="days"></div>
         </div>
-        <div id="holiday-description" class="holiday-description"></div>
+        <div id="holiday-description" class="holiday-description" hidden></div>
         
         <!-- Summary Statistics -->
         <div class="summary-stats">
@@ -149,7 +151,7 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.10.2" defer></script>
+<script src="../js/version-config.js?v=6.11.0" defer></script>
 <script src="../js/pages-wfh-tracker.js" defer></script>
 </body>
 </html>

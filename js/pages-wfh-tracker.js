@@ -1,14 +1,21 @@
 
 // ---- Extracted scripts from inline <script> blocks ----
 document.addEventListener('DOMContentLoaded', () => {
+    if (new URLSearchParams(window.location.search).get('embed') === '1') {
+      document.body.classList.add('is-embedded');
+    }
+
     // Get DOM elements
     const calendarDays = document.getElementById('calendar-days');
     const monthYear = document.getElementById('month-year');
     const prevMonthButton = document.getElementById('prev-month');
     const nextMonthButton = document.getElementById('next-month');
     const todayButton = document.getElementById('today-btn');
+    const clearMonthButton = document.getElementById('clear-month-btn');
     const holidayDescription = document.getElementById('holiday-description');
+    const holidaySyncStatus = document.getElementById('holiday-sync-status');
     const starsContainer = document.getElementById('stars');
+    const isEmbedded = document.body.classList.contains('is-embedded');
 
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
@@ -21,8 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
-    // Define holidays with date keys and descriptions
-    window.holidays = {
+    const HOLIDAY_API_URL = 'https://upset.dev/api/holidays';
+    const HOLIDAY_CACHE_PREFIX = 'edm-helper:holidays:';
+    const HOLIDAY_CACHE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
+
+    // Local fallback keeps the calendar usable when the public source is slow or unavailable.
+    const defaultHolidays = {
       // Format: 'YYYY-MM-DD': 'Holiday Description'
       
       // 2024 National Holidays
@@ -94,6 +105,103 @@ document.addEventListener('DOMContentLoaded', () => {
       '2026-08-18': 'Cuti Bersama Hari Kemerdekaan',
     };
 
+    window.holidays = { ...defaultHolidays };
+
+    function setHolidaySyncStatus(message, state = 'neutral') {
+      if (!holidaySyncStatus) return;
+      holidaySyncStatus.textContent = message;
+      holidaySyncStatus.dataset.state = state;
+    }
+
+    function normalizeHolidayName(holiday) {
+      const name = holiday?.name || holiday?.summary || holiday?.title || holiday?.description || 'Hari Libur';
+      const type = String(holiday?.type || '').toLowerCase();
+      const isLeave = type === 'leave' || holiday?.is_leave === true || /cuti/i.test(name);
+      return isLeave && !/cuti/i.test(name) ? `Cuti Bersama - ${name}` : name;
+    }
+
+    function extractHolidayItems(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (Array.isArray(payload?.data)) return payload.data;
+      if (Array.isArray(payload?.holidays)) return payload.holidays;
+      if (Array.isArray(payload?.holiday_list)) {
+        return payload.holiday_list.map((name) => ({ date: payload.date, name }));
+      }
+      return [];
+    }
+
+    function normalizeHolidayMap(payload) {
+      const map = {};
+      extractHolidayItems(payload).forEach((holiday) => {
+        const date = holiday?.date || holiday?.tanggal;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) return;
+        const name = normalizeHolidayName(holiday);
+        map[date] = map[date] ? `${map[date]} / ${name}` : name;
+      });
+      return map;
+    }
+
+    function getCachedHolidayMap(year) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(`${HOLIDAY_CACHE_PREFIX}${year}`) || 'null');
+        if (!cached || !cached.updatedAt || !cached.data) return null;
+        if (Date.now() - cached.updatedAt > HOLIDAY_CACHE_MAX_AGE) return null;
+        return cached.data;
+      } catch {
+        return null;
+      }
+    }
+
+    function setCachedHolidayMap(year, data) {
+      try {
+        localStorage.setItem(`${HOLIDAY_CACHE_PREFIX}${year}`, JSON.stringify({
+          updatedAt: Date.now(),
+          data
+        }));
+      } catch {
+        // Cache is optional. Private browsing or storage limits should not break the calendar.
+      }
+    }
+
+    async function fetchHolidayMap(year) {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 5000);
+      try {
+        const response = await fetch(`${HOLIDAY_API_URL}?year=${year}`, {
+          cache: 'no-store',
+          signal: controller.signal
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return normalizeHolidayMap(await response.json());
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    }
+
+    async function loadHolidayData(year) {
+      const cached = getCachedHolidayMap(year);
+      if (cached) {
+        window.holidays = { ...defaultHolidays, ...cached };
+        setHolidaySyncStatus(`Holiday source: cached ${year}`, 'success');
+      } else {
+        setHolidaySyncStatus(`Holiday source: updating ${year}...`, 'loading');
+      }
+
+      try {
+        const remoteHolidays = await fetchHolidayMap(year);
+        if (Object.keys(remoteHolidays).length) {
+          setCachedHolidayMap(year, remoteHolidays);
+          window.holidays = { ...defaultHolidays, ...remoteHolidays };
+          setHolidaySyncStatus(`Holiday source: online ${year}`, 'success');
+          if (currentYear === year) renderCalendar(currentMonth, currentYear);
+        }
+      } catch (error) {
+        if (!cached) {
+          setHolidaySyncStatus('Holiday source: local fallback', 'error');
+        }
+      }
+    }
+
     function createStars() {
       // Reduced star count for better performance
       for (let i = 0; i < 20; i++) {
@@ -106,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    createStars();
+    if (!isEmbedded) createStars();
 
     // IndexedDB utility functions
     function openDB() {
@@ -141,6 +249,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    function getMonthStates(db, year, month) {
+      const prefix = `${year}-${(month + 1).toString().padStart(2, '0')}-`;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['days'], 'readonly');
+        const store = transaction.objectStore('days');
+        const request = store.getAll();
+        request.onsuccess = () => {
+          const states = new Map();
+          (request.result || []).forEach((entry) => {
+            if (entry?.date?.startsWith(prefix)) states.set(entry.date, entry.state);
+          });
+          resolve(states);
+        };
+        request.onerror = () => reject(request.error);
+      });
+    }
+
     function putDayState(db, date, state) {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction(['days'], 'readwrite');
@@ -161,6 +286,22 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    function clearMonthStates(db, year, month) {
+      return getMonthStates(db, year, month).then((states) => new Promise((resolve, reject) => {
+        const dates = [...states.keys()].filter((date) => !window.holidays?.[date]);
+        if (!dates.length) {
+          resolve(0);
+          return;
+        }
+
+        const transaction = db.transaction(['days'], 'readwrite');
+        const store = transaction.objectStore('days');
+        dates.forEach((date) => store.delete(date));
+        transaction.oncomplete = () => resolve(dates.length);
+        transaction.onerror = () => reject(transaction.error);
+      }));
+    }
+
     // Helper to format date as YYYY-MM-DD
     function formatDateForCalendar(year, month, day) {
       const mm = (month + 1).toString().padStart(2, '0');
@@ -168,8 +309,38 @@ document.addEventListener('DOMContentLoaded', () => {
       return `${year}-${mm}-${dd}`;
     }
 
+    function clearHolidayDescription() {
+      holidayDescription.textContent = '';
+      holidayDescription.hidden = true;
+    }
+
+    function showHolidayDescription(text) {
+      holidayDescription.textContent = text;
+      holidayDescription.hidden = !text;
+    }
+
+    function getMonthlyStats() {
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      let workDays = 0;
+      let holidays = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(currentYear, currentMonth, day);
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) workDays++;
+
+        const dateKey = formatDateForCalendar(currentYear, currentMonth, day);
+        if (window.holidays && window.holidays[dateKey]) holidays++;
+      }
+
+      const wfhDays = document.querySelectorAll('.day.wfh').length;
+      const wfoDays = document.querySelectorAll('.day.other').length;
+      const percentage = workDays > 0 ? Math.round((wfhDays / workDays) * 100) : 0;
+      return { daysInMonth, workDays, holidays, wfhDays, wfoDays, percentage };
+    }
+
     async function renderCalendar(month, year) {
       const db = await openDB();
+      const savedStates = await getMonthStates(db, year, month);
 
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
@@ -225,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateKey = formatDateForCalendar(year, month, day);
 
         // Load saved state from IndexedDB and apply class
-        const savedState = await getDayState(db, dateKey);
+        const savedState = savedStates.get(dateKey);
         let clickCount = 0;
         if (savedState === 'wfh') {
           dayElement.classList.add('wfh');
@@ -240,39 +411,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Check if the day is a holiday
-        if (holidays[dateKey]) {
+        if (window.holidays[dateKey]) {
           dayElement.classList.add('holiday');
+          dayElement.tabIndex = 0;
+          dayElement.setAttribute('role', 'button');
+          dayElement.setAttribute('aria-label', `${day} ${months[month]} ${year}, ${window.holidays[dateKey]}`);
           // Check if it's a joint holiday
-          if (holidays[dateKey].includes('Cuti Bersama')) {
+          if (window.holidays[dateKey].includes('Cuti Bersama')) {
             dayElement.classList.add('joint-holiday');
           }
-          dayElement.addEventListener('click', () => {
-            holidayDescription.textContent = holidays[dateKey];
+          const showHoliday = () => showHolidayDescription(window.holidays[dateKey]);
+          dayElement.addEventListener('click', showHoliday);
+          dayElement.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              showHoliday();
+            }
           });
         } else if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
           dayElement.classList.add('weekend');
         } else {
-          dayElement.addEventListener('click', async () => {
+          dayElement.tabIndex = 0;
+          dayElement.setAttribute('role', 'button');
+          dayElement.setAttribute('aria-label', `${day} ${months[month]} ${year}, click to cycle Normal, WFH, WFO`);
+          const cycleDay = async () => {
             clickCount++;
             if (clickCount === 1) {
               dayElement.classList.remove('other');
               dayElement.classList.add('wfh');
               await putDayState(db, dateKey, 'wfh');
-              holidayDescription.textContent = '';
+              clearHolidayDescription();
             } else if (clickCount === 2) {
               dayElement.classList.remove('wfh');
               dayElement.classList.add('other');
               await putDayState(db, dateKey, 'other');
-              holidayDescription.textContent = '';
+              clearHolidayDescription();
             } else {
               dayElement.classList.remove('wfh', 'other');
               clickCount = 0;
               await putDayState(db, dateKey, null);
-              holidayDescription.textContent = '';
+              clearHolidayDescription();
             }
             // Update total count display live on click
             updateTotalCount();
             updateStatistics();
+          };
+          dayElement.addEventListener('click', cycleDay);
+          dayElement.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              cycleDay();
+            }
           });
         }
 
@@ -309,18 +498,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       // Calculate counts
-      const wfhDays = document.querySelectorAll('.day.wfh').length;
-      const wfoDays = document.querySelectorAll('.day.other').length;
+      const stats = getMonthlyStats();
       
       // Update total count HTML
       totalCountElement.innerHTML = `
         <div class="count-item wfh">
           <div class="count-label">WFH Days</div>
-          <div class="count-number">${wfhDays}</div>
+          <div class="count-number">${stats.wfhDays}</div>
         </div>
         <div class="count-item wfo">
           <div class="count-label">WFO Days</div>
-          <div class="count-number">${wfoDays}</div>
+          <div class="count-number">${stats.wfoDays}</div>
+        </div>
+        <div class="count-item">
+          <div class="count-label">Work Days</div>
+          <div class="count-number">${stats.workDays}</div>
+        </div>
+        <div class="count-item">
+          <div class="count-label">WFH %</div>
+          <div class="count-number">${stats.percentage}%</div>
         </div>
       `;
       
@@ -333,17 +529,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const totalCountElement = document.getElementById('total-count');
       if (!totalCountElement) return;
       
-      const wfhDays = document.querySelectorAll('.day.wfh').length;
-      const wfoDays = document.querySelectorAll('.day.other').length;
+      const stats = getMonthlyStats();
       
       totalCountElement.innerHTML = `
         <div class="count-item wfh">
           <div class="count-label">WFH Days</div>
-          <div class="count-number">${wfhDays}</div>
+          <div class="count-number">${stats.wfhDays}</div>
         </div>
         <div class="count-item wfo">
           <div class="count-label">WFO Days</div>
-          <div class="count-number">${wfoDays}</div>
+          <div class="count-number">${stats.wfoDays}</div>
+        </div>
+        <div class="count-item">
+          <div class="count-label">Work Days</div>
+          <div class="count-number">${stats.workDays}</div>
+        </div>
+        <div class="count-item">
+          <div class="count-label">WFH %</div>
+          <div class="count-number">${stats.percentage}%</div>
         </div>
       `;
     }
@@ -357,34 +560,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (!totalDaysElement) return;
       
-      // Calculate total days in month
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      totalDaysElement.textContent = daysInMonth;
-      
-      // Calculate work days (excluding weekends)
-      let workDays = 0;
-      let holidays = 0;
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(currentYear, currentMonth, day);
-        const dayOfWeek = date.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-          workDays++;
-        }
-        
-        // Count holidays
-        const dateKey = formatDateForCalendar(currentYear, currentMonth, day);
-        if (window.holidays && window.holidays[dateKey]) {
-          holidays++;
-        }
-      }
-      
-      workDaysElement.textContent = workDays;
-      holidaysCountElement.textContent = holidays;
-      
-      // Calculate WFH percentage
-      const wfhDays = document.querySelectorAll('.day.wfh').length;
-      const percentage = workDays > 0 ? Math.round((wfhDays / workDays) * 100) : 0;
-      wfhPercentageElement.textContent = `${percentage}%`;
+      const stats = getMonthlyStats();
+      totalDaysElement.textContent = stats.daysInMonth;
+      workDaysElement.textContent = stats.workDays;
+      holidaysCountElement.textContent = stats.holidays;
+      wfhPercentageElement.textContent = `${stats.percentage}%`;
     }
 
     prevMonthButton.addEventListener('click', () => {
@@ -394,7 +574,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYear--;
       }
       renderCalendar(currentMonth, currentYear);
-      holidayDescription.textContent = '';
+      loadHolidayData(currentYear);
+      clearHolidayDescription();
     });
 
     nextMonthButton.addEventListener('click', () => {
@@ -404,7 +585,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYear++;
       }
       renderCalendar(currentMonth, currentYear);
-      holidayDescription.textContent = '';
+      loadHolidayData(currentYear);
+      clearHolidayDescription();
     });
 
     // Today button event listener
@@ -413,8 +595,21 @@ document.addEventListener('DOMContentLoaded', () => {
       currentMonth = today.getMonth();
       currentYear = today.getFullYear();
       renderCalendar(currentMonth, currentYear);
-      holidayDescription.textContent = '';
+      loadHolidayData(currentYear);
+      clearHolidayDescription();
     });
 
+    clearMonthButton.addEventListener('click', async () => {
+      const monthLabel = `${months[currentMonth]} ${currentYear}`;
+      if (!window.confirm(`Clear WFH/WFO marks for ${monthLabel}?`)) return;
+
+      const db = await openDB();
+      await clearMonthStates(db, currentYear, currentMonth);
+      clearHolidayDescription();
+      renderCalendar(currentMonth, currentYear);
+    });
+
+    clearHolidayDescription();
     renderCalendar(currentMonth, currentYear);
+    loadHolidayData(currentYear);
 });

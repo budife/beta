@@ -25,10 +25,12 @@ category: Home
 - [Campaign Counter](/campaign-counter) - Campaign tracking workspace.
 - [Config eDM](/config-edm) - eDM configuration editor.
 - [Layout Checker](/layout-checker) - HTML and layout inspection.
+- [TNC Uploader](/tnc-uploader) - Drop PDF terms and conditions into the server folder structure.
 - [WFH Tracker](/wfh-tracker) - WFH and office-day calendar.
 
 ## Recent Updates
 
+- **v6.11.0 · 16 June 2026** - Added TNC Uploader with local PDF queueing, replace-link mode, generated public links and live checks, added lazy Docs, and upgraded WFH Tracker with browser-local marks plus auto-updating Indonesian holiday/cuti bersama data with fallback caching.
 - **v6.10.2 · 16 June 2026** - Matched creator hover popovers across Home and footer areas, normalized Recent Updates version colors, and expanded the full changelog history.
 - **v6.10.1 · 16 June 2026** - Added maintainer polish: centralized footer rendering, a release helper script, full changelog notes, clearer local backup guidance, refreshed cache-busters, and a smaller `budd` hover label.
 - **v6.10.0 · 16 June 2026** - Moved Campaign Counter and the Monday bookmarklet to browser-local XLSX workflows, added series/reblast tooling, preserved folder sessions, and improved database/layout editing polish.
@@ -67,6 +69,6 @@ category: Home
 
 ## System Info
 
-- **Available tools:** `7`
+- **Available tools:** `8`
 - **Deployment:** GitHub Pages and local server
 - **Status:** All tools available

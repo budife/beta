@@ -36,9 +36,18 @@ const ROUTES = {
     content: 'layout-checker.md',
     label: 'Layout Checker'
   },
+  '/tnc-uploader': {
+    content: 'tnc-uploader.md',
+    label: 'TNC Uploader'
+  },
   '/wfh-tracker': {
     content: 'wfh-tracker.md',
     label: 'WFH Tracker'
+  },
+  '/docs': {
+    content: 'index.md',
+    label: 'Documentation',
+    source: 'docs'
   }
 };
 
@@ -50,6 +59,7 @@ const LEGACY_PATHS = {
   '/database-checker.html': '/database-checker',
   '/database-generator.html': '/database-generator',
   '/layout-checker.html': '/layout-checker',
+  '/tnc-uploader.html': '/tnc-uploader',
   '/wfh-tracker.html': '/wfh-tracker'
 };
 
@@ -87,6 +97,10 @@ const TOOL_META = {
     icon: 'fa-solid fa-ruler-combined',
     label: 'Layout Checker'
   },
+  '/tnc-uploader': {
+    icon: 'fa-solid fa-file-pdf',
+    label: 'TNC Uploader'
+  },
   '/wfh-tracker': {
     icon: 'fa-solid fa-calendar-days',
     label: 'WFH Tracker'
@@ -100,6 +114,14 @@ function getVersion() {
 function withBasePath(path) {
   const absolutePath = path.startsWith('/') ? path : `/${path}`;
   return `${BASE_PATH}${absolutePath}` || '/';
+}
+
+function withQueryParam(path, key, value) {
+  const hashIndex = path.indexOf('#');
+  const base = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
+  const hash = hashIndex >= 0 ? path.slice(hashIndex) : '';
+  const separator = base.includes('?') ? '&' : '?';
+  return `${base}${separator}${encodeURIComponent(key)}=${encodeURIComponent(value)}${hash}`;
 }
 
 function stripBasePath(pathname) {
@@ -400,6 +422,8 @@ function styleEmbeddedTool(frame) {
       '/bookmarklet.html',
       '/campaign-counter.html',
       '/database-generator.html',
+      '/tnc-uploader.html',
+      '/wfh-tracker.html',
     ];
     const allowsPageScroll = scrollableToolPaths.some((path) => frameWindow.location.pathname.endsWith(path));
     const isCampaignCounter = frameWindow.location.pathname.endsWith('/campaign-counter.html');
@@ -464,6 +488,8 @@ function styleEmbeddedTool(frame) {
     });
   } catch (error) {
     console.warn('Unable to apply embedded tool layout styles.', error);
+  } finally {
+    frame.classList.add('is-ready');
   }
 }
 
@@ -514,7 +540,7 @@ function renderPage(path, route, markdown) {
   const description = attributes.description || '';
   const icon = attributes.icon || 'fa-solid fa-wand-magic-sparkles';
   const category = attributes.category || 'eDM Helper';
-  const tool = attributes.tool ? withBasePath(attributes.tool) : '';
+  const tool = attributes.tool ? withQueryParam(withBasePath(attributes.tool), 'embed', '1') : '';
   const isHome = route.content === 'home.md';
 
   const documentTitle = `${title} | eDM Helper`;
@@ -644,7 +670,8 @@ async function loadRoute(path) {
   `);
 
   try {
-    const contentUrl = `${BASE_PATH}/content/${route.content}`;
+    const contentRoot = route.source === 'docs' ? 'docs' : 'content';
+    const contentUrl = `${BASE_PATH}/${contentRoot}/${route.content}`;
     const response = await fetch(contentUrl, { cache: 'no-cache' });
     if (!response.ok) {
       throw new Error(`Unable to load ${contentUrl}: ${response.status}`);

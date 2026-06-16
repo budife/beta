@@ -674,6 +674,11 @@ a {
   min-height: 0;
   border: 0;
   background: #fff;
+  opacity: 0;
+}
+
+.tool-frame.is-ready {
+  opacity: 1;
 }
 
 .content-loading,
