@@ -8,7 +8,8 @@
     slices: [],
     generated: null,
     templateDir: null,
-    emailblastRootDir: null,
+    campaignParentDir: null,
+    campaignParentDirInvalid: false,
     copiedCampaignDir: null,
     copiedHtmlFiles: []
   };
@@ -28,7 +29,7 @@
     campaignPathPreview: document.getElementById('campaign-path-preview'),
     templateCopyStatus: document.getElementById('template-copy-status'),
     chooseTemplateFolder: document.getElementById('choose-template-folder'),
-    chooseEmailblastRoot: document.getElementById('choose-emailblast-root'),
+    chooseCampaignParent: document.getElementById('choose-campaign-parent'),
     copyTemplateFolder: document.getElementById('copy-template-folder'),
     copyCampaignPath: document.getElementById('copy-campaign-path'),
     htmlTools: document.getElementById('html-tools'),
@@ -95,6 +96,10 @@
     return `${getCampaignNo()}-${getBlastDate()}-${cleanPathSegment(els.campaignManager?.value || 'RA', 'RA')}`;
   }
 
+  function isCampaignFolderName(value) {
+    return /^\d{4}-\d{8}-/.test(String(value || '').trim());
+  }
+
   function getFinalHtmlName() {
     const name = cleanPathSegment(els.htmlName?.value || 'layout', 'layout');
     return `${getCampaignNo()}-${name}.html`;
@@ -122,7 +127,7 @@
       els.finalHtmlName.value = getFinalHtmlName();
     }
     if (els.copyTemplateFolder) {
-      els.copyTemplateFolder.disabled = !state.templateDir || !state.emailblastRootDir;
+      els.copyTemplateFolder.disabled = !state.templateDir || !state.campaignParentDir || state.campaignParentDirInvalid;
     }
   }
 
@@ -516,7 +521,9 @@ ${rows}
   }
 
   async function getOrCreateCampaignDirectory() {
-    const mktDir = await state.emailblastRootDir.getDirectoryHandle('MKT', { create: true });
+    const campaignRootDir = await state.campaignParentDir.getDirectoryHandle(getCampaignFolderName(), { create: true });
+    const emailblastDir = await campaignRootDir.getDirectoryHandle('emailblast', { create: true });
+    const mktDir = await emailblastDir.getDirectoryHandle('MKT', { create: true });
     const yearDir = await mktDir.getDirectoryHandle(getCampaignYear(), { create: true });
     return yearDir.getDirectoryHandle(getCampaignFolderName(), { create: true });
   }
@@ -550,18 +557,23 @@ ${rows}
     updateCampaignPathPreview();
   }
 
-  async function chooseEmailblastRoot() {
+  async function chooseCampaignParent() {
     if (typeof window.showDirectoryPicker !== 'function') {
       setTemplateStatus('Folder access is not supported in this browser.', 'error');
       return;
     }
-    state.emailblastRootDir = await window.showDirectoryPicker({ mode: 'readwrite' });
-    setTemplateStatus(`Root selected: ${state.emailblastRootDir.name}`, 'success');
+    state.campaignParentDir = await window.showDirectoryPicker({ mode: 'readwrite' });
+    state.campaignParentDirInvalid = isCampaignFolderName(state.campaignParentDir.name);
+    if (state.campaignParentDirInvalid) {
+      setTemplateStatus(`Choose the parent folder, not campaign folder "${state.campaignParentDir.name}".`, 'error');
+    } else {
+      setTemplateStatus(`Parent selected: ${state.campaignParentDir.name}`, 'success');
+    }
     updateCampaignPathPreview();
   }
 
   async function copyTemplateFolder() {
-    if (!state.templateDir || !state.emailblastRootDir) return;
+    if (!state.templateDir || !state.campaignParentDir || state.campaignParentDirInvalid) return;
     setTemplateStatus('Copying template folder...', 'loading');
     const campaignDir = await getOrCreateCampaignDirectory();
     await copyDirectory(state.templateDir, campaignDir);
@@ -612,9 +624,9 @@ ${rows}
       if (error.name !== 'AbortError') setTemplateStatus(error.message || 'Unable to choose template folder.', 'error');
     });
   });
-  els.chooseEmailblastRoot?.addEventListener('click', () => {
-    chooseEmailblastRoot().catch((error) => {
-      if (error.name !== 'AbortError') setTemplateStatus(error.message || 'Unable to choose emailblast root.', 'error');
+  els.chooseCampaignParent?.addEventListener('click', () => {
+    chooseCampaignParent().catch((error) => {
+      if (error.name !== 'AbortError') setTemplateStatus(error.message || 'Unable to choose campaign parent folder.', 'error');
     });
   });
   els.copyTemplateFolder?.addEventListener('click', () => {

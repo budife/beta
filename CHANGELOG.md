@@ -2,6 +2,12 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.5 - 17 June 2026
+
+- Fixed Layout Slicer campaign target selection so the user chooses the campaign parent folder, for example `MKT/2026`.
+- Prevented copying into an already-created campaign folder, avoiding repeated paths like `campaign/emailblast/MKT/YYYY/campaign`.
+- Updated Layout Slicer documentation to clarify the expected folder target.
+
 ## v6.12.4 - 17 June 2026
 
 - Added a Layout Slicer campaign location helper for copying a selected template folder into `emailblast/MKT/YYYY/NNNN-YYYYMMDD-MGR`.

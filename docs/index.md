@@ -265,9 +265,10 @@ Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple 
 The Location panel can copy an existing template folder into a new campaign path.
 
 - Choose the template folder to copy.
-- Choose the `emailblast` root folder as the save target.
+- Choose the campaign parent folder as the save target, for example `MKT/2026`.
 - Fill Campaign No, Blast Date, Manager/Suffix, and HTML Name.
-- The tool creates `emailblast/MKT/YYYY/NNNN-YYYYMMDD-MGR`.
+- The tool creates `NNNN-YYYYMMDD-MGR/emailblast/MKT/YYYY/NNNN-YYYYMMDD-MGR`.
+- Do not choose an existing campaign folder as the target parent, otherwise the campaign folder would be nested inside another campaign folder.
 - The target path preview can be copied for reference.
 - After copy, HTML files in the copied folder are listed so the selected ID/INDO file can be renamed to the final campaign HTML filename.
 
