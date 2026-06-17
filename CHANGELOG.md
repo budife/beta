@@ -2,6 +2,12 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.3 - 17 June 2026
+
+- Marked Layout Slicer as beta in the sidebar, route header, and tool header.
+- Added a yellow beta warning on Layout Slicer so generated slices/HTML are reviewed before production use.
+- Updated cache-busters and app version for the beta notice release.
+
 ## v6.12.2 - 17 June 2026
 
 - Increased Layout Slicer JPG export quality for cleaner sliced assets.

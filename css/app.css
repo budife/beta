@@ -154,6 +154,28 @@ a {
   color: var(--app-accent);
 }
 
+.tool-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 1px 7px;
+  color: #9a6700;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: var(--ui-weight-regular);
+  line-height: 1.2;
+  text-transform: lowercase;
+  background: #fff8c5;
+  border: 1px solid #f0cf63;
+}
+
+.sidebar-link .tool-beta-badge {
+  min-height: 16px;
+  padding: 0 5px;
+  margin-left: 4px;
+  font-size: 10px;
+}
+
 .sidebar-footer {
   flex: 0 0 auto;
   padding: 16px 20px;
@@ -354,6 +376,11 @@ a {
 .content-title i {
   color: var(--app-accent);
   font-size: .75em;
+}
+
+.content-title .tool-beta-badge {
+  align-self: center;
+  margin-left: 2px;
 }
 
 .content-description {

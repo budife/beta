@@ -38,7 +38,8 @@ const ROUTES = {
   },
   '/layout-slicer': {
     content: 'layout-slicer.md',
-    label: 'Layout Slicer'
+    label: 'Layout Slicer',
+    status: 'beta'
   },
   '/tnc-uploader': {
     content: 'tnc-uploader.md',
@@ -104,7 +105,8 @@ const TOOL_META = {
   },
   '/layout-slicer': {
     icon: 'fa-solid fa-scissors',
-    label: 'Layout Slicer'
+    label: 'Layout Slicer',
+    status: 'beta'
   },
   '/tnc-uploader': {
     icon: 'fa-solid fa-file-pdf',
@@ -658,6 +660,7 @@ function renderPage(path, route, markdown) {
       <h1 class="content-title">
         <i class="${escapeHtml(icon)}" aria-hidden="true"></i>
         <span>${escapeHtml(title)}</span>
+        ${attributes.status === 'beta' || route.status === 'beta' ? '<em class="tool-beta-badge">beta</em>' : ''}
       </h1>
       ${description ? `<p class="content-description">${escapeHtml(description)}</p>` : ''}
     </header>

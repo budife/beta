@@ -6,9 +6,9 @@
   <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.12.2">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.2">
-  <link rel="stylesheet" href="../css/controls.css?v=6.12.2">
+  <link rel="stylesheet" href="../css/theme.css?v=6.12.3">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.3">
+  <link rel="stylesheet" href="../css/controls.css?v=6.12.3">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <title>Layout Slicer - eDM Helper</title>
@@ -17,9 +17,14 @@
   <main class="layout-slicer-app" id="layout-slicer-app">
     <section class="slicer-control-panel">
       <div class="slicer-panel-header">
-        <p class="slicer-kicker">Layout Slicer</p>
+        <p class="slicer-kicker">Layout Slicer <em class="tool-beta-badge">beta</em></p>
         <h1><i class="fa-solid fa-scissors" aria-hidden="true"></i> Slice to eDM</h1>
         <p>Drop JPG/PNG, add horizontal slices, then export email-safe HTML and assets.</p>
+      </div>
+
+      <div class="slicer-beta-warning" role="status">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        <span>This tool is still in beta/testing. Please review the generated HTML and image slices before using them for production.</span>
       </div>
 
       <div class="slicer-drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose layout image">
@@ -138,7 +143,7 @@
     </section>
   </main>
 
-  <script src="../js/version-config.js?v=6.12.2" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.12.2" defer></script>
+  <script src="../js/version-config.js?v=6.12.3" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.12.3" defer></script>
 </body>
 </html>
