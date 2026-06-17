@@ -266,9 +266,12 @@ The Location panel can copy an existing template folder into a new campaign path
 
 - Choose the template folder to copy.
 - Choose the campaign parent folder as the save target, for example `MKT/2026`.
-- Fill Campaign No, Blast Date, Manager/Suffix, and HTML Name.
+- Fill HTML File Name first, for example `1112 ANA Premium Pertralite 06-17 Bianca`.
+- The helper can parse campaign number, short blast date, prefix, and manager from that name.
+- You can still edit Campaign No, Blast Date, Manager, or Prefix manually after parsing.
 - The tool creates `NNNN-YYYYMMDD-MGR/emailblast/MKT/YYYY/NNNN-YYYYMMDD-MGR`.
 - Do not choose an existing campaign folder as the target parent, otherwise the campaign folder would be nested inside another campaign folder.
+- HTML files are scanned when the template folder is selected. Rename only happens when the manual Rename selected HTML button is clicked.
 - The target path preview can be copied for reference.
 - After copy, HTML files in the copied folder are listed so the selected ID/INDO file can be renamed to the final campaign HTML filename.
 

@@ -11,7 +11,8 @@
     campaignParentDir: null,
     campaignParentDirInvalid: false,
     copiedCampaignDir: null,
-    copiedHtmlFiles: []
+    copiedHtmlFiles: [],
+    finalHtmlNameManual: false
   };
 
   const els = {
@@ -26,6 +27,7 @@
     blastDate: document.getElementById('blast-date'),
     campaignManager: document.getElementById('campaign-manager'),
     htmlName: document.getElementById('html-name'),
+    htmlPrefix: document.getElementById('html-prefix'),
     campaignPathPreview: document.getElementById('campaign-path-preview'),
     templateCopyStatus: document.getElementById('template-copy-status'),
     chooseTemplateFolder: document.getElementById('choose-template-folder'),
@@ -101,8 +103,8 @@
   }
 
   function getFinalHtmlName() {
-    const name = cleanPathSegment(els.htmlName?.value || 'layout', 'layout');
-    return `${getCampaignNo()}-${name}.html`;
+    const prefix = cleanPathSegment(els.htmlPrefix?.value || els.htmlName?.value || 'layout', 'layout');
+    return `${getCampaignNo()}-${prefix}.html`;
   }
 
   function getResolvedFinalHtmlName() {
@@ -123,11 +125,38 @@
 
   function updateCampaignPathPreview() {
     if (els.campaignPathPreview) els.campaignPathPreview.textContent = getCampaignPath();
-    if (els.finalHtmlName && !els.finalHtmlName.matches(':focus')) {
+    if (els.finalHtmlName && !els.finalHtmlName.matches(':focus') && (!els.finalHtmlName.value.trim() || !state.finalHtmlNameManual)) {
       els.finalHtmlName.value = getFinalHtmlName();
     }
     if (els.copyTemplateFolder) {
       els.copyTemplateFolder.disabled = !state.templateDir || !state.campaignParentDir || state.campaignParentDirInvalid;
+    }
+  }
+
+  function parseHtmlName(value) {
+    const clean = String(value || '').trim();
+    if (!clean) return null;
+    const parts = clean.split(/\s+/);
+    const firstNumber = parts.find((part) => /^\d{4}$/.test(part));
+    const dateIndex = parts.findIndex((part) => /^\d{1,2}[-/]\d{1,2}$/.test(part));
+    const manager = dateIndex >= 0 ? parts.slice(dateIndex + 1).join(' ') : '';
+    const prefixStart = firstNumber ? parts.indexOf(firstNumber) + 1 : 0;
+    const prefixEnd = dateIndex >= 0 ? dateIndex : parts.length;
+    const prefix = parts.slice(prefixStart, prefixEnd).join(' ');
+    const datePart = dateIndex >= 0 ? parts[dateIndex].replace(/\D/g, '').padStart(4, '0') : '';
+    return { campaignNo: firstNumber, prefix, manager, datePart };
+  }
+
+  function applyParsedHtmlName() {
+    const parsed = parseHtmlName(els.htmlName?.value);
+    if (!parsed) return;
+    state.finalHtmlNameManual = false;
+    if (parsed.campaignNo && !els.campaignNo.matches(':focus')) els.campaignNo.value = parsed.campaignNo;
+    if (parsed.prefix && !els.htmlPrefix.matches(':focus')) els.htmlPrefix.value = parsed.prefix;
+    if (parsed.manager && !els.campaignManager.matches(':focus')) els.campaignManager.value = parsed.manager;
+    if (parsed.datePart && !els.blastDate.matches(':focus')) {
+      const year = getCampaignYear();
+      els.blastDate.value = `${year}${parsed.datePart}`;
     }
   }
 
@@ -544,7 +573,7 @@ ${rows}
     els.htmlFileSelect.innerHTML = state.copiedHtmlFiles.map((file) => (
       `<option value="${escapeAttribute(file.name)}">${escapeHtml(file.name)}</option>`
     )).join('');
-    if (els.finalHtmlName) els.finalHtmlName.value = getFinalHtmlName();
+    if (els.finalHtmlName && !state.finalHtmlNameManual) els.finalHtmlName.value = getFinalHtmlName();
   }
 
   async function chooseTemplateFolder() {
@@ -553,7 +582,10 @@ ${rows}
       return;
     }
     state.templateDir = await window.showDirectoryPicker({ mode: 'read' });
-    setTemplateStatus(`Template selected: ${state.templateDir.name}`, 'success');
+    state.copiedHtmlFiles = await listHtmlFiles(state.templateDir);
+    state.copiedCampaignDir = null;
+    renderCopiedHtmlFiles();
+    setTemplateStatus(`Template selected: ${state.templateDir.name} · ${state.copiedHtmlFiles.length} HTML file(s) found`, 'success');
     updateCampaignPathPreview();
   }
 
@@ -584,10 +616,14 @@ ${rows}
   }
 
   async function renameSelectedHtmlFile() {
-    if (!state.copiedCampaignDir || !state.copiedHtmlFiles.length) return;
+    if (!state.copiedHtmlFiles.length) return;
     const currentName = els.htmlFileSelect.value;
     const fileEntry = state.copiedHtmlFiles.find((file) => file.name === currentName);
     if (!fileEntry) return;
+    if (!state.copiedCampaignDir) {
+      setTemplateStatus('Copy as campaign first, then rename the HTML in the copied folder.', 'error');
+      return;
+    }
 
     const targetName = getResolvedFinalHtmlName();
     const sourceFile = await fileEntry.handle.getFile();
@@ -710,11 +746,14 @@ ${rows}
     els.blastDate,
     els.campaignManager,
     els.htmlName,
+    els.htmlPrefix,
     els.finalHtmlName
   ].forEach((input) => {
     if (!input) return;
     input.addEventListener('input', () => {
       state.generated = null;
+      if (input === els.finalHtmlName) state.finalHtmlNameManual = true;
+      if (input === els.htmlName) applyParsedHtmlName();
       updateUi();
     });
   });

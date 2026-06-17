@@ -150,7 +150,7 @@ select {
 
 .slicer-location-grid {
   display: grid;
-  grid-template-columns: 110px 140px 150px minmax(180px, 1fr);
+  grid-template-columns: minmax(320px, 1fr) 110px 140px 150px minmax(180px, 240px);
   gap: 10px;
 }
 

@@ -2,6 +2,13 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.6 - 17 June 2026
+
+- Moved Layout Slicer HTML filename input to the first field in the Location panel.
+- Added filename parsing for names such as `1112 ANA Premium Pertralite 06-17 Bianca`, filling campaign number, blast date, prefix, and manager.
+- Scans HTML files as soon as the template folder is selected, while keeping actual HTML renaming manual.
+- Shows selected folder status with detected HTML file counts.
+
 ## v6.12.5 - 17 June 2026
 
 - Fixed Layout Slicer campaign target selection so the user chooses the campaign parent folder, for example `MKT/2026`.
