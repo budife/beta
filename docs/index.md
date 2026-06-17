@@ -260,6 +260,20 @@ Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple 
 - Preview, download HTML/images, or save everything to a selected folder.
 :::
 
+:::details Campaign location helper
+
+The Location panel can copy an existing template folder into a new campaign path.
+
+- Choose the template folder to copy.
+- Choose the `emailblast` root folder as the save target.
+- Fill Campaign No, Blast Date, Manager/Suffix, and HTML Name.
+- The tool creates `emailblast/MKT/YYYY/NNNN-YYYYMMDD-MGR`.
+- The target path preview can be copied for reference.
+- After copy, HTML files in the copied folder are listed so the selected ID/INDO file can be renamed to the final campaign HTML filename.
+
+Folder copying uses the browser File System Access API and stays local.
+:::
+
 :::details Local behavior
 
 Image processing uses the browser Canvas API. Files stay in the browser unless you explicitly download them or save them to a chosen local folder.

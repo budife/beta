@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **v6.12.4 · 17 June 2026** - Added Layout Slicer campaign location helper for copying template folders into `emailblast/MKT/YYYY` campaign paths and preparing ID/INDO HTML filenames.
 - **v6.12.3 · 17 June 2026** - Marked Layout Slicer as beta with a yellow italic badge and added an in-tool testing warning before production use.
 - **v6.12.2 · 17 June 2026** - Improved Layout Slicer export quality, clarified HTML display width vs source pixels, and added a source-width HTML option.
 - **v6.12.1 · 17 June 2026** - Refined Layout Slicer with top/left rulers, Photoshop-like guide lines, and slimmer markdown content with detailed notes moved to Documentation.

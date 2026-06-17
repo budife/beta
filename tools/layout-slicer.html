@@ -6,9 +6,9 @@
   <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.12.3">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.3">
-  <link rel="stylesheet" href="../css/controls.css?v=6.12.3">
+  <link rel="stylesheet" href="../css/theme.css?v=6.12.4">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.12.4">
+  <link rel="stylesheet" href="../css/controls.css?v=6.12.4">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <title>Layout Slicer - eDM Helper</title>
@@ -26,6 +26,71 @@
         <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
         <span>This tool is still in beta/testing. Please review the generated HTML and image slices before using them for production.</span>
       </div>
+
+      <section class="slicer-location-panel" aria-labelledby="location-title">
+        <div class="slicer-location-head">
+          <div>
+            <p class="slicer-kicker">Location</p>
+            <h2 id="location-title">Campaign folder from template</h2>
+          </div>
+          <span id="template-copy-status">No template selected</span>
+        </div>
+
+        <div class="slicer-location-grid">
+          <label>
+            <span>Campaign no</span>
+            <input id="campaign-no" type="text" value="0018" inputmode="numeric" autocomplete="off">
+          </label>
+          <label>
+            <span>Blast date</span>
+            <input id="blast-date" type="text" value="20260105" inputmode="numeric" autocomplete="off">
+          </label>
+          <label>
+            <span>Manager / suffix</span>
+            <input id="campaign-manager" type="text" value="RA" autocomplete="off">
+          </label>
+          <label>
+            <span>HTML name</span>
+            <input id="html-name" type="text" value="ANA-Premier" autocomplete="off">
+          </label>
+        </div>
+
+        <div class="slicer-path-preview">
+          <span>Target path</span>
+          <code id="campaign-path-preview">emailblast/MKT/2026/0018-20260105-RA/0018-ANA-Premier.html</code>
+          <button id="copy-campaign-path" type="button" class="slicer-secondary">Copy path</button>
+        </div>
+
+        <div class="slicer-location-actions">
+          <button id="choose-template-folder" type="button" class="slicer-secondary">
+            <i class="fa-solid fa-copy" aria-hidden="true"></i>
+            Choose template folder
+          </button>
+          <button id="choose-emailblast-root" type="button" class="slicer-secondary">
+            <i class="fa-solid fa-folder-tree" aria-hidden="true"></i>
+            Choose emailblast root
+          </button>
+          <button id="copy-template-folder" type="button" class="slicer-primary" disabled>
+            <i class="fa-solid fa-clone" aria-hidden="true"></i>
+            Copy as campaign
+          </button>
+        </div>
+
+        <div class="slicer-html-tools" id="html-tools" hidden>
+          <label>
+            <span>HTML file in copied folder</span>
+            <select id="html-file-select"></select>
+          </label>
+          <label>
+            <span>Final HTML filename</span>
+            <input id="final-html-name" type="text" autocomplete="off">
+          </label>
+          <button id="rename-html-file" type="button" class="slicer-secondary">
+            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+            Rename selected HTML
+          </button>
+        </div>
+      </section>
 
       <div class="slicer-drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose layout image">
         <i class="fa-solid fa-file-image" aria-hidden="true"></i>
@@ -143,7 +208,7 @@
     </section>
   </main>
 
-  <script src="../js/version-config.js?v=6.12.3" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.12.3" defer></script>
+  <script src="../js/version-config.js?v=6.12.4" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.12.4" defer></script>
 </body>
 </html>

@@ -6,7 +6,11 @@
     lines: [],
     draggingLine: null,
     slices: [],
-    generated: null
+    generated: null,
+    templateDir: null,
+    emailblastRootDir: null,
+    copiedCampaignDir: null,
+    copiedHtmlFiles: []
   };
 
   const els = {
@@ -17,6 +21,20 @@
     emailWidth: document.getElementById('email-width'),
     useSourceWidth: document.getElementById('use-source-width'),
     imageFormat: document.getElementById('image-format'),
+    campaignNo: document.getElementById('campaign-no'),
+    blastDate: document.getElementById('blast-date'),
+    campaignManager: document.getElementById('campaign-manager'),
+    htmlName: document.getElementById('html-name'),
+    campaignPathPreview: document.getElementById('campaign-path-preview'),
+    templateCopyStatus: document.getElementById('template-copy-status'),
+    chooseTemplateFolder: document.getElementById('choose-template-folder'),
+    chooseEmailblastRoot: document.getElementById('choose-emailblast-root'),
+    copyTemplateFolder: document.getElementById('copy-template-folder'),
+    copyCampaignPath: document.getElementById('copy-campaign-path'),
+    htmlTools: document.getElementById('html-tools'),
+    htmlFileSelect: document.getElementById('html-file-select'),
+    finalHtmlName: document.getElementById('final-html-name'),
+    renameHtmlFile: document.getElementById('rename-html-file'),
     autoSlice: document.getElementById('auto-slice'),
     clearLines: document.getElementById('clear-lines'),
     generateOutput: document.getElementById('generate-output'),
@@ -47,6 +65,65 @@
       .replace(/[^a-z0-9_-]+/gi, '-')
       .replace(/^-+|-+$/g, '')
       .toLowerCase() || 'layout-edm';
+  }
+
+  function cleanPathSegment(value, fallback = 'campaign') {
+    return String(value || fallback)
+      .trim()
+      .replace(/\.[a-z0-9]+$/i, '')
+      .replace(/[<>:"/\\|?*\u0000-\u001F]+/g, '-')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') || fallback;
+  }
+
+  function getCampaignNo() {
+    const value = String(els.campaignNo?.value || '').replace(/\D/g, '').slice(-4);
+    return value.padStart(4, '0') || '0000';
+  }
+
+  function getBlastDate() {
+    const value = String(els.blastDate?.value || '').replace(/\D/g, '').slice(0, 8);
+    return value.length === 8 ? value : '20260105';
+  }
+
+  function getCampaignYear() {
+    return getBlastDate().slice(0, 4);
+  }
+
+  function getCampaignFolderName() {
+    return `${getCampaignNo()}-${getBlastDate()}-${cleanPathSegment(els.campaignManager?.value || 'RA', 'RA')}`;
+  }
+
+  function getFinalHtmlName() {
+    const name = cleanPathSegment(els.htmlName?.value || 'layout', 'layout');
+    return `${getCampaignNo()}-${name}.html`;
+  }
+
+  function getResolvedFinalHtmlName() {
+    const value = els.finalHtmlName?.value?.trim();
+    if (!value) return getFinalHtmlName();
+    return `${cleanPathSegment(value, getFinalHtmlName()).replace(/\.html?$/i, '')}.html`;
+  }
+
+  function getCampaignPath() {
+    return `emailblast/MKT/${getCampaignYear()}/${getCampaignFolderName()}/${getResolvedFinalHtmlName()}`;
+  }
+
+  function setTemplateStatus(message, type = '') {
+    if (!els.templateCopyStatus) return;
+    els.templateCopyStatus.textContent = message;
+    els.templateCopyStatus.className = type ? `is-${type}` : '';
+  }
+
+  function updateCampaignPathPreview() {
+    if (els.campaignPathPreview) els.campaignPathPreview.textContent = getCampaignPath();
+    if (els.finalHtmlName && !els.finalHtmlName.matches(':focus')) {
+      els.finalHtmlName.value = getFinalHtmlName();
+    }
+    if (els.copyTemplateFolder) {
+      els.copyTemplateFolder.disabled = !state.templateDir || !state.emailblastRootDir;
+    }
   }
 
   function setStatus(message, type = '') {
@@ -218,6 +295,7 @@
     els.downloadImages.disabled = !hasGenerated;
     els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
     if (els.emailWidth) els.emailWidth.disabled = Boolean(els.useSourceWidth?.checked);
+    updateCampaignPathPreview();
   }
 
   function syncLinksFromInputs() {
@@ -422,6 +500,95 @@ ${rows}
     await writable.close();
   }
 
+  async function copyDirectory(sourceDir, targetDir) {
+    for await (const [name, handle] of sourceDir.entries()) {
+      if (handle.kind === 'file') {
+        const file = await handle.getFile();
+        await writeFile(targetDir, name, file);
+        continue;
+      }
+
+      if (handle.kind === 'directory') {
+        const nextTarget = await targetDir.getDirectoryHandle(name, { create: true });
+        await copyDirectory(handle, nextTarget);
+      }
+    }
+  }
+
+  async function getOrCreateCampaignDirectory() {
+    const mktDir = await state.emailblastRootDir.getDirectoryHandle('MKT', { create: true });
+    const yearDir = await mktDir.getDirectoryHandle(getCampaignYear(), { create: true });
+    return yearDir.getDirectoryHandle(getCampaignFolderName(), { create: true });
+  }
+
+  async function listHtmlFiles(dirHandle) {
+    const files = [];
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (handle.kind === 'file' && /\.html?$/i.test(name)) {
+        files.push({ name, handle });
+      }
+    }
+    return files.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  function renderCopiedHtmlFiles() {
+    if (!els.htmlTools || !els.htmlFileSelect) return;
+    els.htmlTools.hidden = state.copiedHtmlFiles.length === 0;
+    els.htmlFileSelect.innerHTML = state.copiedHtmlFiles.map((file) => (
+      `<option value="${escapeAttribute(file.name)}">${escapeHtml(file.name)}</option>`
+    )).join('');
+    if (els.finalHtmlName) els.finalHtmlName.value = getFinalHtmlName();
+  }
+
+  async function chooseTemplateFolder() {
+    if (typeof window.showDirectoryPicker !== 'function') {
+      setTemplateStatus('Folder access is not supported in this browser.', 'error');
+      return;
+    }
+    state.templateDir = await window.showDirectoryPicker({ mode: 'read' });
+    setTemplateStatus(`Template selected: ${state.templateDir.name}`, 'success');
+    updateCampaignPathPreview();
+  }
+
+  async function chooseEmailblastRoot() {
+    if (typeof window.showDirectoryPicker !== 'function') {
+      setTemplateStatus('Folder access is not supported in this browser.', 'error');
+      return;
+    }
+    state.emailblastRootDir = await window.showDirectoryPicker({ mode: 'readwrite' });
+    setTemplateStatus(`Root selected: ${state.emailblastRootDir.name}`, 'success');
+    updateCampaignPathPreview();
+  }
+
+  async function copyTemplateFolder() {
+    if (!state.templateDir || !state.emailblastRootDir) return;
+    setTemplateStatus('Copying template folder...', 'loading');
+    const campaignDir = await getOrCreateCampaignDirectory();
+    await copyDirectory(state.templateDir, campaignDir);
+    state.copiedCampaignDir = campaignDir;
+    state.copiedHtmlFiles = await listHtmlFiles(campaignDir);
+    renderCopiedHtmlFiles();
+    setTemplateStatus(`Copied to ${getCampaignPath().replace(/\/[^/]+$/, '')}.`, 'success');
+  }
+
+  async function renameSelectedHtmlFile() {
+    if (!state.copiedCampaignDir || !state.copiedHtmlFiles.length) return;
+    const currentName = els.htmlFileSelect.value;
+    const fileEntry = state.copiedHtmlFiles.find((file) => file.name === currentName);
+    if (!fileEntry) return;
+
+    const targetName = getResolvedFinalHtmlName();
+    const sourceFile = await fileEntry.handle.getFile();
+    await writeFile(state.copiedCampaignDir, targetName, sourceFile);
+    if (targetName !== currentName) {
+      await state.copiedCampaignDir.removeEntry(currentName).catch(() => {});
+    }
+    state.copiedHtmlFiles = await listHtmlFiles(state.copiedCampaignDir);
+    renderCopiedHtmlFiles();
+    els.htmlFileSelect.value = targetName;
+    setTemplateStatus(`HTML ready: ${getCampaignPath().replace(/[^/]+$/, targetName)}`, 'success');
+  }
+
   els.dropZone.addEventListener('click', () => els.imageInput.click());
   els.dropZone.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -440,6 +607,26 @@ ${rows}
     loadImageFile(event.dataTransfer.files[0]);
   });
   els.imageInput.addEventListener('change', () => loadImageFile(els.imageInput.files[0]));
+  els.chooseTemplateFolder?.addEventListener('click', () => {
+    chooseTemplateFolder().catch((error) => {
+      if (error.name !== 'AbortError') setTemplateStatus(error.message || 'Unable to choose template folder.', 'error');
+    });
+  });
+  els.chooseEmailblastRoot?.addEventListener('click', () => {
+    chooseEmailblastRoot().catch((error) => {
+      if (error.name !== 'AbortError') setTemplateStatus(error.message || 'Unable to choose emailblast root.', 'error');
+    });
+  });
+  els.copyTemplateFolder?.addEventListener('click', () => {
+    copyTemplateFolder().catch((error) => setTemplateStatus(error.message || 'Unable to copy template folder.', 'error'));
+  });
+  els.copyCampaignPath?.addEventListener('click', async () => {
+    await navigator.clipboard?.writeText(getCampaignPath());
+    setTemplateStatus('Target path copied.', 'success');
+  });
+  els.renameHtmlFile?.addEventListener('click', () => {
+    renameSelectedHtmlFile().catch((error) => setTemplateStatus(error.message || 'Unable to rename HTML file.', 'error'));
+  });
 
   els.canvas.addEventListener('pointerdown', (event) => {
     if (!state.image) return;
@@ -501,7 +688,19 @@ ${rows}
     state.generated = null;
     updateUi();
   });
-  [els.campaignName, els.assetsFolder, els.emailWidth, els.useSourceWidth, els.imageFormat].forEach((input) => {
+  [
+    els.campaignName,
+    els.assetsFolder,
+    els.emailWidth,
+    els.useSourceWidth,
+    els.imageFormat,
+    els.campaignNo,
+    els.blastDate,
+    els.campaignManager,
+    els.htmlName,
+    els.finalHtmlName
+  ].forEach((input) => {
+    if (!input) return;
     input.addEventListener('input', () => {
       state.generated = null;
       updateUi();

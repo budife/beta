@@ -2,6 +2,12 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## v6.12.4 - 17 June 2026
+
+- Added a Layout Slicer campaign location helper for copying a selected template folder into `emailblast/MKT/YYYY/NNNN-YYYYMMDD-MGR`.
+- Added target path preview and copy action for campaign HTML paths such as `emailblast/MKT/2026/0018-20260105-RA/0018-ANA-Premier.html`.
+- Added copied-folder HTML detection and a rename helper so ID/INDO HTML files can be prepared from the copied campaign folder.
+
 ## v6.12.3 - 17 June 2026
 
 - Marked Layout Slicer as beta in the sidebar, route header, and tool header.
