@@ -350,9 +350,20 @@ WFH Tracker starts with local fallback holiday data. If holiday auto-sync is ena
 
 ## Release Workflow
 
+:::details Versioning
+
+eDM Helper now uses two version layers:
+
+- **Core version** tracks the shared shell, sidebar, router, footer, shared style, and deployment cache-busters.
+- **Tool versions** track each tool independently in `js/tool-versions.js`.
+
+Stable tools show a small subtle badge in the tool header. Beta tools show a clearer amber `beta` badge. Home keeps the global Core version because it describes the whole app shell.
+:::
+
 :::details Checklist
 
-- Update the visible app version.
+- Update the Core version only when shared shell/deployment behavior changes.
+- Update the affected tool version in `js/tool-versions.js` when a specific tool changes.
 - Update cache-busters when shipping frontend changes.
 - Update Recent Updates on Home.
 - Update `CHANGELOG.md`.

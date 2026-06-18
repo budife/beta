@@ -1,6 +1,10 @@
 (function () {
   'use strict';
 
+  if (new URLSearchParams(window.location.search).get('embed') === '1') {
+    document.body.classList.add('is-embedded');
+  }
+
   const STORE_KEY = 'edm-helper-tnc-uploader-items-v1';
   const DEFAULT_PUBLIC_BASE_URL = 'https://mail.hsbc.com.hk/id/emailblast';
   const DIRECT_LINK_CHECK_TIMEOUT_MS = 2500;
@@ -11,6 +15,7 @@
     directoryHandle: null,
     mode: 'normal',
     replaceInfo: null,
+    baseUrl: DEFAULT_PUBLIC_BASE_URL,
   };
 
   function $(id) {
@@ -23,7 +28,6 @@
       'yearInput',
       'marketInput',
       'prefixInput',
-      'baseUrlInput',
       'targetPath',
       'normalModeBtn',
       'replaceModeBtn',
@@ -32,6 +36,7 @@
       'replaceSummary',
       'chooseFolderBtn',
       'dropZone',
+      'droppedList',
       'fileInput',
       'clearBtn',
       'downloadBtn',
@@ -108,6 +113,20 @@
     });
   }
 
+  function getTodayParts() {
+    const now = new Date();
+    return {
+      year: String(now.getFullYear()),
+      month: String(now.getMonth() + 1).padStart(2, '0'),
+      day: String(now.getDate()).padStart(2, '0'),
+    };
+  }
+
+  function getTodayPrefix() {
+    const today = getTodayParts();
+    return `TC${today.month}${today.day}`;
+  }
+
   function getTargetParts() {
     if (state.mode === 'replace' && state.replaceInfo) {
       return [state.replaceInfo.market, state.replaceInfo.year, 'tnc'];
@@ -130,7 +149,7 @@
   }
 
   function getBaseUrl() {
-    return String(elements.baseUrlInput.value || DEFAULT_PUBLIC_BASE_URL)
+    return String(state.baseUrl || DEFAULT_PUBLIC_BASE_URL)
       .trim()
       .replace(/\/+$/g, '');
   }
@@ -351,6 +370,23 @@
     renderItems();
   }
 
+  function renderDroppedList() {
+    const droppedItems = getFileBackedItems();
+    if (!droppedItems.length) {
+      elements.droppedList.innerHTML = '<span>No dropped PDFs yet.</span>';
+      return;
+    }
+
+    elements.droppedList.innerHTML = `
+      <strong>${droppedItems.length} dropped PDF${droppedItems.length === 1 ? '' : 's'}</strong>
+      <ul>
+        ${droppedItems.map((item) => `
+          <li title="${escapeHtml(item.originalName)}">${escapeHtml(item.originalName)}</li>
+        `).join('')}
+      </ul>
+    `;
+  }
+
   function getFileBackedItems() {
     return state.items.filter((item) => item.file);
   }
@@ -362,7 +398,8 @@
   function updateButtons() {
     const fileBackedCount = getFileBackedItems().length;
     const linkCount = getLinkItems().length;
-    elements.fileCount.textContent = `${state.items.length} item${state.items.length === 1 ? '' : 's'}`;
+    const fileCountLabel = `${state.items.length} PDF${state.items.length === 1 ? '' : 's'}`;
+    elements.fileCount.textContent = fileCountLabel;
     elements.saveBtn.disabled = !fileBackedCount || !state.directoryHandle;
     elements.downloadBtn.disabled = !fileBackedCount;
     elements.copyAllLinksBtn.disabled = !linkCount;
@@ -412,12 +449,13 @@
 
   function renderItems() {
     updateButtons();
+    renderDroppedList();
 
     if (!state.items.length) {
       elements.fileList.innerHTML = `
         <div class="tnc-empty">
           <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
-          <p>No PDF selected yet.</p>
+            <p>No PDF selected or saved yet.</p>
         </div>
       `;
       return;
@@ -425,10 +463,19 @@
 
     elements.fileList.innerHTML = state.items.map((item) => `
       <article class="tnc-file-item" data-item-id="${escapeHtml(item.id)}">
-        <div>
-          <div class="tnc-file-name" title="${escapeHtml(item.originalName)}">${escapeHtml(item.originalName)}</div>
-          <div class="tnc-file-target" title="${escapeHtml(`${item.targetPath}/${item.targetName}`)}">${escapeHtml(`${item.targetPath}/${item.targetName}`)}</div>
-          <div class="tnc-file-link" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</div>
+        <div class="tnc-file-details">
+          <div class="tnc-file-row">
+            <span>Original file</span>
+            <strong class="tnc-file-name" title="${escapeHtml(item.originalName)}">${escapeHtml(item.originalName)}</strong>
+          </div>
+          <div class="tnc-file-row">
+            <span>Renamed file</span>
+            <code class="tnc-file-target" title="${escapeHtml(`${item.targetPath}/${item.targetName}`)}">${escapeHtml(item.targetName)}</code>
+          </div>
+          <div class="tnc-file-row">
+            <span>Public link</span>
+            <code class="tnc-file-link" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</code>
+          </div>
         </div>
         <div class="tnc-file-bottom">
           <div class="tnc-file-meta">
@@ -462,14 +509,14 @@
 
   async function chooseFolder() {
     if (!supportsDirectoryWrite()) {
-      setStatus('Folder write is not supported in this browser. Use Chrome/Edge or Download renamed.', 'error');
+      setStatus('Saving to a folder is not supported in this browser. Use Chrome/Edge or download the ready PDFs.', 'error');
       return;
     }
 
     try {
       state.directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
       renderItems();
-      setStatus(`Root folder selected: ${state.directoryHandle.name}.`, 'success');
+      setStatus(`Destination folder selected: ${state.directoryHandle.name}.`, 'success');
     } catch (error) {
       if (error?.name !== 'AbortError') {
         console.error(error);
@@ -489,7 +536,7 @@
   async function saveFiles() {
     const fileBackedItems = getFileBackedItems();
     if (!state.directoryHandle) {
-      setStatus('Choose a root folder first.', 'error');
+      setStatus('Pick a destination folder first.', 'error');
       return;
     }
 
@@ -517,7 +564,7 @@
       setStatus(`${fileBackedItems.length} PDF file(s) saved to ${getTargetPath()}.`, 'success');
     } catch (error) {
       console.error(error);
-      setStatus('Save failed. Check folder permission or use Download renamed.', 'error');
+      setStatus('Save failed. Check folder permission or download the ready PDFs.', 'error');
     } finally {
       renderItems();
     }
@@ -546,7 +593,7 @@
     });
     saveHistory();
     renderItems();
-    setStatus(`${fileBackedItems.length} renamed PDF download(s) started.`, 'success');
+    setStatus(`${fileBackedItems.length} ready PDF download(s) started.`, 'success');
   }
 
   function clearQueue() {
@@ -746,6 +793,7 @@
       elements.replaceSummary.textContent = 'Paste an existing PDF link to reuse its folder and file name.';
       elements.replaceSummary.className = 'tnc-replace-summary';
       state.replaceInfo = null;
+      state.baseUrl = DEFAULT_PUBLIC_BASE_URL;
     }
   }
 
@@ -768,7 +816,7 @@
       return;
     }
 
-    elements.baseUrlInput.value = info.baseUrl;
+    state.baseUrl = info.baseUrl;
     elements.marketInput.value = info.market;
     elements.yearInput.value = info.year;
     elements.replaceSummary.textContent = `Replace mode: ${info.market} / ${info.year} / tnc / ${info.fileName}`;
@@ -801,15 +849,15 @@
     elements.supportBadge.textContent = 'Download fallback only';
     elements.supportBadge.className = 'tnc-support-badge is-limited';
     elements.chooseFolderBtn.disabled = true;
-    elements.saveBtn.title = 'This browser cannot write directly to a folder. Use Download renamed.';
+    elements.saveBtn.title = 'This browser cannot write directly to a folder. Use Download ready PDFs.';
   }
 
   function bindEvents() {
-    elements.yearInput.value = String(new Date().getFullYear());
+    elements.yearInput.value = getTodayParts().year;
+    elements.prefixInput.placeholder = `Example: ${getTodayPrefix()}`;
     ['input', 'change'].forEach((eventName) => {
       elements.yearInput.addEventListener(eventName, updateTargetPath);
       elements.marketInput.addEventListener(eventName, updateTargetPath);
-      elements.baseUrlInput.addEventListener(eventName, updateTargetPath);
       elements.prefixInput.addEventListener(eventName, updateTargetPath);
     });
 

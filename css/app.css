@@ -383,6 +383,29 @@ a {
   margin-left: 2px;
 }
 
+.tool-version-badge {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  color: #71717a;
+  background: #fff;
+  border: 1px solid var(--app-border);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tool-version-badge.is-beta {
+  color: #9a6700;
+  background: #fff8db;
+  border-color: #f7d36b;
+  font-style: italic;
+}
+
 .content-description {
   max-width: 760px;
   margin: 8px 0 0;

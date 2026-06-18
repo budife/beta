@@ -122,6 +122,28 @@ function getVersion() {
   return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.6.0';
 }
 
+function getRouteToolKey(path, route) {
+  if (path === '/') return 'home';
+  if (route?.source === 'docs') return 'docs';
+  return path.replace(/^\//, '');
+}
+
+function getRouteToolVersion(path, route) {
+  const key = getRouteToolKey(path, route);
+  if (typeof getToolVersion === 'function') return getToolVersion(key);
+  if (typeof TOOL_VERSIONS !== 'undefined') return TOOL_VERSIONS[key] || null;
+  return null;
+}
+
+function renderToolVersionBadge(path, route) {
+  if (path === '/') return '';
+  const versionInfo = getRouteToolVersion(path, route);
+  if (!versionInfo?.version) return '';
+  const isBeta = versionInfo.status === 'beta' || route?.status === 'beta';
+  const label = `v${versionInfo.version}${isBeta ? ' beta' : ''}`;
+  return `<span class="tool-version-badge${isBeta ? ' is-beta' : ''}">${escapeHtml(label)}</span>`;
+}
+
 function withBasePath(path) {
   const absolutePath = path.startsWith('/') ? path : `/${path}`;
   return `${BASE_PATH}${absolutePath}` || '/';
@@ -660,7 +682,7 @@ function renderPage(path, route, markdown) {
       <h1 class="content-title">
         <i class="${escapeHtml(icon)}" aria-hidden="true"></i>
         <span>${escapeHtml(title)}</span>
-        ${attributes.status === 'beta' || route.status === 'beta' ? '<em class="tool-beta-badge">beta</em>' : ''}
+        ${renderToolVersionBadge(path, route)}
       </h1>
       ${description ? `<p class="content-description">${escapeHtml(description)}</p>` : ''}
     </header>

@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **Layout Slicer v0.2.1 beta - 18 June 2026** - Removed the extra markdown section so the tool opens directly after the header, and tightened template duplicate naming so generated folders and HTML filenames follow the campaign folder name.
 - **v6.12.6 · 17 June 2026** - Improved Layout Slicer naming flow: HTML filename now sits first, parses campaign number/date/prefix/manager, scans template HTML files early, and keeps rename manual.
 - **v6.12.5 · 17 June 2026** - Fixed Layout Slicer campaign parent selection so copied template folders create `campaign/emailblast/MKT/YYYY/...` without repeating inside another campaign folder.
 - **v6.12.4 · 17 June 2026** - Added Layout Slicer campaign location helper for copying template folders into campaign folders and preparing ID/INDO HTML filenames.

@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Layout Slicer v0.2.1 beta - 18 June 2026
+
+- Removed the extra Layout Slicer markdown heading so the embedded tool starts directly after the route header.
+- Made the duplicate-folder flow derive the generated campaign folder from the folder name, while auto HTML filenames use only campaign number and campaign name.
+
 ## v6.12.6 - 17 June 2026
 
 - Moved Layout Slicer HTML filename input to the first field in the Location panel.

@@ -1,3 +1,8 @@
+html,
+body {
+  height: 100%;
+}
+
 body {
   min-height: 100vh;
   color: var(--text);
@@ -7,10 +12,15 @@ body {
 }
 
 #main-content {
-  min-height: calc(100vh - var(--header-height));
+  height: calc(100vh - var(--header-height, 52px) - 57px);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .tnc-section {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   padding: 0;
 }
 
@@ -18,17 +28,26 @@ body {
   display: grid;
   grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
   gap: 0;
-  min-height: calc(100vh - var(--header-height));
+  height: 100%;
+  min-height: 0;
   border-top: 1px solid var(--border);
 }
 
 .tnc-panel {
   min-width: 0;
+  min-height: 0;
   background: #fff;
 }
 
 .tnc-setup {
+  overflow: auto;
   border-right: 1px solid var(--border);
+}
+
+.tnc-preview {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .tnc-panel-header,
@@ -79,7 +98,11 @@ body {
 
 .tnc-support-badge,
 .tnc-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
+  min-height: 28px;
   padding: 5px 8px;
   color: var(--text-muted);
   background: var(--gray-100);
@@ -128,43 +151,8 @@ body {
   outline-offset: 0;
 }
 
-.tnc-advanced {
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid var(--border);
-}
-
-.tnc-advanced summary {
-  color: var(--text);
-  font-size: 13px;
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-}
-
-.tnc-advanced .tnc-field {
-  display: block;
-  margin-top: 12px;
-}
-
-.tnc-advanced p {
-  margin-top: 8px;
-  font-size: 12px;
-}
-
-.tnc-target-card {
-  margin-top: 16px;
-  padding: 12px;
-  background: var(--gray-100);
-  border: 1px solid var(--border);
-}
-
-.tnc-target-card code {
-  display: block;
-  margin-top: 4px;
-  color: var(--text);
-  font-family: var(--font-family-mono);
-  font-size: 12px;
-  word-break: break-all;
+.tnc-hidden-path {
+  display: none;
 }
 
 .tnc-mode-card {
@@ -224,9 +212,9 @@ body {
 .tnc-drop-zone {
   display: grid;
   place-items: center;
-  min-height: 150px;
-  margin-top: 16px;
-  padding: 18px;
+  min-height: 112px;
+  margin-top: 12px;
+  padding: 14px;
   color: var(--text-muted);
   text-align: center;
   background: #fff;
@@ -247,9 +235,9 @@ body {
 }
 
 .tnc-drop-zone i {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--accent-primary);
-  font-size: 26px;
+  font-size: 22px;
 }
 
 .tnc-drop-zone strong,
@@ -259,13 +247,47 @@ body {
 
 .tnc-drop-zone strong {
   color: var(--text);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: var(--font-weight-semibold);
 }
 
 .tnc-drop-zone span {
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.tnc-dropped-list {
+  max-height: 96px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  overflow: auto;
+  color: var(--text-muted);
+  background: var(--gray-100);
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.tnc-dropped-list strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+}
+
+.tnc-dropped-list ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tnc-dropped-list li {
+  overflow: hidden;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tnc-actions {
@@ -358,8 +380,10 @@ body {
 
 .tnc-file-list {
   display: grid;
+  align-content: start;
   gap: 8px;
-  max-height: calc(100vh - 220px);
+  flex: 1 1 auto;
+  min-height: 0;
   margin-top: 16px;
   overflow: auto;
   padding-right: 4px;
@@ -387,9 +411,33 @@ body {
   border-left: 3px solid var(--accent-primary);
 }
 
+.tnc-file-details {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tnc-file-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.tnc-file-row span {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
 .tnc-file-name,
 .tnc-file-target,
 .tnc-file-link {
+  display: block;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -402,14 +450,13 @@ body {
 }
 
 .tnc-file-target {
-  margin-top: 5px;
-  color: var(--text-muted);
+  color: var(--text);
   font-family: var(--font-family-mono);
   font-size: 12px;
+  font-weight: var(--font-weight-medium);
 }
 
 .tnc-file-link {
-  margin-top: 6px;
   color: #9f3f45;
   font-family: var(--font-family-mono);
   font-size: 12px;
@@ -493,29 +540,53 @@ body.is-embedded > .footer {
 }
 
 body.is-embedded #main-content,
+body.is-embedded .tnc-section,
 body.is-embedded .tnc-shell {
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
+}
+
+body.is-embedded #main-content {
+  overflow: hidden;
+}
+
+body.is-embedded .tnc-shell {
+  height: 100%;
 }
 
 @media (max-width: 900px) {
+  #main-content,
+  body.is-embedded #main-content {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .tnc-section,
+  body.is-embedded .tnc-section {
+    height: auto;
+    overflow: visible;
+  }
+
   .tnc-shell {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .tnc-setup {
+    overflow: visible;
     border-right: 0;
     border-bottom: 1px solid var(--border);
   }
 
   .tnc-file-list {
-    max-height: none;
+    overflow: visible;
   }
 }
 
 @media (max-width: 620px) {
   .tnc-panel-header,
   .tnc-panel-title-row,
-  .tnc-target-card,
   .tnc-file-bottom,
   .tnc-actions {
     align-items: stretch;
@@ -524,5 +595,10 @@ body.is-embedded .tnc-shell {
 
   .tnc-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tnc-file-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
   }
 }

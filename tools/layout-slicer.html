@@ -31,68 +31,87 @@
         <div class="slicer-location-head">
           <div>
             <p class="slicer-kicker">Location</p>
-            <h2 id="location-title">Campaign folder from template</h2>
+            <h2 id="location-title">Template folder duplicate</h2>
           </div>
           <span id="template-copy-status">No template selected</span>
         </div>
 
+        <div class="slicer-folder-picks">
+          <div class="slicer-folder-pick">
+            <span>Input template folder</span>
+            <strong id="template-source-name">Not selected</strong>
+            <button id="choose-template-folder" type="button" class="slicer-secondary">
+              <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+              Choose input
+            </button>
+          </div>
+          <div class="slicer-folder-pick">
+            <span>Output paste folder</span>
+            <strong id="template-output-name">Not selected</strong>
+            <button id="choose-campaign-parent" type="button" class="slicer-secondary">
+              <i class="fa-solid fa-folder-tree" aria-hidden="true"></i>
+              Choose output
+            </button>
+          </div>
+        </div>
+
         <div class="slicer-location-grid">
-          <label class="slicer-location-name">
-            <span>HTML file name</span>
-            <input id="html-name" type="text" value="1112 ANA Premium Pertralite 06-17 Bianca" autocomplete="off">
+          <label>
+            <span>Folder name</span>
+            <input id="duplicate-folder-name" type="text" placeholder="0023 Nama Campaign 06-18 Bianca" autocomplete="off">
           </label>
           <label>
-            <span>Campaign no</span>
-            <input id="campaign-no" type="text" value="0018" inputmode="numeric" autocomplete="off">
+            <span>Year</span>
+            <input id="template-year" type="text" placeholder="2026" inputmode="numeric" autocomplete="off">
           </label>
           <label>
-            <span>Blast date</span>
-            <input id="blast-date" type="text" value="20260105" inputmode="numeric" autocomplete="off">
+            <span>Campaign ID + date</span>
+            <input id="template-campaign-folder" type="text" placeholder="1112-20260617-BI" autocomplete="off">
           </label>
           <label>
-            <span>Manager</span>
-            <input id="campaign-manager" type="text" value="RA" autocomplete="off">
-          </label>
-          <label>
-            <span>Prefix</span>
-            <input id="html-prefix" type="text" value="ANA-Premier" autocomplete="off">
+            <span>File name</span>
+            <input id="final-html-name" type="text" placeholder="1112-ANA-Premium.html" autocomplete="off">
           </label>
         </div>
 
         <div class="slicer-path-preview">
-          <span>Target path</span>
-          <code id="campaign-path-preview">emailblast/MKT/2026/0018-20260105-RA/0018-ANA-Premier.html</code>
+          <span>Output preview</span>
+          <code id="campaign-path-preview">Choose template folder and paste location</code>
           <button id="copy-campaign-path" type="button" class="slicer-secondary">Copy path</button>
         </div>
 
+        <div class="slicer-template-review" id="template-review" hidden>
+          <div>
+            <span>Template folder</span>
+            <strong id="template-review-source">Choose template folder first</strong>
+          </div>
+          <div>
+            <span>Destination</span>
+            <strong id="template-review-target">Template folder location</strong>
+          </div>
+          <div>
+            <span>HTML rename plan</span>
+            <strong id="template-review-html">No HTML file detected yet</strong>
+          </div>
+          <div>
+            <span>MKT path</span>
+            <strong id="template-review-mkt">No HTML file detected yet</strong>
+          </div>
+        </div>
+
         <div class="slicer-location-actions">
-          <button id="choose-template-folder" type="button" class="slicer-secondary">
-            <i class="fa-solid fa-copy" aria-hidden="true"></i>
-            Choose template folder
-          </button>
-          <button id="choose-campaign-parent" type="button" class="slicer-secondary">
-            <i class="fa-solid fa-folder-tree" aria-hidden="true"></i>
-            Choose campaign parent
-          </button>
           <button id="copy-template-folder" type="button" class="slicer-primary" disabled>
             <i class="fa-solid fa-clone" aria-hidden="true"></i>
-            Copy as campaign
+            Duplicate folder
           </button>
         </div>
 
         <div class="slicer-html-tools" id="html-tools" hidden>
           <label>
-            <span>HTML file in copied folder</span>
+            <span>Template HTML file</span>
             <select id="html-file-select"></select>
           </label>
-          <label>
-            <span>Final HTML filename</span>
-            <input id="final-html-name" type="text" autocomplete="off">
-          </label>
-          <button id="rename-html-file" type="button" class="slicer-secondary">
-            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-            Rename selected HTML
-          </button>
+          <p class="slicer-inline-note">Choose the HTML file found inside the template path. The duplicate process copies the folder first, then renames this HTML in the copied folder path.</p>
         </div>
       </section>
 
@@ -127,8 +146,24 @@
             <option value="image/png">PNG</option>
           </select>
         </label>
+        <label>
+          <span>Export width</span>
+          <input id="export-width" type="number" min="320" max="3000" value="1000">
+        </label>
+        <label>
+          <span>DPI note</span>
+          <input id="export-dpi" type="number" min="72" max="600" value="300">
+        </label>
+        <label>
+          <span>Quality</span>
+          <select id="image-quality">
+            <option value="0.72">Low</option>
+            <option value="0.9">High</option>
+            <option value="0.98" selected>Very high</option>
+          </select>
+        </label>
       </div>
-      <p class="slicer-form-note">Slices export at the original image pixel width. HTML display width only controls how wide the email renders.</p>
+      <p class="slicer-form-note">Export width controls generated image pixel width. DPI is kept as a production note because browser export cannot reliably write DPI metadata.</p>
 
       <div class="slicer-actions">
         <button id="auto-slice" type="button" class="slicer-secondary">
@@ -155,7 +190,20 @@
             <p class="slicer-kicker">Preview</p>
             <h2>Source Layout</h2>
           </div>
-          <span id="image-meta">No image</span>
+          <div class="slicer-preview-tools">
+            <button id="zoom-out" type="button" class="slicer-secondary" disabled>-</button>
+            <select id="zoom-level" disabled>
+              <option value="fit">Fit</option>
+              <option value="0.25">25%</option>
+              <option value="0.5">50%</option>
+              <option value="0.75">75%</option>
+              <option value="1">100%</option>
+              <option value="1.5">150%</option>
+              <option value="2">200%</option>
+            </select>
+            <button id="zoom-in" type="button" class="slicer-secondary" disabled>+</button>
+            <span id="image-meta">No image</span>
+          </div>
         </div>
         <div class="slicer-canvas-wrap" id="canvas-wrap">
           <div class="slicer-ruler-corner"></div>
