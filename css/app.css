@@ -942,6 +942,23 @@ a {
   border-color: var(--app-accent);
 }
 
+.recent-update-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 16px;
+  padding: 1px 6px;
+  margin-left: 8px;
+  color: var(--ui-accent-dark);
+  font-size: 10px;
+  font-style: italic;
+  font-weight: var(--ui-weight-regular);
+  line-height: 1.2;
+  text-transform: lowercase;
+  vertical-align: middle;
+  background: var(--app-accent-soft);
+  border: 1px solid #f8b4b8;
+}
+
 .markdown-section[data-section="recent-updates"] .recent-creator-link {
   display: inline-block;
 }

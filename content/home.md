@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **Core v6.13.1 - 18 June 2026** - Moved update status out of the sidebar and added automatic Recent Updates badges that show new update for entries from the last three days.
 - **Core v6.13.0 - 18 June 2026** - Added Maintenance with local backup restore, per-tool smoke tests, privacy controls, and release helper workflow.
 - **Layout Slicer v0.2.1 beta - 18 June 2026** - Removed the extra markdown section so the tool opens directly after the header, and tightened template duplicate naming so generated folders and HTML filenames follow the campaign folder name.
 - **v6.12.6 · 17 June 2026** - Improved Layout Slicer naming flow: HTML filename now sits first, parses campaign number/date/prefix/manager, scans template HTML files early, and keeps rename manual.

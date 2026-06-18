@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.13.1 - 18 June 2026
+
+- Moved update status out of the sidebar and added automatic Recent Updates badges that show new update for entries from the last three days.
+
 ## Core v6.13.0 - 18 June 2026
 
 - Added Maintenance with local backup restore, per-tool smoke tests, privacy controls, and release helper workflow.

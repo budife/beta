@@ -276,6 +276,36 @@ function slugifyHeading(value) {
     .replace(/^-|-$/g, '');
 }
 
+function getStartOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function isWithinRecentDays(date, days = 3) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
+  const diffDays = Math.floor((getStartOfDay(new Date()) - getStartOfDay(date)) / 86400000);
+  return diffDays >= 0 && diffDays <= days;
+}
+
+function parseUpdateDate(text) {
+  const monthIndex = {
+    january: 0,
+    february: 1,
+    march: 2,
+    april: 3,
+    may: 4,
+    june: 5,
+    july: 6,
+    august: 7,
+    september: 8,
+    october: 9,
+    november: 10,
+    december: 11
+  };
+  const match = text.match(/\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\b/i);
+  if (!match) return null;
+  return new Date(Number(match[3]), monthIndex[match[2].toLowerCase()], Number(match[1]));
+}
+
 function renderMarkdown(source) {
   if (!source) return '';
 
@@ -489,6 +519,21 @@ function enhanceHomeDashboard(container) {
   if (updates) {
     const updateItems = Array.from(updates.querySelectorAll('li'));
     updateItems[0]?.classList.add('latest-update');
+    updateItems.forEach((item) => {
+      const updateDate = parseUpdateDate(item.textContent);
+      if (!isWithinRecentDays(updateDate)) return;
+
+      const badge = document.createElement('span');
+      badge.className = 'recent-update-badge';
+      badge.textContent = 'new update';
+      badge.title = 'Added within the last 3 days';
+      const title = item.querySelector('strong');
+      if (title) {
+        title.insertAdjacentElement('afterend', badge);
+      } else {
+        item.insertAdjacentElement('afterbegin', badge);
+      }
+    });
     updates.querySelectorAll('code').forEach((code) => {
       if (code.textContent.trim().toLowerCase() !== 'budd') return;
       const creatorLink = document.createElement('button');
