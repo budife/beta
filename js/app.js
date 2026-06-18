@@ -53,6 +53,10 @@ const ROUTES = {
     content: 'index.md',
     label: 'Documentation',
     source: 'docs'
+  },
+  '/maintenance': {
+    content: 'maintenance.md',
+    label: 'Maintenance'
   }
 };
 
@@ -66,7 +70,8 @@ const LEGACY_PATHS = {
   '/layout-checker.html': '/layout-checker',
   '/layout-slicer.html': '/layout-slicer',
   '/tnc-uploader.html': '/tnc-uploader',
-  '/wfh-tracker.html': '/wfh-tracker'
+  '/wfh-tracker.html': '/wfh-tracker',
+  '/maintenance.html': '/maintenance'
 };
 
 const viewport = document.getElementById('content-viewport');
@@ -115,7 +120,24 @@ const TOOL_META = {
   '/wfh-tracker': {
     icon: 'fa-solid fa-calendar-days',
     label: 'WFH Tracker'
+  },
+  '/maintenance': {
+    icon: 'fa-solid fa-screwdriver-wrench',
+    label: 'Maintenance'
   }
+};
+
+const TOOL_PRIVACY = {
+  '/bookmarklet': 'Local only',
+  '/campaign-counter': 'Local only',
+  '/config-edm': 'Local only',
+  '/database-checker': 'External optional',
+  '/database-generator': 'Local only',
+  '/layout-checker': 'External optional',
+  '/layout-slicer': 'Local only',
+  '/tnc-uploader': 'External optional',
+  '/wfh-tracker': 'Holiday sync optional',
+  '/maintenance': 'Local only'
 };
 
 function getVersion() {
@@ -142,6 +164,13 @@ function renderToolVersionBadge(path, route) {
   const isBeta = versionInfo.status === 'beta' || route?.status === 'beta';
   const label = `v${versionInfo.version}${isBeta ? ' beta' : ''}`;
   return `<span class="tool-version-badge${isBeta ? ' is-beta' : ''}">${escapeHtml(label)}</span>`;
+}
+
+function renderPrivacyBadge(path) {
+  const label = TOOL_PRIVACY[path];
+  if (!label) return '';
+  const isLocal = label === 'Local only';
+  return `<span class="tool-privacy-badge${isLocal ? ' is-local' : ''}">${escapeHtml(label)}</span>`;
 }
 
 function withBasePath(path) {
@@ -295,6 +324,13 @@ function renderMarkdown(source) {
       flushParagraph();
       closeList();
       html.push('<div class="privacy-settings-panel" data-privacy-settings></div>');
+      return;
+    }
+
+    if (line.trim() === '{{local-backup}}') {
+      flushParagraph();
+      closeList();
+      html.push('<div class="local-backup-mount" data-local-backup></div>');
       return;
     }
 
@@ -507,11 +543,28 @@ function renderPrivacySettings(container) {
   });
 }
 
+function renderLocalBackup(container) {
+  const panel = container.querySelector('[data-local-backup]');
+  if (!panel) return;
+
+  if (!window.EDM_LOCAL_BACKUP?.render) {
+    panel.innerHTML = '<p class="local-backup-status is-error">Local backup helper failed to load.</p>';
+    return;
+  }
+
+  window.EDM_LOCAL_BACKUP.render(panel);
+}
+
 function enhanceDocsPage(container) {
   renderPrivacySettings(container);
   const currentAnchor = window.location.hash.slice(1);
   const firstTab = container.querySelector('[data-section="docs-navigation"] a[data-anchor]');
   setActiveDocsTab(container, currentAnchor || firstTab?.dataset.anchor);
+}
+
+function enhanceMaintenancePage(container) {
+  renderLocalBackup(container);
+  renderPrivacySettings(container);
 }
 
 function setActiveLink(path) {
@@ -683,6 +736,7 @@ function renderPage(path, route, markdown) {
         <i class="${escapeHtml(icon)}" aria-hidden="true"></i>
         <span>${escapeHtml(title)}</span>
         ${renderToolVersionBadge(path, route)}
+        ${renderPrivacyBadge(path)}
       </h1>
       ${description ? `<p class="content-description">${escapeHtml(description)}</p>` : ''}
     </header>
@@ -727,6 +781,10 @@ function renderPage(path, route, markdown) {
     if (isHome) {
       markdownContainer.classList.add('home-dashboard');
       enhanceHomeDashboard(markdownContainer);
+    }
+    if (path === '/maintenance') {
+      markdownContainer.classList.add('docs-content');
+      enhanceMaintenancePage(markdownContainer);
     }
   }
 

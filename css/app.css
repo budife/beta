@@ -406,6 +406,28 @@ a {
   font-style: italic;
 }
 
+.tool-privacy-badge {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  color: #7a4b00;
+  background: #fffaf0;
+  border: 1px solid #fed7aa;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tool-privacy-badge.is-local {
+  color: #087443;
+  background: #ecfdf3;
+  border-color: #bbf7d0;
+}
+
 .content-description {
   max-width: 760px;
   margin: 8px 0 0;
@@ -537,6 +559,95 @@ a {
   width: 18px;
   height: 18px;
   accent-color: var(--app-accent);
+}
+
+.local-backup-mount {
+  margin: 14px 0 18px;
+}
+
+.local-backup-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+}
+
+.local-backup-summary {
+  display: grid;
+  gap: 4px;
+}
+
+.local-backup-summary strong {
+  color: #18181b;
+  font-size: 14px;
+  font-weight: var(--ui-weight-semibold);
+}
+
+.local-backup-summary span,
+.local-backup-status {
+  color: var(--app-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.local-backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.local-backup-actions button,
+.local-backup-import span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 13px;
+  color: #18181b;
+  background: #fff;
+  border: 1px solid var(--app-border);
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--ui-weight-semibold);
+  cursor: pointer;
+}
+
+.local-backup-actions button:first-child {
+  color: #fff;
+  background: var(--app-accent);
+  border-color: var(--app-accent);
+}
+
+.local-backup-actions .is-danger {
+  color: #b42318;
+  background: #fff5f5;
+  border-color: #fecaca;
+}
+
+.local-backup-status {
+  margin: 0;
+  padding: 10px 12px;
+  background: #fff;
+  border-left: 3px solid var(--app-border);
+}
+
+.local-backup-status.is-success {
+  color: #087443;
+  background: #ecfdf3;
+  border-left-color: #22a06b;
+}
+
+.local-backup-status.is-error {
+  color: #b42318;
+  background: #fff5f5;
+  border-left-color: #ef4444;
+}
+
+.local-backup-status.is-loading {
+  color: #9f3f45;
+  background: var(--app-accent-soft);
+  border-left-color: var(--app-accent);
 }
 
 .markdown-section[data-section="docs-navigation"] {

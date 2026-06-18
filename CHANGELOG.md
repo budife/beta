@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.13.0 - 18 June 2026
+
+- Added Maintenance with local backup restore, per-tool smoke tests, privacy controls, and release helper workflow.
+
 ## Layout Slicer v0.2.1 beta - 18 June 2026
 
 - Removed the extra Layout Slicer markdown heading so the embedded tool starts directly after the route header.

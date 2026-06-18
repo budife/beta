@@ -11,6 +11,7 @@ category: Reference
 - [Basics](#global-navigation)
 - [Database](#database-checker)
 - [Tools](#bookmarklet)
+- [Local Backup](#local-data-backup)
 - [Maintenance](#release-workflow)
 - [Troubleshooting](#troubleshooting)
 - [Credits](#credits-dedication)
@@ -62,6 +63,7 @@ The app uses clean SPA routes with a fixed sidebar. Opening a tool changes only 
 
 - Home: `/`
 - Docs: `/docs`
+- Maintenance: `/maintenance`
 - Database Checker: `/database-checker`
 - Database Generator: `/database-generator`
 - Bookmarklet: `/bookmarklet`
@@ -360,6 +362,15 @@ eDM Helper now uses two version layers:
 Stable tools show a small subtle badge in the tool header. Beta tools show a clearer amber `beta` badge. Home keeps the global Core version because it describes the whole app shell.
 :::
 
+:::details Header privacy labels
+
+Tool headers show a small privacy label:
+
+- **Local only** means data stays in browser/file handles unless you save/export it yourself.
+- **External optional** means the tool can fetch a public URL only when you use that feature and external checks are enabled.
+- **Holiday sync optional** means WFH Tracker can fetch public Indonesian holiday data by year.
+:::
+
 :::details Checklist
 
 - Update the Core version only when shared shell/deployment behavior changes.
@@ -372,6 +383,25 @@ Stable tools show a small subtle badge in the tool header. Beta tools show a cle
 - Run `git diff --check`.
 - Commit with a clear release message.
 - Push to `origin main`.
+:::
+
+:::details Release helper
+
+Use `scripts/release.ps1` to reduce manual release edits.
+
+- Core release: `scripts/release.ps1 -Version 6.13.0 -UpdateNote "Updated shared shell maintenance tools."`
+- Tool release: `scripts/release.ps1 -Tool layout-slicer -ToolVersion 0.2.2 -UpdateNote "Improved duplicate folder naming."`
+
+The helper updates Recent Updates and `CHANGELOG.md`. Core releases also update cache-busters unless `-NoCacheBuster` is used.
+:::
+
+## Local Data Backup
+
+:::details Backup and restore
+
+Open `/maintenance` to export or import browser-local data. The backup downloads as JSON and is not uploaded by eDM Helper.
+
+Use this before clearing browser data, switching machines, or moving between office browser profiles.
 :::
 
 ## Local Data & Storage
