@@ -8,9 +8,9 @@
   <meta name="keywords" content="edm, tnc, pdf, uploader, emailblast">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.13.1">
-  <link rel="stylesheet" href="../css/pages-tnc-uploader.css?v=6.13.1">
-  <link rel="stylesheet" href="../css/controls.css?v=6.13.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.13.2">
+  <link rel="stylesheet" href="../css/pages-tnc-uploader.css?v=6.13.2">
+  <link rel="stylesheet" href="../css/controls.css?v=6.13.2">
 
   <title>TNC Uploader - eDM Helper</title>
   <meta name="theme-color" content="#0f172a">
@@ -42,7 +42,6 @@
             <label class="tnc-field">
               <span>Year</span>
               <input id="yearInput" type="number" min="2020" max="2099" step="1" inputmode="numeric">
-              <small>Auto uses today's year.</small>
             </label>
             <label class="tnc-field">
               <span>Market folder</span>
@@ -77,8 +76,8 @@
           <div class="tnc-drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Drop PDF files or choose files">
             <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple>
             <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i>
-            <strong>Drop PDF here</strong>
-            <span>or click to choose one or more PDFs</span>
+            <strong id="dropTitle">Drop PDF here</strong>
+            <span id="dropHint">or click to choose one or more PDFs</span>
           </div>
           <div class="tnc-dropped-list" id="droppedList" aria-live="polite">
             <span>No dropped PDFs yet.</span>
@@ -87,15 +86,15 @@
           <div class="tnc-actions">
             <button class="tnc-button tnc-button-secondary" type="button" id="clearBtn">
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-              Clear
+              Clear queue
             </button>
             <button class="tnc-button tnc-button-secondary" type="button" id="downloadBtn" disabled>
               <i class="fa-solid fa-download" aria-hidden="true"></i>
-              Download ready PDFs
+              Download files
             </button>
             <button class="tnc-button tnc-button-secondary" type="button" id="chooseFolderBtn">
               <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
-              Pick destination folder
+              Pick folder
             </button>
             <button class="tnc-button tnc-button-primary" type="button" id="saveBtn" disabled>
               <i class="fa-solid fa-upload" aria-hidden="true"></i>
@@ -170,8 +169,8 @@
   </footer>
 
   <script src="../js/footer.js" defer></script>
-  <script src="../js/version-config.js?v=6.13.1" defer></script>
-  <script src="../js/privacy-settings.js?v=6.13.1" defer></script>
-  <script src="../js/pages-tnc-uploader.js?v=6.13.1" defer></script>
+  <script src="../js/version-config.js?v=6.13.2" defer></script>
+  <script src="../js/privacy-settings.js?v=6.13.2" defer></script>
+  <script src="../js/pages-tnc-uploader.js?v=6.13.2" defer></script>
 </body>
 </html>

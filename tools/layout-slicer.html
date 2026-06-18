@@ -6,9 +6,9 @@
   <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.13.1">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.13.1">
-  <link rel="stylesheet" href="../css/controls.css?v=6.13.1">
+  <link rel="stylesheet" href="../css/theme.css?v=6.13.2">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.13.2">
+  <link rel="stylesheet" href="../css/controls.css?v=6.13.2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <title>Layout Slicer - eDM Helper</title>
@@ -19,15 +19,28 @@
       <div class="slicer-panel-header">
         <p class="slicer-kicker">Layout Slicer <em class="tool-beta-badge">beta</em></p>
         <h1><i class="fa-solid fa-scissors" aria-hidden="true"></i> Slice to eDM</h1>
-        <p>Drop JPG/PNG, add horizontal slices, then export email-safe HTML and assets.</p>
+        <p>Drop JPG/PNG, add horizontal guides, then export ordered image slices.</p>
       </div>
 
       <div class="slicer-beta-warning" role="status">
         <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-        <span>This tool is still in beta/testing. Please review the generated HTML and image slices before using them for production.</span>
+        <span>This tool is still in beta/testing. Please review the generated image slices before using them for production.</span>
       </div>
 
-      <section class="slicer-location-panel" aria-labelledby="location-title">
+      <div class="slicer-accordion" data-slicer-accordion>
+        <section class="slicer-accordion-item is-open" data-slicer-section="campaign">
+          <button class="slicer-accordion-trigger" id="campaign-section-trigger" type="button" aria-expanded="true" aria-controls="campaign-section-panel">
+            <span class="slicer-accordion-title">
+              <strong>Campaign folder</strong>
+              <span>Duplicate a template folder and prepare the copied HTML path.</span>
+            </span>
+            <span class="slicer-accordion-meta">
+              <span>Template setup</span>
+              <i class="fa-solid fa-chevron-down slicer-accordion-chevron" aria-hidden="true"></i>
+            </span>
+          </button>
+          <div class="slicer-accordion-panel" id="campaign-section-panel" role="region" aria-labelledby="campaign-section-trigger">
+            <section class="slicer-location-panel" aria-labelledby="location-title">
         <div class="slicer-location-head">
           <div>
             <p class="slicer-kicker">Location</p>
@@ -113,8 +126,23 @@
           </label>
           <p class="slicer-inline-note">Choose the HTML file found inside the template path. The duplicate process copies the folder first, then renames this HTML in the copied folder path.</p>
         </div>
-      </section>
+            </section>
+          </div>
+        </section>
 
+        <section class="slicer-accordion-item" data-slicer-section="slicer">
+          <button class="slicer-accordion-trigger" id="slicer-section-trigger" type="button" aria-expanded="false" aria-controls="slicer-section-panel">
+            <span class="slicer-accordion-title">
+              <strong>Image slicer</strong>
+              <span>Load JPG/PNG, add guide lines, then export eDM assets.</span>
+            </span>
+            <span class="slicer-accordion-meta">
+              <span>Slice export</span>
+              <i class="fa-solid fa-chevron-down slicer-accordion-chevron" aria-hidden="true"></i>
+            </span>
+          </button>
+          <div class="slicer-accordion-panel" id="slicer-section-panel" role="region" aria-labelledby="slicer-section-trigger" hidden>
+            <div class="slicer-slicer-controls">
       <div class="slicer-drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose layout image">
         <i class="fa-solid fa-file-image" aria-hidden="true"></i>
         <strong>Drop layout image here</strong>
@@ -123,22 +151,6 @@
       </div>
 
       <div class="slicer-form-grid">
-        <label>
-          <span>Campaign / file name</span>
-          <input id="campaign-name" type="text" value="layout-edm" autocomplete="off">
-        </label>
-        <label>
-          <span>Assets folder</span>
-          <input id="assets-folder" type="text" value="images" autocomplete="off">
-        </label>
-        <label>
-          <span>HTML display width</span>
-          <input id="email-width" type="number" min="320" max="1200" value="600">
-        </label>
-        <label class="slicer-check-row">
-          <input id="use-source-width" type="checkbox">
-          <span>Use source width in HTML</span>
-        </label>
         <label>
           <span>Image format</span>
           <select id="image-format">
@@ -163,25 +175,42 @@
           </select>
         </label>
       </div>
-      <p class="slicer-form-note">Export width controls generated image pixel width. DPI is kept as a production note because browser export cannot reliably write DPI metadata.</p>
+      <p class="slicer-form-note">Export width controls the generated image pixel width. Change these settings any time, then generate again to refresh the slices.</p>
 
       <div class="slicer-actions">
-        <button id="auto-slice" type="button" class="slicer-secondary">
-          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-          Auto 600px
-        </button>
-        <button id="clear-lines" type="button" class="slicer-secondary">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-          Clear lines
-        </button>
-        <button id="generate-output" type="button" class="slicer-primary">
-          <i class="fa-solid fa-play" aria-hidden="true"></i>
-          Generate
-        </button>
+        <div class="slicer-action-group" aria-label="Guide tools">
+          <span>Guides</span>
+          <button id="auto-slice" type="button" class="slicer-secondary slicer-compact-action">
+            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+            Auto
+          </button>
+          <button id="clear-lines" type="button" class="slicer-secondary slicer-compact-action">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            Reset
+          </button>
+        </div>
+        <div class="slicer-action-group is-primary" aria-label="Generate slices">
+          <span>Process</span>
+          <button id="generate-output" type="button" class="slicer-primary">
+            <i class="fa-solid fa-play" aria-hidden="true"></i>
+            Generate slices
+          </button>
+        </div>
+        <div class="slicer-action-group" aria-label="Export images">
+          <span>Export</span>
+          <button id="download-images" type="button" class="slicer-secondary" disabled>
+            <i class="fa-solid fa-download" aria-hidden="true"></i>
+            Download
+          </button>
+          <button id="save-folder" type="button" class="slicer-secondary" disabled>
+            <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+            Save folder
+          </button>
+        </div>
       </div>
 
       <p class="slicer-status" id="slicer-status">No image loaded yet.</p>
-    </section>
+            </div>
 
     <section class="slicer-workspace">
       <div class="slicer-preview-panel">
@@ -223,44 +252,20 @@
 
       <aside class="slicer-slices-panel">
         <div class="slicer-panel-toolbar">
-          <div>
-            <p class="slicer-kicker">Slices</p>
-            <h2>Output pieces</h2>
-          </div>
           <span id="slice-count">0 slices</span>
         </div>
         <div class="slicer-slice-list" id="slice-list">
           <p class="slicer-muted">Slices will appear after you load an image.</p>
         </div>
       </aside>
-
-      <section class="slicer-output-panel">
-        <div class="slicer-panel-toolbar">
-          <div>
-            <p class="slicer-kicker">Output</p>
-            <h2>Generated eDM</h2>
+    </section>
           </div>
-          <div class="slicer-output-actions">
-            <button id="download-html" type="button" class="slicer-secondary" disabled>
-              <i class="fa-solid fa-code" aria-hidden="true"></i>
-              HTML
-            </button>
-            <button id="download-images" type="button" class="slicer-secondary" disabled>
-              <i class="fa-solid fa-download" aria-hidden="true"></i>
-              Images
-            </button>
-            <button id="save-folder" type="button" class="slicer-primary" disabled>
-              <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
-              Save folder
-            </button>
-          </div>
-        </div>
-        <iframe id="html-preview" title="Generated email HTML preview" sandbox=""></iframe>
-      </section>
+        </section>
+      </div>
     </section>
   </main>
 
-  <script src="../js/version-config.js?v=6.13.1" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.13.1" defer></script>
+  <script src="../js/version-config.js?v=6.13.2" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.13.2" defer></script>
 </body>
 </html>

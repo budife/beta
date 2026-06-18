@@ -2,6 +2,23 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.13.2 - 18 June 2026
+
+- Refreshed cache-busters for the latest Layout Slicer and TNC Uploader changes.
+
+## Layout Slicer v0.3.0 beta - 18 June 2026
+
+- Reworked Layout Slicer into a pure image slicing workflow by removing HTML generation, link mapping, and HTML preview/export controls.
+- Added accordion sections so Campaign Folder and Image Slicer stay focused one at a time.
+- Clarified image export controls, adaptive rulers, source/export metadata, and image-only save/download output.
+- Grouped slicing actions into Guides, Process, and Export so the workflow is easier to scan.
+
+## TNC Uploader v0.3.1 beta - 18 June 2026
+
+- Cleared saved PDFs from the active drop queue while preserving saved history.
+- Limited replace-link mode to one PDF at a time and improved the drop-zone copy for replacement uploads.
+- Simplified queue actions and labels for clearer save/download folder behavior.
+
 ## Core v6.13.1 - 18 June 2026
 
 - Moved update status out of the sidebar and added automatic Recent Updates badges that show new update for entries from the last three days.

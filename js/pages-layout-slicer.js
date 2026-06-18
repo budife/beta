@@ -3,6 +3,7 @@
     file: null,
     image: null,
     imageUrl: '',
+    sourceFileSize: 0,
     lines: [],
     draggingLine: null,
     slices: [],
@@ -17,12 +18,14 @@
   };
 
   const els = {
+    campaignAccordion: document.querySelector('[data-slicer-section="campaign"]'),
+    slicerAccordion: document.querySelector('[data-slicer-section="slicer"]'),
+    campaignAccordionTrigger: document.getElementById('campaign-section-trigger'),
+    slicerAccordionTrigger: document.getElementById('slicer-section-trigger'),
+    campaignAccordionPanel: document.getElementById('campaign-section-panel'),
+    slicerAccordionPanel: document.getElementById('slicer-section-panel'),
     dropZone: document.getElementById('drop-zone'),
     imageInput: document.getElementById('image-input'),
-    campaignName: document.getElementById('campaign-name'),
-    assetsFolder: document.getElementById('assets-folder'),
-    emailWidth: document.getElementById('email-width'),
-    useSourceWidth: document.getElementById('use-source-width'),
     imageFormat: document.getElementById('image-format'),
     exportWidth: document.getElementById('export-width'),
     exportDpi: document.getElementById('export-dpi'),
@@ -64,13 +67,40 @@
     zoomIn: document.getElementById('zoom-in'),
     zoomLevel: document.getElementById('zoom-level'),
     sliceList: document.getElementById('slice-list'),
-    htmlPreview: document.getElementById('html-preview'),
-    downloadHtml: document.getElementById('download-html'),
     downloadImages: document.getElementById('download-images'),
     saveFolder: document.getElementById('save-folder')
   };
 
   const ctx = els.canvas.getContext('2d');
+
+  function setActiveAccordion(section) {
+    const active = section === 'slicer' ? 'slicer' : 'campaign';
+    [
+      {
+        key: 'campaign',
+        item: els.campaignAccordion,
+        trigger: els.campaignAccordionTrigger,
+        panel: els.campaignAccordionPanel
+      },
+      {
+        key: 'slicer',
+        item: els.slicerAccordion,
+        trigger: els.slicerAccordionTrigger,
+        panel: els.slicerAccordionPanel
+      }
+    ].forEach(({ key, item, trigger, panel }) => {
+      const isOpen = key === active;
+      item?.classList.toggle('is-open', isOpen);
+      trigger?.setAttribute('aria-expanded', String(isOpen));
+      if (panel) panel.hidden = !isOpen;
+    });
+
+    if (active === 'slicer' && state.image) {
+      window.requestAnimationFrame(() => {
+        if (state.zoomMode === 'fit') setZoom(getFitZoom(), 'fit');
+      });
+    }
+  }
 
   function slugify(value) {
     return String(value || 'layout-edm')
@@ -350,19 +380,12 @@
     els.status.className = `slicer-status${type ? ` is-${type}` : ''}`;
   }
 
-  function getEmailWidth() {
-    if (els.useSourceWidth?.checked && state.image) return state.image.naturalWidth;
-    const width = Number.parseInt(els.emailWidth.value, 10);
-    return Number.isFinite(width) && width > 0 ? width : 600;
-  }
-
   function getAutoSliceStep() {
-    const width = Number.parseInt(els.emailWidth.value, 10);
-    return Number.isFinite(width) && width > 0 ? width : 600;
+    return 600;
   }
 
   function getAssetsFolder() {
-    return slugify(els.assetsFolder.value || 'images');
+    return 'images';
   }
 
   function getExtension() {
@@ -391,6 +414,31 @@
     return Number.isFinite(dpi) ? Math.min(600, Math.max(72, dpi)) : 300;
   }
 
+  function formatFileSize(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return '';
+    if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+
+  function getQualityLabel() {
+    return els.imageQuality?.selectedOptions?.[0]?.text || 'Very high';
+  }
+
+  function renderImageMeta() {
+    if (!els.imageMeta) return;
+    if (!state.image) {
+      els.imageMeta.textContent = 'No image';
+      return;
+    }
+
+    const extension = getExtension().toUpperCase();
+    const sourceSize = formatFileSize(state.sourceFileSize);
+    els.imageMeta.innerHTML = `
+      <span><strong>Source</strong> ${state.image.naturalWidth} × ${state.image.naturalHeight}px${sourceSize ? ` · ${sourceSize}` : ''}</span>
+      <span><strong>Export</strong> ${getExportWidth()}px wide · ${extension} · ${getQualityLabel()}</span>
+    `;
+  }
+
   function formatFileName(index) {
     return `img_${String(index + 1).padStart(2, '0')}.${getExtension()}`;
   }
@@ -400,10 +448,19 @@
     return els.canvas.clientWidth / els.canvas.width;
   }
 
+  function getPreviewScaleFactor() {
+    if (!state.image) return 1;
+    return Math.min(1, getExportScale());
+  }
+
+  function getDisplayScale() {
+    return state.zoom * getPreviewScaleFactor();
+  }
+
   function getFitZoom() {
     if (!state.image) return 1;
     const available = Math.max(240, els.canvasWrap.clientWidth - 56);
-    return Math.min(1, Math.max(0.1, available / state.image.naturalWidth));
+    return Math.min(1, Math.max(0.1, available / (state.image.naturalWidth * getPreviewScaleFactor())));
   }
 
   function setZoom(value, mode = 'manual') {
@@ -419,8 +476,9 @@
     if (!state.image) return;
     const zoom = state.zoomMode === 'fit' ? getFitZoom() : state.zoom;
     state.zoom = zoom;
-    const scaledWidth = Math.max(1, Math.round(state.image.naturalWidth * zoom));
-    const scaledHeight = Math.max(1, Math.round(state.image.naturalHeight * zoom));
+    const displayScale = getDisplayScale();
+    const scaledWidth = Math.max(1, Math.round(state.image.naturalWidth * displayScale));
+    const scaledHeight = Math.max(1, Math.round(state.image.naturalHeight * displayScale));
     els.canvas.style.width = `${scaledWidth}px`;
     els.canvas.style.height = `${scaledHeight}px`;
     els.stage.style.width = `${scaledWidth}px`;
@@ -492,14 +550,24 @@
     els.rulerLeft.innerHTML = buildRulerTicks(state.image.naturalHeight, 'y');
   }
 
+  function getNiceRulerStep(rawStep) {
+    const steps = [50, 100, 200, 250, 500, 1000, 2000];
+    return steps.find((step) => step >= rawStep) || 5000;
+  }
+
   function buildRulerTicks(length, axis) {
     const ticks = [];
-    for (let position = 0; position <= length; position += 50) {
-      const major = position % 100 === 0;
-      const label = major ? position : '';
+    const displayScale = getDisplayScale();
+    const majorStep = getNiceRulerStep(72 / Math.max(displayScale, 0.01));
+    const minorStep = majorStep / 2;
+
+    for (let position = 0; position <= length; position += minorStep) {
+      const rounded = Math.round(position);
+      const major = rounded % majorStep === 0;
+      const label = major ? rounded : '';
       const style = axis === 'x'
-        ? `left:${position * state.zoom}px;`
-        : `top:${position * state.zoom}px;`;
+        ? `left:${rounded * displayScale}px;`
+        : `top:${rounded * displayScale}px;`;
       ticks.push(`<span class="slicer-ruler-tick${major ? ' is-major' : ''}" style="${style}">${label}</span>`);
     }
     return ticks.join('');
@@ -511,7 +579,7 @@
       return;
     }
     els.guideLayer.innerHTML = state.lines.map((line, index) => (
-      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${line * state.zoom}px"></div>`
+      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${line * getDisplayScale()}px"></div>`
     )).join('');
   }
 
@@ -550,11 +618,36 @@
       .replace(/>/g, '&gt;');
   }
 
+  function renderImageSlices() {
+    const ranges = getSliceRanges();
+    preserveSliceLinks(ranges);
+    els.sliceCount.textContent = `${state.slices.length} slice${state.slices.length === 1 ? '' : 's'}`;
+
+    if (!state.image) {
+      els.sliceList.innerHTML = '<p class="slicer-muted">Slices will appear after you load an image.</p>';
+      return;
+    }
+
+    els.sliceList.innerHTML = state.slices.map((slice, index) => `
+      <article class="slicer-slice-card">
+        <div class="slicer-slice-head">
+          <div>
+            <div class="slicer-slice-title">${slice.fileName}</div>
+            <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
+            <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px</div>
+          </div>
+          ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
+        </div>
+      </article>
+    `).join('');
+  }
+
   function updateUi() {
     drawCanvas();
     renderRulers();
     renderGuides();
-    renderSlices();
+    renderImageSlices();
+    renderImageMeta();
     const hasImage = Boolean(state.image);
     els.autoSlice.disabled = !hasImage;
     els.clearLines.disabled = !hasImage || state.lines.length === 0;
@@ -563,18 +656,9 @@
     els.zoomIn.disabled = !hasImage;
     els.zoomLevel.disabled = !hasImage;
     const hasGenerated = Boolean(state.generated);
-    els.downloadHtml.disabled = !hasGenerated;
-    els.downloadImages.disabled = !hasGenerated;
-    els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
-    if (els.emailWidth) els.emailWidth.disabled = Boolean(els.useSourceWidth?.checked);
+    if (els.downloadImages) els.downloadImages.disabled = !hasGenerated;
+    if (els.saveFolder) els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
     updateCampaignPathPreview();
-  }
-
-  function syncLinksFromInputs() {
-    els.sliceList.querySelectorAll('[data-slice-link]').forEach((input) => {
-      const index = Number(input.dataset.sliceLink);
-      if (state.slices[index]) state.slices[index].link = input.value.trim();
-    });
   }
 
   async function loadImageFile(file) {
@@ -583,8 +667,10 @@
       return;
     }
 
+    setActiveAccordion('slicer');
     if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
     state.file = file;
+    state.sourceFileSize = file.size;
     state.imageUrl = URL.createObjectURL(file);
     const image = new Image();
     image.decoding = 'async';
@@ -595,8 +681,6 @@
       state.generated = null;
       state.zoomMode = 'fit';
       state.zoom = getFitZoom();
-      els.campaignName.value = slugify(file.name);
-      els.imageMeta.textContent = `${image.naturalWidth} × ${image.naturalHeight}px · ${Math.round(file.size / 1024)} KB`;
       if (els.exportWidth) els.exportWidth.value = image.naturalWidth;
       setStatus(`Image loaded at ${image.naturalWidth}px wide. Click the preview to add slice lines.`, 'success');
       updateUi();
@@ -663,69 +747,18 @@
 
   async function generateOutput() {
     if (!state.image) return;
-    syncLinksFromInputs();
     const type = els.imageFormat.value;
     const generatedSlices = [];
 
     for (const slice of state.slices) {
       const canvas = createSliceCanvas(slice);
       const blob = await canvasToBlob(canvas, type);
-      const dataUrl = canvas.toDataURL(type, type === 'image/jpeg' ? getImageQuality() : undefined);
-      generatedSlices.push({ ...slice, blob, dataUrl });
+      generatedSlices.push({ ...slice, blob });
     }
 
-    const html = buildEmailHtml(generatedSlices, false);
-    const previewHtml = buildEmailHtml(generatedSlices, true);
-    state.generated = { slices: generatedSlices, html, previewHtml };
-    els.htmlPreview.srcdoc = previewHtml;
-    setStatus(`Generated ${generatedSlices.length} slice(s) at ${getExportWidth()}px export width. HTML displays at ${getEmailWidth()}px.`, 'success');
+    state.generated = { slices: generatedSlices };
+    setStatus(`Generated ${generatedSlices.length} image slice(s) at ${getExportWidth()}px export width.`, 'success');
     updateUi();
-  }
-
-  function buildEmailHtml(slices, useDataUrls) {
-    const width = getEmailWidth();
-    const assetsFolder = getAssetsFolder();
-    const title = escapeHtml(els.campaignName.value || 'Layout eDM');
-    const rows = slices.map((slice) => {
-      const src = useDataUrls ? slice.dataUrl : `${assetsFolder}/${slice.fileName}`;
-      const img = `<img class="img_scale" src="${src}" alt="image" width="${width}" border="0" style="display:block;width:${width}px;max-width:100%;height:auto;border:0;text-decoration:none;">`;
-      const imageMarkup = slice.link
-        ? `<a href="${escapeAttribute(slice.link)}" target="_blank" style="border:0;text-decoration:none;">${img}</a>`
-        : img;
-      return `          <tr>
-            <td align="center" valign="top" style="padding:0;line-height:0;font-size:0;">${imageMarkup}</td>
-          </tr>`;
-    }).join('\n');
-
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-  <!-- Export note: images generated at ${getExportWidth()}px wide, ${getExportDpi()} DPI production note, ${els.imageQuality?.selectedOptions?.[0]?.text || 'Very high'} quality. -->
-  <style type="text/css">
-    body { margin:0; padding:0; background:#f2f2f2; }
-    table { border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; }
-    img { -ms-interpolation-mode:bicubic; }
-    @media only screen and (max-width:${width + 40}px) {
-      table[class="table-wrapper"] { width:100% !important; }
-      img[class="img_scale"] { width:100% !important; height:auto !important; }
-    }
-  </style>
-</head>
-<body style="margin:0;padding:0;background:#f2f2f2;">
-  <table align="center" bgcolor="#f2f2f2" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#f2f2f2;">
-    <tr>
-      <td align="center" valign="top">
-        <table class="table-wrapper" align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="${width}" style="width:${width}px;background:#ffffff;">
-${rows}
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
   }
 
   function escapeHtml(value) {
@@ -746,12 +779,6 @@ ${rows}
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  function downloadHtml() {
-    if (!state.generated) return;
-    const fileName = `${slugify(els.campaignName.value)}.html`;
-    downloadBlob(new Blob([state.generated.html], { type: 'text/html;charset=utf-8' }), fileName);
-  }
-
   function downloadImages() {
     if (!state.generated) return;
     state.generated.slices.forEach((slice, index) => {
@@ -763,11 +790,10 @@ ${rows}
     if (!state.generated || typeof window.showDirectoryPicker !== 'function') return;
     const root = await window.showDirectoryPicker({ mode: 'readwrite' });
     const assetDir = await root.getDirectoryHandle(getAssetsFolder(), { create: true });
-    await writeFile(root, `${slugify(els.campaignName.value)}.html`, state.generated.html);
     for (const slice of state.generated.slices) {
       await writeFile(assetDir, slice.fileName, slice.blob);
     }
-    setStatus(`Saved HTML and ${state.generated.slices.length} image(s) to selected folder.`, 'success');
+    setStatus(`Saved ${state.generated.slices.length} image(s) to ${getAssetsFolder()}.`, 'success');
   }
 
   async function writeFile(dirHandle, name, content) {
@@ -967,6 +993,8 @@ ${rows}
     setTemplateStatus(`HTML ready: ${getCampaignPath().replace(/[^/]+$/, targetName)}`, 'success');
   }
 
+  els.campaignAccordionTrigger?.addEventListener('click', () => setActiveAccordion('campaign'));
+  els.slicerAccordionTrigger?.addEventListener('click', () => setActiveAccordion('slicer'));
   els.dropZone.addEventListener('click', () => els.imageInput.click());
   els.dropZone.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -1054,8 +1082,7 @@ ${rows}
     updateUi();
   });
   els.generateOutput.addEventListener('click', generateOutput);
-  els.downloadHtml.addEventListener('click', downloadHtml);
-  els.downloadImages.addEventListener('click', downloadImages);
+  els.downloadImages?.addEventListener('click', downloadImages);
   els.zoomOut?.addEventListener('click', () => setZoom(state.zoom - 0.1));
   els.zoomIn?.addEventListener('click', () => setZoom(state.zoom + 0.1));
   els.zoomLevel?.addEventListener('change', () => {
@@ -1068,16 +1095,10 @@ ${rows}
   window.addEventListener('resize', () => {
     if (state.zoomMode === 'fit') setZoom(getFitZoom(), 'fit');
   });
-  els.saveFolder.addEventListener('click', () => {
+  els.saveFolder?.addEventListener('click', () => {
     saveToFolder().catch((error) => {
       if (error.name !== 'AbortError') setStatus(error.message || 'Unable to save files.', 'error');
     });
-  });
-  els.sliceList.addEventListener('input', (event) => {
-    if (!event.target.matches('[data-slice-link]')) return;
-    syncLinksFromInputs();
-    state.generated = null;
-    updateUi();
   });
   els.sliceList.addEventListener('click', (event) => {
     const button = event.target.closest('[data-remove-line]');
@@ -1089,10 +1110,6 @@ ${rows}
     updateUi();
   });
   [
-    els.campaignName,
-    els.assetsFolder,
-    els.emailWidth,
-    els.useSourceWidth,
     els.imageFormat,
     els.exportWidth,
     els.exportDpi,
@@ -1103,8 +1120,12 @@ ${rows}
     els.finalHtmlName
   ].forEach((input) => {
     if (!input) return;
-    input.addEventListener('input', () => {
+    const handleFieldChange = () => {
+      const hadGenerated = Boolean(state.generated);
       state.generated = null;
+      if (hadGenerated && [els.imageFormat, els.exportWidth, els.exportDpi, els.imageQuality].includes(input)) {
+        setStatus('Settings changed. Generate again to refresh slices.', 'success');
+      }
       if (input === els.finalHtmlName) state.finalHtmlNameManual = true;
       if (input === els.duplicateFolderName) {
         state.finalHtmlNameManual = false;
@@ -1112,7 +1133,9 @@ ${rows}
       }
       updateCampaignPathPreview();
       updateUi();
-    });
+    };
+    input.addEventListener('input', handleFieldChange);
+    input.addEventListener('change', handleFieldChange);
   });
 
   updateUi();

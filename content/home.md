@@ -10,7 +10,7 @@ category: Home
 - [Database Checker](/database-checker) - Validate campaign databases before delivery.
 - [Config eDM](/config-edm) - Open and update eDM project configuration.
 - [Layout Checker](/layout-checker) - Review HTML structure and campaign layout.
-- [Layout Slicer](/layout-slicer) - Slice JPG/PNG layouts into email-ready HTML.
+- [Layout Slicer](/layout-slicer) - Slice JPG/PNG layouts into ordered image assets.
 - [Campaign Counter](/campaign-counter) - Track campaign totals, notes, and history.
 
 ## Tool Sitemap
@@ -26,12 +26,15 @@ category: Home
 - [Campaign Counter](/campaign-counter) - Campaign tracking workspace.
 - [Config eDM](/config-edm) - eDM configuration editor.
 - [Layout Checker](/layout-checker) - HTML and layout inspection.
-- [Layout Slicer](/layout-slicer) - Convert flat JPG/PNG layouts into sliced eDM HTML and image assets.
+- [Layout Slicer](/layout-slicer) - Convert flat JPG/PNG layouts into ordered image slices.
 - [TNC Uploader](/tnc-uploader) - Drop PDF terms and conditions into the server folder structure.
 - [WFH Tracker](/wfh-tracker) - WFH and office-day calendar.
 
 ## Recent Updates
 
+- **Core v6.13.2 - 18 June 2026** - Refreshed cache-busters for the latest Layout Slicer and TNC Uploader changes.
+- **Layout Slicer v0.3.0 beta - 18 June 2026** - Reworked slicing into a pure image-assets workflow with accordion sections, clearer actions, adaptive rulers, export metadata, and image-only save/download output.
+- **TNC Uploader v0.3.1 beta - 18 June 2026** - Tightened the PDF queue workflow so saved files clear from the active drop queue, replace-link mode accepts one PDF, and action labels feel clearer.
 - **Core v6.13.1 - 18 June 2026** - Moved update status out of the sidebar and added automatic Recent Updates badges that show new update for entries from the last three days.
 - **Core v6.13.0 - 18 June 2026** - Added Maintenance with local backup restore, per-tool smoke tests, privacy controls, and release helper workflow.
 - **Layout Slicer v0.2.1 beta - 18 June 2026** - Removed the extra markdown section so the tool opens directly after the header, and tightened template duplicate naming so generated folders and HTML filenames follow the campaign folder name.

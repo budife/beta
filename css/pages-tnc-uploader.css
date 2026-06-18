@@ -291,9 +291,8 @@ body {
 }
 
 .tnc-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 16px;
 }
@@ -303,7 +302,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 36px;
+  min-height: 38px;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 0;
@@ -315,13 +314,19 @@ body {
 
 .tnc-button:disabled {
   cursor: not-allowed;
-  opacity: .55;
+  opacity: 1;
 }
 
 .tnc-button-primary {
   color: #fff;
   background: var(--accent-primary);
   border-color: var(--accent-primary);
+}
+
+.tnc-button-primary:disabled {
+  color: #c56d73;
+  background: #f9c7cb;
+  border-color: #f9c7cb;
 }
 
 .tnc-button-primary:not(:disabled):hover {
@@ -334,6 +339,12 @@ body {
   background: #fff;
 }
 
+.tnc-button-secondary:disabled {
+  color: #9ca3af;
+  background: #f4f4f5;
+  border-color: #e4e4e7;
+}
+
 .tnc-button-secondary:not(:disabled):hover {
   color: var(--accent-primary);
   background: var(--red-50);
@@ -341,9 +352,9 @@ body {
 }
 
 .tnc-status {
-  min-height: 32px;
+  min-height: 0;
   margin-top: 12px;
-  padding: 8px 10px;
+  padding: 7px 10px;
   color: var(--text-muted);
   background: var(--gray-100);
   border-left: 3px solid var(--border);
@@ -587,10 +598,13 @@ body.is-embedded .tnc-shell {
 @media (max-width: 620px) {
   .tnc-panel-header,
   .tnc-panel-title-row,
-  .tnc-file-bottom,
-  .tnc-actions {
+  .tnc-file-bottom {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .tnc-actions {
+    grid-template-columns: 1fr;
   }
 
   .tnc-form-grid {

@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.13.1',
+    version: '6.13.2',
     status: 'stable'
   },
   home: {
@@ -46,12 +46,12 @@ const TOOL_VERSIONS = {
   },
   'layout-slicer': {
     label: 'Layout Slicer',
-    version: '0.2.1',
+    version: '0.3.0',
     status: 'beta'
   },
   'tnc-uploader': {
     label: 'TNC Uploader',
-    version: '0.3.0',
+    version: '0.3.1',
     status: 'beta'
   },
   'wfh-tracker': {

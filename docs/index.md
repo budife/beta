@@ -248,7 +248,7 @@ If a layout URL is used, the tool may request the layout directly. If direct bro
 
 :::details Purpose
 
-Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple email-safe HTML table layout. It uses guide lines first, then slices only when output is generated.
+Layout Slicer turns a flat JPG or PNG eDM mockup into ordered image slices. It uses guide lines first, then generates image assets only when output is generated.
 :::
 
 :::details Workflow
@@ -257,9 +257,8 @@ Layout Slicer turns a flat JPG or PNG eDM mockup into image slices and a simple 
 - Use the top and left rulers to read position.
 - Click the preview once to add a horizontal guide line.
 - Drag guide lines to adjust them.
-- Add optional URLs to slices that should become linked images.
-- Generate output.
-- Preview, download HTML/images, or save everything to a selected folder.
+- Generate slices.
+- Download the generated images or save them into a selected local folder.
 :::
 
 :::details Campaign location helper
@@ -287,11 +286,9 @@ Image processing uses the browser Canvas API. Files stay in the browser unless y
 
 :::details Export quality and width
 
-Layout Slicer exports each slice at the original uploaded image pixel width. The HTML display width controls how wide the email renders, so a 1000px source can still render as a 600px email.
+Layout Slicer exports each slice using the selected Export Width. The preview metadata shows both the original source dimensions and the current export settings so the source and output sizes stay clear.
 
-Use **Use source width in HTML** when the generated HTML should render at the uploaded image width instead of the default email width.
-
-JPG export uses very high browser quality. Browser Canvas export does not reliably write 300dpi metadata, but email and webmail rendering depends on pixel dimensions, so keeping the source pixel width is the important part.
+JPG export uses the selected browser quality. Browser Canvas export does not reliably write 300dpi metadata, but email and webmail rendering depends on pixel dimensions, so choosing the right export width is the important part.
 :::
 
 ## TNC Uploader

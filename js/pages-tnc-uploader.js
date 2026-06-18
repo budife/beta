@@ -36,6 +36,8 @@
       'replaceSummary',
       'chooseFolderBtn',
       'dropZone',
+      'dropTitle',
+      'dropHint',
       'droppedList',
       'fileInput',
       'clearBtn',
@@ -315,6 +317,8 @@
 
   function refreshItemTargets({ keepStatus = true } = {}) {
     state.items = state.items.map((item) => {
+      if (!item.file) return item;
+
       const targetName = state.mode === 'replace' && state.replaceInfo
         ? state.replaceInfo.fileName
         : sanitizePdfName(item.originalName || item.targetName, elements.prefixInput.value.trim());
@@ -345,6 +349,9 @@
       incoming = incoming.slice(0, 1);
       trimmedForReplace = true;
     }
+    if (state.mode === 'replace' && incoming.length) {
+      state.items = state.items.filter((item) => !item.file);
+    }
     incoming.forEach((file) => {
       const item = createItemFromFile(file);
       const existingIndex = state.items.findIndex((current) => current.id === item.id);
@@ -361,7 +368,9 @@
     if (!incoming.length) {
       setStatus('No PDF found. Drop or choose .pdf files only.', 'error');
     } else if (trimmedForReplace) {
-      setStatus('Replace mode uses one PDF at a time. Added the first PDF only.', 'error');
+      setStatus('Replace mode uses one PDF at a time. Added the first PDF and cleared the active queue.', 'error');
+    } else if (state.mode === 'replace') {
+      setStatus('Replacement PDF added. Active queue is limited to this one file.', 'success');
     } else {
       setStatus(`${incoming.length} PDF file(s) added.`, 'success');
     }
@@ -558,10 +567,12 @@
         await writable.close();
         item.status = 'saved';
         item.savedAt = now;
+        item.file = null;
       }
+      elements.fileInput.value = '';
       saveHistory();
       renderItems();
-      setStatus(`${fileBackedItems.length} PDF file(s) saved to ${getTargetPath()}.`, 'success');
+      setStatus(`${fileBackedItems.length} PDF file(s) saved. Queue cleared; saved links remain in history.`, 'success');
     } catch (error) {
       console.error(error);
       setStatus('Save failed. Check folder permission or download the ready PDFs.', 'error');
@@ -788,6 +799,15 @@
     elements.replaceModeBtn.setAttribute('aria-selected', String(isReplace));
     elements.replaceFields.hidden = !isReplace;
     elements.prefixInput.disabled = isReplace;
+    elements.fileInput.multiple = !isReplace;
+    elements.dropTitle.textContent = isReplace ? 'Drop replacement PDF here' : 'Drop PDF here';
+    elements.dropHint.textContent = isReplace
+      ? 'or click to choose one replacement PDF'
+      : 'or click to choose one or more PDFs';
+    elements.dropZone.setAttribute(
+      'aria-label',
+      isReplace ? 'Drop one replacement PDF or choose one file' : 'Drop PDF files or choose files'
+    );
 
     if (!isReplace) {
       elements.replaceSummary.textContent = 'Paste an existing PDF link to reuse its folder and file name.';
@@ -826,6 +846,12 @@
 
   function setUploadMode(mode) {
     state.mode = mode === 'replace' ? 'replace' : 'normal';
+    if (state.mode === 'replace' && getFileBackedItems().length) {
+      state.items = state.items.filter((item) => !item.file);
+      elements.fileInput.value = '';
+      saveHistory();
+      setStatus('Replace mode is one PDF at a time. Active dropped files were cleared; saved history remains.');
+    }
     renderReplaceMode();
     if (state.mode === 'replace') {
       applyReplaceLink();

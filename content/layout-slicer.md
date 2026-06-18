@@ -1,6 +1,6 @@
 ---
 title: Layout Slicer
-description: Convert a flat JPG or PNG layout into email-safe image slices and HTML without opening Photoshop.
+description: Convert a flat JPG or PNG layout into ordered image slices without opening Photoshop.
 icon: fa-solid fa-scissors
 category: Tools
 status: beta
