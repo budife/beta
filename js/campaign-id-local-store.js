@@ -48,17 +48,23 @@
     const recordsRequest = transaction.objectStore(RECORDS).getAll();
     const allocationsRequest = transaction.objectStore(ALLOCATIONS).getAll();
     const importMetaRequest = transaction.objectStore(META).get('lastImport');
-    const [records, allocations, importMeta] = await Promise.all([
+    const generatedMetaRequest = transaction.objectStore(META).get('lastGenerated');
+    const folderHandleRequest = transaction.objectStore(META).get('folderHandle');
+    const [records, allocations, importMeta, generatedMeta, folderHandleMeta] = await Promise.all([
       requestResult(recordsRequest),
       requestResult(allocationsRequest),
-      requestResult(importMetaRequest)
+      requestResult(importMetaRequest),
+      requestResult(generatedMetaRequest),
+      requestResult(folderHandleRequest)
     ]);
     await transactionDone(transaction);
     db.close();
     return {
       records,
       allocations,
-      lastImport: importMeta?.value || null
+      lastImport: importMeta?.value || null,
+      lastGenerated: generatedMeta?.value || null,
+      folderHandle: folderHandleMeta?.value || null
     };
   }
 
@@ -103,9 +109,20 @@
     db.close();
   }
 
+  async function saveFolderHandle(handle) {
+    const db = await open();
+    const transaction = db.transaction(META, 'readwrite');
+    transaction.objectStore(META).put({
+      key: 'folderHandle',
+      value: handle
+    });
+    await transactionDone(transaction);
+    db.close();
+  }
+
   async function reserve(sequenceNumber) {
     const db = await open();
-    const transaction = db.transaction(ALLOCATIONS, 'readwrite');
+    const transaction = db.transaction([ALLOCATIONS, META], 'readwrite');
     const store = transaction.objectStore(ALLOCATIONS);
     const existing = await requestResult(store.get(sequenceNumber));
     if (existing) {
@@ -113,10 +130,18 @@
       db.close();
       throw new Error('Campaign ID is already used.');
     }
+    const generatedAt = new Date().toISOString();
     store.put({
       sequenceNumber,
       source: 'manual',
-      updatedAt: new Date().toISOString()
+      updatedAt: generatedAt
+    });
+    transaction.objectStore(META).put({
+      key: 'lastGenerated',
+      value: {
+        sequenceNumber,
+        generatedAt
+      }
     });
     await transactionDone(transaction);
     db.close();
@@ -132,5 +157,5 @@
     db.close();
   }
 
-  return { load, importRecords, reserve, reset };
+  return { load, importRecords, saveFolderHandle, reserve, reset };
 });

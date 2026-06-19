@@ -7,11 +7,11 @@ category: Home
 
 ## Quick Access
 
-- [Database Checker](/database-checker) - Validate campaign databases before delivery.
-- [Config eDM](/config-edm) - Open and update eDM project configuration.
-- [Layout Checker](/layout-checker) - Review HTML structure and campaign layout.
-- [Layout Slicer](/layout-slicer) - Slice JPG/PNG layouts into ordered image assets.
-- [Campaign Counter](/campaign-counter) - Track campaign totals, notes, and history.
+- [Database Checker](/database-checker)
+- [Config eDM](/config-edm)
+- [Layout Checker](/layout-checker)
+- [Layout Slicer](/layout-slicer)
+- [Campaign Counter](/campaign-counter)
 
 ## Tool Sitemap
 
@@ -32,6 +32,9 @@ category: Home
 
 ## Recent Updates
 
+- **Core v6.13.4 - 19 June 2026** - Refreshed cache-busters for the latest Campaign Counter folder-scan fixes.
+- **Campaign Counter v1.4.1 beta - 19 June 2026** - Added reusable folder refresh, saved last generated ID, smarter folder-name parsing, unique ID chips, range brackets, and aligned campaign ID boxes.
+- **Core v6.13.3 - 19 June 2026** - Refreshed cache-busters after the Campaign Counter beta UI updates so iframe CSS and JS changes load reliably.
 - **Core v6.13.2 - 18 June 2026** - Refreshed cache-busters for the latest Layout Slicer and TNC Uploader changes.
 - **Layout Slicer v0.3.0 beta - 18 June 2026** - Reworked slicing into a pure image-assets workflow with accordion sections, clearer actions, adaptive rulers, export metadata, and image-only save/download output.
 - **TNC Uploader v0.3.1 beta - 18 June 2026** - Tightened the PDF queue workflow so saved files clear from the active drop queue, replace-link mode accepts one PDF, and action labels feel clearer.

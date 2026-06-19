@@ -777,70 +777,54 @@ a {
 }
 
 .markdown-section[data-section="quick-access"] ul {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   padding: 0;
+  margin: 0;
   list-style: none;
 }
 
 .markdown-section[data-section="quick-access"] li {
-  position: relative;
-  min-height: 82px;
+  flex: 0 0 auto;
   margin: 0;
   padding: 0;
-  background: var(--app-soft);
-  border: 1px solid var(--app-border);
-  border-left: 3px solid transparent;
+  background: transparent;
+  border: 0;
 }
 
 .markdown-section[data-section="quick-access"] li:hover {
-  background: var(--app-accent-soft);
-  border-color: var(--app-accent);
-  border-left-color: var(--app-accent);
+  background: transparent;
 }
 
 .markdown-section[data-section="quick-access"] a {
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  min-height: 50px;
+  gap: 7px;
+  min-height: 34px;
   margin: 0;
-  padding: 13px 16px 2px;
-  color: #18181b;
-  font-size: 15px;
+  padding: 0 12px;
+  color: #3f3f46;
+  font-size: 13px;
+  font-weight: var(--ui-weight-regular);
+  background: #fff;
+  border: 1px solid var(--app-border);
 }
 
-.markdown-section[data-section="quick-access"] a:hover {
+.markdown-section[data-section="quick-access"] a:hover,
+.markdown-section[data-section="quick-access"] a:focus-visible {
+  color: #9f3f45;
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent);
   text-decoration: none;
 }
 
-.markdown-section[data-section="quick-access"] li {
-  padding-bottom: 14px;
-}
-
-.quick-access-description {
-  display: block;
-  padding: 0 54px 0 66px;
-  color: var(--app-muted);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
 .quick-access-icon {
-  display: grid;
+  display: inline-grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  grid-row: 1;
+  width: 18px;
+  height: 18px;
   color: var(--app-accent);
-  background: #fff;
-  border: 1px solid #f3d5d6;
-}
-
-.quick-access-arrow {
-  color: #a1a1aa;
   font-size: 12px;
 }
 
@@ -1141,7 +1125,6 @@ a {
     padding: 24px 20px 34px;
   }
 
-  .markdown-section[data-section="quick-access"] ul,
   .markdown-section[data-section="tool-sitemap"] {
     grid-template-columns: 1fr;
   }

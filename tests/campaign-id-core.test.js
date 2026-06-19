@@ -133,7 +133,7 @@ test('pairs Monday item and subitem names with their Campaign IDs', () => {
 test('local Campaign ID store exposes the required browser operations', () => {
   assert.deepEqual(
     Object.keys(localStore).sort(),
-    ['importRecords', 'load', 'reserve', 'reset']
+    ['importRecords', 'load', 'reserve', 'reset', 'saveFolderHandle']
   );
 });
 

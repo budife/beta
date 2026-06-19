@@ -2,6 +2,22 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.13.4 - 19 June 2026
+
+- Refreshed cache-busters for the latest Campaign Counter folder-scan and range UI changes.
+
+## Campaign Counter v1.4.1 beta - 19 June 2026
+
+- Added reusable folder refresh so the last scanned campaign folder can be checked again without opening the folder picker every time.
+- Saved the last manually generated campaign ID separately from imported/scanned IDs.
+- Improved campaign folder parsing for spaced ranges like `0007 - 0010`, copied-folder suffixes, and folder names with extra text before the campaign ID.
+- Rendered each campaign ID only once while keeping multiple campaign details available in the hover/click popup.
+- Added visual range brackets for multi-ID folders and aligned all campaign ID chips so bracketed and non-bracketed items share the same row height.
+
+## Core v6.13.3 - 19 June 2026
+
+- Refreshed cache-busters after the Campaign Counter beta UI updates so iframe CSS and JS changes load reliably.
+
 ## Core v6.13.2 - 18 June 2026
 
 - Refreshed cache-busters for the latest Layout Slicer and TNC Uploader changes.

@@ -18,7 +18,8 @@ const ROUTES = {
   },
   '/campaign-counter': {
     content: 'campaign-counter.md',
-    label: 'Campaign Counter'
+    label: 'Campaign Counter',
+    status: 'beta'
   },
   '/config-edm': {
     content: 'config-edm.md',
@@ -90,7 +91,8 @@ const TOOL_META = {
   },
   '/campaign-counter': {
     icon: 'fa-solid fa-chart-line',
-    label: 'Campaign Counter'
+    label: 'Campaign Counter',
+    status: 'beta'
   },
   '/config-edm': {
     icon: 'fa-solid fa-sliders',
@@ -479,13 +481,6 @@ function enhanceHomeDashboard(container) {
     const meta = link ? TOOL_META[link.dataset.routePath] : null;
     if (!link || !meta) return;
 
-    const description = Array.from(item.childNodes)
-      .filter((node) => node.nodeType === Node.TEXT_NODE)
-      .map((node) => node.textContent)
-      .join(' ')
-      .trim()
-      .replace(/^-\s*/, '');
-
     Array.from(item.childNodes)
       .filter((node) => node.nodeType === Node.TEXT_NODE)
       .forEach((node) => node.remove());
@@ -495,16 +490,6 @@ function enhanceHomeDashboard(container) {
       'afterbegin',
       `<span class="quick-access-icon"><i class="${meta.icon}" aria-hidden="true"></i></span>`
     );
-    link.insertAdjacentHTML(
-      'beforeend',
-      '<i class="fa-solid fa-arrow-right quick-access-arrow" aria-hidden="true"></i>'
-    );
-    if (description) {
-      item.insertAdjacentHTML(
-        'beforeend',
-        `<span class="quick-access-description">${escapeHtml(description)}</span>`
-      );
-    }
   });
 
   const sitemap = container.querySelector('[data-section="tool-sitemap"]');
