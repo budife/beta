@@ -32,6 +32,8 @@ category: Home
 
 ## Recent Updates
 
+- **Core v6.13.5 - 19 June 2026** - Refreshed cache-busters for the Campaign Counter unparsed-folder note cleanup.
+- **Campaign Counter v1.4.2 beta - 19 June 2026** - Removed the long unparsed folder list from the workspace and kept failed-folder counts available as a compact hover note.
 - **Core v6.13.4 - 19 June 2026** - Refreshed cache-busters for the latest Campaign Counter folder-scan fixes.
 - **Campaign Counter v1.4.1 beta - 19 June 2026** - Added reusable folder refresh, saved last generated ID, smarter folder-name parsing, unique ID chips, range brackets, and aligned campaign ID boxes.
 - **Core v6.13.3 - 19 June 2026** - Refreshed cache-busters after the Campaign Counter beta UI updates so iframe CSS and JS changes load reliably.

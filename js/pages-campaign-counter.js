@@ -336,29 +336,20 @@ function renderFolderBrowser() {
   const groupedRecords = groupRecordsBySequence(currentFolderRecords);
   const latest = scannedValues.length ? scannedValues[scannedValues.length - 1] : null;
   const outOfCounterCount = scannedValues.filter(value => value > COUNTER_MAX).length;
+  const unparsedNote = unparsedFolders.length
+    ? `<small class="folder-unparsed-note" title="${escapeHtml(unparsedFolders.join('\n'))}">${unparsedFolders.length} unparsed folder${unparsedFolders.length === 1 ? '' : 's'}</small>`
+    : `<small>${outOfCounterCount ? `${outOfCounterCount} out of 0000-1999 range` : 'Hover or click an ID for campaign detail.'}</small>`;
 
   document.getElementById('series-counter-list').innerHTML = `
     <div class="folder-series-meta">
       <strong>${escapeHtml(currentFolderName || 'Scanned folder')}</strong>
       <span>${scannedValues.length} IDs</span>
-      <small>${outOfCounterCount ? `${outOfCounterCount} out of 0000-1999 range` : 'Hover or click an ID for campaign detail.'}</small>
+      ${unparsedNote}
     </div>
     <div class="series-id-grid" aria-label="Scanned used Campaign IDs">
       <div class="range-bridge-layer" aria-hidden="true"></div>
       ${renderUsedIdBoxes(scannedRows, latest, groupedRecords)}
     </div>`;
-
-  const unparsed = document.getElementById('folder-unparsed');
-  if (!unparsedFolders.length) {
-    unparsed.hidden = true;
-    unparsed.innerHTML = '';
-  } else {
-    unparsed.hidden = false;
-    unparsed.innerHTML = `
-      <h2>Unparsed folders</h2>
-      <p>Rename these to <code>XXXX Nama Campaign MM-DD Manager</code>.</p>
-      <ul>${unparsedFolders.map(name => `<li>${escapeHtml(name)}</li>`).join('')}</ul>`;
-  }
 }
 
 function renderAll() {

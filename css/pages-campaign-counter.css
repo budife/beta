@@ -3459,6 +3459,10 @@ html {
   font-size: 10px;
 }
 
+.folder-series-meta .folder-unparsed-note {
+  cursor: help;
+}
+
 .folder-browser .series-id-grid {
   max-height: calc(100vh - 285px);
   min-height: 74px;
@@ -3521,34 +3525,6 @@ html {
 .folder-range-block h2 small {
   color: #71717a;
   font: 400 10px Consolas, Monaco, "Courier New", monospace;
-}
-
-.folder-unparsed {
-  margin-top: 12px;
-  padding: 12px;
-  color: #7f1d1d;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-}
-
-.folder-unparsed h2 {
-  margin: 0 0 4px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.folder-unparsed p {
-  margin: 0 0 8px;
-  color: #7f1d1d;
-  font-size: 12px;
-}
-
-.folder-unparsed ul {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  padding-left: 18px;
-  font-size: 12px;
 }
 
 @media (max-width: 980px) {

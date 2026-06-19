@@ -2,6 +2,15 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.13.5 - 19 June 2026
+
+- Refreshed cache-busters for the Campaign Counter unparsed-folder note cleanup.
+
+## Campaign Counter v1.4.2 beta - 19 June 2026
+
+- Removed the long unparsed folder list from the workspace so it no longer blocks the Campaign ID grid.
+- Kept failed-folder counts visible in the scan summary and folder header, with folder details available as a compact hover note.
+
 ## Core v6.13.4 - 19 June 2026
 
 - Refreshed cache-busters for the latest Campaign Counter folder-scan and range UI changes.
