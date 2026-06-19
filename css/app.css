@@ -133,9 +133,17 @@ a {
 }
 
 .sidebar-link i {
+  flex: 0 0 auto;
   width: 18px;
   color: #a1a1aa;
   text-align: center;
+}
+
+.sidebar-link span {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 4px;
 }
 
 .sidebar-link:hover {
@@ -170,9 +178,9 @@ a {
 }
 
 .sidebar-link .tool-beta-badge {
+  flex: 0 0 auto;
   min-height: 16px;
   padding: 0 5px;
-  margin-left: 4px;
   font-size: 10px;
 }
 
