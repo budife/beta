@@ -16,6 +16,7 @@
     mode: 'normal',
     replaceInfo: null,
     baseUrl: DEFAULT_PUBLIC_BASE_URL,
+    editingItemId: null,
   };
 
   function $(id) {
@@ -248,6 +249,7 @@
       checkedAt,
       savedAt,
       downloadedAt,
+      linkName,
     } = item;
     return {
       id,
@@ -263,6 +265,7 @@
       checkedAt,
       savedAt,
       downloadedAt,
+      linkName,
     };
   }
 
@@ -295,12 +298,48 @@
       && (file.type === 'application/pdf' || /\.pdf$/i.test(file.name));
   }
 
+  function getPdfExtension(name) {
+    const match = String(name || '').match(/(\.[^.]+)$/);
+    return match ? match[1] : '.pdf';
+  }
+
+  function getDefaultLinkName(fileName) {
+    return stripPdfExtension(fileName)
+      .replace(/\s+-\s+/g, '-')
+      .replace(/\s*\((?:copy|\d+)\)\s*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function normalizeLinkName(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function getLinkNameError(value) {
+    const clean = normalizeLinkName(value);
+    if (!clean) return 'Link name is required.';
+    if (/[<>:"/\\|?*]/.test(clean)) return 'Link name contains invalid filename characters.';
+    if (/\.[a-z0-9]{1,8}$/i.test(clean)) return 'Do not include a file extension.';
+    return '';
+  }
+
+  function buildNewUploadTargetName(item) {
+    const rawName = normalizeLinkName(item.linkName || getDefaultLinkName(item.originalName || item.targetName));
+    const error = getLinkNameError(rawName);
+    const safeName = error ? getDefaultLinkName(item.originalName || item.targetName) || 'tnc' : rawName;
+    return sanitizePdfName(`${safeName}.pdf`, elements.prefixInput.value.trim());
+  }
+
   function createItemFromFile(file) {
-    const targetName = getTargetName(file);
+    const linkName = state.mode === 'replace' ? '' : getDefaultLinkName(file.name);
+    const targetName = state.mode === 'replace' && state.replaceInfo
+      ? state.replaceInfo.fileName
+      : sanitizePdfName(`${linkName || stripPdfExtension(file.name)}.pdf`, elements.prefixInput.value.trim());
     return {
       id: createItemId(file.name, targetName),
       file,
       originalName: file.name,
+      linkName,
       targetName,
       targetPath: getTargetPath(),
       url: buildPublicUrl(targetName),
@@ -321,7 +360,7 @@
 
       const targetName = state.mode === 'replace' && state.replaceInfo
         ? state.replaceInfo.fileName
-        : sanitizePdfName(item.originalName || item.targetName, elements.prefixInput.value.trim());
+        : buildNewUploadTargetName(item);
       return {
         ...item,
         id: createItemId(item.originalName || targetName, targetName),
@@ -335,6 +374,11 @@
       };
     });
     saveHistory();
+  }
+
+  function hasInvalidQueuedNames() {
+    if (state.mode === 'replace') return false;
+    return getFileBackedItems().some((item) => getLinkNameError(item.linkName || getDefaultLinkName(item.originalName)));
   }
 
   function addFiles(fileList) {
@@ -409,8 +453,9 @@
     const linkCount = getLinkItems().length;
     const fileCountLabel = `${state.items.length} PDF${state.items.length === 1 ? '' : 's'}`;
     elements.fileCount.textContent = fileCountLabel;
-    elements.saveBtn.disabled = !fileBackedCount || !state.directoryHandle;
-    elements.downloadBtn.disabled = !fileBackedCount;
+    const hasInvalidNames = hasInvalidQueuedNames();
+    elements.saveBtn.disabled = !fileBackedCount || !state.directoryHandle || hasInvalidNames;
+    elements.downloadBtn.disabled = !fileBackedCount || hasInvalidNames;
     elements.copyAllLinksBtn.disabled = !linkCount;
     elements.checkAllBtn.disabled = !linkCount;
   }
@@ -470,17 +515,41 @@
       return;
     }
 
-    elements.fileList.innerHTML = state.items.map((item) => `
-      <article class="tnc-file-item" data-item-id="${escapeHtml(item.id)}">
+    elements.fileList.innerHTML = state.items.map((item) => {
+      const isRenameable = Boolean(item.file) && state.mode !== 'replace';
+      const isEditing = isRenameable && state.editingItemId === item.id;
+      const linkName = normalizeLinkName(item.linkName || getDefaultLinkName(item.originalName));
+      const linkNameError = isRenameable ? getLinkNameError(linkName) : '';
+      const extension = getPdfExtension(item.originalName);
+      return `
+      <article class="tnc-file-item ${linkNameError ? 'has-name-error' : ''}" data-item-id="${escapeHtml(item.id)}">
         <div class="tnc-file-details">
           <div class="tnc-file-row">
             <span>Original file</span>
             <strong class="tnc-file-name" title="${escapeHtml(item.originalName)}">${escapeHtml(item.originalName)}</strong>
           </div>
+          ${isRenameable ? `
+            <div class="tnc-file-row">
+              <span>Final filename</span>
+              <code class="tnc-file-target ${linkNameError ? 'is-invalid' : ''}" title="${escapeHtml(linkNameError || item.targetName)}">${escapeHtml(linkNameError || item.targetName)}</code>
+            </div>
+            <div class="tnc-edit-hint">Double-click this item to rename before saving.</div>
+            <div class="tnc-rename-grid ${isEditing ? 'is-open' : ''}">
+              <label class="tnc-link-name-field">
+                <span>Link name</span>
+                <input type="text" value="${escapeHtml(linkName)}" data-action="rename" data-id="${escapeHtml(item.id)}" aria-invalid="${linkNameError ? 'true' : 'false'}">
+              </label>
+              <div class="tnc-extension-field">
+                <span>Extension</span>
+                <strong>${escapeHtml(extension)}</strong>
+              </div>
+            </div>
+          ` : `
           <div class="tnc-file-row">
-            <span>Renamed file</span>
+            <span>Current file</span>
             <code class="tnc-file-target" title="${escapeHtml(`${item.targetPath}/${item.targetName}`)}">${escapeHtml(item.targetName)}</code>
           </div>
+          `}
           <div class="tnc-file-row">
             <span>Public link</span>
             <code class="tnc-file-link" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</code>
@@ -502,7 +571,8 @@
           </div>
         </div>
       </article>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function findItem(id) {
@@ -511,9 +581,73 @@
 
   function removeItem(id) {
     state.items = state.items.filter((item) => item.id !== id);
+    if (state.editingItemId === id) state.editingItemId = null;
     saveHistory();
     renderItems();
     setStatus(state.items.length ? 'Item removed.' : 'Queue cleared.');
+  }
+
+  function startRenameItem(id) {
+    const item = findItem(id);
+    if (state.mode === 'replace' || !item?.file) return;
+    state.editingItemId = id;
+    renderItems();
+    window.setTimeout(() => {
+      const input = elements.fileList.querySelector(`[data-action="rename"][data-id="${CSS.escape(id)}"]`);
+      input?.focus();
+      input?.select();
+    }, 0);
+  }
+
+  function renameQueuedItem(id, value) {
+    if (state.mode === 'replace') return;
+    const item = findItem(id);
+    if (!item?.file) return;
+
+    item.linkName = normalizeLinkName(value);
+    const error = getLinkNameError(item.linkName);
+    if (!error) {
+      item.targetName = buildNewUploadTargetName(item);
+      item.targetPath = getTargetPath();
+      item.url = buildPublicUrl(item.targetName);
+      item.status = 'queued';
+      item.httpStatus = '';
+      item.verifiedVia = '';
+      item.checkedAt = '';
+      setStatus('Final filename updated.', 'success');
+    } else {
+      setStatus(error, 'error');
+    }
+    saveHistory();
+    updateButtons();
+
+    const row = elements.fileList.querySelector(`[data-item-id="${CSS.escape(id)}"]`);
+    if (!row) return;
+    row.classList.toggle('has-name-error', Boolean(error));
+    const finalName = row.querySelector('.tnc-file-target');
+    if (finalName) {
+      finalName.textContent = error || item.targetName;
+      finalName.title = error || item.targetName;
+      finalName.classList.toggle('is-invalid', Boolean(error));
+    }
+    const publicLink = row.querySelector('.tnc-file-link');
+    if (publicLink && !error) {
+      publicLink.textContent = item.url;
+      publicLink.title = item.url;
+    }
+  }
+
+  async function findExistingTarget(targetDir, items) {
+    if (state.mode === 'replace') return null;
+    for (const item of items) {
+      try {
+        await targetDir.getFileHandle(item.targetName, { create: false });
+        return item;
+      } catch (error) {
+        if (error?.name !== 'NotFoundError') throw error;
+      }
+    }
+    return null;
   }
 
   async function chooseFolder() {
@@ -554,11 +688,21 @@
       return;
     }
 
+    if (hasInvalidQueuedNames()) {
+      setStatus('Fix invalid Link Name fields before saving.', 'error');
+      return;
+    }
+
     elements.saveBtn.disabled = true;
     setStatus('Saving PDF files...');
 
     try {
       const targetDir = await ensureDirectory(state.directoryHandle, getDirectoryParts());
+      const existingItem = await findExistingTarget(targetDir, fileBackedItems);
+      if (existingItem) {
+        setStatus(`${existingItem.targetName} already exists. Choose another Link Name or switch to Replace PDF link.`, 'error');
+        return;
+      }
       const now = new Date().toISOString();
       for (const item of fileBackedItems) {
         const fileHandle = await targetDir.getFileHandle(item.targetName, { create: true });
@@ -585,6 +729,11 @@
     const fileBackedItems = getFileBackedItems();
     if (!fileBackedItems.length) {
       setStatus('Drop PDF files again before downloading. History rows only keep metadata.', 'error');
+      return;
+    }
+
+    if (hasInvalidQueuedNames()) {
+      setStatus('Fix invalid Link Name fields before downloading.', 'error');
       return;
     }
 
@@ -933,6 +1082,35 @@
       if (action === 'open') openItemLink(id);
       if (action === 'check') checkItemLink(id);
       if (action === 'remove') removeItem(id);
+    });
+
+    elements.fileList.addEventListener('dblclick', (event) => {
+      const item = event.target.closest('.tnc-file-item');
+      if (!item || event.target.closest('button')) return;
+      startRenameItem(item.dataset.itemId);
+    });
+
+    elements.fileList.addEventListener('input', (event) => {
+      const input = event.target.closest('[data-action="rename"]');
+      if (!input) return;
+      renameQueuedItem(input.dataset.id, input.value);
+    });
+
+    elements.fileList.addEventListener('blur', (event) => {
+      const input = event.target.closest('[data-action="rename"]');
+      if (!input) return;
+      state.editingItemId = null;
+      renderItems();
+    }, true);
+
+    elements.fileList.addEventListener('keydown', (event) => {
+      const input = event.target.closest('[data-action="rename"]');
+      if (!input) return;
+      if (event.key === 'Enter' || event.key === 'Escape') {
+        event.preventDefault();
+        state.editingItemId = null;
+        renderItems();
+      }
     });
   }
 
