@@ -2,6 +2,14 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.14.0 - 28 July 2026
+
+- Refreshed cache-busters for the Database Checker automatic dashboard redesign.
+
+## Database Checker v1.9.0 - 28 July 2026
+
+- Redesigned Database Checker into an automatic validation dashboard with recursive package scanning, real package progress, status cards, filters, search, and a details drawer.
+
 ## Core v6.13.6 - 19 June 2026
 
 - Fixed sidebar beta badge spacing so longer tool labels like Campaign Counter keep their status badge visible.

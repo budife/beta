@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.13.6',
+    version: '6.14.0',
     status: 'stable'
   },
   home: {
@@ -31,7 +31,7 @@ const TOOL_VERSIONS = {
   },
   'database-checker': {
     label: 'Database Checker',
-    version: '1.8.0',
+    version: '1.9.0',
     status: 'stable'
   },
   'database-generator': {

@@ -6,8 +6,8 @@ const VIRTUAL_BUFFER_SIZE = 50; // Increased back to 50 for better visibility
 const OBJECT_POOL_SIZE = 200; // Reduced from 500
 const DEBOUNCE_DELAY = 100; // Added for scroll events
 const PACKAGE_FILE_TYPES = ['EmailCustMast', 'CustPref', 'CustSubs', 'CustAttr'];
-const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|CustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
-const CUSTOMER_MASTER_ALIASES = ['EmailCustMast', 'CustMast'];
+const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|EmailCustMaster|CustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
+const CUSTOMER_MASTER_ALIASES = ['EmailCustMast', 'EmailCustMaster', 'CustMast'];
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PACKAGE_FINDINGS_BATCH_SIZE = 20;
 const MAX_STORED_PACKAGE_FINDINGS = 10000;
@@ -591,6 +591,12 @@ class DatabaseChecker {
     this.selectedPackageKey = '';
     this.selectedPackage = null;
     this.lastPackageResult = null;
+    this.dashboardResults = new Map();
+    this.dashboardFilter = 'all';
+    this.dashboardSearch = '';
+    this.dashboardScanActive = false;
+    this.scanStartedAt = 0;
+    this.scanElapsedTimer = null;
     this.packageValidationToken = 0;
     this.packageAbortController = null;
     this.lastPackageFiles = null;
@@ -790,6 +796,27 @@ class DatabaseChecker {
 
   bindEvents(){
     document.getElementById('folderOpenBtn').addEventListener('click', ()=>this.openFolder());
+    document.querySelector('[data-open-folder-trigger]')?.addEventListener('click', () => this.openFolder());
+    document.getElementById('dashboardFilters')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-filter]');
+      if (!button) return;
+      this.dashboardFilter = button.dataset.filter || 'all';
+      document.querySelectorAll('#dashboardFilters [data-filter]').forEach((item) => {
+        item.classList.toggle('active', item === button);
+      });
+      this.renderDashboardCards();
+    });
+    document.getElementById('dashboardSearch')?.addEventListener('input', (event) => {
+      this.dashboardSearch = event.target.value.trim().toLowerCase();
+      this.renderDashboardCards();
+    });
+    document.getElementById('dashboardCards')?.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-package-card]');
+      if (!card) return;
+      this.openPackageDetailsDrawer(card.dataset.packageKey);
+    });
+    document.getElementById('drawerCloseBtn')?.addEventListener('click', () => this.closePackageDetailsDrawer());
+    document.getElementById('drawerBackdrop')?.addEventListener('click', () => this.closePackageDetailsDrawer());
 
     this.checkBtn = document.getElementById('checkBtn');
     this.checkBtn.addEventListener('click', ()=>{
@@ -894,6 +921,7 @@ class DatabaseChecker {
       if (e.key === 'Escape' && this.modalIsOpen()) this.closeSearchModal();
       if (e.key === 'Escape' && this.rawDataModal?.classList.contains('show')) this.closeRawDataModal();
       if (e.key === 'Escape' && this.layoutTestModal?.classList.contains('show')) this.closeLayoutTestModal();
+      if (e.key === 'Escape') this.closePackageDetailsDrawer();
     });
   }
 
@@ -3227,30 +3255,27 @@ class DatabaseChecker {
   }
 
   async buildFileTree(dirHandle, parentUl = document.querySelector('#fileList ul')){
-    parentUl.innerHTML = '';
+    if (parentUl) parentUl.innerHTML = '';
     this.databasePackages.clear();
+    this.dashboardResults.clear();
     this.selectedPackageKey = '';
     this.selectedPackage = null;
     this.lastPackageResult = null;
+    this.lastPackageFiles = null;
+    this.layoutTestCustomerSamples = [];
+    this.activeLayoutTestCustomer = null;
+    this.updateDashboardSummary();
+    this.renderDashboardCards();
+    this.setDashboardStartVisible(false);
+    this.updateScanProgress({
+      visible: true,
+      completed: 0,
+      total: 0,
+      current: 'Scanning folders...',
+      title: 'Scanning folder recursively'
+    });
 
-    for await (const entry of dirHandle.values()) {
-      if (entry.kind !== 'file') continue;
-      const match = entry.name.match(PACKAGE_FILE_PATTERN);
-      if (!match) continue;
-
-      const key = match[1];
-      const sourceType = match[2];
-      const type = normalizePackageFileType(sourceType);
-      if (!this.databasePackages.has(key)) {
-        this.databasePackages.set(key, { key, files: new Map() });
-      }
-      const packageFiles = this.databasePackages.get(key).files;
-      const existing = packageFiles.get(type);
-      const shouldReplace = !existing
-        || sourceType.toLowerCase() === 'emailcustmast'
-        || !existing.name.toLowerCase().endsWith('-emailcustmast.txt');
-      if (shouldReplace) packageFiles.set(type, entry);
-    }
+    await this.collectPackageEntries(dirHandle);
 
     const packages = [...this.databasePackages.values()];
     for (const packageInfo of packages) {
@@ -3299,11 +3324,387 @@ class DatabaseChecker {
       empty.textContent = 'No database package files found';
       parentUl.appendChild(empty);
       this.updatePackageStatus();
+      this.updateScanProgress({ visible: false });
+      this.setDashboardStartVisible(true);
+      this.renderDashboardCards();
       return;
     }
 
-    const initialPackage = packages.find((packageInfo) => packageInfo.files.size === 4) || packages[0];
-    this.selectPackage(initialPackage.key);
+    this.updateDashboardSummary();
+    this.renderDashboardCards();
+    await this.validatePackagesAutomatically(packages);
+  }
+
+  async collectPackageEntries(dirHandle, pathParts = []) {
+    for await (const entry of dirHandle.values()) {
+      if (entry.kind === 'directory') {
+        await this.collectPackageEntries(entry, [...pathParts, entry.name]);
+        continue;
+      }
+
+      if (entry.kind !== 'file') continue;
+      const match = entry.name.match(PACKAGE_FILE_PATTERN);
+      if (!match) continue;
+
+      const key = match[1];
+      const sourceType = match[2];
+      const type = normalizePackageFileType(sourceType);
+      if (!type) continue;
+
+      if (!this.databasePackages.has(key)) {
+        this.databasePackages.set(key, { key, files: new Map(), relativePath: pathParts.join('/') });
+      }
+      const packageInfo = this.databasePackages.get(key);
+      const packageFiles = packageInfo.files;
+      const existing = packageFiles.get(type);
+      const sourceIsPreferredMaster = /^emailcustmas(?:t|ter)$/i.test(sourceType);
+      const existingIsAlias = existing && /-custmast\.txt$/i.test(existing.name || '');
+      const shouldReplace = !existing || (type === 'EmailCustMast' && sourceIsPreferredMaster && existingIsAlias);
+      if (shouldReplace) packageFiles.set(type, entry);
+    }
+  }
+
+  async validatePackagesAutomatically(packages) {
+    const total = packages.length;
+    this.dashboardScanActive = true;
+    this.scanStartedAt = performance.now();
+    window.clearInterval(this.scanElapsedTimer);
+    this.scanElapsedTimer = window.setInterval(() => this.updateScanElapsedTime(), 100);
+    this.updateScanProgress({
+      visible: true,
+      completed: 0,
+      total,
+      current: packages[0]?.key || '-',
+      title: 'Validating packages'
+    });
+
+    for (let index = 0; index < packages.length; index += 1) {
+      const packageInfo = packages[index];
+      this.updateScanProgress({
+        visible: true,
+        completed: index,
+        total,
+        current: packageInfo.key,
+        title: 'Validating packages'
+      });
+
+      try {
+        const files = await this.readPackageFiles(packageInfo);
+        const result = await this.validateDatabasePackage(files, packageInfo);
+        const entry = this.createDashboardResult(packageInfo, files, result);
+        packageInfo.dashboardStatus = entry.status;
+        packageInfo.dashboardResult = entry;
+        this.dashboardResults.set(packageInfo.key, entry);
+      } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        console.error('Package validation failed:', packageInfo.key, error);
+        const entry = this.createDashboardError(packageInfo, error);
+        packageInfo.dashboardStatus = entry.status;
+        packageInfo.dashboardResult = entry;
+        this.dashboardResults.set(packageInfo.key, entry);
+      }
+
+      this.updateDashboardSummary();
+      this.renderDashboardCards();
+      this.updateScanProgress({
+        visible: true,
+        completed: index + 1,
+        total,
+        current: packageInfo.key,
+        title: index + 1 === total ? 'Scan complete' : 'Validating packages'
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+
+    window.clearInterval(this.scanElapsedTimer);
+    this.scanElapsedTimer = null;
+    this.dashboardScanActive = false;
+    this.updateScanElapsedTime();
+    this.renderDashboardCards();
+  }
+
+  createDashboardResult(packageInfo, files, result) {
+    const fileCount = PACKAGE_FILE_TYPES.filter((type) => packageInfo.files.has(type)).length;
+    const status = this.getPackageDashboardStatus(result);
+    const issueSummary = this.getPackageIssueSummary(result, fileCount);
+    return {
+      packageInfo,
+      files,
+      result,
+      status,
+      statusLabel: status === 'passed' ? 'Pass' : status === 'warning' ? 'Warning' : 'Failed',
+      fileCount,
+      issueSummary,
+      sortRank: status === 'failed' ? 0 : status === 'warning' ? 1 : 2
+    };
+  }
+
+  createDashboardError(packageInfo, error) {
+    const findings = this.createFindingsCollector();
+    findings.push(this.createFinding('Validation Error', 'Package', 0, '', error.message || 'Unable to validate this package.'));
+    const fileStats = PACKAGE_FILE_TYPES.map((type) => ({
+      type,
+      present: packageInfo.files.has(type),
+      rows: 0,
+      errors: type === 'Package' ? 1 : 0
+    }));
+    const result = {
+      packageName: packageInfo.key,
+      databaseType: packageInfo.databaseType || 'Unknown',
+      customerCount: 0,
+      findings,
+      findingCount: findings.totalCount,
+      findingsTruncated: false,
+      fileStats,
+      categoryCounts: [['Validation Error', 1]],
+      unitCounts: [],
+      dynamicUnits: [],
+      layoutTestCustomers: []
+    };
+    return this.createDashboardResult(packageInfo, {}, result);
+  }
+
+  getPackageDashboardStatus(result) {
+    if (!result.findingCount) return 'passed';
+    const criticalCategories = new Set([
+      'Missing File',
+      'Invalid Format',
+      'Missing Required Fields',
+      'Invalid Email',
+      'Email Mismatch',
+      'Campaign Mismatch',
+      'Invalid Preference',
+      'Invalid Subscription',
+      'Missing Customer',
+      'Extra Customer',
+      'Missing Attribute',
+      'Duplicate customer ID',
+      'Duplicate customer attribute',
+      'Validation Error'
+    ]);
+    return result.categoryCounts.some(([category]) => criticalCategories.has(category)) ? 'failed' : 'warning';
+  }
+
+  getPackageIssueSummary(result, fileCount) {
+    if (!result.findingCount) return 'No Issues';
+    const missing = result.findings
+      .filter((finding) => finding.category === 'Missing File')
+      .map((finding) => `${finding.file}.txt is missing`);
+    if (missing.length) return missing.slice(0, 2).join(', ');
+    const [topCategory, count] = result.categoryCounts[0] || ['Issue', result.findingCount];
+    return `${count} ${topCategory}`;
+  }
+
+  updateDashboardSummary() {
+    const results = [...this.dashboardResults.values()];
+    const counts = {
+      total: this.databasePackages.size,
+      passed: results.filter((item) => item.status === 'passed').length,
+      warning: results.filter((item) => item.status === 'warning').length,
+      failed: results.filter((item) => item.status === 'failed').length
+    };
+    const setText = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = String(value);
+    };
+    setText('summaryTotal', counts.total);
+    setText('summaryPassed', counts.passed);
+    setText('summaryWarning', counts.warning);
+    setText('summaryFailed', counts.failed);
+  }
+
+  renderDashboardCards() {
+    const container = document.getElementById('dashboardCards');
+    if (!container) return;
+    const search = this.dashboardSearch;
+    const results = [...this.dashboardResults.values()]
+      .filter((entry) => this.dashboardFilter === 'all' || entry.status === this.dashboardFilter)
+      .filter((entry) => {
+        if (!search) return true;
+        const haystack = [
+          entry.packageInfo.key,
+          entry.packageInfo.relativePath,
+          entry.result.packageName,
+          ...(entry.result.dynamicUnits || [])
+        ].join(' ').toLowerCase();
+        return haystack.includes(search);
+      })
+      .sort((a, b) => a.sortRank - b.sortRank || a.packageInfo.key.localeCompare(b.packageInfo.key, undefined, { numeric: true }));
+
+    if (!results.length) {
+      const hasScanned = this.dashboardResults.size > 0 || this.databasePackages.size > 0;
+      const isWaitingForResults = this.dashboardScanActive && this.dashboardResults.size === 0;
+      container.innerHTML = `
+        <div class="db-empty-dashboard">
+          <i class="fa-solid ${isWaitingForResults ? 'fa-spinner fa-spin' : hasScanned ? 'fa-filter' : 'fa-box-archive'}"></i>
+          <strong>${isWaitingForResults ? 'Validating first package' : hasScanned ? 'No packages match this view' : 'No packages scanned yet'}</strong>
+          <span>${isWaitingForResults ? 'Cards appear here as each package finishes.' : hasScanned ? 'Adjust the filter or search keyword.' : 'Open a folder to validate every package automatically.'}</span>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = results.map((entry) => this.renderPackageCard(entry)).join('');
+  }
+
+  renderPackageCard(entry) {
+    const statusIcon = entry.status === 'passed'
+      ? 'fa-circle-check'
+      : entry.status === 'warning'
+        ? 'fa-triangle-exclamation'
+        : 'fa-circle-xmark';
+    return `
+      <article class="package-card ${entry.status}" data-package-card data-package-key="${escapeHtml(entry.packageInfo.key)}" tabindex="0">
+        <div class="package-card-status">
+          <span><i class="fa-solid ${statusIcon}" aria-hidden="true"></i>${entry.statusLabel}</span>
+          <small>${entry.result.databaseType}</small>
+        </div>
+        <h2>${escapeHtml(entry.packageInfo.key)}</h2>
+        <div class="package-card-meta">
+          <span>${entry.fileCount} / 4 Files</span>
+          <span>${entry.result.customerCount.toLocaleString()} customers</span>
+        </div>
+        <p>${escapeHtml(entry.issueSummary)}</p>
+        <button type="button">View Details <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      </article>
+    `;
+  }
+
+  updateScanProgress({ visible, completed = 0, total = 0, current = '-', title = 'Scanning Packages...' }) {
+    const panel = document.getElementById('scanProgress');
+    if (!panel) return;
+    panel.hidden = !visible;
+    const percent = total ? Math.round((completed / total) * 100) : 0;
+    const setText = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    };
+    setText('scanProgressTitle', title);
+    setText('scanProgressPercent', `${percent}%`);
+    setText('scanProgressCount', `${completed} / ${total} Packages`);
+    setText('scanProgressCurrent', current || '-');
+    const bar = document.getElementById('scanProgressBar');
+    if (bar) bar.style.width = `${percent}%`;
+    this.updateScanElapsedTime();
+  }
+
+  updateScanElapsedTime() {
+    const element = document.getElementById('scanElapsedTime');
+    if (!element || !this.scanStartedAt) return;
+    element.textContent = `${((performance.now() - this.scanStartedAt) / 1000).toFixed(2)} sec`;
+  }
+
+  setDashboardStartVisible(visible) {
+    const panel = document.getElementById('dbStartPanel');
+    if (panel) panel.hidden = !visible;
+  }
+
+  openPackageDetailsDrawer(packageKey) {
+    const entry = this.dashboardResults.get(packageKey);
+    if (!entry) return;
+    this.selectedPackageKey = packageKey;
+    this.selectedPackage = entry.packageInfo;
+    this.lastPackageResult = entry.result;
+    this.lastPackageFiles = entry.files;
+    this.layoutTestCustomerSamples = entry.result.layoutTestCustomers || [];
+    this.activeLayoutTestCustomer = null;
+    this.rawDataFileType = 'EmailCustMast';
+    this.saveSelectedPackageState();
+    document.getElementById('openRawDataBtn').disabled = false;
+    document.getElementById('exportReportBtn').disabled = false;
+    document.getElementById('openLayoutTestBtn').disabled = !this.layoutTestCustomerSamples.length;
+    document.getElementById('currentPath').textContent = packageKey;
+    this.updatePackageStatus(entry.result);
+
+    const drawer = document.getElementById('packageDetailsDrawer');
+    const content = document.getElementById('drawerContent');
+    if (!drawer || !content) return;
+    content.innerHTML = this.renderPackageDrawer(entry);
+    drawer.classList.add('show');
+    drawer.setAttribute('aria-hidden', 'false');
+  }
+
+  closePackageDetailsDrawer() {
+    const drawer = document.getElementById('packageDetailsDrawer');
+    if (!drawer) return;
+    drawer.classList.remove('show');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+
+  renderPackageDrawer(entry) {
+    const result = entry.result;
+    const files = PACKAGE_FILE_TYPES.map((type) => {
+      const stat = result.fileStats.find((item) => item.type === type);
+      return `
+        <div class="drawer-file ${stat?.present ? 'present' : 'missing'}">
+          <span><i class="fa-solid ${stat?.present ? 'fa-check' : 'fa-xmark'}"></i>${escapeHtml(type)}</span>
+          <strong>${stat?.present ? `${stat.rows.toLocaleString()} rows` : 'Missing'}</strong>
+        </div>
+      `;
+    }).join('');
+    const categories = result.categoryCounts.length
+      ? result.categoryCounts.map(([category, count]) => `<span>${escapeHtml(category)} <strong>${count.toLocaleString()}</strong></span>`).join('')
+      : '<span>No validation issues</span>';
+    const issues = result.findings.length
+      ? result.findings.slice(0, 30).map((finding) => this.renderDrawerIssue(finding)).join('')
+      : '<div class="drawer-empty">No issues found.</div>';
+
+    return `
+      <header class="drawer-header">
+        <p class="eyebrow">Package</p>
+        <h2 id="drawerTitle">${escapeHtml(entry.packageInfo.key)}</h2>
+        <span class="drawer-status ${entry.status}">${entry.statusLabel}</span>
+      </header>
+      <section class="drawer-section">
+        <h3>Package Information</h3>
+        <dl class="drawer-meta">
+          <div><dt>Database type</dt><dd>${escapeHtml(result.databaseType)}</dd></div>
+          <div><dt>Customers</dt><dd>${result.customerCount.toLocaleString()}</dd></div>
+          <div><dt>Files</dt><dd>${entry.fileCount}/4</dd></div>
+          <div><dt>Findings</dt><dd>${result.findingCount.toLocaleString()}</dd></div>
+        </dl>
+      </section>
+      <section class="drawer-section">
+        <h3>Detected Files</h3>
+        <div class="drawer-files">${files}</div>
+      </section>
+      <section class="drawer-section">
+        <h3>Validation Results</h3>
+        <div class="drawer-categories">${categories}</div>
+      </section>
+      <section class="drawer-section">
+        <h3>Issues</h3>
+        <div class="drawer-issues">${issues}</div>
+        ${result.findingsTruncated ? '<p class="drawer-note">Only the first stored findings are shown. Export the report for the saved finding set.</p>' : ''}
+      </section>
+      <section class="drawer-section">
+        <h3>Metadata</h3>
+        <dl class="drawer-meta">
+          <div><dt>Relative path</dt><dd>${escapeHtml(entry.packageInfo.relativePath || '/')}</dd></div>
+          <div><dt>Total size</dt><dd>${this.formatFileSize(entry.packageInfo.totalSize)}</dd></div>
+          <div><dt>Date</dt><dd>${entry.packageInfo.date ? this.formatPackageDate(entry.packageInfo.date) : 'Not detected'}</dd></div>
+        </dl>
+      </section>
+    `;
+  }
+
+  renderDrawerIssue(finding) {
+    return `
+      <article class="drawer-issue">
+        <div>
+          <strong>${escapeHtml(finding.category)}</strong>
+          <span>${escapeHtml([finding.file, finding.lineNumber ? `Line ${finding.lineNumber}` : ''].filter(Boolean).join(' · '))}</span>
+        </div>
+        ${finding.id ? `<code>${escapeHtml(finding.id)}</code>` : ''}
+        <p>${escapeHtml(finding.message)}</p>
+        ${finding.expected !== undefined || finding.actual !== undefined ? `
+          <div class="drawer-issue-values">
+            <span>Expected: ${escapeHtml(String(finding.expected ?? '-'))}</span>
+            <span>Actual: ${escapeHtml(String(finding.actual ?? '-'))}</span>
+          </div>
+        ` : ''}
+      </article>
+    `;
   }
 
   async scanPackageMetadata(packageInfo) {
