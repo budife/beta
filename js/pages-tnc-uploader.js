@@ -166,13 +166,6 @@
     return `${getBaseUrl()}/${pathParts}`;
   }
 
-  function getTargetName(file) {
-    if (state.mode === 'replace' && state.replaceInfo) {
-      return state.replaceInfo.fileName;
-    }
-    return sanitizePdfName(file.name, elements.prefixInput.value.trim());
-  }
-
   function parseReplaceLink(value) {
     const source = String(value || '').trim();
     if (!source) return null;
@@ -533,7 +526,7 @@
               <span>Final filename</span>
               <code class="tnc-file-target ${linkNameError ? 'is-invalid' : ''}" title="${escapeHtml(linkNameError || item.targetName)}">${escapeHtml(linkNameError || item.targetName)}</code>
             </div>
-            <div class="tnc-edit-hint">Double-click this item to rename before saving.</div>
+            <button class="tnc-edit-hint" type="button" data-action="rename-start" data-id="${escapeHtml(item.id)}">Double-click this item to rename before saving.</button>
             <div class="tnc-rename-grid ${isEditing ? 'is-open' : ''}">
               <label class="tnc-link-name-field">
                 <span>Link name</span>
@@ -1078,6 +1071,7 @@
       if (!button) return;
       const id = button.dataset.id;
       const action = button.dataset.action;
+      if (action === 'rename-start') startRenameItem(id);
       if (action === 'copy') copyText(findItem(id)?.url || '');
       if (action === 'open') openItemLink(id);
       if (action === 'check') checkItemLink(id);
@@ -1086,7 +1080,7 @@
 
     elements.fileList.addEventListener('dblclick', (event) => {
       const item = event.target.closest('.tnc-file-item');
-      if (!item || event.target.closest('button')) return;
+      if (!item || event.target.closest('.tnc-file-actions')) return;
       startRenameItem(item.dataset.itemId);
     });
 
