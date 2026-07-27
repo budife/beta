@@ -815,6 +815,13 @@ class DatabaseChecker {
       if (!card) return;
       this.openPackageDetailsDrawer(card.dataset.packageKey);
     });
+    document.getElementById('dashboardCards')?.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const card = event.target.closest('[data-package-card]');
+      if (!card) return;
+      event.preventDefault();
+      this.openPackageDetailsDrawer(card.dataset.packageKey);
+    });
     document.getElementById('drawerCloseBtn')?.addEventListener('click', () => this.closePackageDetailsDrawer());
     document.getElementById('drawerBackdrop')?.addEventListener('click', () => this.closePackageDetailsDrawer());
 
@@ -3466,23 +3473,56 @@ class DatabaseChecker {
 
   getPackageDashboardStatus(result) {
     if (!result.findingCount) return 'passed';
-    const criticalCategories = new Set([
-      'Missing File',
-      'Invalid Format',
-      'Missing Required Fields',
-      'Invalid Email',
-      'Email Mismatch',
-      'Campaign Mismatch',
-      'Invalid Preference',
-      'Invalid Subscription',
-      'Missing Customer',
-      'Extra Customer',
-      'Missing Attribute',
-      'Duplicate customer ID',
-      'Duplicate customer attribute',
-      'Validation Error'
-    ]);
-    return result.categoryCounts.some(([category]) => criticalCategories.has(category)) ? 'failed' : 'warning';
+    return result.findings.some((finding) => this.getFindingSeverity(finding) === 'critical') ? 'failed' : 'warning';
+  }
+
+  getFindingSeverity(finding) {
+    const category = String(finding?.category || '').toLowerCase();
+    const message = String(finding?.message || '').toLowerCase();
+    const criticalPatterns = [
+      /missing file/,
+      /invalid format/,
+      /malformed row/,
+      /missing required fields/,
+      /invalid email/,
+      /email mismatch/,
+      /campaign mismatch/,
+      /invalid preference/,
+      /invalid subscription/,
+      /missing customer/,
+      /extra customer/,
+      /missing attribute/,
+      /duplicate/,
+      /validation error/,
+      /invalid filename/,
+      /invalid header/,
+      /invalid delimiter/,
+      /invalid encoding/,
+      /invalid column count/,
+      /invalid field count/,
+      /empty file/,
+      /corrupt file/,
+      /package incomplete/
+    ];
+    const warningPatterns = [
+      /empty krhred/,
+      /dot-only krhred/,
+      /outer whitespace/,
+      /repeated spaces/,
+      /leading space/,
+      /trailing space/,
+      /double space/,
+      /triple space/,
+      /suspicious value/,
+      /customer count anomaly/,
+      /krhred too long/,
+      /invalid krhred/,
+      /unexpected attribute/,
+      /empty optional/
+    ];
+    if (criticalPatterns.some((pattern) => pattern.test(category) || pattern.test(message))) return 'critical';
+    if (warningPatterns.some((pattern) => pattern.test(category) || pattern.test(message))) return 'warning';
+    return 'warning';
   }
 
   getPackageIssueSummary(result, fileCount) {
@@ -3544,7 +3584,31 @@ class DatabaseChecker {
       return;
     }
 
-    container.innerHTML = results.map((entry) => this.renderPackageCard(entry)).join('');
+    const groups = [
+      ['failed', 'Failed', 'Critical packages that need attention first.'],
+      ['warning', 'Warning', 'Data quality issues to review.'],
+      ['passed', 'Passed', 'Clean packages with no findings.']
+    ];
+    container.innerHTML = groups
+      .map(([status, title, description]) => {
+        const items = results.filter((entry) => entry.status === status);
+        if (!items.length) return '';
+        return `
+          <section class="package-severity-section ${status}">
+            <div class="severity-section-header">
+              <div>
+                <h2>${title}</h2>
+                <p>${description}</p>
+              </div>
+              <strong>${items.length}</strong>
+            </div>
+            <div class="severity-card-grid">
+              ${items.map((entry) => this.renderPackageCard(entry)).join('')}
+            </div>
+          </section>
+        `;
+      })
+      .join('');
   }
 
   renderPackageCard(entry) {
@@ -3642,12 +3706,7 @@ class DatabaseChecker {
         </div>
       `;
     }).join('');
-    const categories = result.categoryCounts.length
-      ? result.categoryCounts.map(([category, count]) => `<span>${escapeHtml(category)} <strong>${count.toLocaleString()}</strong></span>`).join('')
-      : '<span>No validation issues</span>';
-    const issues = result.findings.length
-      ? result.findings.slice(0, 30).map((finding) => this.renderDrawerIssue(finding)).join('')
-      : '<div class="drawer-empty">No issues found.</div>';
+    const validationResults = this.renderValidationResultGroups(result);
 
     return `
       <header class="drawer-header">
@@ -3670,11 +3729,7 @@ class DatabaseChecker {
       </section>
       <section class="drawer-section">
         <h3>Validation Results</h3>
-        <div class="drawer-categories">${categories}</div>
-      </section>
-      <section class="drawer-section">
-        <h3>Issues</h3>
-        <div class="drawer-issues">${issues}</div>
+        <div class="drawer-validation-results">${validationResults}</div>
         ${result.findingsTruncated ? '<p class="drawer-note">Only the first stored findings are shown. Export the report for the saved finding set.</p>' : ''}
       </section>
       <section class="drawer-section">
@@ -3688,14 +3743,51 @@ class DatabaseChecker {
     `;
   }
 
-  renderDrawerIssue(finding) {
+  renderValidationResultGroups(result) {
+    if (!result.findings.length) {
+      return '<div class="drawer-empty">No validation issues.</div>';
+    }
+
+    const grouped = new Map();
+    result.findings.forEach((finding) => {
+      const category = finding.category || 'Issue';
+      if (!grouped.has(category)) grouped.set(category, []);
+      grouped.get(category).push(finding);
+    });
+
+    return [...grouped.entries()]
+      .sort((a, b) => {
+        const severityRank = (items) => this.getFindingSeverity(items[0]) === 'critical' ? 0 : 1;
+        return severityRank(a[1]) - severityRank(b[1]) || b[1].length - a[1].length || a[0].localeCompare(b[0]);
+      })
+      .map(([category, findings]) => this.renderDrawerIssueGroup(category, findings, this.getFindingSeverity(findings[0])))
+      .join('');
+  }
+
+  renderDrawerIssueGroup(title, findings, severity) {
+    const visibleItems = findings.slice(0, 30);
     return `
-      <article class="drawer-issue">
+      <details class="drawer-issue-group ${severity}">
+        <summary>
+          <span>${escapeHtml(title)}</span>
+          <strong>${findings.length.toLocaleString()}</strong>
+        </summary>
+        <div class="drawer-issue-category">
+          ${visibleItems.map((finding) => this.renderDrawerIssue(finding, severity)).join('')}
+        </div>
+        ${findings.length > visibleItems.length ? `<p class="drawer-note">${(findings.length - visibleItems.length).toLocaleString()} more ${title.toLowerCase()} hidden for performance. Use Export for the stored finding set.</p>` : ''}
+      </details>
+    `;
+  }
+
+  renderDrawerIssue(finding, severity = 'critical') {
+    return `
+      <article class="drawer-issue ${severity}">
         <div>
           <strong>${escapeHtml(finding.category)}</strong>
           <span>${escapeHtml([finding.file, finding.lineNumber ? `Line ${finding.lineNumber}` : ''].filter(Boolean).join(' · '))}</span>
         </div>
-        ${finding.id ? `<code>${escapeHtml(finding.id)}</code>` : ''}
+        ${finding.customerId || finding.id ? `<code>${escapeHtml(finding.customerId || finding.id)}</code>` : ''}
         <p>${escapeHtml(finding.message)}</p>
         ${finding.expected !== undefined || finding.actual !== undefined ? `
           <div class="drawer-issue-values">
