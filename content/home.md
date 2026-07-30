@@ -33,6 +33,7 @@ category: Home
 ## Recent Updates
 
 - **Core v6.14.1 - 30 July 2026** - Refreshed cache-busters after restoring Database Checker to the previous compact workspace.
+- **Layout Checker v1.4.1 - 30 July 2026** - Added preview open-in-new-tab and screenshot download actions, with screenshot capture now preparing remote layout images before export.
 - **Database Checker v1.8.1 - 30 July 2026** - Reverted the automatic dashboard redesign and restored the previous package workspace, validation panels, and layout-test workflow.
 - **TNC Uploader v0.3.2 beta - 28 July 2026** - Added new-upload filename rename by double-click, preserved replace-link filenames, blocked invalid names, prevented accidental overwrites, and hardened long filename/link wrapping.
 - **Core v6.13.6 - 19 June 2026** - Fixed sidebar beta badge spacing so longer tool labels like Campaign Counter keep their status badge visible.

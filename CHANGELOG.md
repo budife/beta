@@ -6,6 +6,12 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Refreshed cache-busters after restoring Database Checker to the previous compact workspace.
 
+## Layout Checker v1.4.1 - 30 July 2026
+
+- Added an Open Preview action to launch the applied layout and KRHRED values in a new browser tab.
+- Added a Screenshot action beside the Highlight KRHRED control.
+- Improved screenshot capture by preparing remote layout images as inline data before rendering the PNG export.
+
 ## Database Checker v1.8.1 - 30 July 2026
 
 - Reverted the automatic dashboard redesign.

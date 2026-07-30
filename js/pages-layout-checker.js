@@ -104,6 +104,16 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     return layoutPreviewFrame?.contentDocument || layoutPreviewFrame?.contentWindow?.document || null;
   }
 
+  function resolvePreviewUrl(value, sourceUrl = latestPreviewSourceUrl) {
+    const raw = String(value || '').trim();
+    if (!raw || raw.startsWith('data:') || raw.startsWith('blob:') || raw.startsWith('cid:')) return raw;
+    try {
+      return new URL(raw, getPreviewBaseHref(sourceUrl) || window.location.href).href;
+    } catch {
+      return raw;
+    }
+  }
+
   function getPreviewFileBaseName() {
     const fallback = 'layout-preview';
     const source = (originalUrlInput?.value || latestPreviewSourceUrl || '').trim();
@@ -152,6 +162,108 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     return html2canvasLoadPromise;
   }
 
+  function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function fetchImageAsDataUrl(url) {
+    const attempts = [
+      url,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+    ];
+
+    for (const attempt of attempts) {
+      try {
+        const response = await fetch(attempt, { cache: 'force-cache' });
+        if (!response.ok) continue;
+        const blob = await response.blob();
+        if (!blob.size) continue;
+        return await blobToDataUrl(blob);
+      } catch (error) {
+        console.warn('Image inline attempt failed.', attempt, error);
+      }
+    }
+
+    return '';
+  }
+
+  async function inlinePreviewImages(html, sourceUrl = '') {
+    const preparedHtml = preparePreviewHtml(html, sourceUrl);
+    const documentClone = new DOMParser().parseFromString(preparedHtml, 'text/html');
+    const images = Array.from(documentClone.querySelectorAll('img[src]'));
+    const uniqueUrls = new Map();
+
+    images.forEach((image) => {
+      const resolvedUrl = resolvePreviewUrl(image.getAttribute('src'), sourceUrl);
+      if (resolvedUrl && !resolvedUrl.startsWith('data:')) uniqueUrls.set(resolvedUrl, null);
+    });
+
+    const resolvedPairs = await Promise.all(Array.from(uniqueUrls.keys()).map(async (url) => [
+      url,
+      await fetchImageAsDataUrl(url),
+    ]));
+
+    resolvedPairs.forEach(([url, dataUrl]) => uniqueUrls.set(url, dataUrl));
+
+    images.forEach((image) => {
+      const resolvedUrl = resolvePreviewUrl(image.getAttribute('src'), sourceUrl);
+      const dataUrl = uniqueUrls.get(resolvedUrl);
+      if (dataUrl) {
+        image.setAttribute('src', dataUrl);
+        image.removeAttribute('srcset');
+        image.removeAttribute('crossorigin');
+      }
+    });
+
+    return `<!doctype html>${documentClone.documentElement.outerHTML}`;
+  }
+
+  function writePreviewDocument(frame, html) {
+    return new Promise((resolve) => {
+      frame.onload = () => resolve();
+      frame.srcdoc = html;
+      window.setTimeout(resolve, 1500);
+    });
+  }
+
+  function waitForDocumentImages(documentRef, timeoutMs = 7000) {
+    const images = Array.from(documentRef?.images || []);
+    if (!images.length) return Promise.resolve();
+
+    return new Promise((resolve) => {
+      let settled = false;
+      let remaining = images.filter(image => !image.complete).length;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+      const done = () => {
+        remaining -= 1;
+        if (remaining <= 0) finish();
+      };
+
+      if (!remaining) {
+        finish();
+        return;
+      }
+
+      images.forEach((image) => {
+        if (image.complete) return;
+        image.addEventListener('load', done, { once: true });
+        image.addEventListener('error', done, { once: true });
+      });
+      window.setTimeout(finish, timeoutMs);
+    });
+  }
+
   async function downloadPreviewScreenshot() {
     if (!latestPreviewHtml.trim()) {
       setLayoutStatus('error', 'Apply or load a layout before downloading screenshot');
@@ -165,10 +277,19 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       }
       setLayoutStatus('loading', 'Capturing layout screenshot');
       setLayoutView('preview');
-      await new Promise(resolve => setTimeout(resolve, 150));
-      const previewDocument = getPreviewDocument();
+      setLayoutStatus('loading', 'Preparing images for screenshot');
+      const captureHtml = await inlinePreviewImages(latestPreviewHtml, latestPreviewSourceUrl);
+      const captureFrame = document.createElement('iframe');
+      captureFrame.className = 'lc-screenshot-frame';
+      captureFrame.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(captureFrame);
+      await writePreviewDocument(captureFrame, captureHtml);
+      const previewDocument = captureFrame.contentDocument || captureFrame.contentWindow?.document || getPreviewDocument();
+      await waitForDocumentImages(previewDocument);
       const target = previewDocument?.body || previewDocument?.documentElement;
       if (!target) throw new Error('Preview is not ready yet');
+      captureFrame.style.height = `${Math.max(target.scrollHeight, 600)}px`;
+      setLayoutStatus('loading', 'Capturing layout screenshot');
       const html2canvas = await loadHtml2Canvas();
       const canvas = await html2canvas(target, {
         backgroundColor: '#ffffff',
@@ -179,6 +300,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
         windowWidth: target.scrollWidth,
         windowHeight: target.scrollHeight,
       });
+      captureFrame.remove();
       canvas.toBlob((blob) => {
         if (!blob) {
           setLayoutStatus('error', 'Screenshot could not be created');
@@ -191,6 +313,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       console.error('Unable to capture layout screenshot.', error);
       setLayoutStatus('error', 'Screenshot blocked by remote assets. Open preview and use browser screenshot.');
     } finally {
+      document.querySelectorAll('.lc-screenshot-frame').forEach(frame => frame.remove());
       if (downloadScreenshotBtn) {
         downloadScreenshotBtn.innerHTML = '<i class="fa-solid fa-download"></i> Screenshot';
         updatePreviewActions();

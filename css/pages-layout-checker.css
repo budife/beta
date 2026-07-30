@@ -2809,6 +2809,16 @@ body *::after {
   background: #fff;
 }
 
+.lc-screenshot-frame {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1000px;
+  min-height: 100vh;
+  border: 0;
+  pointer-events: none;
+}
+
 .lc-panel + .lc-panel {
   margin-top: 0;
 }
