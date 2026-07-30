@@ -223,6 +223,17 @@
     elements.statusText.classList.toggle('is-error', type === 'error');
   }
 
+  function setStatusHtml(html, type = '') {
+    elements.statusText.innerHTML = html;
+    elements.statusText.classList.toggle('is-success', type === 'success');
+    elements.statusText.classList.toggle('is-error', type === 'error');
+  }
+
+  function getDirectToolUrl() {
+    const basePath = window.location.pathname.replace(/\/tools\/tnc-uploader\.html$/i, '');
+    return `${window.location.origin}${basePath}/tools/tnc-uploader.html`;
+  }
+
   function createItemId(fileName, targetName) {
     return `${getTargetPath()}/${targetName || fileName}`.toLowerCase();
   }
@@ -645,7 +656,7 @@
 
   async function chooseFolder() {
     if (!supportsDirectoryWrite()) {
-      setStatus('Saving to a folder is not supported in this browser. Use Chrome/Edge or download the ready PDFs.', 'error');
+      setStatusHtml(`Folder picker is blocked here. <a href="${escapeHtml(getDirectToolUrl())}" target="_blank" rel="noopener noreferrer">Open TNC Uploader in a new tab</a>, then pick folder again.`, 'error');
       return;
     }
 
@@ -656,7 +667,7 @@
     } catch (error) {
       if (error?.name !== 'AbortError') {
         console.error(error);
-        setStatus('Unable to select folder. Please try again.', 'error');
+        setStatusHtml(`Unable to open folder picker here. <a href="${escapeHtml(getDirectToolUrl())}" target="_blank" rel="noopener noreferrer">Open TNC Uploader in a new tab</a>, then pick folder again.`, 'error');
       }
     }
   }

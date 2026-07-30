@@ -377,6 +377,14 @@ body {
   border-left-color: var(--error);
 }
 
+.tnc-status a {
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
 .tnc-panel-title-row {
   display: flex;
   align-items: flex-start;
