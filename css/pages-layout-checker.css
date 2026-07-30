@@ -2481,6 +2481,7 @@ body *::after {
 .lc-editor-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 7px;
 }
 
@@ -2725,6 +2726,15 @@ body *::after {
   min-height: 50px;
   padding: 8px 12px;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.lc-editor-actions {
+  justify-content: flex-end;
+}
+
+.lc-editor-actions .lc-btn {
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .lc-view-tabs {

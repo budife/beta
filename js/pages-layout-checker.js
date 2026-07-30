@@ -30,6 +30,8 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const previewPanel = document.getElementById('previewPanel');
   const layoutPreviewFrame = document.getElementById('layoutPreviewFrame');
   const downloadBtn = document.getElementById('downloadBtn');
+  const downloadScreenshotBtn = document.getElementById('downloadScreenshotBtn');
+  const openPreviewBtn = document.getElementById('openPreviewBtn');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
   const textModeBtn = document.getElementById('textModeBtn');
   const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
@@ -43,6 +45,9 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   let abortController = null;
   let currentOperation = null;
   let krhredPreviewTimer = null;
+  let latestPreviewHtml = '';
+  let latestPreviewSourceUrl = '';
+  let html2canvasLoadPromise = null;
 
   function setLayoutStatus(state, text) {
     if (!layoutStatus) return;
@@ -82,8 +87,115 @@ const originalUrlInput = document.getElementById('originalUrlInput');
 
   function renderPreview(html, statusText = 'Preview ready', sourceUrl = '') {
     if (!layoutPreviewFrame) return;
-    layoutPreviewFrame.srcdoc = preparePreviewHtml(html || '', sourceUrl);
+    latestPreviewHtml = html || '';
+    latestPreviewSourceUrl = sourceUrl || '';
+    layoutPreviewFrame.srcdoc = preparePreviewHtml(latestPreviewHtml, latestPreviewSourceUrl);
+    updatePreviewActions();
     setLayoutStatus(html ? 'ready' : 'empty', html ? statusText : 'No layout loaded');
+  }
+
+  function updatePreviewActions() {
+    const hasPreview = Boolean(latestPreviewHtml && latestPreviewHtml.trim());
+    if (openPreviewBtn) openPreviewBtn.disabled = !hasPreview;
+    if (downloadScreenshotBtn) downloadScreenshotBtn.disabled = !hasPreview;
+  }
+
+  function getPreviewDocument() {
+    return layoutPreviewFrame?.contentDocument || layoutPreviewFrame?.contentWindow?.document || null;
+  }
+
+  function getPreviewFileBaseName() {
+    const fallback = 'layout-preview';
+    const source = (originalUrlInput?.value || latestPreviewSourceUrl || '').trim();
+    if (!source) return fallback;
+    try {
+      const name = new URL(source).pathname.split('/').pop() || fallback;
+      return name.replace(/\.(html?|php|aspx?)$/i, '') || fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function downloadBlob(blob, fileName) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function openPreviewInNewTab() {
+    if (!latestPreviewHtml.trim()) {
+      setLayoutStatus('error', 'Apply or load a layout before opening preview');
+      return;
+    }
+    const blob = new Blob([preparePreviewHtml(latestPreviewHtml, latestPreviewSourceUrl)], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+
+  function loadHtml2Canvas() {
+    if (window.html2canvas) return Promise.resolve(window.html2canvas);
+    if (html2canvasLoadPromise) return html2canvasLoadPromise;
+    html2canvasLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      script.async = true;
+      script.onload = () => resolve(window.html2canvas);
+      script.onerror = () => reject(new Error('Unable to load screenshot library'));
+      document.head.appendChild(script);
+    });
+    return html2canvasLoadPromise;
+  }
+
+  async function downloadPreviewScreenshot() {
+    if (!latestPreviewHtml.trim()) {
+      setLayoutStatus('error', 'Apply or load a layout before downloading screenshot');
+      return;
+    }
+
+    try {
+      if (downloadScreenshotBtn) {
+        downloadScreenshotBtn.disabled = true;
+        downloadScreenshotBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Capturing';
+      }
+      setLayoutStatus('loading', 'Capturing layout screenshot');
+      setLayoutView('preview');
+      await new Promise(resolve => setTimeout(resolve, 150));
+      const previewDocument = getPreviewDocument();
+      const target = previewDocument?.body || previewDocument?.documentElement;
+      if (!target) throw new Error('Preview is not ready yet');
+      const html2canvas = await loadHtml2Canvas();
+      const canvas = await html2canvas(target, {
+        backgroundColor: '#ffffff',
+        scale: Math.min(2, window.devicePixelRatio || 1),
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+        windowWidth: target.scrollWidth,
+        windowHeight: target.scrollHeight,
+      });
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          setLayoutStatus('error', 'Screenshot could not be created');
+          return;
+        }
+        downloadBlob(blob, `${getPreviewFileBaseName()}-screenshot.png`);
+        setLayoutStatus('ready', 'Screenshot downloaded');
+      }, 'image/png');
+    } catch (error) {
+      console.error('Unable to capture layout screenshot.', error);
+      setLayoutStatus('error', 'Screenshot blocked by remote assets. Open preview and use browser screenshot.');
+    } finally {
+      if (downloadScreenshotBtn) {
+        downloadScreenshotBtn.innerHTML = '<i class="fa-solid fa-download"></i> Screenshot';
+        updatePreviewActions();
+      }
+    }
   }
 
   function setLayoutView(view) {
@@ -122,6 +234,8 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       setLayoutView('preview');
     });
   }
+  if (openPreviewBtn) openPreviewBtn.addEventListener('click', openPreviewInNewTab);
+  if (downloadScreenshotBtn) downloadScreenshotBtn.addEventListener('click', downloadPreviewScreenshot);
 
   // Progress indicator functions
   function showProgress(text, operation) {

@@ -12,6 +12,14 @@ All notable user-facing changes to eDM Helper are tracked here.
 - Restored the previous Database Checker package workspace, validation panels, package overview, and layout-test workflow.
 - Kept the existing validation rules and tests intact.
 
+## TNC Uploader v0.3.2 beta - 28 July 2026
+
+- Added optional filename rename for new uploads through a compact double-click editor inside the PDF queue.
+- Preserved replace-link mode so replacement PDFs keep the existing public filename.
+- Blocked empty or invalid Windows filename characters before save/download.
+- Prevented normal uploads from overwriting an existing destination file without choosing another name.
+- Hardened long filenames, generated links, status messages, queue cards, and action rows so they wrap without breaking the layout.
+
 ## Core v6.13.6 - 19 June 2026
 
 - Fixed sidebar beta badge spacing so longer tool labels like Campaign Counter keep their status badge visible.
