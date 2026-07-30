@@ -32,8 +32,8 @@ category: Home
 
 ## Recent Updates
 
-- **Core v6.14.0 - 28 July 2026** - Refreshed cache-busters for the Database Checker automatic dashboard redesign.
-- **Database Checker v1.9.0 - 28 July 2026** - Redesigned Database Checker into an automatic validation dashboard with recursive package scanning, real package progress, status cards, filters, search, and a details drawer.
+- **Core v6.14.1 - 30 July 2026** - Refreshed cache-busters after restoring Database Checker to the previous compact workspace.
+- **Database Checker v1.8.1 - 30 July 2026** - Reverted the automatic dashboard redesign and restored the previous package workspace, validation panels, and layout-test workflow.
 - **Core v6.13.6 - 19 June 2026** - Fixed sidebar beta badge spacing so longer tool labels like Campaign Counter keep their status badge visible.
 - **Core v6.13.5 - 19 June 2026** - Refreshed cache-busters for the Campaign Counter unparsed-folder note cleanup.
 - **Campaign Counter v1.4.2 beta - 19 June 2026** - Removed the long unparsed folder list from the workspace and kept failed-folder counts available as a compact hover note.

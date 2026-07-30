@@ -11,7 +11,7 @@
 
 
 
-  
+
 
   <!-- Meta Tags -->
 
@@ -25,14 +25,14 @@
 
   <meta name="author" content="eDM Helper">
 
-  
+
 
   <!-- CSS -->
-  <link rel="stylesheet" href="../css/theme.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/pages-database-checker.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/controls.css?v=6.14.0">
+  <link rel="stylesheet" href="../css/theme.css?v=6.14.1">
+  <link rel="stylesheet" href="../css/pages-database-checker.css?v=6.14.1">
+  <link rel="stylesheet" href="../css/controls.css?v=6.14.1">
 
-  
+
 
   <title>Database Checker - eDM Helper</title>
 
@@ -58,7 +58,7 @@
         </a>
       </div>
 
-      
+
 
       <div class="nav-right">
 
@@ -73,135 +73,190 @@
 
 
   <main id="main-content" role="main">
-  <div id="mainContent" class="main-content database-dashboard-shell">
-    <section class="db-dashboard-hero" aria-labelledby="db-dashboard-title">
-      <div>
-        <p class="eyebrow">Database validation</p>
-        <h1 id="db-dashboard-title">Database Checker</h1>
-        <p>Open a folder once. eDM Helper scans TXT files recursively, groups packages, and validates every package automatically.</p>
-      </div>
-      <div class="db-dashboard-actions">
-        <button id="folderOpenBtn" class="btn btn-primary db-open-folder-btn" type="button">
-          <i class="fa-solid fa-folder-open"></i><span>Open Folder</span>
-        </button>
-        <button id="openRawDataBtn" class="btn btn-secondary" type="button" title="View raw database files" disabled>
-          <i class="fa-solid fa-file-lines"></i><span>Raw Data</span>
-        </button>
-        <button id="exportReportBtn" class="btn btn-secondary" type="button" title="Export validation report" disabled>
-          <i class="fa-solid fa-download"></i><span>Export</span>
-        </button>
-        <button id="openLayoutTestBtn" class="btn btn-secondary" type="button" title="Test package data against an email layout" disabled>
-          <i class="fa-solid fa-envelope-open-text"></i><span>Layout Test</span>
-        </button>
-      </div>
-    </section>
 
-    <section id="dbStartPanel" class="db-start-panel">
-      <button class="db-start-button" type="button" data-open-folder-trigger>
-        <i class="fa-solid fa-folder-open"></i>
-        <span>Open Folder</span>
-        <small>Select the root folder that contains database TXT files.</small>
-      </button>
-    </section>
+  <!-- Enhanced Sidebar -->
 
-    <section id="scanProgress" class="scan-progress-panel" hidden aria-live="polite">
-      <div class="scan-progress-header">
-        <div>
-          <p class="eyebrow">Scanning Packages...</p>
-          <h2 id="scanProgressTitle">Preparing folder scan</h2>
-        </div>
-        <strong id="scanProgressPercent">0%</strong>
-      </div>
-      <div class="scan-progress-track">
-        <span id="scanProgressBar"></span>
-      </div>
-      <div class="scan-progress-grid">
-        <div>
-          <span>Packages</span>
-          <strong id="scanProgressCount">0 / 0 Packages</strong>
-        </div>
-        <div>
-          <span>Current Package</span>
-          <strong id="scanProgressCurrent">-</strong>
-        </div>
-        <div>
-          <span>Elapsed Time</span>
-          <strong id="scanElapsedTime">0.00 sec</strong>
-        </div>
-      </div>
-    </section>
+  <aside id="sidebar" class="sidebar">
 
-    <section class="dashboard-summary" aria-label="Package summary">
-      <div class="summary-card">
-        <span>Total Packages</span>
-        <strong id="summaryTotal">0</strong>
-      </div>
-      <div class="summary-card passed">
-        <span>Passed</span>
-        <strong id="summaryPassed">0</strong>
-      </div>
-      <div class="summary-card warning">
-        <span>Warning</span>
-        <strong id="summaryWarning">0</strong>
-      </div>
-      <div class="summary-card failed">
-        <span>Failed</span>
-        <strong id="summaryFailed">0</strong>
-      </div>
-    </section>
+    <div class="sidebar-header">
 
-    <section class="dashboard-controls" aria-label="Package filters">
-      <div class="filter-tabs" id="dashboardFilters">
-        <button type="button" class="active" data-filter="all">All</button>
-        <button type="button" data-filter="passed">Passed</button>
-        <button type="button" data-filter="warning">Warning</button>
-        <button type="button" data-filter="failed">Failed</button>
-      </div>
-      <label class="dashboard-search">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        <input id="dashboardSearch" type="search" placeholder="Search package, prefix, or campaign number">
-      </label>
-    </section>
+      <h2>Database Checker</h2>
 
-    <section class="dashboard-results" aria-label="Package validation results">
-      <div id="dashboardCards" class="package-card-grid">
-        <div class="db-empty-dashboard">
-          <i class="fa-solid fa-box-archive"></i>
-          <strong>No packages scanned yet</strong>
-          <span>Open a folder to validate every package automatically.</span>
-        </div>
-      </div>
-    </section>
-
-    <aside id="packageDetailsDrawer" class="package-details-drawer" aria-hidden="true" aria-labelledby="drawerTitle">
-      <div class="drawer-backdrop" id="drawerBackdrop"></div>
-      <div class="drawer-panel" role="dialog" aria-modal="true">
-        <button id="drawerCloseBtn" class="drawer-close" type="button" aria-label="Close details">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-        <div id="drawerContent" class="drawer-content"></div>
-      </div>
-    </aside>
-
-    <div class="dashboard-compat" aria-hidden="true">
-      <aside id="sidebar" class="sidebar">
-        <p id="packageStatus" class="package-status">No database package selected</p>
-        <div id="fileList" class="file-list"><ul></ul></div>
-      </aside>
-      <div id="loadingWrapper" class="loading-indicator" style="visibility:hidden;">
-        <div id="loadingIndicator" class="pill">Processing...</div>
-        <div id="progressText">0%</div>
-      </div>
-      <span id="currentPath">No file selected</span>
-      <button id="checkBtn" class="btn btn-primary" type="button" disabled>
-        <i class="fa-solid fa-list-check"></i><span>Check Database Package</span>
-      </button>
-      <button id="loadMoreBtn" class="btn btn-secondary" style="display:none;">
-        <i class="fa-solid fa-angles-down"></i><span>Load More</span>
-      </button>
-      <div id="databaseContent" class="data-container"></div>
-      <div id="resultsContainer" class="results-container"></div>
     </div>
+
+
+
+    <!-- File Operations -->
+
+    <div class="sidebar-section">
+
+      <button id="folderOpenBtn" class="btn btn-primary btn-block" type="button">
+
+        <i class="fa-solid fa-folder-open"></i><span>Open Folder</span>
+
+      </button>
+
+      <p id="packageStatus" class="package-status">No database package selected</p>
+
+    </div>
+
+
+
+    <!-- Database Packages -->
+
+    <div class="sidebar-section package-list-section">
+
+      <h3>Packages</h3>
+
+      <div id="fileList" class="file-list">
+
+        <ul></ul>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+
+  <!-- Main Content Area -->
+
+  <div id="mainContent" class="main-content">
+
+    <!-- Top Toolbar -->
+
+    <div class="toolbar">
+
+      <div class="toolbar-left">
+        <div class="title-with-loading">
+          <h1>Database Package Validation</h1>
+
+          <div id="loadingWrapper" class="loading-indicator" style="visibility:hidden;">
+
+            <div id="loadingIndicator" class="pill">Processing...</div>
+
+            <div id="progressText">0%</div>
+
+          </div>
+        </div>
+
+        <div class="breadcrumb">
+
+          <span id="currentPath">No file selected</span>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="toolbar-right">
+
+        <button id="checkBtn" class="btn btn-primary" type="button" disabled>
+
+          <i class="fa-solid fa-list-check"></i><span>Check Database Package</span>
+
+        </button>
+
+        <button id="openRawDataBtn" class="btn btn-secondary" type="button" title="View raw database files" disabled>
+
+          <i class="fa-solid fa-file-lines"></i><span>Raw Data</span>
+
+        </button>
+
+        <button id="exportReportBtn" class="btn btn-secondary" type="button" title="Export validation report" disabled>
+
+          <i class="fa-solid fa-download"></i><span>Export</span>
+
+        </button>
+
+        <button id="openLayoutTestBtn" class="btn btn-secondary" type="button" title="Test package data against an email layout" disabled>
+
+          <i class="fa-solid fa-envelope-open-text"></i><span>Layout Test</span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Content Area with Split View -->
+
+    <div class="content-area">
+
+      <!-- Package Overview Panel -->
+
+      <div class="panel data-panel">
+
+        <div class="panel-header">
+
+          <h3>Package Overview</h3>
+
+        </div>
+
+        <div class="panel-body">
+
+          <div id="databaseContent" class="data-container">
+
+            <div class="empty-state">
+
+              <i class="fa-solid fa-box-archive"></i>
+
+              <p>Open a folder to scan database packages</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="panel-footer">
+
+          <button id="loadMoreBtn" class="btn btn-secondary" style="display:none;">
+
+            <i class="fa-solid fa-angles-down"></i><span>Load More</span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Results Panel -->
+
+      <div class="panel results-panel">
+
+        <div class="panel-header">
+
+          <h3>Validation Results</h3>
+
+        </div>
+
+        <div class="panel-body">
+
+          <div id="resultsContainer" class="results-container">
+
+            <div class="empty-state">
+
+              <i class="fa-solid fa-check-circle"></i>
+
+              <p>No validation results yet</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
 
@@ -432,9 +487,9 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.14.0" defer></script>
-<script src="../js/privacy-settings.js?v=6.14.0" defer></script>
-<script src="../js/pages-database-checker.js?v=6.14.0" defer></script>
+<script src="../js/version-config.js?v=6.14.1" defer></script>
+<script src="../js/privacy-settings.js?v=6.14.1" defer></script>
+<script src="../js/pages-database-checker.js?v=6.14.1" defer></script>
 
 </body>
 

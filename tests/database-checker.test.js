@@ -98,20 +98,15 @@ test('CustMast is accepted as a customer master alias', async () => {
   assert.equal(result.fileStats.find((item) => item.type === 'EmailCustMast').present, true);
 });
 
-test('customer master filename pattern accepts supported aliases', () => {
+test('customer master filename pattern accepts both supported names', () => {
   assert.equal(
     vm.runInContext("PACKAGE_FILE_PATTERN.test('20260101_TEST-EmailCustMast.txt')", sandbox),
-    true
-  );
-  assert.equal(
-    vm.runInContext("PACKAGE_FILE_PATTERN.test('20260101_TEST-EmailCustMaster.txt')", sandbox),
     true
   );
   assert.equal(
     vm.runInContext("PACKAGE_FILE_PATTERN.test('20260101_TEST-CustMast.txt')", sandbox),
     true
   );
-  assert.equal(vm.runInContext("normalizePackageFileType('EmailCustMaster')", sandbox), 'EmailCustMast');
   assert.equal(vm.runInContext("normalizePackageFileType('CustMast')", sandbox), 'EmailCustMast');
 });
 

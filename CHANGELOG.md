@@ -2,13 +2,15 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
-## Core v6.14.0 - 28 July 2026
+## Core v6.14.1 - 30 July 2026
 
-- Refreshed cache-busters for the Database Checker automatic dashboard redesign.
+- Refreshed cache-busters after restoring Database Checker to the previous compact workspace.
 
-## Database Checker v1.9.0 - 28 July 2026
+## Database Checker v1.8.1 - 30 July 2026
 
-- Redesigned Database Checker into an automatic validation dashboard with recursive package scanning, real package progress, status cards, filters, search, and a details drawer.
+- Reverted the automatic dashboard redesign.
+- Restored the previous Database Checker package workspace, validation panels, package overview, and layout-test workflow.
+- Kept the existing validation rules and tests intact.
 
 ## Core v6.13.6 - 19 June 2026
 

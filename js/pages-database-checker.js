@@ -6,8 +6,8 @@ const VIRTUAL_BUFFER_SIZE = 50; // Increased back to 50 for better visibility
 const OBJECT_POOL_SIZE = 200; // Reduced from 500
 const DEBOUNCE_DELAY = 100; // Added for scroll events
 const PACKAGE_FILE_TYPES = ['EmailCustMast', 'CustPref', 'CustSubs', 'CustAttr'];
-const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|EmailCustMaster|CustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
-const CUSTOMER_MASTER_ALIASES = ['EmailCustMast', 'EmailCustMaster', 'CustMast'];
+const PACKAGE_FILE_PATTERN = /^(.*)-(EmailCustMast|CustMast|CustPref|CustSubs|CustAttr)\.txt$/i;
+const CUSTOMER_MASTER_ALIASES = ['EmailCustMast', 'CustMast'];
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PACKAGE_FINDINGS_BATCH_SIZE = 20;
 const MAX_STORED_PACKAGE_FINDINGS = 10000;
@@ -591,12 +591,6 @@ class DatabaseChecker {
     this.selectedPackageKey = '';
     this.selectedPackage = null;
     this.lastPackageResult = null;
-    this.dashboardResults = new Map();
-    this.dashboardFilter = 'all';
-    this.dashboardSearch = '';
-    this.dashboardScanActive = false;
-    this.scanStartedAt = 0;
-    this.scanElapsedTimer = null;
     this.packageValidationToken = 0;
     this.packageAbortController = null;
     this.lastPackageFiles = null;
@@ -796,34 +790,6 @@ class DatabaseChecker {
 
   bindEvents(){
     document.getElementById('folderOpenBtn').addEventListener('click', ()=>this.openFolder());
-    document.querySelector('[data-open-folder-trigger]')?.addEventListener('click', () => this.openFolder());
-    document.getElementById('dashboardFilters')?.addEventListener('click', (event) => {
-      const button = event.target.closest('[data-filter]');
-      if (!button) return;
-      this.dashboardFilter = button.dataset.filter || 'all';
-      document.querySelectorAll('#dashboardFilters [data-filter]').forEach((item) => {
-        item.classList.toggle('active', item === button);
-      });
-      this.renderDashboardCards();
-    });
-    document.getElementById('dashboardSearch')?.addEventListener('input', (event) => {
-      this.dashboardSearch = event.target.value.trim().toLowerCase();
-      this.renderDashboardCards();
-    });
-    document.getElementById('dashboardCards')?.addEventListener('click', (event) => {
-      const card = event.target.closest('[data-package-card]');
-      if (!card) return;
-      this.openPackageDetailsDrawer(card.dataset.packageKey);
-    });
-    document.getElementById('dashboardCards')?.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      const card = event.target.closest('[data-package-card]');
-      if (!card) return;
-      event.preventDefault();
-      this.openPackageDetailsDrawer(card.dataset.packageKey);
-    });
-    document.getElementById('drawerCloseBtn')?.addEventListener('click', () => this.closePackageDetailsDrawer());
-    document.getElementById('drawerBackdrop')?.addEventListener('click', () => this.closePackageDetailsDrawer());
 
     this.checkBtn = document.getElementById('checkBtn');
     this.checkBtn.addEventListener('click', ()=>{
@@ -928,7 +894,6 @@ class DatabaseChecker {
       if (e.key === 'Escape' && this.modalIsOpen()) this.closeSearchModal();
       if (e.key === 'Escape' && this.rawDataModal?.classList.contains('show')) this.closeRawDataModal();
       if (e.key === 'Escape' && this.layoutTestModal?.classList.contains('show')) this.closeLayoutTestModal();
-      if (e.key === 'Escape') this.closePackageDetailsDrawer();
     });
   }
 
@@ -3262,27 +3227,30 @@ class DatabaseChecker {
   }
 
   async buildFileTree(dirHandle, parentUl = document.querySelector('#fileList ul')){
-    if (parentUl) parentUl.innerHTML = '';
+    parentUl.innerHTML = '';
     this.databasePackages.clear();
-    this.dashboardResults.clear();
     this.selectedPackageKey = '';
     this.selectedPackage = null;
     this.lastPackageResult = null;
-    this.lastPackageFiles = null;
-    this.layoutTestCustomerSamples = [];
-    this.activeLayoutTestCustomer = null;
-    this.updateDashboardSummary();
-    this.renderDashboardCards();
-    this.setDashboardStartVisible(false);
-    this.updateScanProgress({
-      visible: true,
-      completed: 0,
-      total: 0,
-      current: 'Scanning folders...',
-      title: 'Scanning folder recursively'
-    });
 
-    await this.collectPackageEntries(dirHandle);
+    for await (const entry of dirHandle.values()) {
+      if (entry.kind !== 'file') continue;
+      const match = entry.name.match(PACKAGE_FILE_PATTERN);
+      if (!match) continue;
+
+      const key = match[1];
+      const sourceType = match[2];
+      const type = normalizePackageFileType(sourceType);
+      if (!this.databasePackages.has(key)) {
+        this.databasePackages.set(key, { key, files: new Map() });
+      }
+      const packageFiles = this.databasePackages.get(key).files;
+      const existing = packageFiles.get(type);
+      const shouldReplace = !existing
+        || sourceType.toLowerCase() === 'emailcustmast'
+        || !existing.name.toLowerCase().endsWith('-emailcustmast.txt');
+      if (shouldReplace) packageFiles.set(type, entry);
+    }
 
     const packages = [...this.databasePackages.values()];
     for (const packageInfo of packages) {
@@ -3331,472 +3299,11 @@ class DatabaseChecker {
       empty.textContent = 'No database package files found';
       parentUl.appendChild(empty);
       this.updatePackageStatus();
-      this.updateScanProgress({ visible: false });
-      this.setDashboardStartVisible(true);
-      this.renderDashboardCards();
       return;
     }
 
-    this.updateDashboardSummary();
-    this.renderDashboardCards();
-    await this.validatePackagesAutomatically(packages);
-  }
-
-  async collectPackageEntries(dirHandle, pathParts = []) {
-    for await (const entry of dirHandle.values()) {
-      if (entry.kind === 'directory') {
-        await this.collectPackageEntries(entry, [...pathParts, entry.name]);
-        continue;
-      }
-
-      if (entry.kind !== 'file') continue;
-      const match = entry.name.match(PACKAGE_FILE_PATTERN);
-      if (!match) continue;
-
-      const key = match[1];
-      const sourceType = match[2];
-      const type = normalizePackageFileType(sourceType);
-      if (!type) continue;
-
-      if (!this.databasePackages.has(key)) {
-        this.databasePackages.set(key, { key, files: new Map(), relativePath: pathParts.join('/') });
-      }
-      const packageInfo = this.databasePackages.get(key);
-      const packageFiles = packageInfo.files;
-      const existing = packageFiles.get(type);
-      const sourceIsPreferredMaster = /^emailcustmas(?:t|ter)$/i.test(sourceType);
-      const existingIsAlias = existing && /-custmast\.txt$/i.test(existing.name || '');
-      const shouldReplace = !existing || (type === 'EmailCustMast' && sourceIsPreferredMaster && existingIsAlias);
-      if (shouldReplace) packageFiles.set(type, entry);
-    }
-  }
-
-  async validatePackagesAutomatically(packages) {
-    const total = packages.length;
-    this.dashboardScanActive = true;
-    this.scanStartedAt = performance.now();
-    window.clearInterval(this.scanElapsedTimer);
-    this.scanElapsedTimer = window.setInterval(() => this.updateScanElapsedTime(), 100);
-    this.updateScanProgress({
-      visible: true,
-      completed: 0,
-      total,
-      current: packages[0]?.key || '-',
-      title: 'Validating packages'
-    });
-
-    for (let index = 0; index < packages.length; index += 1) {
-      const packageInfo = packages[index];
-      this.updateScanProgress({
-        visible: true,
-        completed: index,
-        total,
-        current: packageInfo.key,
-        title: 'Validating packages'
-      });
-
-      try {
-        const files = await this.readPackageFiles(packageInfo);
-        const result = await this.validateDatabasePackage(files, packageInfo);
-        const entry = this.createDashboardResult(packageInfo, files, result);
-        packageInfo.dashboardStatus = entry.status;
-        packageInfo.dashboardResult = entry;
-        this.dashboardResults.set(packageInfo.key, entry);
-      } catch (error) {
-        if (error.name === 'AbortError') throw error;
-        console.error('Package validation failed:', packageInfo.key, error);
-        const entry = this.createDashboardError(packageInfo, error);
-        packageInfo.dashboardStatus = entry.status;
-        packageInfo.dashboardResult = entry;
-        this.dashboardResults.set(packageInfo.key, entry);
-      }
-
-      this.updateDashboardSummary();
-      this.renderDashboardCards();
-      this.updateScanProgress({
-        visible: true,
-        completed: index + 1,
-        total,
-        current: packageInfo.key,
-        title: index + 1 === total ? 'Scan complete' : 'Validating packages'
-      });
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    }
-
-    window.clearInterval(this.scanElapsedTimer);
-    this.scanElapsedTimer = null;
-    this.dashboardScanActive = false;
-    this.updateScanElapsedTime();
-    this.renderDashboardCards();
-  }
-
-  createDashboardResult(packageInfo, files, result) {
-    const fileCount = PACKAGE_FILE_TYPES.filter((type) => packageInfo.files.has(type)).length;
-    const status = this.getPackageDashboardStatus(result);
-    const issueSummary = this.getPackageIssueSummary(result, fileCount);
-    return {
-      packageInfo,
-      files,
-      result,
-      status,
-      statusLabel: status === 'passed' ? 'Pass' : status === 'warning' ? 'Warning' : 'Failed',
-      fileCount,
-      issueSummary,
-      sortRank: status === 'failed' ? 0 : status === 'warning' ? 1 : 2
-    };
-  }
-
-  createDashboardError(packageInfo, error) {
-    const findings = this.createFindingsCollector();
-    findings.push(this.createFinding('Validation Error', 'Package', 0, '', error.message || 'Unable to validate this package.'));
-    const fileStats = PACKAGE_FILE_TYPES.map((type) => ({
-      type,
-      present: packageInfo.files.has(type),
-      rows: 0,
-      errors: type === 'Package' ? 1 : 0
-    }));
-    const result = {
-      packageName: packageInfo.key,
-      databaseType: packageInfo.databaseType || 'Unknown',
-      customerCount: 0,
-      findings,
-      findingCount: findings.totalCount,
-      findingsTruncated: false,
-      fileStats,
-      categoryCounts: [['Validation Error', 1]],
-      unitCounts: [],
-      dynamicUnits: [],
-      layoutTestCustomers: []
-    };
-    return this.createDashboardResult(packageInfo, {}, result);
-  }
-
-  getPackageDashboardStatus(result) {
-    if (!result.findingCount) return 'passed';
-    return result.findings.some((finding) => this.getFindingSeverity(finding) === 'critical') ? 'failed' : 'warning';
-  }
-
-  getFindingSeverity(finding) {
-    const category = String(finding?.category || '').toLowerCase();
-    const message = String(finding?.message || '').toLowerCase();
-    const criticalPatterns = [
-      /missing file/,
-      /invalid format/,
-      /malformed row/,
-      /missing required fields/,
-      /invalid email/,
-      /email mismatch/,
-      /campaign mismatch/,
-      /invalid preference/,
-      /invalid subscription/,
-      /missing customer/,
-      /extra customer/,
-      /missing attribute/,
-      /duplicate/,
-      /validation error/,
-      /invalid filename/,
-      /invalid header/,
-      /invalid delimiter/,
-      /invalid encoding/,
-      /invalid column count/,
-      /invalid field count/,
-      /empty file/,
-      /corrupt file/,
-      /package incomplete/
-    ];
-    const warningPatterns = [
-      /empty krhred/,
-      /dot-only krhred/,
-      /outer whitespace/,
-      /repeated spaces/,
-      /leading space/,
-      /trailing space/,
-      /double space/,
-      /triple space/,
-      /suspicious value/,
-      /customer count anomaly/,
-      /krhred too long/,
-      /invalid krhred/,
-      /unexpected attribute/,
-      /empty optional/
-    ];
-    if (criticalPatterns.some((pattern) => pattern.test(category) || pattern.test(message))) return 'critical';
-    if (warningPatterns.some((pattern) => pattern.test(category) || pattern.test(message))) return 'warning';
-    return 'warning';
-  }
-
-  getPackageIssueSummary(result, fileCount) {
-    if (!result.findingCount) return 'No Issues';
-    const missing = result.findings
-      .filter((finding) => finding.category === 'Missing File')
-      .map((finding) => `${finding.file}.txt is missing`);
-    if (missing.length) return missing.slice(0, 2).join(', ');
-    const [topCategory, count] = result.categoryCounts[0] || ['Issue', result.findingCount];
-    return `${count} ${topCategory}`;
-  }
-
-  updateDashboardSummary() {
-    const results = [...this.dashboardResults.values()];
-    const counts = {
-      total: this.databasePackages.size,
-      passed: results.filter((item) => item.status === 'passed').length,
-      warning: results.filter((item) => item.status === 'warning').length,
-      failed: results.filter((item) => item.status === 'failed').length
-    };
-    const setText = (id, value) => {
-      const element = document.getElementById(id);
-      if (element) element.textContent = String(value);
-    };
-    setText('summaryTotal', counts.total);
-    setText('summaryPassed', counts.passed);
-    setText('summaryWarning', counts.warning);
-    setText('summaryFailed', counts.failed);
-  }
-
-  renderDashboardCards() {
-    const container = document.getElementById('dashboardCards');
-    if (!container) return;
-    const search = this.dashboardSearch;
-    const results = [...this.dashboardResults.values()]
-      .filter((entry) => this.dashboardFilter === 'all' || entry.status === this.dashboardFilter)
-      .filter((entry) => {
-        if (!search) return true;
-        const haystack = [
-          entry.packageInfo.key,
-          entry.packageInfo.relativePath,
-          entry.result.packageName,
-          ...(entry.result.dynamicUnits || [])
-        ].join(' ').toLowerCase();
-        return haystack.includes(search);
-      })
-      .sort((a, b) => a.sortRank - b.sortRank || a.packageInfo.key.localeCompare(b.packageInfo.key, undefined, { numeric: true }));
-
-    if (!results.length) {
-      const hasScanned = this.dashboardResults.size > 0 || this.databasePackages.size > 0;
-      const isWaitingForResults = this.dashboardScanActive && this.dashboardResults.size === 0;
-      container.innerHTML = `
-        <div class="db-empty-dashboard">
-          <i class="fa-solid ${isWaitingForResults ? 'fa-spinner fa-spin' : hasScanned ? 'fa-filter' : 'fa-box-archive'}"></i>
-          <strong>${isWaitingForResults ? 'Validating first package' : hasScanned ? 'No packages match this view' : 'No packages scanned yet'}</strong>
-          <span>${isWaitingForResults ? 'Cards appear here as each package finishes.' : hasScanned ? 'Adjust the filter or search keyword.' : 'Open a folder to validate every package automatically.'}</span>
-        </div>
-      `;
-      return;
-    }
-
-    const groups = [
-      ['failed', 'Failed', 'Critical packages that need attention first.'],
-      ['warning', 'Warning', 'Data quality issues to review.'],
-      ['passed', 'Passed', 'Clean packages with no findings.']
-    ];
-    container.innerHTML = groups
-      .map(([status, title, description]) => {
-        const items = results.filter((entry) => entry.status === status);
-        if (!items.length) return '';
-        return `
-          <section class="package-severity-section ${status}">
-            <div class="severity-section-header">
-              <div>
-                <h2>${title}</h2>
-                <p>${description}</p>
-              </div>
-              <strong>${items.length}</strong>
-            </div>
-            <div class="severity-card-grid">
-              ${items.map((entry) => this.renderPackageCard(entry)).join('')}
-            </div>
-          </section>
-        `;
-      })
-      .join('');
-  }
-
-  renderPackageCard(entry) {
-    const statusIcon = entry.status === 'passed'
-      ? 'fa-circle-check'
-      : entry.status === 'warning'
-        ? 'fa-triangle-exclamation'
-        : 'fa-circle-xmark';
-    return `
-      <article class="package-card ${entry.status}" data-package-card data-package-key="${escapeHtml(entry.packageInfo.key)}" tabindex="0">
-        <div class="package-card-status">
-          <span><i class="fa-solid ${statusIcon}" aria-hidden="true"></i>${entry.statusLabel}</span>
-          <small>${entry.result.databaseType}</small>
-        </div>
-        <h2>${escapeHtml(entry.packageInfo.key)}</h2>
-        <div class="package-card-meta">
-          <span>${entry.fileCount} / 4 Files</span>
-          <span>${entry.result.customerCount.toLocaleString()} customers</span>
-        </div>
-        <p>${escapeHtml(entry.issueSummary)}</p>
-        <button type="button">View Details <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-      </article>
-    `;
-  }
-
-  updateScanProgress({ visible, completed = 0, total = 0, current = '-', title = 'Scanning Packages...' }) {
-    const panel = document.getElementById('scanProgress');
-    if (!panel) return;
-    panel.hidden = !visible;
-    const percent = total ? Math.round((completed / total) * 100) : 0;
-    const setText = (id, value) => {
-      const element = document.getElementById(id);
-      if (element) element.textContent = value;
-    };
-    setText('scanProgressTitle', title);
-    setText('scanProgressPercent', `${percent}%`);
-    setText('scanProgressCount', `${completed} / ${total} Packages`);
-    setText('scanProgressCurrent', current || '-');
-    const bar = document.getElementById('scanProgressBar');
-    if (bar) bar.style.width = `${percent}%`;
-    this.updateScanElapsedTime();
-  }
-
-  updateScanElapsedTime() {
-    const element = document.getElementById('scanElapsedTime');
-    if (!element || !this.scanStartedAt) return;
-    element.textContent = `${((performance.now() - this.scanStartedAt) / 1000).toFixed(2)} sec`;
-  }
-
-  setDashboardStartVisible(visible) {
-    const panel = document.getElementById('dbStartPanel');
-    if (panel) panel.hidden = !visible;
-  }
-
-  openPackageDetailsDrawer(packageKey) {
-    const entry = this.dashboardResults.get(packageKey);
-    if (!entry) return;
-    this.selectedPackageKey = packageKey;
-    this.selectedPackage = entry.packageInfo;
-    this.lastPackageResult = entry.result;
-    this.lastPackageFiles = entry.files;
-    this.layoutTestCustomerSamples = entry.result.layoutTestCustomers || [];
-    this.activeLayoutTestCustomer = null;
-    this.rawDataFileType = 'EmailCustMast';
-    this.saveSelectedPackageState();
-    document.getElementById('openRawDataBtn').disabled = false;
-    document.getElementById('exportReportBtn').disabled = false;
-    document.getElementById('openLayoutTestBtn').disabled = !this.layoutTestCustomerSamples.length;
-    document.getElementById('currentPath').textContent = packageKey;
-    this.updatePackageStatus(entry.result);
-
-    const drawer = document.getElementById('packageDetailsDrawer');
-    const content = document.getElementById('drawerContent');
-    if (!drawer || !content) return;
-    content.innerHTML = this.renderPackageDrawer(entry);
-    drawer.classList.add('show');
-    drawer.setAttribute('aria-hidden', 'false');
-  }
-
-  closePackageDetailsDrawer() {
-    const drawer = document.getElementById('packageDetailsDrawer');
-    if (!drawer) return;
-    drawer.classList.remove('show');
-    drawer.setAttribute('aria-hidden', 'true');
-  }
-
-  renderPackageDrawer(entry) {
-    const result = entry.result;
-    const files = PACKAGE_FILE_TYPES.map((type) => {
-      const stat = result.fileStats.find((item) => item.type === type);
-      return `
-        <div class="drawer-file ${stat?.present ? 'present' : 'missing'}">
-          <span><i class="fa-solid ${stat?.present ? 'fa-check' : 'fa-xmark'}"></i>${escapeHtml(type)}</span>
-          <strong>${stat?.present ? `${stat.rows.toLocaleString()} rows` : 'Missing'}</strong>
-        </div>
-      `;
-    }).join('');
-    const validationResults = this.renderValidationResultGroups(result);
-
-    return `
-      <header class="drawer-header">
-        <p class="eyebrow">Package</p>
-        <h2 id="drawerTitle">${escapeHtml(entry.packageInfo.key)}</h2>
-        <span class="drawer-status ${entry.status}">${entry.statusLabel}</span>
-      </header>
-      <section class="drawer-section">
-        <h3>Package Information</h3>
-        <dl class="drawer-meta">
-          <div><dt>Database type</dt><dd>${escapeHtml(result.databaseType)}</dd></div>
-          <div><dt>Customers</dt><dd>${result.customerCount.toLocaleString()}</dd></div>
-          <div><dt>Files</dt><dd>${entry.fileCount}/4</dd></div>
-          <div><dt>Findings</dt><dd>${result.findingCount.toLocaleString()}</dd></div>
-        </dl>
-      </section>
-      <section class="drawer-section">
-        <h3>Detected Files</h3>
-        <div class="drawer-files">${files}</div>
-      </section>
-      <section class="drawer-section">
-        <h3>Validation Results</h3>
-        <div class="drawer-validation-results">${validationResults}</div>
-        ${result.findingsTruncated ? '<p class="drawer-note">Only the first stored findings are shown. Export the report for the saved finding set.</p>' : ''}
-      </section>
-      <section class="drawer-section">
-        <h3>Metadata</h3>
-        <dl class="drawer-meta">
-          <div><dt>Relative path</dt><dd>${escapeHtml(entry.packageInfo.relativePath || '/')}</dd></div>
-          <div><dt>Total size</dt><dd>${this.formatFileSize(entry.packageInfo.totalSize)}</dd></div>
-          <div><dt>Date</dt><dd>${entry.packageInfo.date ? this.formatPackageDate(entry.packageInfo.date) : 'Not detected'}</dd></div>
-        </dl>
-      </section>
-    `;
-  }
-
-  renderValidationResultGroups(result) {
-    if (!result.findings.length) {
-      return '<div class="drawer-empty">No validation issues.</div>';
-    }
-
-    const grouped = new Map();
-    result.findings.forEach((finding) => {
-      const category = finding.category || 'Issue';
-      if (!grouped.has(category)) grouped.set(category, []);
-      grouped.get(category).push(finding);
-    });
-
-    return [...grouped.entries()]
-      .sort((a, b) => {
-        const severityRank = (items) => this.getFindingSeverity(items[0]) === 'critical' ? 0 : 1;
-        return severityRank(a[1]) - severityRank(b[1]) || b[1].length - a[1].length || a[0].localeCompare(b[0]);
-      })
-      .map(([category, findings]) => this.renderDrawerIssueGroup(category, findings, this.getFindingSeverity(findings[0])))
-      .join('');
-  }
-
-  renderDrawerIssueGroup(title, findings, severity) {
-    const visibleItems = findings.slice(0, 30);
-    return `
-      <details class="drawer-issue-group ${severity}">
-        <summary>
-          <span>${escapeHtml(title)}</span>
-          <strong>${findings.length.toLocaleString()}</strong>
-        </summary>
-        <div class="drawer-issue-category">
-          ${visibleItems.map((finding) => this.renderDrawerIssue(finding, severity)).join('')}
-        </div>
-        ${findings.length > visibleItems.length ? `<p class="drawer-note">${(findings.length - visibleItems.length).toLocaleString()} more ${title.toLowerCase()} hidden for performance. Use Export for the stored finding set.</p>` : ''}
-      </details>
-    `;
-  }
-
-  renderDrawerIssue(finding, severity = 'critical') {
-    return `
-      <article class="drawer-issue ${severity}">
-        <div>
-          <strong>${escapeHtml(finding.category)}</strong>
-          <span>${escapeHtml([finding.file, finding.lineNumber ? `Line ${finding.lineNumber}` : ''].filter(Boolean).join(' · '))}</span>
-        </div>
-        ${finding.customerId || finding.id ? `<code>${escapeHtml(finding.customerId || finding.id)}</code>` : ''}
-        <p>${escapeHtml(finding.message)}</p>
-        ${finding.expected !== undefined || finding.actual !== undefined ? `
-          <div class="drawer-issue-values">
-            <span>Expected: ${escapeHtml(String(finding.expected ?? '-'))}</span>
-            <span>Actual: ${escapeHtml(String(finding.actual ?? '-'))}</span>
-          </div>
-        ` : ''}
-      </article>
-    `;
+    const initialPackage = packages.find((packageInfo) => packageInfo.files.size === 4) || packages[0];
+    this.selectPackage(initialPackage.key);
   }
 
   async scanPackageMetadata(packageInfo) {
