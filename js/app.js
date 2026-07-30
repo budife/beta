@@ -586,10 +586,63 @@ function renderLocalBackup(container) {
 }
 
 function enhanceDocsPage(container) {
-  renderPrivacySettings(container);
+  renderDocsTools(container);
   const currentAnchor = window.location.hash.slice(1);
   const firstTab = container.querySelector('[data-section="docs-navigation"] a[data-anchor]');
   setActiveDocsTab(container, currentAnchor || firstTab?.dataset.anchor);
+}
+
+function renderDocsTools(container) {
+  const navigation = container.querySelector('[data-section="docs-navigation"]');
+  if (!navigation || container.querySelector('[data-docs-tools]')) return;
+
+  const tools = document.createElement('div');
+  tools.className = 'docs-tools';
+  tools.dataset.docsTools = '';
+  tools.innerHTML = `
+    <label class="docs-search">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input type="search" placeholder="Search documentation" aria-label="Search documentation" data-docs-search>
+    </label>
+    <div class="docs-tools-actions">
+      <button type="button" data-docs-expand>Expand all</button>
+      <button type="button" data-docs-collapse>Collapse all</button>
+    </div>
+    <p class="docs-search-status" data-docs-search-status hidden></p>
+  `;
+  navigation.insertAdjacentElement('afterend', tools);
+
+  const details = Array.from(container.querySelectorAll('.docs-details'));
+  const sections = Array.from(container.querySelectorAll('.markdown-section:not([data-section="docs-navigation"])'));
+  const search = tools.querySelector('[data-docs-search]');
+  const status = tools.querySelector('[data-docs-search-status]');
+
+  search.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase();
+    let matchedSections = 0;
+
+    sections.forEach((section) => {
+      const sectionMatches = !query || section.textContent.toLowerCase().includes(query);
+      section.hidden = !sectionMatches;
+      if (sectionMatches) matchedSections += 1;
+    });
+
+    details.forEach((item) => {
+      if (query && item.textContent.toLowerCase().includes(query)) item.open = true;
+    });
+
+    status.hidden = !query;
+    status.textContent = query
+      ? `${matchedSections} section${matchedSections === 1 ? '' : 's'} matched.`
+      : '';
+  });
+
+  tools.querySelector('[data-docs-expand]').addEventListener('click', () => {
+    details.forEach((item) => { item.open = true; });
+  });
+  tools.querySelector('[data-docs-collapse]').addEventListener('click', () => {
+    details.forEach((item) => { item.open = false; });
+  });
 }
 
 function enhanceMaintenancePage(container) {

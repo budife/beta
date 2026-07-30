@@ -1,31 +1,31 @@
 ---
 title: Maintenance
-description: Local backup, privacy switches, release notes, and project health checks in one place.
+description: Browser-local data safeguards, privacy switches, and a compact release routine in one place.
 icon: fa-solid fa-screwdriver-wrench
 category: Reference
 ---
 
-## Local Backup
+## Keep Your Local State Safe
 
-Export or restore browser-local data used by eDM Helper. This backup stays on your machine unless you choose to share the downloaded JSON file.
+Before clearing browser data, changing machines, or changing browser profiles, export a local JSON backup. eDM Helper does not upload this file anywhere.
 
 {{local-backup}}
 
-## Privacy Switches
+## Network & Privacy Controls
 
-Use these before working with stricter campaign data. Changes are saved in this browser only.
+Use these before working with stricter campaign data. Each setting is saved in this browser only and applies immediately to the related tool.
 
 {{privacy-settings}}
 
-## Maintenance Checklist
+## Release Routine
 
-- Update the affected tool version in `js/tool-versions.js`.
-- Update Recent Updates on Home.
-- Update `CHANGELOG.md`.
-- Run smoke tests and JS syntax checks.
-- Commit and push only after checks pass.
+1. Update the affected tool version in `js/tool-versions.js`.
+2. Update Recent Updates on Home and `CHANGELOG.md`.
+3. Run targeted syntax checks, smoke tests, and `git diff --check`.
+4. Refresh cache-busters for changed shared CSS/JS.
+5. Commit and push only after the checks pass.
 
-## Local Data Covered
+## What the Backup Covers
 
 - Privacy toggles.
 - Config eDM last state.
@@ -36,3 +36,9 @@ Use these before working with stricter campaign data. Changes are saved in this 
 - Campaign ID IndexedDB data.
 - WFH calendar IndexedDB data.
 - WFH holiday cache.
+
+## Recovery Notes
+
+- Import replaces the matching eDM Helper local data stored in this browser.
+- Refresh any currently open tool after restoring a backup.
+- Folder permissions are managed by the browser and are not included in backups. Choose the folder again when a tool requests it.

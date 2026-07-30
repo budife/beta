@@ -16,6 +16,8 @@ category: Reference
 - [Troubleshooting](#troubleshooting)
 - [Credits](#credits-dedication)
 
+Use the search field to find a workflow, setting, filename, or error message quickly. Expand all is useful when you want to read the guide end-to-end; collapse all brings the page back to a compact reference view.
+
 ## Privacy & Network Behavior
 
 eDM Helper is designed as a local-first internal helper. Files such as database TXT, XML config, XLSX imports, PDFs, pasted HTML, customer emails, and KRHRED values are processed in the browser unless a tool explicitly checks a public URL.
@@ -49,9 +51,7 @@ These flows do not intentionally upload local files or customer databases. They 
 
 ## Network Settings
 
-Use these settings when working in stricter office environments. Changes are saved in this browser only.
-
-{{privacy-settings}}
+Use the [Maintenance](/maintenance) page when working in stricter office environments. Privacy settings are saved in this browser only and apply immediately to the related tool.
 
 - Turn off external URL checks to prevent tools from fetching public layout/PDF URLs.
 - Turn off proxy fallback to allow direct browser checks only.

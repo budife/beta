@@ -121,10 +121,20 @@ node --check js/pages-tnc-uploader.js
 
 - Keep tools lightweight and dependency-free unless there is a strong reason.
 - Prefer local/browser storage over cloud storage for work data.
-- Update `CHANGELOG.md` and `content/home.md` Recent Updates for every user-facing change.
+- Always update `CHANGELOG.md` and `content/home.md` Recent Updates after finishing an edit, fix, or new feature.
 - Update `js/tool-versions.js` when a specific tool changes.
 - Update cache-busters in affected HTML files when CSS/JS changes need to refresh on GitHub Pages.
 - Follow `STYLE-GUIDE.md` for spacing, colors, typography, and UI patterns.
+
+## Release Checklist
+
+Before calling a feature or fix done:
+
+- Add a concise entry to `content/home.md` under `Recent Updates`.
+- Add the matching details to `CHANGELOG.md`.
+- Bump the relevant tool version in `js/tool-versions.js` when the change is user-facing.
+- Refresh cache-busters in affected HTML files when CSS or JavaScript changed.
+- Run `git diff --check` and the relevant test command.
 
 ## Credits
 

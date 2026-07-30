@@ -195,29 +195,45 @@
     };
 
     panel.querySelector('[data-backup-export]').addEventListener('click', async () => {
-      setStatus('Preparing backup...', 'loading');
-      const data = await exportLocalState();
-      downloadJson(data, `edm-helper-backup-${new Date().toISOString().slice(0, 10)}.json`);
-      setStatus('Backup downloaded locally.', 'success');
+      try {
+        setStatus('Preparing backup...', 'loading');
+        const data = await exportLocalState();
+        downloadJson(data, `edm-helper-backup-${new Date().toISOString().slice(0, 10)}.json`);
+        setStatus('Backup downloaded locally.', 'success');
+      } catch (error) {
+        setStatus(error.message || 'Unable to export the local backup.', 'error');
+      }
     });
 
     panel.querySelector('[data-backup-import]').addEventListener('change', async (event) => {
       const file = event.target.files?.[0];
       if (!file) return;
-      setStatus('Restoring backup...', 'loading');
-      const data = await readFileAsJson(file);
-      restoreLocalStorage(data.localStorage);
-      await restoreIndexedDb(data.indexedDB);
-      setStatus('Backup restored. Refresh open tools to reload restored state.', 'success');
-      event.target.value = '';
+      try {
+        setStatus('Restoring backup...', 'loading');
+        const data = await readFileAsJson(file);
+        if (data?.app !== 'eDM Helper' || !Number.isFinite(data?.backupVersion)) {
+          throw new Error('This file is not a compatible eDM Helper backup.');
+        }
+        restoreLocalStorage(data.localStorage);
+        await restoreIndexedDb(data.indexedDB);
+        setStatus('Backup restored. Refresh open tools to reload restored state.', 'success');
+      } catch (error) {
+        setStatus(error.message || 'Unable to restore the local backup.', 'error');
+      } finally {
+        event.target.value = '';
+      }
     });
 
     panel.querySelector('[data-backup-clear]').addEventListener('click', async () => {
       const confirmed = window.confirm('Clear eDM Helper local browser data on this browser?');
       if (!confirmed) return;
-      setStatus('Clearing local data...', 'loading');
-      await clearLocalState();
-      setStatus('Local data cleared for this browser.', 'success');
+      try {
+        setStatus('Clearing local data...', 'loading');
+        await clearLocalState();
+        setStatus('Local data cleared for this browser.', 'success');
+      } catch (error) {
+        setStatus(error.message || 'Unable to clear local data.', 'error');
+      }
     });
   }
 

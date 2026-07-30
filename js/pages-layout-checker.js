@@ -48,6 +48,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   let latestPreviewHtml = '';
   let latestPreviewSourceUrl = '';
   let html2canvasLoadPromise = null;
+  const screenshotImageCache = new Map();
 
   function setLayoutStatus(state, text) {
     if (!layoutStatus) return;
@@ -152,7 +153,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     return html2canvasLoadPromise;
   }
 
-  function waitForDocumentImages(documentRef, timeoutMs = 1800) {
+  function waitForDocumentImages(documentRef, timeoutMs = 5000) {
     const images = Array.from(documentRef?.images || []);
     if (!images.length) return Promise.resolve();
 
@@ -183,6 +184,160 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     });
   }
 
+  function readBlobAsDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error || new Error('Unable to read image'));
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function resolvePreviewAssetUrl(url, documentRef) {
+    if (!url || /^(data:|blob:|about:|#)/i.test(url)) return '';
+    try {
+      return new URL(url, latestPreviewSourceUrl || documentRef?.baseURI || window.location.href).href;
+    } catch {
+      return '';
+    }
+  }
+
+  function getImageFetchAttempts(url) {
+    const attempts = [{ url, via: 'direct' }];
+    if (window.EDM_PRIVACY?.get?.('proxyFallbacks') === false) return attempts;
+
+    const cleanUrl = url.replace(/^https?:\/\//, '');
+    return [
+      ...attempts,
+      { url: `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}`, via: 'Weserv Image' },
+      { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, via: 'AllOrigins Raw' },
+      { url: `https://corsproxy.io/?${encodeURIComponent(url)}`, via: 'CorsProxy' },
+      { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, via: 'CodeTabs' }
+    ];
+  }
+
+  async function fetchImageAsDataUrl(url) {
+    if (!url) return '';
+    if (screenshotImageCache.has(url)) return screenshotImageCache.get(url);
+    if (window.EDM_PRIVACY?.get?.('externalChecks') === false) return '';
+
+    const controllers = [];
+    const fetchAttempt = async (attempt) => {
+      const controller = new AbortController();
+      controllers.push(controller);
+      const timeoutId = window.setTimeout(() => controller.abort(), 7000);
+      try {
+        const response = await fetch(attempt.url, {
+          signal: controller.signal,
+          mode: 'cors',
+          credentials: 'omit',
+          headers: { Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8' }
+        });
+        if (!response.ok) throw new Error(`${attempt.via} HTTP ${response.status}`);
+        const blob = await response.blob();
+        if (!blob || !blob.size) throw new Error(`${attempt.via} returned an empty image`);
+        return await readBlobAsDataUrl(blob);
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    };
+
+    try {
+      const dataUrl = await Promise.any(getImageFetchAttempts(url).map(fetchAttempt));
+      screenshotImageCache.set(url, dataUrl);
+      return dataUrl;
+    } catch (error) {
+      console.warn('Unable to prepare image for screenshot:', url, error);
+      screenshotImageCache.set(url, '');
+      return '';
+    } finally {
+      controllers.forEach(controller => controller.abort());
+    }
+  }
+
+  async function runLimited(items, limit, worker) {
+    const queue = [...items];
+    const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+      while (queue.length) {
+        const item = queue.shift();
+        await worker(item);
+      }
+    });
+    await Promise.all(workers);
+  }
+
+  function collectScreenshotImageTasks(documentRef) {
+    const tasks = [];
+    const addTask = (element, attribute, rawUrl) => {
+      const url = resolvePreviewAssetUrl(rawUrl, documentRef);
+      if (!url) return;
+      tasks.push({ element, attribute, rawUrl, url });
+    };
+
+    Array.from(documentRef.images || []).forEach((image) => {
+      addTask(image, 'src', image.getAttribute('src') || image.currentSrc || image.src);
+    });
+
+    Array.from(documentRef.querySelectorAll('[background]')).forEach((element) => {
+      addTask(element, 'background', element.getAttribute('background'));
+    });
+
+    Array.from(documentRef.querySelectorAll('[style*="url("]')).forEach((element) => {
+      const styleValue = element.getAttribute('style') || '';
+      const matches = styleValue.matchAll(/url\((['"]?)(.*?)\1\)/gi);
+      for (const match of matches) {
+        addTask(element, 'style', match[2]);
+      }
+    });
+
+    return tasks;
+  }
+
+  async function preparePreviewImagesForScreenshot(documentRef) {
+    const tasks = collectScreenshotImageTasks(documentRef);
+    if (!tasks.length) return { total: 0, converted: 0 };
+
+    let completed = 0;
+    let converted = 0;
+    const styleDataUrls = new Map();
+
+    await runLimited(tasks, 6, async (task) => {
+      const dataUrl = await fetchImageAsDataUrl(task.url);
+      completed += 1;
+      setLayoutStatus('loading', `Preparing screenshot images ${completed}/${tasks.length}`);
+      if (!dataUrl) return;
+      converted += 1;
+
+      if (task.attribute === 'src') {
+        task.element.removeAttribute('srcset');
+        task.element.removeAttribute('sizes');
+        task.element.crossOrigin = 'anonymous';
+        task.element.src = dataUrl;
+        return;
+      }
+
+      if (task.attribute === 'background') {
+        task.element.setAttribute('background', dataUrl);
+        return;
+      }
+
+      if (!styleDataUrls.has(task.element)) styleDataUrls.set(task.element, []);
+      styleDataUrls.get(task.element).push([task.rawUrl, dataUrl]);
+    });
+
+    styleDataUrls.forEach((replacements, element) => {
+      let styleValue = element.getAttribute('style') || '';
+      replacements.forEach(([rawUrl, dataUrl]) => {
+        const escaped = rawUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        styleValue = styleValue.replace(new RegExp(escaped, 'g'), dataUrl);
+      });
+      element.setAttribute('style', styleValue);
+    });
+
+    await waitForDocumentImages(documentRef, 8000);
+    return { total: tasks.length, converted };
+  }
+
   async function downloadPreviewScreenshot() {
     if (!latestPreviewHtml.trim()) {
       setLayoutStatus('error', 'Apply or load a layout before downloading screenshot');
@@ -198,15 +353,18 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       setLayoutView('preview');
       const previewDocument = getPreviewDocument();
       await waitForDocumentImages(previewDocument);
-      const target = previewDocument?.body || previewDocument?.documentElement;
+      if (!previewDocument?.documentElement) throw new Error('Preview is not ready yet');
+      const imageResult = await preparePreviewImagesForScreenshot(previewDocument);
+      const target = previewDocument.body || previewDocument.documentElement;
       if (!target) throw new Error('Preview is not ready yet');
       const html2canvas = await loadHtml2Canvas();
       const canvas = await html2canvas(target, {
         backgroundColor: '#ffffff',
         scale: Math.min(2, window.devicePixelRatio || 1),
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
+        imageTimeout: 12000,
         windowWidth: target.scrollWidth,
         windowHeight: target.scrollHeight,
       });
@@ -216,11 +374,14 @@ const originalUrlInput = document.getElementById('originalUrlInput');
           return;
         }
         downloadBlob(blob, `${getPreviewFileBaseName()}-screenshot.png`);
-        setLayoutStatus('ready', 'Screenshot downloaded');
+        const suffix = imageResult.total
+          ? ` (${imageResult.converted}/${imageResult.total} images embedded)`
+          : '';
+        setLayoutStatus('ready', `Screenshot downloaded${suffix}`);
       }, 'image/png');
     } catch (error) {
       console.error('Unable to capture layout screenshot.', error);
-      setLayoutStatus('error', 'Browser blocked the screenshot images. Use Open preview, then browser screenshot.');
+      setLayoutStatus('error', 'Screenshot failed. Try again after the preview finishes loading.');
     } finally {
       if (downloadScreenshotBtn) {
         downloadScreenshotBtn.innerHTML = '<i class="fa-solid fa-download"></i> Screenshot';

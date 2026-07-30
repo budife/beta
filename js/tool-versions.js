@@ -6,12 +6,12 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.14.1',
+    version: '6.14.2',
     status: 'stable'
   },
   home: {
     label: 'Home',
-    version: '1.0.0',
+    version: '1.0.1',
     status: 'stable'
   },
   bookmarklet: {
@@ -41,7 +41,7 @@ const TOOL_VERSIONS = {
   },
   'layout-checker': {
     label: 'Layout Checker',
-    version: '1.4.1',
+    version: '1.4.2',
     status: 'stable'
   },
   'layout-slicer': {
@@ -61,12 +61,12 @@ const TOOL_VERSIONS = {
   },
   docs: {
     label: 'Documentation',
-    version: '1.0.0',
+    version: '1.0.2',
     status: 'stable'
   },
   maintenance: {
     label: 'Maintenance',
-    version: '1.0.0',
+    version: '1.0.2',
     status: 'stable'
   }
 };

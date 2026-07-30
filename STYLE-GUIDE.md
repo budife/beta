@@ -15,6 +15,16 @@ CSS.
 - Do not create a separate mobile visual language. Let the desktop layout
   adapt through wrapping, shrinking, stacking, and contained scrolling.
 
+## Release Hygiene
+
+Every completed edit, fix, or feature must leave a visible paper trail:
+
+- Update `content/home.md` Recent Updates.
+- Update `CHANGELOG.md`.
+- Update `js/tool-versions.js` for tool-specific user-facing changes.
+- Refresh cache-busters in affected HTML files when CSS or JavaScript changes.
+- Run `git diff --check` before handing work back.
+
 ## 2. Design Tokens
 
 Define shared values as CSS custom properties. Page styles should consume

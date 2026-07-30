@@ -483,6 +483,71 @@ a {
   font-size: 14px;
 }
 
+.docs-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 18px 0 24px;
+  padding: 12px;
+  background: var(--app-soft);
+  border: 1px solid var(--app-border);
+}
+
+.docs-search {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--app-muted);
+  background: #fff;
+  border: 1px solid var(--app-border);
+}
+
+.docs-search input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0 8px;
+  color: #18181b;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+}
+
+.docs-tools-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.docs-tools-actions button {
+  min-height: 36px;
+  padding: 0 11px;
+  color: #3f3f46;
+  background: #fff;
+  border: 1px solid var(--app-border);
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--ui-weight-medium);
+  cursor: pointer;
+}
+
+.docs-tools-actions button:hover,
+.docs-tools-actions button:focus-visible {
+  color: #9f3f45;
+  border-color: var(--app-accent);
+}
+
+.docs-search-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 12px;
+}
+
 .docs-details {
   margin: 10px 0;
   border: 1px solid var(--app-border);
@@ -543,6 +608,13 @@ a {
   padding: 12px 14px;
   background: var(--app-soft);
   border: 1px solid var(--app-border);
+}
+
+.privacy-setting > span,
+.local-backup-summary,
+.local-backup-status {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .privacy-setting strong,
@@ -625,6 +697,12 @@ a {
   color: #fff;
   background: var(--app-accent);
   border-color: var(--app-accent);
+}
+
+.local-backup-actions button:focus-visible,
+.local-backup-import:focus-within span {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
 }
 
 .local-backup-actions .is-danger {
@@ -722,6 +800,29 @@ a {
 .markdown-section:last-child {
   padding-bottom: 0;
   border-bottom: 0;
+}
+
+@media (max-width: 620px) {
+  .docs-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .docs-tools-actions {
+    width: 100%;
+  }
+
+  .docs-tools-actions button {
+    flex: 1 1 auto;
+  }
+
+  .privacy-setting {
+    align-items: flex-start;
+  }
+
+  .privacy-setting input {
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
 }
 
 .markdown-content h2,

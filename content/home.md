@@ -32,6 +32,14 @@ category: Home
 
 ## Recent Updates
 
+- **Core v6.14.4 - 31 July 2026** - Removed duplicate privacy settings from Docs and kept Maintenance as the single place to change them.
+- **Documentation v1.0.2 - 31 July 2026** - Replaced the duplicate editable privacy panel with a direct Maintenance link.
+- **Maintenance v1.0.2 - 31 July 2026** - Kept Maintenance as the canonical home for local privacy and network controls.
+- **Core v6.14.3 - 31 July 2026** - Optimized Documentation with search and expand/collapse controls, hardened Docs and Maintenance layouts, and refreshed shared cache-busters.
+- **Documentation v1.0.1 - 31 July 2026** - Added quick guide search with matching sections opened automatically, plus compact Expand all and Collapse all actions.
+- **Maintenance v1.0.1 - 31 July 2026** - Reorganized backup/privacy/release guidance and added safer backup export, restore, and local-data error handling.
+- **Core v6.14.2 - 31 July 2026** - Refreshed Layout Checker cache-busters after the screenshot capture fix.
+- **Layout Checker v1.4.2 - 31 July 2026** - Improved screenshot export so remote email images are prepared before capture and included in the downloaded preview image when the browser allows it.
 - **Core v6.14.1 - 30 July 2026** - Refreshed cache-busters after restoring Database Checker to the previous compact workspace.
 - **Layout Checker v1.4.1 - 30 July 2026** - Added preview open-in-new-tab and a faster screenshot action that captures the visible layout preview.
 - **Database Checker v1.8.1 - 30 July 2026** - Reverted the automatic dashboard redesign and restored the previous package workspace, validation panels, and layout-test workflow.

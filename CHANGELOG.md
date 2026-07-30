@@ -2,6 +2,45 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.14.4 - 31 July 2026
+
+- Removed the duplicate privacy-settings surface from Documentation and kept Maintenance as the single settings location.
+
+## Documentation v1.0.2 - 31 July 2026
+
+- Replaced the duplicate editable privacy panel with a clear link to Maintenance.
+
+## Maintenance v1.0.2 - 31 July 2026
+
+- Kept Maintenance as the canonical place for browser-local privacy and network controls.
+
+## Core v6.14.3 - 31 July 2026
+
+- Optimized Documentation with in-page search plus compact Expand all and Collapse all controls.
+- Hardened shared Docs and Maintenance layouts for long content, narrow screens, and visible keyboard focus.
+- Refreshed shared shell cache-busters for the Docs and Maintenance update.
+
+## Documentation v1.0.1 - 31 July 2026
+
+- Added quick search across documentation sections and automatic expansion of matching guidance.
+- Added simple all-open and all-closed controls to keep the long reference easy to scan.
+
+## Maintenance v1.0.1 - 31 July 2026
+
+- Reorganized backup, privacy, release, and recovery guidance into a more direct operating flow.
+- Added clear error handling for backup export, restore, and local-data clearing.
+- Added backup-file compatibility validation before restoring browser-local state.
+
+## Core v6.14.2 - 31 July 2026
+
+- Refreshed Layout Checker cache-busters after the screenshot capture fix.
+
+## Layout Checker v1.4.2 - 31 July 2026
+
+- Improved Screenshot export so remote email images are prepared through direct/proxy image fetching before capture.
+- Added image-load waiting and data-URL embedding for preview screenshots so captured layouts include more than just text.
+- Kept a clearer screenshot failure message when a browser or remote host still blocks image capture.
+
 ## Core v6.14.1 - 30 July 2026
 
 - Refreshed cache-busters after restoring Database Checker to the previous compact workspace.
