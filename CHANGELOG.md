@@ -10,7 +10,7 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Added an Open Preview action to launch the applied layout and KRHRED values in a new browser tab.
 - Added a Screenshot action beside the Highlight KRHRED control.
-- Improved screenshot capture by preparing remote layout images as inline data before rendering the PNG export.
+- Switched screenshot capture to the visible preview for a faster export, with a clear fallback message when browser security blocks remote images.
 
 ## Database Checker v1.8.1 - 30 July 2026
 
