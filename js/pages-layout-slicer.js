@@ -10,9 +10,9 @@
     generated: null,
     templateDir: null,
     campaignParentDir: null,
-    copiedCampaignDir: null,
-    copiedHtmlFiles: [],
-    finalHtmlNameManual: false,
+    templateDirectories: [],
+    templateFileCount: 0,
+    fullWorkflow: false,
     zoom: 1,
     zoomMode: 'fit'
   };
@@ -20,8 +20,6 @@
   const els = {
     campaignAccordion: document.querySelector('[data-slicer-section="campaign"]'),
     slicerAccordion: document.querySelector('[data-slicer-section="slicer"]'),
-    campaignAccordionTrigger: document.getElementById('campaign-section-trigger'),
-    slicerAccordionTrigger: document.getElementById('slicer-section-trigger'),
     campaignAccordionPanel: document.getElementById('campaign-section-panel'),
     slicerAccordionPanel: document.getElementById('slicer-section-panel'),
     dropZone: document.getElementById('drop-zone'),
@@ -31,8 +29,6 @@
     exportDpi: document.getElementById('export-dpi'),
     imageQuality: document.getElementById('image-quality'),
     duplicateFolderName: document.getElementById('duplicate-folder-name'),
-    templateYear: document.getElementById('template-year'),
-    templateCampaignFolder: document.getElementById('template-campaign-folder'),
     campaignPathPreview: document.getElementById('campaign-path-preview'),
     templateCopyStatus: document.getElementById('template-copy-status'),
     templateSourceName: document.getElementById('template-source-name'),
@@ -40,16 +36,10 @@
     chooseTemplateFolder: document.getElementById('choose-template-folder'),
     chooseCampaignParent: document.getElementById('choose-campaign-parent'),
     copyTemplateFolder: document.getElementById('copy-template-folder'),
-    copyCampaignPath: document.getElementById('copy-campaign-path'),
-    templateReview: document.getElementById('template-review'),
-    templateReviewSource: document.getElementById('template-review-source'),
-    templateReviewTarget: document.getElementById('template-review-target'),
-    templateReviewHtml: document.getElementById('template-review-html'),
-    templateReviewMkt: document.getElementById('template-review-mkt'),
-    htmlTools: document.getElementById('html-tools'),
-    htmlFileSelect: document.getElementById('html-file-select'),
-    finalHtmlName: document.getElementById('final-html-name'),
-    renameHtmlFile: document.getElementById('rename-html-file'),
+    workflowCards: Array.from(document.querySelectorAll('[data-slicer-workflow]')),
+    templateContents: document.getElementById('template-contents'),
+    templateContentsSummary: document.getElementById('template-contents-summary'),
+    templateContentsList: document.getElementById('template-contents-list'),
     autoSlice: document.getElementById('auto-slice'),
     clearLines: document.getElementById('clear-lines'),
     generateOutput: document.getElementById('generate-output'),
@@ -76,22 +66,11 @@
   function setActiveAccordion(section) {
     const active = section === 'slicer' ? 'slicer' : 'campaign';
     [
-      {
-        key: 'campaign',
-        item: els.campaignAccordion,
-        trigger: els.campaignAccordionTrigger,
-        panel: els.campaignAccordionPanel
-      },
-      {
-        key: 'slicer',
-        item: els.slicerAccordion,
-        trigger: els.slicerAccordionTrigger,
-        panel: els.slicerAccordionPanel
-      }
-    ].forEach(({ key, item, trigger, panel }) => {
+      { key: 'campaign', item: els.campaignAccordion, panel: els.campaignAccordionPanel },
+      { key: 'slicer', item: els.slicerAccordion, panel: els.slicerAccordionPanel }
+    ].forEach(({ key, item, panel }) => {
       const isOpen = key === active;
       item?.classList.toggle('is-open', isOpen);
-      trigger?.setAttribute('aria-expanded', String(isOpen));
       if (panel) panel.hidden = !isOpen;
     });
 
@@ -102,23 +81,15 @@
     }
   }
 
-  function slugify(value) {
-    return String(value || 'layout-edm')
-      .trim()
-      .replace(/\.[a-z0-9]+$/i, '')
-      .replace(/[^a-z0-9_-]+/gi, '-')
-      .replace(/^-+|-+$/g, '')
-      .toLowerCase() || 'layout-edm';
-  }
-
-  function cleanPathSegment(value, fallback = 'campaign') {
-    return String(value || fallback)
-      .trim()
-      .replace(/\.[a-z0-9]+$/i, '')
-      .replace(/[<>:"/\\|?*\u0000-\u001F]+/g, '-')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '') || fallback;
+  function setWorkflow(workflow) {
+    state.fullWorkflow = workflow === 'full';
+    els.workflowCards.forEach((card) => {
+      card.classList.toggle('is-active', card.dataset.slicerWorkflow === workflow);
+    });
+    setActiveAccordion(workflow === 'slice' ? 'slicer' : 'campaign');
+    if (workflow === 'full') {
+      setTemplateStatus('Copy a template folder first. Slicing will open automatically after the copy.', '');
+    }
   }
 
   function cleanFolderName(value, fallback = 'template copy') {
@@ -129,198 +100,14 @@
       .trim() || fallback;
   }
 
-  function cleanFolderSegment(value, fallback) {
-    return cleanFolderName(value, fallback);
-  }
-
-  function cleanHtmlFileName(value, fallback = 'index.html') {
-    const cleaned = String(value || fallback)
-      .trim()
-      .replace(/[<>:"/\\|?*\u0000-\u001F]+/g, '-')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    const withExt = cleaned || fallback;
-    return /\.html?$/i.test(withExt) ? withExt : `${withExt}.html`;
-  }
-
-  function cleanNameForFile(value, fallback = 'campaign') {
-    return String(value || fallback)
-      .trim()
-      .replace(/\.[a-z0-9]+$/i, '')
-      .replace(/[<>:"/\\|?*\u0000-\u001F]+/g, '-')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '') || fallback;
-  }
-
-  function parseFolderName(value) {
-    const raw = String(value || '').trim();
-    const dateMatch = raw.match(/(?:^|\s)(\d{1,2})[-/](\d{1,2})(?=\s|$)/);
-    const campaignNoMatch = raw.match(/^\s*(\d{4})\b/);
-    const campaignNo = campaignNoMatch?.[1] || '';
-    const year = String(new Date().getFullYear());
-    const month = dateMatch ? dateMatch[1].padStart(2, '0') : '';
-    const day = dateMatch ? dateMatch[2].padStart(2, '0') : '';
-    const dateToken = dateMatch ? `${month}${day}` : '';
-    const fullDate = dateMatch ? `${year}${dateToken}` : '';
-    const beforeDate = dateMatch ? raw.slice(0, dateMatch.index).trim() : raw;
-    const afterDate = dateMatch ? raw.slice(dateMatch.index + dateMatch[0].length).trim() : '';
-    const campaignName = beforeDate.replace(/^\d{4}\s*/, '').trim();
-    const managerWord = afterDate.split(/\s+/).find(Boolean) || '';
-    const managerCode = managerWord.replace(/[^a-z]/gi, '').slice(0, 2).toUpperCase();
-    const suffix = managerCode || 'XX';
-    const campaignFolder = campaignNo && fullDate ? `${campaignNo}-${fullDate}-${suffix}` : '';
-    const fileParts = [
-      campaignNo,
-      cleanNameForFile(campaignName, 'Campaign')
-    ].filter(Boolean);
-    return {
-      campaignNo,
-      year,
-      campaignFolder,
-      fileName: fileParts.length ? `${fileParts.join('-')}.html` : ''
-    };
-  }
-
-  function getSelectedTemplateHtml() {
-    const selectedPath = els.htmlFileSelect?.value || state.copiedHtmlFiles[0]?.path || '';
-    return state.copiedHtmlFiles.find((file) => file.path === selectedPath) || state.copiedHtmlFiles[0] || null;
-  }
-
-  function getSelectedTemplateHtmlName() {
-    return getSelectedTemplateHtml()?.name || '';
-  }
-
-  function getSelectedTemplateHtmlPath() {
-    return getSelectedTemplateHtml()?.path || '';
-  }
-
   function getDuplicateFolderName() {
     return cleanFolderName(els.duplicateFolderName?.value || state.templateDir?.name || 'template copy', 'template copy');
   }
 
-  function getEmailblastFolder() {
-    return 'emailblast';
-  }
-
-  function getTemplateYear() {
-    const value = String(els.templateYear?.value || '').replace(/\D/g, '').slice(0, 4);
-    return value.length === 4 ? value : String(new Date().getFullYear());
-  }
-
-  function getTemplateMarket() {
-    return 'MKT';
-  }
-
-  function getTemplateCampaignFolder() {
-    return cleanFolderSegment(els.templateCampaignFolder?.value || 'campaign-folder', 'campaign-folder');
-  }
-
-  function getFolderNameTarget() {
-    const parsed = parseFolderName(els.duplicateFolderName?.value || '');
-    if (!parsed.campaignNo || !parsed.campaignFolder) return null;
-    return {
-      year: parsed.year,
-      campaignFolder: parsed.campaignFolder,
-      fileName: parsed.fileName
-    };
-  }
-
-  function getFinalHtmlName() {
-    const selectedHtml = getSelectedTemplateHtmlName();
-    return selectedHtml || `${getDuplicateFolderName()}.html`;
-  }
-
-  function getResolvedFinalHtmlName() {
-    const value = els.finalHtmlName?.value?.trim();
-    if (!value) return getFinalHtmlName();
-    return cleanHtmlFileName(value, getFinalHtmlName());
-  }
-
-  function getDuplicateTarget() {
-    const folderTarget = getFolderNameTarget();
-    if (folderTarget) {
-      return {
-        year: folderTarget.year,
-        campaignFolder: folderTarget.campaignFolder,
-        fileName: cleanHtmlFileName(folderTarget.fileName, getFinalHtmlName())
-      };
-    }
-
-    return {
-      year: getTemplateYear(),
-      campaignFolder: getTemplateCampaignFolder(),
-      fileName: getResolvedFinalHtmlName()
-    };
-  }
 
   function getCampaignPath() {
     const pasteLocation = state.campaignParentDir?.name || '[choose output folder]';
-    const hasHtmlTarget = Boolean(getSelectedTemplateHtmlName() || els.finalHtmlName?.value?.trim());
-    const targetHtmlPath = getStructuredHtmlPath();
-    return hasHtmlTarget
-      ? `${pasteLocation}/${getDuplicateFolderName()}/${targetHtmlPath}`
-      : `${pasteLocation}/${getDuplicateFolderName()}`;
-  }
-
-  function getStructuredHtmlPath() {
-    const target = getDuplicateTarget();
-    return [
-      getEmailblastFolder(),
-      getTemplateMarket(),
-      target.year,
-      target.campaignFolder,
-      target.fileName
-    ].join('/');
-  }
-
-  function getSelectedMktPath() {
-    const target = getDuplicateTarget();
-    return [
-      getTemplateMarket(),
-      target.year,
-      target.campaignFolder,
-      target.fileName
-    ].join('/');
-  }
-
-  function getSelectedHtmlPathParts() {
-    const selectedPath = getSelectedTemplateHtmlPath();
-    const parts = selectedPath ? selectedPath.split('/') : [];
-    const mktIndex = parts.findIndex((part) => part.toLowerCase() === 'mkt');
-    const emailblast = mktIndex > 0 ? parts[mktIndex - 1] : 'emailblast';
-    return {
-      emailblast,
-      market: mktIndex >= 0 ? parts[mktIndex] : 'MKT',
-      year: mktIndex >= 0 && parts[mktIndex + 1] ? parts[mktIndex + 1] : String(new Date().getFullYear()),
-      campaignFolder: mktIndex >= 0 && parts[mktIndex + 2] ? parts[mktIndex + 2] : '',
-      fileName: parts[parts.length - 1] || ''
-    };
-  }
-
-  function syncTemplateFieldsFromSelectedHtml(force = false) {
-    const parts = getSelectedHtmlPathParts();
-    if (els.templateYear && (force || !els.templateYear.value.trim())) els.templateYear.value = parts.year;
-    if (els.templateCampaignFolder && (force || !els.templateCampaignFolder.value.trim())) els.templateCampaignFolder.value = parts.campaignFolder;
-    if (els.finalHtmlName && (force || !els.finalHtmlName.value.trim() || !state.finalHtmlNameManual)) els.finalHtmlName.value = parts.fileName || getFinalHtmlName();
-  }
-
-  function syncTemplateFieldsFromFolderName(forceFinalName = false) {
-    const parsed = parseFolderName(els.duplicateFolderName?.value || '');
-    if (!parsed.campaignNo) return;
-    if (els.templateYear) els.templateYear.value = parsed.year;
-    if (els.templateCampaignFolder && parsed.campaignFolder) els.templateCampaignFolder.value = parsed.campaignFolder;
-    if (els.finalHtmlName && parsed.fileName && (forceFinalName || !state.finalHtmlNameManual || !els.finalHtmlName.value.trim())) {
-      els.finalHtmlName.value = parsed.fileName;
-      state.finalHtmlNameManual = false;
-    }
-    return true;
-  }
-
-  function normalizeFinalHtmlInput() {
-    if (!els.finalHtmlName) return;
-    els.finalHtmlName.value = getResolvedFinalHtmlName();
+    return `${pasteLocation}/${getDuplicateFolderName()}`;
   }
 
   function setTemplateStatus(message, type = '') {
@@ -330,11 +117,6 @@
   }
 
   function updateCampaignPathPreview() {
-    if (els.finalHtmlName && !els.finalHtmlName.matches(':focus') && (!els.finalHtmlName.value.trim() || !state.finalHtmlNameManual)) {
-      const syncedFromFolderName = syncTemplateFieldsFromFolderName(false);
-      if (!syncedFromFolderName) syncTemplateFieldsFromSelectedHtml(false);
-    }
-
     if (els.campaignPathPreview) els.campaignPathPreview.textContent = getCampaignPath();
     if (els.templateSourceName) {
       els.templateSourceName.textContent = state.templateDir?.name || 'Not selected';
@@ -345,7 +127,6 @@
     if (els.copyTemplateFolder) {
       els.copyTemplateFolder.disabled = !canProcessTemplate();
     }
-    renderTemplateReview();
   }
 
   function canProcessTemplate() {
@@ -356,23 +137,25 @@
     );
   }
 
-  function renderTemplateReview() {
-    if (!els.templateReview) return;
-    const hasTemplateContext = Boolean(state.templateDir || state.campaignParentDir || state.copiedHtmlFiles.length);
-    els.templateReview.hidden = !hasTemplateContext;
-    if (!hasTemplateContext) return;
+  function renderTemplateContents() {
+    if (!els.templateContents || !els.templateContentsList || !els.templateContentsSummary) return;
+    const hasTemplate = Boolean(state.templateDir);
+    els.templateContents.hidden = !hasTemplate;
+    if (!hasTemplate) return;
 
-    const selectedHtml = getSelectedTemplateHtmlPath() || 'No HTML file detected yet';
-    els.templateReviewSource.textContent = state.templateDir
-      ? `${state.templateDir.name} / ${selectedHtml}`
-      : 'Choose template folder first';
-    els.templateReviewTarget.textContent = state.campaignParentDir
-      ? `${state.campaignParentDir.name} / ${getDuplicateFolderName()}`
-      : 'Choose paste location';
-    els.templateReviewHtml.textContent = `${selectedHtml} -> ${getResolvedFinalHtmlName()}`;
-    if (els.templateReviewMkt) {
-      els.templateReviewMkt.textContent = getSelectedMktPath() || 'No HTML file detected yet';
-    }
+    const fileLabel = `${state.templateFileCount} file${state.templateFileCount === 1 ? '' : 's'}`;
+    const folderLabel = `${state.templateDirectories.length} subfolder${state.templateDirectories.length === 1 ? '' : 's'}`;
+    els.templateContentsSummary.textContent = `${folderLabel} · ${fileLabel}`;
+    els.templateContentsList.replaceChildren();
+
+    const entries = state.templateDirectories.length
+      ? state.templateDirectories
+      : ['No subfolders found. Files at the template root will still be copied.'];
+    entries.forEach((path) => {
+      const item = document.createElement('li');
+      item.textContent = path;
+      els.templateContentsList.appendChild(item);
+    });
   }
 
   function setStatus(message, type = '') {
@@ -661,16 +444,11 @@
     updateCampaignPathPreview();
   }
 
-  async function loadImageFile(file) {
-    if (!file || !/^image\/(png|jpeg)$/.test(file.type)) {
-      setStatus('Please choose a JPG or PNG file.', 'error');
-      return;
-    }
-
+  function loadRasterImage(file, sourceSize = file.size) {
     setActiveAccordion('slicer');
     if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
     state.file = file;
-    state.sourceFileSize = file.size;
+    state.sourceFileSize = sourceSize;
     state.imageUrl = URL.createObjectURL(file);
     const image = new Image();
     image.decoding = 'async';
@@ -687,6 +465,42 @@
     };
     image.onerror = () => setStatus('Unable to read this image.', 'error');
     image.src = state.imageUrl;
+  }
+
+  async function loadPdfFile(file) {
+    setActiveAccordion('slicer');
+    setStatus('Rendering the first PDF page for slicing...', '');
+    try {
+      const pdfjs = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+      const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      const imageBlob = await new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Unable to prepare the PDF page as an image.')), 'image/png');
+      });
+      loadRasterImage(new File([imageBlob], `${file.name.replace(/\.pdf$/i, '')}.png`, { type: 'image/png' }), file.size);
+      setStatus('PDF first page loaded. Add guides, then generate slices.', 'success');
+    } catch (error) {
+      setStatus(error.message || 'Unable to render this PDF. Try a JPG or PNG instead.', 'error');
+    }
+  }
+
+  async function loadImageFile(file) {
+    if (!file) return;
+    if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+      await loadPdfFile(file);
+      return;
+    }
+    if (!/^image\/(png|jpeg)$/.test(file.type)) {
+      setStatus('Please choose a PDF, JPG, JPEG, or PNG file.', 'error');
+      return;
+    }
+    loadRasterImage(file);
   }
 
   function canvasToImageY(event) {
@@ -874,6 +688,16 @@
     return files.sort((a, b) => a.path.localeCompare(b.path));
   }
 
+  async function listDirectories(dirHandle, basePath = '') {
+    const directories = [];
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (handle.kind !== 'directory') continue;
+      const path = basePath ? `${basePath}/${name}` : name;
+      directories.push(path, ...await listDirectories(handle, path));
+    }
+    return directories.sort((a, b) => a.localeCompare(b));
+  }
+
   function renderCopiedHtmlFiles() {
     if (!els.htmlTools || !els.htmlFileSelect) return;
     els.htmlTools.hidden = state.copiedHtmlFiles.length === 0;
@@ -891,12 +715,14 @@
     }
     state.templateDir = await window.showDirectoryPicker({ mode: 'read' });
     state.copiedHtmlFiles = await listHtmlFiles(state.templateDir);
+    state.templateDirectories = await listDirectories(state.templateDir);
     state.copiedCampaignDir = null;
     if (els.duplicateFolderName && !els.duplicateFolderName.value.trim()) {
       els.duplicateFolderName.value = `${state.templateDir.name} copy`;
     }
     state.finalHtmlNameManual = false;
     renderCopiedHtmlFiles();
+    renderTemplateContents();
     syncTemplateFieldsFromSelectedHtml(true);
     syncTemplateFieldsFromFolderName();
     setTemplateStatus(`Template selected: ${state.templateDir.name} - ${state.copiedHtmlFiles.length} HTML file(s) found`, 'success');
@@ -918,9 +744,6 @@
     const folderSynced = syncTemplateFieldsFromFolderName(true);
     if (folderSynced) state.finalHtmlNameManual = false;
     updateCampaignPathPreview();
-    const selectedTemplateHtmlPath = getSelectedTemplateHtmlPath();
-    const targetName = getDuplicateTarget().fileName;
-    const targetHtmlPath = getStructuredHtmlPath();
     setTemplateStatus('Processing duplicate...', 'loading');
     const duplicateDir = await getOrCreateDuplicateDirectory();
     const isPastingInsideTemplate = typeof state.templateDir.isSameEntry === 'function'
@@ -928,22 +751,10 @@
     await copyDirectory(state.templateDir, duplicateDir, isPastingInsideTemplate ? getDuplicateFolderName() : '');
     state.copiedCampaignDir = duplicateDir;
     state.copiedHtmlFiles = await listHtmlFiles(duplicateDir);
-    const copiedEntry = selectedTemplateHtmlPath
-      ? state.copiedHtmlFiles.find((file) => file.path === selectedTemplateHtmlPath)
-      : null;
-    if (!copiedEntry && selectedTemplateHtmlPath) {
-      throw new Error(`Template HTML not found after copy: ${selectedTemplateHtmlPath}`);
-    }
-    if (copiedEntry && targetName) await moveCampaignDirectoryAndRenameHtml(copiedEntry, targetName);
-    state.copiedHtmlFiles = await listHtmlFiles(duplicateDir);
     renderCopiedHtmlFiles();
-    if (els.htmlFileSelect && copiedEntry && targetName) {
-      const movedEntry = state.copiedHtmlFiles.find((file) => file.path === targetHtmlPath);
-      if (movedEntry) els.htmlFileSelect.value = movedEntry.path;
-      if (els.finalHtmlName) els.finalHtmlName.value = targetName;
-    }
     updateCampaignPathPreview();
     setTemplateStatus(`Duplicated: ${getCampaignPath()}`, 'success');
+    if (state.fullWorkflow) setActiveAccordion('slicer');
   }
 
   async function renameHtmlFileEntry(fileEntry, targetName) {
@@ -993,8 +804,11 @@
     setTemplateStatus(`HTML ready: ${getCampaignPath().replace(/[^/]+$/, targetName)}`, 'success');
   }
 
-  els.campaignAccordionTrigger?.addEventListener('click', () => setActiveAccordion('campaign'));
-  els.slicerAccordionTrigger?.addEventListener('click', () => setActiveAccordion('slicer'));
+  els.campaignAccordionTrigger?.addEventListener('click', () => setWorkflow('copy'));
+  els.slicerAccordionTrigger?.addEventListener('click', () => setWorkflow('slice'));
+  els.workflowCards.forEach((card) => {
+    card.addEventListener('click', () => setWorkflow(card.dataset.slicerWorkflow));
+  });
   els.dropZone.addEventListener('click', () => els.imageInput.click());
   els.dropZone.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -1010,9 +824,11 @@
   els.dropZone.addEventListener('drop', (event) => {
     event.preventDefault();
     els.dropZone.classList.remove('is-dragover');
-    loadImageFile(event.dataTransfer.files[0]);
+    loadImageFile(event.dataTransfer.files[0]).catch((error) => setStatus(error.message || 'Unable to load this file.', 'error'));
   });
-  els.imageInput.addEventListener('change', () => loadImageFile(els.imageInput.files[0]));
+  els.imageInput.addEventListener('change', () => {
+    loadImageFile(els.imageInput.files[0]).catch((error) => setStatus(error.message || 'Unable to load this file.', 'error'));
+  });
   els.chooseTemplateFolder?.addEventListener('click', () => {
     chooseTemplateFolder().catch((error) => {
       if (error.name !== 'AbortError') setTemplateStatus(error.message || 'Unable to choose template folder.', 'error');

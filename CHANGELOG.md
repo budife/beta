@@ -2,6 +2,17 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.14.5 - 31 July 2026
+
+- Refreshed Layout Slicer cache-busters after its workflow rework.
+
+## Layout Slicer v0.4.0 beta - 31 July 2026
+
+- Reworked the entry flow into three large actions: Copy folder, Slice layout, and Full workflow.
+- Simplified template duplication: the copied folder now keeps the original template structure instead of moving nested HTML paths automatically.
+- Added a pre-copy subfolder list so the complete template structure is visible before duplicate.
+- Added PDF source support by rendering the first page in-browser before slicing; JPG, JPEG, and PNG remain supported.
+
 ## Core v6.14.4 - 31 July 2026
 
 - Removed the duplicate privacy-settings surface from Documentation and kept Maintenance as the single settings location.

@@ -113,6 +113,62 @@ select {
   color: #b7791f;
 }
 
+.slicer-workflow-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.slicer-workflow-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 112px;
+  padding: 18px;
+  color: var(--text, #111827);
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--border, #d8dde5);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.slicer-workflow-card:hover,
+.slicer-workflow-card:focus-visible,
+.slicer-workflow-card.is-active {
+  background: #fff7f7;
+  border-color: var(--accent-primary, #f3838b);
+  border-left-color: var(--accent-primary, #f3838b);
+  outline: 0;
+}
+
+.slicer-workflow-card > i {
+  flex: 0 0 auto;
+  color: var(--accent-primary, #f3838b);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.slicer-workflow-card > span {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.slicer-workflow-card strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.slicer-workflow-card small {
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
 .slicer-accordion {
   display: grid;
   gap: 12px;
@@ -260,6 +316,94 @@ select {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 10px;
+}
+
+.slicer-template-contents {
+  margin: 10px 0;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-template-contents-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: #f7f7f8;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-template-contents-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.slicer-template-contents-head span,
+.slicer-template-contents-head strong {
+  overflow-wrap: anywhere;
+}
+
+.slicer-template-contents-head span {
+  color: var(--text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.slicer-template-contents-head > span:last-child {
+  flex: 0 0 auto;
+  color: #047857;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.slicer-template-contents-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 6px;
+  max-height: 190px;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+  list-style: none;
+}
+
+.slicer-template-contents-list li {
+  min-width: 0;
+  padding: 7px 8px;
+  overflow-wrap: anywhere;
+  color: var(--text-muted, #6b7280);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  background: #fff;
+  border: 1px solid var(--border, #eef0f3);
+}
+
+.slicer-advanced-copy-options {
+  margin: 10px 0;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-advanced-copy-options summary {
+  padding: 10px;
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.slicer-advanced-copy-options > p {
+  margin: 0;
+  padding: 0 10px 10px;
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
+}
+
+.slicer-advanced-copy-options .slicer-location-grid {
+  padding: 0 10px 10px;
 }
 
 .slicer-folder-pick {
@@ -947,6 +1091,7 @@ select {
 }
 
 @media (max-width: 1100px) {
+  .slicer-workflow-picker,
   .slicer-form-grid,
   .slicer-folder-picks,
   .slicer-location-grid,
@@ -984,6 +1129,16 @@ select {
 
   .slicer-accordion-panel .slicer-workspace {
     margin: 12px -12px -12px;
+  }
+
+  .slicer-workflow-card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .slicer-template-contents-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .slicer-actions {

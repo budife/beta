@@ -32,6 +32,8 @@ category: Home
 
 ## Recent Updates
 
+- **Core v6.14.5 - 31 July 2026** - Refreshed Layout Slicer delivery assets after its workflow rework.
+- **Layout Slicer v0.4.0 beta - 31 July 2026** - Reworked the entry flow into Copy folder, Slice layout, and Full workflow; duplicate copies now retain the template structure, show included subfolders, and PDF first pages can be used for slicing.
 - **Core v6.14.4 - 31 July 2026** - Removed duplicate privacy settings from Docs and kept Maintenance as the single place to change them.
 - **Documentation v1.0.2 - 31 July 2026** - Replaced the duplicate editable privacy panel with a direct Maintenance link.
 - **Maintenance v1.0.2 - 31 July 2026** - Kept Maintenance as the canonical home for local privacy and network controls.

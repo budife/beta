@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Slice JPG or PNG email layouts into eDM-ready HTML and image assets.">
+  <meta name="description" content="Copy campaign templates and slice PDF or image layouts into eDM-ready image assets.">
   <meta name="author" content="eDM Helper">
 
-  <link rel="stylesheet" href="../css/theme.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/controls.css?v=6.14.0">
+  <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.14.5">
+  <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <title>Layout Slicer - eDM Helper</title>
@@ -18,8 +18,8 @@
     <section class="slicer-control-panel">
       <div class="slicer-panel-header">
         <p class="slicer-kicker">Layout Slicer <em class="tool-beta-badge">beta</em></p>
-        <h1><i class="fa-solid fa-scissors" aria-hidden="true"></i> Slice to eDM</h1>
-        <p>Drop JPG/PNG, add horizontal guides, then export ordered image slices.</p>
+        <h1><i class="fa-solid fa-scissors" aria-hidden="true"></i> Layout Slicer</h1>
+        <p>Copy a campaign template, slice a layout, or run both steps in one simple workflow.</p>
       </div>
 
       <div class="slicer-beta-warning" role="status">
@@ -27,19 +27,24 @@
         <span>This tool is still in beta/testing. Please review the generated image slices before using them for production.</span>
       </div>
 
-      <div class="slicer-accordion" data-slicer-accordion>
-        <section class="slicer-accordion-item is-open" data-slicer-section="campaign">
-          <button class="slicer-accordion-trigger" id="campaign-section-trigger" type="button" aria-expanded="true" aria-controls="campaign-section-panel">
-            <span class="slicer-accordion-title">
-              <strong>Campaign folder</strong>
-              <span>Duplicate a template folder and prepare the copied HTML path.</span>
-            </span>
-            <span class="slicer-accordion-meta">
-              <span>Template setup</span>
-              <i class="fa-solid fa-chevron-down slicer-accordion-chevron" aria-hidden="true"></i>
-            </span>
-          </button>
-          <div class="slicer-accordion-panel" id="campaign-section-panel" role="region" aria-labelledby="campaign-section-trigger">
+      <section class="slicer-workflow-picker" aria-label="Choose a Layout Slicer workflow">
+        <button type="button" class="slicer-workflow-card is-active" data-slicer-workflow="copy">
+          <i class="fa-solid fa-folder-tree" aria-hidden="true"></i>
+          <span><strong>Copy folder</strong><small>Duplicate a template into a named campaign folder.</small></span>
+        </button>
+        <button type="button" class="slicer-workflow-card" data-slicer-workflow="slice">
+          <i class="fa-solid fa-scissors" aria-hidden="true"></i>
+          <span><strong>Slice layout</strong><small>Use a PDF, JPG, JPEG, or PNG as the slicing source.</small></span>
+        </button>
+        <button type="button" class="slicer-workflow-card" data-slicer-workflow="full">
+          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+          <span><strong>Full workflow</strong><small>Copy the folder first, then continue directly to slicing.</small></span>
+        </button>
+      </section>
+
+      <div class="slicer-workflow-panels">
+        <section class="slicer-workflow-panel is-open" data-slicer-section="campaign">
+          <div class="slicer-workflow-panel-body" id="campaign-section-panel" role="region" aria-label="Copy folder workflow">
             <section class="slicer-location-panel" aria-labelledby="location-title">
         <div class="slicer-location-head">
           <div>
@@ -68,48 +73,25 @@
           </div>
         </div>
 
-        <div class="slicer-location-grid">
-          <label>
-            <span>Folder name</span>
-            <input id="duplicate-folder-name" type="text" placeholder="0023 Nama Campaign 06-18 Bianca" autocomplete="off">
-          </label>
-          <label>
-            <span>Year</span>
-            <input id="template-year" type="text" placeholder="2026" inputmode="numeric" autocomplete="off">
-          </label>
-          <label>
-            <span>Campaign ID + date</span>
-            <input id="template-campaign-folder" type="text" placeholder="1112-20260617-BI" autocomplete="off">
-          </label>
-          <label>
-            <span>File name</span>
-            <input id="final-html-name" type="text" placeholder="1112-ANA-Premium.html" autocomplete="off">
-          </label>
-        </div>
+        <label class="slicer-folder-name-field">
+          <span>New folder name</span>
+          <input id="duplicate-folder-name" type="text" placeholder="0023 Nama Campaign 06-18 Bianca" autocomplete="off">
+        </label>
+
+        <section class="slicer-template-contents" id="template-contents" hidden aria-live="polite">
+          <div class="slicer-template-contents-head">
+            <div>
+              <span>Template contents</span>
+              <strong id="template-contents-summary">No template selected</strong>
+            </div>
+            <span>All subfolders included</span>
+          </div>
+          <ul id="template-contents-list" class="slicer-template-contents-list"></ul>
+        </section>
 
         <div class="slicer-path-preview">
           <span>Output preview</span>
           <code id="campaign-path-preview">Choose template folder and paste location</code>
-          <button id="copy-campaign-path" type="button" class="slicer-secondary">Copy path</button>
-        </div>
-
-        <div class="slicer-template-review" id="template-review" hidden>
-          <div>
-            <span>Template folder</span>
-            <strong id="template-review-source">Choose template folder first</strong>
-          </div>
-          <div>
-            <span>Destination</span>
-            <strong id="template-review-target">Template folder location</strong>
-          </div>
-          <div>
-            <span>HTML rename plan</span>
-            <strong id="template-review-html">No HTML file detected yet</strong>
-          </div>
-          <div>
-            <span>MKT path</span>
-            <strong id="template-review-mkt">No HTML file detected yet</strong>
-          </div>
         </div>
 
         <div class="slicer-location-actions">
@@ -119,35 +101,18 @@
           </button>
         </div>
 
-        <div class="slicer-html-tools" id="html-tools" hidden>
-          <label>
-            <span>Template HTML file</span>
-            <select id="html-file-select"></select>
-          </label>
-          <p class="slicer-inline-note">Choose the HTML file found inside the template path. The duplicate process copies the folder first, then renames this HTML in the copied folder path.</p>
-        </div>
             </section>
           </div>
         </section>
 
-        <section class="slicer-accordion-item" data-slicer-section="slicer">
-          <button class="slicer-accordion-trigger" id="slicer-section-trigger" type="button" aria-expanded="false" aria-controls="slicer-section-panel">
-            <span class="slicer-accordion-title">
-              <strong>Image slicer</strong>
-              <span>Load JPG/PNG, add guide lines, then export eDM assets.</span>
-            </span>
-            <span class="slicer-accordion-meta">
-              <span>Slice export</span>
-              <i class="fa-solid fa-chevron-down slicer-accordion-chevron" aria-hidden="true"></i>
-            </span>
-          </button>
-          <div class="slicer-accordion-panel" id="slicer-section-panel" role="region" aria-labelledby="slicer-section-trigger" hidden>
+        <section class="slicer-workflow-panel" data-slicer-section="slicer">
+          <div class="slicer-workflow-panel-body" id="slicer-section-panel" role="region" aria-label="Slice layout workflow" hidden>
             <div class="slicer-slicer-controls">
       <div class="slicer-drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose layout image">
         <i class="fa-solid fa-file-image" aria-hidden="true"></i>
-        <strong>Drop layout image here</strong>
-        <span>or click to choose JPG/PNG</span>
-        <input id="image-input" type="file" accept="image/png,image/jpeg" hidden>
+        <strong>Drop layout file here</strong>
+        <span>or click to choose PDF, JPG, JPEG, or PNG</span>
+        <input id="image-input" type="file" accept="application/pdf,image/png,image/jpeg" hidden>
       </div>
 
       <div class="slicer-form-grid">
@@ -265,7 +230,7 @@
     </section>
   </main>
 
-  <script src="../js/version-config.js?v=6.14.0" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.14.0" defer></script>
+  <script src="../js/version-config.js?v=6.14.5" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.14.5" defer></script>
 </body>
 </html>

@@ -46,7 +46,7 @@ const TOOL_VERSIONS = {
   },
   'layout-slicer': {
     label: 'Layout Slicer',
-    version: '0.3.0',
+    version: '0.4.0',
     status: 'beta'
   },
   'tnc-uploader': {

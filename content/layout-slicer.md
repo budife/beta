@@ -1,6 +1,6 @@
 ---
 title: Layout Slicer
-description: Convert a flat JPG or PNG layout into ordered image slices without opening Photoshop.
+description: Copy campaign templates and slice PDF or image layouts into ordered eDM image assets.
 icon: fa-solid fa-scissors
 category: Tools
 status: beta
