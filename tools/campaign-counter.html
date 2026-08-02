@@ -14,7 +14,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=6.14.0">
+  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=1.6.1">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.0">
   
   <title>Campaign Counter - eDM Helper</title>
@@ -25,68 +25,82 @@
   
 </head>
 <body>
-  <!-- Navigation Bar -->
-  <header class="header" role="banner">
-    <nav class="nav" role="navigation" aria-label="Main navigation">
-      <div class="nav-left">
-        <a href="../index.html" class="nav-link">
-          <i class="fa-solid fa-home"></i>
-          <span>Home</span>
-        </a>
-      </div>
-      <div class="nav-right"></div>
-    </nav>
-  </header>
-
   <main id="main-content" role="main">
     <section class="campaign-section">
       <div class="container">
-        <section class="counter-workspace" aria-label="Campaign counter workspace">
-          <section class="counter-generator" aria-labelledby="counter-generator-title">
-            <div class="counter-generator-body" id="counter-generator-body">
-              <p class="counter-generator-title" id="counter-generator-title">Loading counter</p>
-            </div>
-          </section>
+        <section class="campaign-counter-page" aria-label="Campaign Counter">
+          <div class="counter-workspace">
+            <section class="counter-card counter-summary" aria-labelledby="last-campaign-label">
+              <div class="counter-summary-top">
+                <p class="counter-summary-label" id="last-campaign-label">Last Campaign</p>
+                <span class="counter-connection-status" id="counter-connection-status" role="status">Connecting</span>
+              </div>
+              <div class="counter-last-row">
+                <output class="counter-last-id" id="counter-last-id">----</output>
+                <button class="counter-edit" id="edit-last-campaign" type="button" aria-label="Set next Campaign ID" title="Set next Campaign ID" disabled>
+                  <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div class="counter-actions">
+                <button class="counter-step-back" id="step-back-campaign" type="button" aria-label="Set Last Campaign back by one" title="Set Last Campaign back by one" disabled>
+                  <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="counter-generate" id="generate-campaign" type="button" disabled>
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i> Generate Campaign ID
+                </button>
+              </div>
+              <p class="counter-message" id="counter-message" role="status" aria-live="polite">Connecting to Supabase...</p>
+            </section>
 
-          <section class="folder-browser" aria-labelledby="folder-browser-title">
-            <div class="folder-browser-header">
-              <div>
-                <span class="counter-eyebrow">Folder scan</span>
-                <h1 id="folder-browser-title">Used Campaign IDs</h1>
-                <p>Scan campaign folders named <code>XXXX Nama Campaign MM-DD Manager</code>.</p>
+            <section class="counter-card counter-activity" aria-labelledby="recent-activity-title">
+              <header class="activity-heading">
+                <h2 id="recent-activity-title">Recent Activity</h2>
+              <p>Latest 20 counter activities.</p>
+              </header>
+              <div class="activity-list" id="activity-list" aria-live="polite">
+                <p class="activity-empty">Loading activity...</p>
               </div>
-              <div class="folder-browser-actions">
-                <span class="counter-local-status" id="counter-local-status">Local only</span>
-                <span class="counter-total" id="counter-total">0 used</span>
-                <label class="counter-import-mode">
-                  <span>Mode</span>
-                  <select id="import-mode" aria-label="Folder scan mode">
-                    <option value="replace">Replace scan</option>
-                    <option value="merge">Merge</option>
-                  </select>
-                </label>
-                <button type="button" class="counter-export-local" id="export-local">
-                  <i class="fa-solid fa-download"></i> Export JSON
-                </button>
-                <button type="button" class="counter-reset-local" id="reset-local">
-                  <i class="fa-solid fa-rotate-left"></i> Reset
-                </button>
-                <button type="button" class="used-id-upload" id="scan-folder">
-                  <i class="fa-solid fa-folder-open"></i> Scan folder
-                </button>
-              </div>
-            </div>
-            <p class="folder-selected" id="folder-selected">No folder scanned yet.</p>
-            <p class="used-id-import-status" id="import-status" role="status" aria-live="polite"></p>
-            <div class="counter-import-summary" id="import-summary" hidden></div>
-            <div class="folder-id-list" id="series-counter-list" aria-live="polite">
-              <p class="series-loading">Loading local Campaign IDs...</p>
-            </div>
-          </section>
+            </section>
+          </div>
         </section>
       </div>
     </section>
   </main>
+
+  <dialog class="welcome-dialog" id="welcome-dialog" aria-labelledby="welcome-title">
+    <form id="welcome-form" method="dialog">
+      <span class="counter-eyebrow">Welcome</span>
+      <h2 id="welcome-title">Welcome to eDM Helper</h2>
+      <p>Before using Campaign Counter, please enter your name.</p>
+      <label for="username-input">Name
+        <input id="username-input" type="text" autocomplete="name" maxlength="80" required>
+      </label>
+      <label class="remember-name" for="remember-username">
+        <input id="remember-username" type="checkbox" checked>
+        Remember this device
+      </label>
+      <button type="submit">Continue</button>
+    </form>
+  </dialog>
+
+  <dialog class="manual-dialog" id="manual-dialog" aria-labelledby="manual-title">
+    <form id="manual-form" method="dialog">
+      <span class="counter-eyebrow">Manual adjustment</span>
+      <h2 id="manual-title">Set Next Campaign ID</h2>
+      <p>Current Last Campaign <strong id="manual-current-id">----</strong></p>
+      <label for="manual-next-id">Next Campaign ID
+        <input id="manual-next-id" type="text" inputmode="numeric" maxlength="4" placeholder="0100" required>
+      </label>
+      <label for="manual-reason">Reason <span>(optional)</span>
+        <input id="manual-reason" type="text" maxlength="240" placeholder="Reason for adjustment">
+      </label>
+      <p class="manual-error" id="manual-error" role="alert"></p>
+      <div class="manual-actions">
+        <button class="manual-cancel" id="manual-cancel" type="button">Cancel</button>
+        <button class="manual-save" id="manual-save" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
 
   <!-- Footer -->
   <footer class="footer" role="contentinfo">
@@ -117,8 +131,9 @@
 
   <script src="../js/footer.js?v=6.14.0" defer></script>
   <script src="../js/version-config.js?v=6.14.0" defer></script>
-  <script src="../js/campaign-id-core.js?v=6.14.0" defer></script>
-  <script src="../js/campaign-id-local-store.js?v=6.14.0" defer></script>
-  <script src="../js/pages-campaign-counter.js?v=6.14.0" defer></script>
+  <script src="../js/supabase-config.js?v=1.6.1" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="../js/campaign-counter-supabase.js?v=1.6.1" defer></script>
+  <script src="../js/pages-campaign-counter.js?v=1.6.1" defer></script>
 </body>
 </html>

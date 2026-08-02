@@ -130,24 +130,26 @@ test('pairs Monday item and subitem names with their Campaign IDs', () => {
   ]);
 });
 
-test('local Campaign ID store exposes the required browser operations', () => {
+test('local Campaign ID store exposes its existing backup operations', () => {
   assert.deepEqual(
     Object.keys(localStore).sort(),
     ['importRecords', 'load', 'reserve', 'reset', 'saveFolderHandle']
   );
 });
 
-test('Campaign Counter and Monday bookmarklet do not contain cloud endpoints', () => {
-  const files = [
-    path.join(__dirname, '../js/pages-campaign-counter.js'),
-    path.join(__dirname, '../js/monday-campaign-bookmarklet.js'),
-    path.join(__dirname, '../tools/campaign-counter.html')
-  ];
-  const source = files.map(file => fs.readFileSync(file, 'utf8')).join('\n');
-  assert.equal(/supabase|campaign-id-bridge|neuyjcotcmjnndjyzbcq/i.test(source), false);
+test('Campaign Counter Phase 1 uses a dedicated Supabase service while the bookmarklet stays local', () => {
+  const adapter = fs.readFileSync(path.join(__dirname, '../js/campaign-counter-supabase.js'), 'utf8');
+  const counter = fs.readFileSync(path.join(__dirname, '../js/pages-campaign-counter.js'), 'utf8');
+  const bookmarklet = fs.readFileSync(path.join(__dirname, '../js/monday-campaign-bookmarklet.js'), 'utf8');
+  assert.match(adapter, /createClient/);
+  assert.match(adapter, /set_next_campaign_id/);
+  assert.match(adapter, /Generated from active counter/);
+  assert.match(adapter, /campaign_registry/);
+  assert.match(counter, /CampaignRegistryService/);
+  assert.doesNotMatch(bookmarklet, /supabase|campaign-id-bridge|neuyjcotcmjnndjyzbcq/i);
 });
 
-test('local campaign tools expose backup and merge or replace controls', () => {
+test('Campaign Counter Phase 1 exposes only the dashboard workflow', () => {
   const counterSource = fs.readFileSync(
     path.join(__dirname, '../tools/campaign-counter.html'),
     'utf8'
@@ -161,9 +163,20 @@ test('local campaign tools expose backup and merge or replace controls', () => {
     'utf8'
   );
 
-  assert.match(counterSource, /id="import-mode"/);
-  assert.match(counterSource, /id="export-local"/);
-  assert.match(counterScript, /campaign-id-box\.is-open/);
+  assert.match(counterSource, /id="generate-campaign"/);
+  assert.match(counterSource, /id="activity-list"/);
+  assert.match(counterSource, /id="welcome-dialog"/);
+  assert.match(counterSource, /id="edit-last-campaign"/);
+  assert.match(counterSource, /id="manual-dialog"/);
+  assert.match(counterScript, /setNextCampaignId/);
+  const manualFix = fs.readFileSync(path.join(__dirname, '../supabase/fix-set-next-campaign-id.sql'), 'utf8');
+  assert.match(manualFix, /insert into public\.campaign_registry/);
+  assert.match(manualFix, /returning \* into v_registry/);
+  assert.match(manualFix, /order by cr\.generated_at desc, cr\.id desc/);
+  assert.match(manualFix, /v_next_campaign_id/);
+  assert.doesNotMatch(manualFix, /greater than the current/i);
+  assert.doesNotMatch(counterSource, /id="scan-folder"/);
+  assert.doesNotMatch(counterScript, /showDirectoryPicker/);
   assert.match(bookmarkletSource, /<option value="merge">Merge<\/option>/);
   assert.match(bookmarkletSource, /<option value="replace">Replace<\/option>/);
   assert.match(bookmarkletSource, /Local backup downloaded/);

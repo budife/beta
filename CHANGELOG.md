@@ -2,6 +2,28 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.14.6 - 3 August 2026
+
+- Removed the unsupported `file-system-access` iframe permission attribute and refreshed the app shell cache-buster.
+
+## Campaign Counter v1.6.1 beta - 3 August 2026
+
+- Reworked Campaign Counter into Phase 1: Supabase connection status, Last Campaign, one guarded Generate action, and the latest 20 activity records.
+- Added a first-run local username dialog and a dedicated Campaign Registry service; generated IDs are allocated and recorded through one Supabase RPC.
+- Removed Folder Browser, XLSX, local backup, series navigation, and related controls from this module for the focused Phase 1 flow.
+- Added a subtle manual counter adjustment dialog with optional note and `manual_set` registry records; any unused ID from `0001` through `9999` can be set.
+- Connected the deployed Campaign Counter to the Supabase Campaign Registry using the project's public endpoint and publishable key.
+- Removed prior Counter table/query/schema references; the module now uses only `campaign_registry`, `generate_campaign_id`, and `set_next_campaign_id`.
+- Improved manual counter error feedback with safe RPC messages and full browser-console diagnostics.
+- Added a qualified-column SQL fix for the manual counter RPC PostgreSQL `42702` error.
+- Removed an unsupported iframe permission attribute that produced a browser console warning.
+- Manual counter adjustment now accepts any four-digit Campaign ID instead of only values above the current ID.
+- Last Campaign now reflects the latest registry activity, including a manual set, instead of the numerically highest ID.
+- Removed the duplicate page header and legacy Home bar; connection state now lives in the Last Campaign panel for a consistent tool workspace.
+- Added a compact Back action beside Generate to manually step the current Last Campaign down by one when that ID is unused.
+- Made the latest manual or generated registry activity the active counter pointer, so setting `0314` makes the next generated ID `0315` without discarding prior generated activity.
+- Generate now explicitly saves `Last Campaign + 1` through the active pointer, preventing old maximum-value RPC behavior from jumping to an unrelated high ID.
+
 ## Core v6.14.5 - 31 July 2026
 
 - Refreshed Layout Slicer cache-busters after its workflow rework.
@@ -253,7 +275,7 @@ All notable user-facing changes to eDM Helper are tracked here.
 ## v6.9.0 - 15 June 2026
 
 - Rebuilt Campaign Counter around Regular-to-9000 ID series.
-- Added Monday XLSX synchronization and the compact Monday allocator bookmarklet.
+- Added Monday XLSX synchronization and the compact Monday counter bookmarklet.
 - Added a GitHub Pages data bridge for environments that block direct Supabase requests.
 
 ## v6.8.1 - 14 June 2026

@@ -35,7 +35,7 @@ This project is designed for internal-style daily work and avoids sending sensit
 
 - Database files, generated campaign IDs, WFH marks, and most tool data stay in the browser or selected local folders.
 - External network access is optional for features such as layout URL fetching, link checking, proxy fallback, or holiday sync.
-- Campaign Counter and bookmarklet workflows are browser-local and do not require Supabase/cloud sync in the current flow.
+- Campaign Counter Phase 1 uses Supabase with a public anon key for shared Campaign ID allocation and activity; the Monday bookmarklet remains browser-local.
 - Review the source before using it with confidential work. The code is plain static web code and can be inspected directly in this repository.
 
 ## Run Locally

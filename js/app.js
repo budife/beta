@@ -837,7 +837,6 @@ function renderPage(path, route, markdown) {
           src="${escapeHtml(tool)}"
           title="${escapeHtml(title)} tool"
           loading="eager"
-          allow="file-system-access"
         ></iframe>
       </div>
     `

@@ -1,47 +1,45 @@
-# Campaign ID Local Workflow
+# Campaign Counter Phase 1
 
-Campaign Counter and the Monday Campaign ID bookmarklet intentionally use
-separate browser-local databases. No Campaign ID, campaign name, blast date,
-or XLSX content is sent to Supabase or another application server.
+Campaign Counter is a small Supabase-backed registry for generating shared
+four-digit Campaign IDs. It does not scan folders, import XLSX files, or use
+the Monday bookmarklet in this phase.
 
-## Campaign Counter
+## Required setup
 
-1. Export the Monday board as XLSX.
-2. Choose **Merge** to retain prior XLSX data or **Replace XLSX data** to
-   replace imported records while keeping manually reserved IDs.
-3. Open Campaign Counter and select **Import XLSX**.
-4. The browser reads `Task` / `Campaign ID` and `Subitem` /
-   `Campaign ID (sub)`.
-5. Records are stored in IndexedDB for the eDM Helper origin.
+1. The Supabase project must expose `campaign_registry`,
+   `generate_campaign_id`, and `set_next_campaign_id`.
+2. Add the project URL and **Publishable/Anon** key directly to
+   `js/supabase-config.js`.
 
-Campaign Counter stores full Campaign IDs, item names, item type, blast dates,
-and four-digit sequence numbers. Reblasts with the same four-digit number are
-grouped under one ID box and shown in its tooltip.
-The import summary reports campaigns, unique IDs, reblasts, and malformed
-campaign rows. Click an ID box to keep its detail popup open while scrolling.
+```js
+window.EDM_SUPABASE_CONFIG = {
+  url: 'https://your-project.supabase.co',
+  anonKey: 'your-publishable-anon-key'
+};
+```
 
-Use **Reset** to remove all Campaign Counter data stored by the current
-browser. Reset does not contact or modify any remote database.
-Use **Export JSON** to download a local backup before clearing browser data.
+Only the public anon key is valid in this static GitHub Pages app. Never add a
+service-role key, database password, or private token to the repository.
 
-## Monday Bookmarklet
+## User flow
 
-1. Install **Monday Campaign ID** from the Bookmarklet page.
-2. Run it on Monday.
-3. Choose **Merge** or **Replace**, then select **Upload XLSX** inside the
-   bookmarklet panel.
-4. Used four-digit numbers are stored in IndexedDB for the Monday origin.
+1. Open Campaign Counter and confirm `Connected`.
+2. On the first visit, enter a name; it is retained in `localStorage` as
+   `edm_username`.
+3. Select **Generate Campaign ID**. The button locks while Supabase processes
+   the request, preventing duplicate clicks.
+4. The new ID is copied to the clipboard, Last Campaign refreshes, and the
+   activity list shows who generated it and when.
 
-The bookmarklet has its own series tabs, local candidate allocator, and Reset
-button. Its ID list scrolls independently so the panel stays compact. Use
-**Export** to back up the bookmarklet's local allocation data. It does not read
-Campaign Counter storage because browser same-origin rules keep the two
-databases separate.
+Use the small edit icon next to Last Campaign when an ID must be set manually.
+Any value from `0001` through `9999` is accepted. The optional reason is saved
+with a `manual_set` activity record. The newest activity becomes the active
+counter pointer: after manually setting `0314`, the next generated ID is `0315`.
 
-## Storage Boundaries
+If the badge says `Offline`, no ID can be generated. Check the network,
+Supabase URL, anon key, and SQL setup, then refresh the page.
 
-- Campaign Counter data belongs to the eDM Helper website origin.
-- Bookmarklet data belongs to the current Monday hostname.
-- Upload the XLSX separately in each tool.
-- Clearing browser site data also clears the corresponding Campaign ID data.
-- Data does not synchronize between browsers, devices, or Monday hostnames.
+If manual adjustment returns PostgreSQL error `42702`, run
+`supabase/fix-set-next-campaign-id.sql` in Supabase SQL Editor. It replaces the
+RPC with a version that qualifies every `campaign_registry` column using `cr`.
+Run the complete file, including its initial `drop function` statement.

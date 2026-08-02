@@ -32,6 +32,8 @@ category: Home
 
 ## Recent Updates
 
+- **Core v6.14.6 - 3 August 2026** - Removed the unsupported iframe permission warning and refreshed the app shell cache-buster.
+- **Campaign Counter v1.6.1 beta - 3 August 2026** - Generate now follows the visible Last Campaign pointer instead of jumping to the numerically largest historical ID.
 - **Core v6.14.5 - 31 July 2026** - Refreshed Layout Slicer delivery assets after its workflow rework.
 - **Layout Slicer v0.4.0 beta - 31 July 2026** - Reworked the entry flow into Copy folder, Slice layout, and Full workflow; duplicate copies now retain the template structure, show included subfolders, and PDF first pages can be used for slicing.
 - **Core v6.14.4 - 31 July 2026** - Removed duplicate privacy settings from Docs and kept Maintenance as the single place to change them.
@@ -77,7 +79,7 @@ category: Home
 - **v6.10.2 · 16 June 2026** - Matched creator hover popovers across Home and footer areas, normalized Recent Updates version colors, and expanded the full changelog history.
 - **v6.10.1 · 16 June 2026** - Added maintainer polish: centralized footer rendering, a release helper script, full changelog notes, clearer local backup guidance, refreshed cache-busters, and a smaller `budd` hover label.
 - **v6.10.0 · 16 June 2026** - Moved Campaign Counter and the Monday bookmarklet to browser-local XLSX workflows, added series/reblast tooling, preserved folder sessions, and improved database/layout editing polish.
-- **v6.9.0 · 15 June 2026** - Rebuilt Campaign Counter around Regular-to-9000 ID series, added Monday XLSX synchronization, introduced the compact Monday allocator bookmarklet, and added a GitHub Pages data bridge for environments that block direct Supabase requests.
+- **v6.9.0 · 15 June 2026** - Rebuilt Campaign Counter around Regular-to-9000 ID series, added Monday XLSX synchronization, introduced a compact Monday counter bookmarklet, and added a GitHub Pages data bridge for environments that block direct Supabase requests.
 - **v6.8.1 · 14 June 2026** - Moved the Database Generator Add action below the email field, streamlined Config eDM with same-file saving and a NOW date shortcut, and added the hoverable `budd` creator footer with website and social links.
 - **v6.8.0 · 14 June 2026** - Corrected the four-file database package standard to use `EmailCustMast`, including package validation, raw-data inspection, layout testing, and generated database filenames.
 - **v6.7.3 · 14 June 2026** - Fixed Layout Checker KRHRED highlighting to match Database Checker previews and enlarged the primary Apply action.
