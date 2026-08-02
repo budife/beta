@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **Layout Slicer v0.4.2 beta - 3 August 2026** - Reworked Copy Folder with a campaign-name outer folder, editable eDM path segments, date-aware campaign-folder generation, direct public HTML URL previews, safe pre-duplicate validation, real file-copy progress, and a simpler two-workflow entry screen.
 - **Core v6.14.6 - 3 August 2026** - Removed the unsupported iframe permission warning and refreshed the app shell cache-buster.
 - **Campaign Counter v1.6.1 beta - 3 August 2026** - Generate now follows the visible Last Campaign pointer instead of jumping to the numerically largest historical ID.
 - **Core v6.14.5 - 31 July 2026** - Refreshed Layout Slicer delivery assets after its workflow rework.

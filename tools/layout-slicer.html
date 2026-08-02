@@ -7,7 +7,7 @@
   <meta name="author" content="eDM Helper">
 
   <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.14.5">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.14.7">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -16,12 +16,6 @@
 <body>
   <main class="layout-slicer-app" id="layout-slicer-app">
     <section class="slicer-control-panel">
-      <div class="slicer-panel-header">
-        <p class="slicer-kicker">Layout Slicer <em class="tool-beta-badge">beta</em></p>
-        <h1><i class="fa-solid fa-scissors" aria-hidden="true"></i> Layout Slicer</h1>
-        <p>Copy a campaign template, slice a layout, or run both steps in one simple workflow.</p>
-      </div>
-
       <div class="slicer-beta-warning" role="status">
         <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
         <span>This tool is still in beta/testing. Please review the generated image slices before using them for production.</span>
@@ -35,10 +29,6 @@
         <button type="button" class="slicer-workflow-card" data-slicer-workflow="slice">
           <i class="fa-solid fa-scissors" aria-hidden="true"></i>
           <span><strong>Slice layout</strong><small>Use a PDF, JPG, JPEG, or PNG as the slicing source.</small></span>
-        </button>
-        <button type="button" class="slicer-workflow-card" data-slicer-workflow="full">
-          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-          <span><strong>Full workflow</strong><small>Copy the folder first, then continue directly to slicing.</small></span>
         </button>
       </section>
 
@@ -73,25 +63,44 @@
           </div>
         </div>
 
-        <label class="slicer-folder-name-field">
-          <span>New folder name</span>
-          <input id="duplicate-folder-name" type="text" placeholder="0023 Nama Campaign 06-18 Bianca" autocomplete="off">
-        </label>
-
-        <section class="slicer-template-contents" id="template-contents" hidden aria-live="polite">
-          <div class="slicer-template-contents-head">
+        <section class="slicer-copy-structure" id="template-structure" hidden aria-labelledby="template-structure-title">
+          <div class="slicer-copy-section-head">
             <div>
-              <span>Template contents</span>
-              <strong id="template-contents-summary">No template selected</strong>
+              <span>Template structure</span>
+              <h3 id="template-structure-title">Output folder segments</h3>
             </div>
-            <span>All subfolders included</span>
+            <small>Change only the names you need.</small>
           </div>
-          <ul id="template-contents-list" class="slicer-template-contents-list"></ul>
+          <div class="slicer-template-name-flow">
+            <div>
+              <span>Original template folder</span>
+              <code id="template-original-folder-name">Not selected</code>
+            </div>
+            <label>
+              <span>New campaign folder name</span>
+              <input id="duplicate-folder-name" type="text" placeholder="0031 Nama Campaign 06-18 Bianca" autocomplete="off">
+            </label>
+          </div>
+          <div class="slicer-path-segments" id="template-path-segments"></div>
+          <div class="slicer-child-folders">
+            <span>Child folders copied</span>
+            <div id="template-child-folders" class="slicer-child-folder-list"></div>
+          </div>
+        </section>
+
+        <section class="slicer-html-rename" id="html-rename-section" hidden aria-labelledby="html-rename-title">
+          <div class="slicer-copy-section-head">
+            <div>
+              <span>HTML rename</span>
+              <h3 id="html-rename-title">Keep a field empty to preserve the original file name.</h3>
+            </div>
+          </div>
+          <div id="html-rename-list" class="slicer-html-rename-list"></div>
         </section>
 
         <div class="slicer-path-preview">
           <span>Output preview</span>
-          <code id="campaign-path-preview">Choose template folder and paste location</code>
+          <div id="campaign-path-preview" class="slicer-output-preview-list">Enter a new campaign folder name and an HTML rename to preview the public URL.</div>
         </div>
 
         <div class="slicer-location-actions">
@@ -100,6 +109,31 @@
             Duplicate folder
           </button>
         </div>
+
+        <section class="slicer-copy-success" id="copy-success-panel" hidden aria-live="polite">
+          <div>
+            <span><i class="fa-solid fa-check" aria-hidden="true"></i> Campaign folder created</span>
+            <code id="copy-success-path"></code>
+          </div>
+          <div class="slicer-success-actions">
+            <button id="open-copied-folder" type="button" class="slicer-secondary">Open folder</button>
+            <button id="open-copied-parent" type="button" class="slicer-secondary">Open parent folder</button>
+            <button id="copy-copied-path" type="button" class="slicer-secondary">Copy path</button>
+            <button id="duplicate-another" type="button" class="slicer-secondary">Duplicate another</button>
+          </div>
+        </section>
+
+        <section class="slicer-copy-progress" id="copy-progress-panel" hidden aria-live="polite" aria-label="Copy progress">
+          <div class="slicer-copy-section-head">
+            <div>
+              <span id="copy-progress-stage">Preparing</span>
+              <h3 id="copy-progress-file">Preparing folder copy...</h3>
+            </div>
+            <strong id="copy-progress-percent">0%</strong>
+          </div>
+          <progress id="copy-progress-bar" max="100" value="0">0%</progress>
+          <p><strong id="copy-progress-count">0 / 0 files</strong><span id="copy-progress-detail">Waiting to start.</span></p>
+        </section>
 
             </section>
           </div>
@@ -231,6 +265,6 @@
   </main>
 
   <script src="../js/version-config.js?v=6.14.5" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.14.5" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.14.7" defer></script>
 </body>
 </html>

@@ -246,6 +246,11 @@ If a layout URL is used, the tool may request the layout directly. If direct bro
 
 ## Layout Slicer
 
+:::details Copy Folder
+
+Choose the template folder, then choose the output parent folder. The new campaign name becomes the outer project folder; the editable `Root/Team/Year/Campaign Folder` eDM structure is created inside it. Copy Folder lists only direct child folders and lets each HTML file keep its original name or receive a new name before copying. The preview updates as names change. After a successful copy, use Copy Path or Duplicate Another; browsers cannot force-open Windows Explorer, but Open Folder opens the selected handle in the browser folder picker when supported.
+:::
+
 :::details Purpose
 
 Layout Slicer turns a flat JPG or PNG eDM mockup into ordered image slices. It uses guide lines first, then generates image assets only when output is generated.

@@ -12,7 +12,16 @@
     campaignParentDir: null,
     templateDirectories: [],
     templateFileCount: 0,
-    fullWorkflow: false,
+    templateHtmlFiles: [],
+    copiedHtmlFiles: [],
+    htmlRenameMap: new Map(),
+    copiedCampaignDir: null,
+    copiedCampaignRootDir: null,
+    templateFiles: [],
+    templateStructure: [],
+    templateCampaignPrefix: '',
+    campaignFolderManual: false,
+    campaignFolderReady: false,
     zoom: 1,
     zoomMode: 'fit'
   };
@@ -29,6 +38,7 @@
     exportDpi: document.getElementById('export-dpi'),
     imageQuality: document.getElementById('image-quality'),
     duplicateFolderName: document.getElementById('duplicate-folder-name'),
+    templateOriginalFolderName: document.getElementById('template-original-folder-name'),
     campaignPathPreview: document.getElementById('campaign-path-preview'),
     templateCopyStatus: document.getElementById('template-copy-status'),
     templateSourceName: document.getElementById('template-source-name'),
@@ -37,9 +47,24 @@
     chooseCampaignParent: document.getElementById('choose-campaign-parent'),
     copyTemplateFolder: document.getElementById('copy-template-folder'),
     workflowCards: Array.from(document.querySelectorAll('[data-slicer-workflow]')),
-    templateContents: document.getElementById('template-contents'),
-    templateContentsSummary: document.getElementById('template-contents-summary'),
-    templateContentsList: document.getElementById('template-contents-list'),
+    templateStructure: document.getElementById('template-structure'),
+    templatePathSegments: document.getElementById('template-path-segments'),
+    templateChildFolders: document.getElementById('template-child-folders'),
+    htmlRenameSection: document.getElementById('html-rename-section'),
+    htmlRenameList: document.getElementById('html-rename-list'),
+    copySuccessPanel: document.getElementById('copy-success-panel'),
+    copySuccessPath: document.getElementById('copy-success-path'),
+    openCopiedFolder: document.getElementById('open-copied-folder'),
+    openCopiedParent: document.getElementById('open-copied-parent'),
+    copyCopiedPath: document.getElementById('copy-copied-path'),
+    duplicateAnother: document.getElementById('duplicate-another'),
+    copyProgressPanel: document.getElementById('copy-progress-panel'),
+    copyProgressStage: document.getElementById('copy-progress-stage'),
+    copyProgressFile: document.getElementById('copy-progress-file'),
+    copyProgressPercent: document.getElementById('copy-progress-percent'),
+    copyProgressBar: document.getElementById('copy-progress-bar'),
+    copyProgressCount: document.getElementById('copy-progress-count'),
+    copyProgressDetail: document.getElementById('copy-progress-detail'),
     autoSlice: document.getElementById('auto-slice'),
     clearLines: document.getElementById('clear-lines'),
     generateOutput: document.getElementById('generate-output'),
@@ -62,6 +87,7 @@
   };
 
   const ctx = els.canvas.getContext('2d');
+  const PUBLIC_LAYOUT_BASE_URL = 'http://mail.hsbc.com.hk/id';
 
   function setActiveAccordion(section) {
     const active = section === 'slicer' ? 'slicer' : 'campaign';
@@ -82,14 +108,10 @@
   }
 
   function setWorkflow(workflow) {
-    state.fullWorkflow = workflow === 'full';
     els.workflowCards.forEach((card) => {
       card.classList.toggle('is-active', card.dataset.slicerWorkflow === workflow);
     });
     setActiveAccordion(workflow === 'slice' ? 'slicer' : 'campaign');
-    if (workflow === 'full') {
-      setTemplateStatus('Copy a template folder first. Slicing will open automatically after the copy.', '');
-    }
   }
 
   function cleanFolderName(value, fallback = 'template copy') {
@@ -101,13 +123,71 @@
   }
 
   function getDuplicateFolderName() {
-    return cleanFolderName(els.duplicateFolderName?.value || state.templateDir?.name || 'template copy', 'template copy');
+    return cleanFolderName(state.templateStructure[3]?.value || '', '');
   }
 
+  function getCampaignProjectName() {
+    return cleanFolderName(els.duplicateFolderName?.value || '', '');
+  }
+
+  function buildCampaignFolderName(name) {
+    const source = String(name || '').trim();
+    const campaignId = source.match(/^\s*(\d{4})\b/)?.[1] || 'XXXX';
+    const dateMatch = source.match(/\b\d{2}-\d{2}\b/);
+    const afterDate = dateMatch ? source.slice((dateMatch.index || 0) + dateMatch[0].length).trim() : '';
+    const manager = afterDate.split(/\s+/).filter(Boolean)[0] || source.split(/\s+/).at(-1) || 'XX';
+    const initials = manager.replace(/[^a-z]/gi, '').slice(0, 2).toUpperCase() || 'XX';
+    const year = cleanFolderName(state.templateStructure[2]?.value || '', 'YYYY');
+    const folderDate = dateMatch ? `${year}${dateMatch[0].replace('-', '')}` : `${year}MMDD`;
+    return `${campaignId}-${folderDate}-${initials}`;
+  }
+
+  function syncCampaignFolderFromName() {
+    if (state.campaignFolderManual || !state.templateStructure[3]) return;
+    const name = els.duplicateFolderName?.value?.trim();
+    state.templateStructure[3].value = name ? buildCampaignFolderName(name) : '';
+    state.campaignFolderReady = Boolean(name);
+  }
+
+  function getStructureValues() {
+    return state.templateStructure.map((segment, index) => cleanFolderName(segment.value, index === 3 ? '' : segment.original));
+  }
 
   function getCampaignPath() {
     const pasteLocation = state.campaignParentDir?.name || '[choose output folder]';
-    return `${pasteLocation}/${getDuplicateFolderName()}`;
+    const segments = getStructureValues();
+    const projectName = getCampaignProjectName() || '[new campaign folder name]';
+    return `${pasteLocation}/${projectName}/${segments.length ? segments.join('/') : getDuplicateFolderName()}`;
+  }
+
+  function getPublicOutputUrls() {
+    if (!state.campaignFolderReady) return [];
+    const segments = getStructureValues();
+    return state.templateHtmlFiles
+      .filter((file) => String(state.htmlRenameMap.get(file.path) || '').trim())
+      .map((file) => `${PUBLIC_LAYOUT_BASE_URL}/${[...segments, getRenamedHtmlFileName(file)].map(encodeURIComponent).join('/')}`);
+  }
+
+  function renderOutputPreview() {
+    if (!els.campaignPathPreview) return;
+    const urls = getPublicOutputUrls();
+    els.campaignPathPreview.replaceChildren();
+    if (!state.campaignFolderReady) {
+      els.campaignPathPreview.textContent = 'Enter a new campaign folder name to generate the destination.';
+      return;
+    }
+    if (!urls.length) {
+      els.campaignPathPreview.textContent = 'Rename an HTML file to add its public URL preview.';
+      return;
+    }
+    urls.forEach((url) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = url;
+      els.campaignPathPreview.appendChild(link);
+    });
   }
 
   function setTemplateStatus(message, type = '') {
@@ -116,10 +196,20 @@
     els.templateCopyStatus.className = type ? `is-${type}` : '';
   }
 
+  function getCopyErrorMessage(error) {
+    if (error?.name === 'NotAllowedError') return 'Permission was denied for this folder. Choose a folder you can write to.';
+    if (error?.name === 'NotFoundError') return 'The selected folder is no longer available. Choose it again and retry.';
+    if (error?.message?.startsWith('A folder with this campaign name')) return error.message;
+    return 'Unable to copy the template. Check the destination folder and try again.';
+  }
+
   function updateCampaignPathPreview() {
-    if (els.campaignPathPreview) els.campaignPathPreview.textContent = getCampaignPath();
+    renderOutputPreview();
     if (els.templateSourceName) {
       els.templateSourceName.textContent = state.templateDir?.name || 'Not selected';
+    }
+    if (els.templateOriginalFolderName) {
+      els.templateOriginalFolderName.textContent = state.templateDir?.name || 'Not selected';
     }
     if (els.templateOutputName) {
       els.templateOutputName.textContent = state.campaignParentDir?.name || 'Not selected';
@@ -127,17 +217,20 @@
     if (els.copyTemplateFolder) {
       els.copyTemplateFolder.disabled = !canProcessTemplate();
     }
+    renderTemplateStructure();
   }
 
   function canProcessTemplate() {
     return Boolean(
       state.templateDir
       && state.campaignParentDir
+      && state.campaignFolderReady
+      && getCampaignProjectName()
       && getDuplicateFolderName()
     );
   }
 
-  function renderTemplateContents() {
+  function renderLegacyTemplateContents() {
     if (!els.templateContents || !els.templateContentsList || !els.templateContentsSummary) return;
     const hasTemplate = Boolean(state.templateDir);
     els.templateContents.hidden = !hasTemplate;
@@ -155,6 +248,78 @@
       const item = document.createElement('li');
       item.textContent = path;
       els.templateContentsList.appendChild(item);
+    });
+  }
+
+  function renderTemplateStructure() {
+    if (!els.templateStructure || !els.templatePathSegments || !els.templateChildFolders) return;
+    const hasTemplate = Boolean(state.templateDir);
+    els.templateStructure.hidden = !hasTemplate;
+    if (!hasTemplate) return;
+
+    els.templatePathSegments.replaceChildren();
+    state.templateStructure.forEach((segment, index) => {
+      const field = document.createElement('label');
+      field.className = 'slicer-path-segment';
+      field.innerHTML = `<span>${escapeHtml(segment.label)}</span>`;
+      const input = document.createElement('input');
+      input.value = segment.value;
+      input.autocomplete = 'off';
+      input.addEventListener('input', () => {
+        segment.value = input.value;
+        if (index === 3) {
+          state.campaignFolderManual = true;
+          state.campaignFolderReady = Boolean(input.value.trim());
+        }
+        if (index === 2) syncCampaignFolderFromName();
+        updateCampaignPathPreview();
+      });
+      field.appendChild(input);
+      els.templatePathSegments.appendChild(field);
+    });
+
+    els.templateChildFolders.replaceChildren();
+    const children = state.templateDirectories.length ? state.templateDirectories : ['No child folders'];
+    children.forEach((name) => {
+      const item = document.createElement('span');
+      item.textContent = name;
+      els.templateChildFolders.appendChild(item);
+    });
+  }
+
+  function getRenamedHtmlFileName(file) {
+    const requested = cleanFolderName(state.htmlRenameMap.get(file.path) || '', '');
+    if (!requested) return file.name;
+    const extension = file.name.match(/(\.html?)$/i)?.[1] || '.html';
+    return `${requested.replace(/\.html?$/i, '').trim().replace(/\s+/g, '-')}${extension}`;
+  }
+
+  function renderHtmlRenameFields() {
+    if (!els.htmlRenameSection || !els.htmlRenameList) return;
+    els.htmlRenameSection.hidden = state.templateHtmlFiles.length === 0;
+    els.htmlRenameList.replaceChildren();
+    state.templateHtmlFiles.forEach((file) => {
+      const row = document.createElement('div');
+      row.className = 'slicer-html-rename-row';
+      const extension = file.name.match(/(\.html?)$/i)?.[1] || '.html';
+      const baseName = file.name.slice(0, -extension.length);
+      row.innerHTML = `<code>${escapeHtml(file.path)}</code><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>`;
+      const field = document.createElement('label');
+      field.innerHTML = '<span>Rename to</span>';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = baseName;
+      input.value = state.htmlRenameMap.get(file.path) || '';
+      input.autocomplete = 'off';
+      input.addEventListener('input', () => {
+        state.htmlRenameMap.set(file.path, input.value);
+        updateCampaignPathPreview();
+      });
+      field.appendChild(input);
+      const suffix = document.createElement('small');
+      suffix.textContent = extension;
+      row.append(field, suffix);
+      els.htmlRenameList.appendChild(row);
     });
   }
 
@@ -617,18 +782,20 @@
     await writable.close();
   }
 
-  async function copyDirectory(sourceDir, targetDir, skipName = '') {
+  async function copyDirectory(sourceDir, targetDir, skipName = '', basePath = '') {
     for await (const [name, handle] of sourceDir.entries()) {
       if (skipName && name === skipName) continue;
+      const path = basePath ? `${basePath}/${name}` : name;
       if (handle.kind === 'file') {
         const file = await handle.getFile();
-        await writeFile(targetDir, name, file);
+        const templateEntry = state.templateHtmlFiles.find((entry) => entry.path === path);
+        await writeFile(targetDir, templateEntry ? getRenamedHtmlFileName(templateEntry) : name, file);
         continue;
       }
 
       if (handle.kind === 'directory') {
         const nextTarget = await targetDir.getDirectoryHandle(name, { create: true });
-        await copyDirectory(handle, nextTarget);
+        await copyDirectory(handle, nextTarget, '', path);
       }
     }
   }
@@ -668,8 +835,55 @@
     return left.join('/') === right.join('/');
   }
 
-  async function getOrCreateDuplicateDirectory() {
-    return state.campaignParentDir.getDirectoryHandle(getDuplicateFolderName(), { create: true });
+  async function createDuplicateDirectory() {
+    const segments = getStructureValues();
+    const projectName = getCampaignProjectName();
+    if (!segments.length) throw new Error('Template folder structure is not ready yet.');
+    try {
+      await getDirectoryByParts(state.campaignParentDir, [projectName]);
+      throw new Error('A folder with this campaign name already exists. Choose a different name.');
+    } catch (error) {
+      if (error.name !== 'NotFoundError') throw error;
+    }
+    const projectDir = await ensureDirectoryByParts(state.campaignParentDir, [projectName]);
+    const campaignDir = await ensureDirectoryByParts(projectDir, segments);
+    return { projectDir, campaignDir };
+  }
+
+  function setCopyProgress(stage, currentFile, completed, total, detail = '') {
+    const safeTotal = Math.max(1, total);
+    const percentage = Math.round((completed / safeTotal) * 100);
+    if (els.copyProgressPanel) els.copyProgressPanel.hidden = false;
+    if (els.copyProgressStage) els.copyProgressStage.textContent = stage;
+    if (els.copyProgressFile) els.copyProgressFile.textContent = currentFile || 'Preparing folder copy...';
+    if (els.copyProgressPercent) els.copyProgressPercent.textContent = `${percentage}%`;
+    if (els.copyProgressBar) els.copyProgressBar.value = percentage;
+    if (els.copyProgressCount) els.copyProgressCount.textContent = `${completed} / ${total} files`;
+    if (els.copyProgressDetail) els.copyProgressDetail.textContent = detail;
+  }
+
+  function nextPaint() {
+    return new Promise((resolve) => window.requestAnimationFrame(resolve));
+  }
+
+  async function copyScannedTemplateFiles(targetDir) {
+    const total = state.templateFiles.length;
+    let completed = 0;
+    setCopyProgress('Copying files', 'Preparing destination...', completed, total, 'Using the scanned template file list.');
+    await nextPaint();
+
+    for (const entry of state.templateFiles) {
+      const relativePath = entry.path.slice(state.templateCampaignPrefix.length).replace(/^\//, '');
+      const parts = relativePath.split('/').filter(Boolean);
+      const fileName = parts.pop();
+      const destination = await ensureDirectoryByParts(targetDir, parts);
+      const sourceFile = await entry.handle.getFile();
+      const renamed = state.templateHtmlFiles.find((file) => file.path === entry.path);
+      await writeFile(destination, renamed ? getRenamedHtmlFileName(renamed) : fileName, sourceFile);
+      completed += 1;
+      setCopyProgress('Copying files', entry.path, completed, total, 'Copying directly to the final destination.');
+      if (completed % 8 === 0 || completed === total) await nextPaint();
+    }
   }
 
   async function listHtmlFiles(dirHandle, basePath = '', parentDir = dirHandle) {
@@ -688,12 +902,55 @@
     return files.sort((a, b) => a.path.localeCompare(b.path));
   }
 
-  async function listDirectories(dirHandle, basePath = '') {
+  async function scanTemplateDirectory(dirHandle) {
+    const files = [];
+    const directories = [];
+    async function visit(currentDir, basePath = '') {
+      for await (const [name, handle] of currentDir.entries()) {
+        const path = basePath ? `${basePath}/${name}` : name;
+        if (handle.kind === 'file') {
+          files.push({ name, path, handle, parentDir: currentDir });
+          continue;
+        }
+        directories.push({ name, path, handle });
+        await visit(handle, path);
+      }
+    }
+    await visit(dirHandle);
+    return { files, directories };
+  }
+
+  function configureTemplateStructure(scan) {
+    const source = scan.files.find((file) => /\.html?$/i.test(file.name)) || scan.files[0];
+    const sourceParts = source?.path.split('/').slice(0, -1) || [];
+    const hasEmbeddedCampaignPath = sourceParts.length >= 4;
+    const campaignParts = hasEmbeddedCampaignPath ? sourceParts.slice(0, 4) : [state.templateDir.name];
+    const labels = ['Root', 'Team', 'Year', 'Campaign folder'];
+    state.templateStructure = campaignParts.map((name, index) => ({
+      label: labels[index] || `Folder ${index + 1}`,
+      original: name,
+      value: name
+    }));
+    state.templateCampaignPrefix = hasEmbeddedCampaignPath ? campaignParts.join('/') : '';
+    const insideCampaign = (entry) => !state.templateCampaignPrefix
+      || entry.path === state.templateCampaignPrefix
+      || entry.path.startsWith(`${state.templateCampaignPrefix}/`);
+    state.templateFiles = scan.files.filter(insideCampaign);
+    state.templateHtmlFiles = state.templateFiles.filter((file) => /\.html?$/i.test(file.name));
+    const childPrefix = state.templateCampaignPrefix ? `${state.templateCampaignPrefix}/` : '';
+    state.templateDirectories = scan.directories
+      .filter((directory) => directory.path.startsWith(childPrefix))
+      .map((directory) => directory.path.slice(childPrefix.length))
+      .filter((path) => path && !path.includes('/'))
+      .sort((left, right) => left.localeCompare(right));
+    state.templateFileCount = state.templateFiles.length;
+  }
+
+  async function listDirectories(dirHandle) {
     const directories = [];
     for await (const [name, handle] of dirHandle.entries()) {
       if (handle.kind !== 'directory') continue;
-      const path = basePath ? `${basePath}/${name}` : name;
-      directories.push(path, ...await listDirectories(handle, path));
+      directories.push(name);
     }
     return directories.sort((a, b) => a.localeCompare(b));
   }
@@ -714,18 +971,21 @@
       return;
     }
     state.templateDir = await window.showDirectoryPicker({ mode: 'read' });
-    state.copiedHtmlFiles = await listHtmlFiles(state.templateDir);
-    state.templateDirectories = await listDirectories(state.templateDir);
+    setTemplateStatus('Scanning template...', 'loading');
+    const scan = await scanTemplateDirectory(state.templateDir);
+    configureTemplateStructure(scan);
+    state.copiedHtmlFiles = [];
+    state.htmlRenameMap.clear();
+    state.campaignFolderManual = false;
+    state.campaignFolderReady = false;
+    if (state.templateStructure[3]) state.templateStructure[3].value = '';
+    if (els.duplicateFolderName) els.duplicateFolderName.value = '';
+    syncCampaignFolderFromName();
     state.copiedCampaignDir = null;
-    if (els.duplicateFolderName && !els.duplicateFolderName.value.trim()) {
-      els.duplicateFolderName.value = `${state.templateDir.name} copy`;
-    }
-    state.finalHtmlNameManual = false;
-    renderCopiedHtmlFiles();
-    renderTemplateContents();
-    syncTemplateFieldsFromSelectedHtml(true);
-    syncTemplateFieldsFromFolderName();
-    setTemplateStatus(`Template selected: ${state.templateDir.name} - ${state.copiedHtmlFiles.length} HTML file(s) found`, 'success');
+    state.copiedCampaignRootDir = null;
+    if (els.copySuccessPanel) els.copySuccessPanel.hidden = true;
+    renderHtmlRenameFields();
+    setTemplateStatus(`Template scanned: ${state.templateFileCount} file(s) - ${state.templateHtmlFiles.length} HTML file(s) found`, 'success');
     updateCampaignPathPreview();
   }
 
@@ -741,20 +1001,26 @@
 
   async function copyTemplateFolder() {
     if (!canProcessTemplate()) return;
-    const folderSynced = syncTemplateFieldsFromFolderName(true);
-    if (folderSynced) state.finalHtmlNameManual = false;
     updateCampaignPathPreview();
+    if (els.copySuccessPanel) els.copySuccessPanel.hidden = true;
     setTemplateStatus('Processing duplicate...', 'loading');
-    const duplicateDir = await getOrCreateDuplicateDirectory();
-    const isPastingInsideTemplate = typeof state.templateDir.isSameEntry === 'function'
-      && await state.templateDir.isSameEntry(state.campaignParentDir);
-    await copyDirectory(state.templateDir, duplicateDir, isPastingInsideTemplate ? getDuplicateFolderName() : '');
-    state.copiedCampaignDir = duplicateDir;
-    state.copiedHtmlFiles = await listHtmlFiles(duplicateDir);
-    renderCopiedHtmlFiles();
+    setCopyProgress('Preparing', 'Checking destination...', 0, state.templateFiles.length, 'Template scan is already complete.');
+    await nextPaint();
+    const duplicate = await createDuplicateDirectory();
+    await copyScannedTemplateFiles(duplicate.campaignDir);
+    setCopyProgress('Renaming HTML files', 'Applying selected HTML names...', state.templateFiles.length, state.templateFiles.length, 'HTML names were applied during direct copy.');
+    await nextPaint();
+    setCopyProgress('Finalizing', 'Refreshing copied folder...', state.templateFiles.length, state.templateFiles.length, 'Copy complete.');
+    state.copiedCampaignRootDir = duplicate.projectDir;
+    state.copiedCampaignDir = duplicate.campaignDir;
+    state.copiedHtmlFiles = await listHtmlFiles(duplicate.campaignDir);
     updateCampaignPathPreview();
+    setCopyProgress('Completed', 'Campaign folder ready.', state.templateFiles.length, state.templateFiles.length, 'All scanned files were copied.');
     setTemplateStatus(`Duplicated: ${getCampaignPath()}`, 'success');
-    if (state.fullWorkflow) setActiveAccordion('slicer');
+    if (els.copySuccessPanel && els.copySuccessPath) {
+      els.copySuccessPath.textContent = getCampaignPath();
+      els.copySuccessPanel.hidden = false;
+    }
   }
 
   async function renameHtmlFileEntry(fileEntry, targetName) {
@@ -840,7 +1106,40 @@
     });
   });
   els.copyTemplateFolder?.addEventListener('click', () => {
-    copyTemplateFolder().catch((error) => setTemplateStatus(error.message || 'Unable to copy template folder.', 'error'));
+    copyTemplateFolder().catch((error) => setTemplateStatus(getCopyErrorMessage(error), 'error'));
+  });
+  els.copyCopiedPath?.addEventListener('click', async () => {
+    await navigator.clipboard?.writeText(getCampaignPath());
+    setTemplateStatus('Path copied.', 'success');
+  });
+  els.openCopiedFolder?.addEventListener('click', async () => {
+    if (!state.copiedCampaignRootDir || typeof window.showDirectoryPicker !== 'function') return;
+    try {
+      await window.showDirectoryPicker({ mode: 'read', startIn: state.copiedCampaignRootDir });
+    } catch (error) {
+      if (error.name !== 'AbortError') setTemplateStatus('Unable to open the copied folder picker.', 'error');
+    }
+  });
+  els.openCopiedParent?.addEventListener('click', async () => {
+    if (!state.campaignParentDir || typeof window.showDirectoryPicker !== 'function') return;
+    try {
+      await window.showDirectoryPicker({ mode: 'read', startIn: state.campaignParentDir });
+    } catch (error) {
+      if (error.name !== 'AbortError') setTemplateStatus('Unable to open the parent folder picker.', 'error');
+    }
+  });
+  els.duplicateAnother?.addEventListener('click', () => {
+    els.duplicateFolderName.value = '';
+    state.htmlRenameMap.clear();
+    state.copiedCampaignDir = null;
+    state.copiedCampaignRootDir = null;
+    state.campaignFolderReady = false;
+    state.campaignFolderManual = false;
+    if (state.templateStructure[3]) state.templateStructure[3].value = '';
+    if (els.copySuccessPanel) els.copySuccessPanel.hidden = true;
+    renderHtmlRenameFields();
+    updateCampaignPathPreview();
+    setTemplateStatus('Ready for another campaign folder.', 'success');
   });
   els.copyCampaignPath?.addEventListener('click', async () => {
     await navigator.clipboard?.writeText(getCampaignPath());
@@ -930,10 +1229,7 @@
     els.exportWidth,
     els.exportDpi,
     els.imageQuality,
-    els.duplicateFolderName,
-    els.templateYear,
-    els.templateCampaignFolder,
-    els.finalHtmlName
+    els.duplicateFolderName
   ].forEach((input) => {
     if (!input) return;
     const handleFieldChange = () => {
@@ -942,10 +1238,9 @@
       if (hadGenerated && [els.imageFormat, els.exportWidth, els.exportDpi, els.imageQuality].includes(input)) {
         setStatus('Settings changed. Generate again to refresh slices.', 'success');
       }
-      if (input === els.finalHtmlName) state.finalHtmlNameManual = true;
       if (input === els.duplicateFolderName) {
-        state.finalHtmlNameManual = false;
-        syncTemplateFieldsFromFolderName(true);
+        state.campaignFolderManual = false;
+        syncCampaignFolderFromName();
       }
       updateCampaignPathPreview();
       updateUi();

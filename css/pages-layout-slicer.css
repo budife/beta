@@ -115,7 +115,7 @@ select {
 
 .slicer-workflow-picker {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin: 0 0 16px;
 }
@@ -383,6 +383,255 @@ select {
   border: 1px solid var(--border, #eef0f3);
 }
 
+.slicer-copy-structure,
+.slicer-html-rename,
+.slicer-copy-success {
+  margin-top: 10px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-copy-section-head {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.slicer-copy-section-head span,
+.slicer-child-folders > span,
+.slicer-html-rename-row label > span {
+  display: block;
+  color: var(--text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.slicer-copy-section-head h3 {
+  margin: 3px 0 0;
+  color: var(--text, #111827);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.slicer-copy-section-head small {
+  max-width: 230px;
+  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.slicer-path-segments {
+  display: grid;
+  grid-template-columns: minmax(100px, .6fr) minmax(80px, .45fr) minmax(100px, .55fr) minmax(220px, 1.7fr);
+  gap: 8px;
+}
+
+.slicer-template-name-flow {
+  display: grid;
+  grid-template-columns: minmax(220px, .8fr) minmax(280px, 1.2fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.slicer-template-name-flow > div,
+.slicer-template-name-flow > label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.slicer-template-name-flow span {
+  color: var(--text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.slicer-template-name-flow code {
+  min-width: 0;
+  min-height: 38px;
+  padding: 10px;
+  overflow-wrap: anywhere;
+  color: var(--text, #111827);
+  background: #f7f7f8;
+  border: 1px solid var(--border, #e5e7eb);
+  font-size: 12px;
+}
+
+.slicer-template-name-flow input {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 10px;
+  color: var(--text, #111827);
+  background: #fff;
+  border: 1px solid var(--border, #d8dde5);
+  border-radius: 0;
+}
+
+.slicer-path-segment {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.slicer-path-segment > span {
+  color: var(--text-muted, #6b7280);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.slicer-path-segment > i {
+  position: absolute;
+  top: 30px;
+  right: -14px;
+  z-index: 1;
+  color: var(--text-muted, #6b7280);
+  font-size: 10px;
+}
+
+.slicer-path-segment input,
+.slicer-html-rename-row input {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 10px;
+  color: var(--text, #111827);
+  background: #fff;
+  border: 1px solid var(--border, #d8dde5);
+  border-radius: 0;
+}
+
+.slicer-path-segment input:disabled {
+  color: var(--text-muted, #6b7280);
+  background: #f7f7f8;
+}
+
+.slicer-child-folders {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.slicer-child-folder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slicer-child-folder-list span {
+  max-width: 100%;
+  padding: 5px 8px;
+  overflow-wrap: anywhere;
+  color: var(--text-muted, #6b7280);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  background: #f7f7f8;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-html-rename-list {
+  display: grid;
+  gap: 8px;
+}
+
+.slicer-html-rename-row {
+  display: grid;
+  grid-template-columns: minmax(160px, .9fr) auto minmax(180px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  min-width: 0;
+}
+
+.slicer-html-rename-row code {
+  min-width: 0;
+  padding: 11px 9px;
+  overflow-wrap: anywhere;
+  color: var(--text, #111827);
+  font-size: 11px;
+}
+
+.slicer-html-rename-row > i,
+.slicer-html-rename-row > small {
+  padding-bottom: 12px;
+  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+}
+
+.slicer-copy-success {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 3px solid #16a34a;
+}
+
+.slicer-copy-progress {
+  margin-top: 10px;
+  padding: 12px;
+  background: #fffaf0;
+  border: 1px solid #f3d6a4;
+}
+
+.slicer-copy-progress progress {
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin: 4px 0 8px;
+  accent-color: #ef8a91;
+}
+
+.slicer-copy-progress > p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  margin: 0;
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
+}
+
+.slicer-copy-progress > p strong {
+  color: var(--text, #111827);
+  font-family: Consolas, "Courier New", monospace;
+  font-weight: 500;
+}
+
+.slicer-copy-success > div:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.slicer-copy-success span {
+  color: #047857;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.slicer-copy-success code {
+  overflow-wrap: anywhere;
+  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+}
+
+.slicer-success-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
 .slicer-advanced-copy-options {
   margin: 10px 0;
   border: 1px solid var(--border, #e5e7eb);
@@ -491,14 +740,25 @@ select {
   border: 1px solid var(--border, #e5e7eb);
 }
 
-.slicer-path-preview code {
+.slicer-output-preview-list {
+  display: grid;
+  gap: 4px;
   min-width: 0;
-  overflow: hidden;
   color: var(--text, #111827);
   font-family: Consolas, "Courier New", monospace;
   font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+.slicer-output-preview-list a {
+  color: #b4232c;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.slicer-output-preview-list a:hover,
+.slicer-output-preview-list a:focus-visible {
+  text-decoration: underline;
 }
 
 .slicer-template-review {
@@ -1139,6 +1399,30 @@ select {
   .slicer-template-contents-head {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .slicer-path-segments,
+  .slicer-template-name-flow,
+  .slicer-html-rename-row {
+    grid-template-columns: 1fr;
+  }
+
+  .slicer-path-segment > i {
+    display: none;
+  }
+
+  .slicer-html-rename-row > i,
+  .slicer-html-rename-row > small {
+    padding: 0;
+  }
+
+  .slicer-copy-success {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .slicer-success-actions {
+    justify-content: flex-start;
   }
 
   .slicer-actions {

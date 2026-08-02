@@ -2,6 +2,17 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Layout Slicer v0.4.2 beta - 3 August 2026
+
+- Reworked Copy Folder into a compact pre-copy workflow with the original template name, a new campaign-name field, editable Root/Team/Year/Campaign Folder segments, child-folder chips, and a separate multi-file HTML rename area.
+- Campaign Folder now derives `XXXX-YYYYMMDD-XX` from the new campaign name's `MM-DD` and the editable Year segment, while remaining manually editable.
+- New campaign folder names are now the outer project folder; the copied `emailblast/Team/Year/Campaign Folder` structure is created inside it.
+- Copy stays disabled until a new campaign name generates a destination; edited HTML names now convert spaces to hyphens automatically.
+- Output Preview now lists only explicitly renamed HTML files as direct `mail.hsbc.com.hk/id/...` URLs, so one supplied rename produces one public link preview.
+- Added a live output preview, direct copy into a newly created destination, duplicate-name protection, and post-copy path actions including Copy Path and Duplicate Another.
+- Added real file-count copy progress from the initial template scan, including the current stage, file, completed count, and percentage.
+- Removed Full Workflow and the duplicate in-tool Layout Slicer header; Copy Folder and Slice Layout remain as the two focused workflows.
+
 ## Core v6.14.6 - 3 August 2026
 
 - Removed the unsupported `file-system-access` iframe permission attribute and refreshed the app shell cache-buster.
