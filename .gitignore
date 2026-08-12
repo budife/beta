@@ -1,1 +1,3 @@
 contoh jangan di deploy/
+__pycache__/
+*.pyc

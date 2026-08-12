@@ -32,6 +32,13 @@ category: Home
 
 ## Recent Updates
 
+- **TNC Uploader v0.3.9 beta - 13 August 2026** - Removed the duplicate status row so the newest real activity carries the `New` badge instead.
+- **TNC Uploader v0.3.8 beta - 13 August 2026** - Merged the latest status into Recent Activity as a compact colored `New` row.
+- **TNC Uploader v0.3.7 beta - 13 August 2026** - Expanded Recent Activity with file names, paths, filename changes, link-check results, and colored action content.
+- **TNC Uploader v0.3.6 beta - 13 August 2026** - Made Recent Activity more compact with colored local action markers and inline timestamps.
+- **TNC Uploader v0.3.5 beta - 13 August 2026** - Fixed saved PDF history so it renders immediately when the tool opens.
+- **TNC Uploader v0.3.4 beta - 13 August 2026** - Put active dropped PDFs above saved history, clarified the selected destination and target path, and streamlined actions to pick a folder, save PDFs, or clear the queue.
+- **TNC Uploader v0.3.3 beta - 13 August 2026** - Added a persistent right-side Recent Activity log for local queue, folder, save, download, copy, check, and cleanup actions without changing the existing PDF history.
 - **Layout Slicer v0.4.2 beta - 3 August 2026** - Reworked Copy Folder with a campaign-name outer folder, editable eDM path segments, date-aware campaign-folder generation, direct public HTML URL previews, safe pre-duplicate validation, real file-copy progress, and a simpler two-workflow entry screen.
 - **Core v6.14.6 - 3 August 2026** - Removed the unsupported iframe permission warning and refreshed the app shell cache-buster.
 - **Campaign Counter v1.6.1 beta - 3 August 2026** - Generate now follows the visible Last Campaign pointer instead of jumping to the numerically largest historical ID.

@@ -6,6 +6,8 @@
   }
 
   const STORE_KEY = 'edm-helper-tnc-uploader-items-v1';
+  const ACTIVITY_STORE_KEY = 'edm-helper-tnc-uploader-activity-v1';
+  const MAX_ACTIVITY_ITEMS = 30;
   const DEFAULT_PUBLIC_BASE_URL = 'https://mail.hsbc.com.hk/id/emailblast';
   const DIRECT_LINK_CHECK_TIMEOUT_MS = 2500;
   const PROXY_LINK_CHECK_TIMEOUT_MS = 6500;
@@ -17,6 +19,7 @@
     replaceInfo: null,
     baseUrl: DEFAULT_PUBLIC_BASE_URL,
     editingItemId: null,
+    activity: [],
   };
 
   function $(id) {
@@ -29,6 +32,7 @@
       'yearInput',
       'marketInput',
       'prefixInput',
+      'destinationSummary',
       'targetPath',
       'normalModeBtn',
       'replaceModeBtn',
@@ -42,7 +46,6 @@
       'droppedList',
       'fileInput',
       'clearBtn',
-      'downloadBtn',
       'saveBtn',
       'statusText',
       'copyAllLinksBtn',
@@ -50,6 +53,8 @@
       'clearHistoryBtn',
       'fileCount',
       'fileList',
+      'clearActivityBtn',
+      'activityList',
     ].forEach((id) => {
       elements[id] = $(id);
     });
@@ -219,14 +224,10 @@
 
   function setStatus(message, type = '') {
     elements.statusText.textContent = message;
-    elements.statusText.classList.toggle('is-success', type === 'success');
-    elements.statusText.classList.toggle('is-error', type === 'error');
   }
 
   function setStatusHtml(html, type = '') {
     elements.statusText.innerHTML = html;
-    elements.statusText.classList.toggle('is-success', type === 'success');
-    elements.statusText.classList.toggle('is-error', type === 'error');
   }
 
   function getDirectToolUrl() {
@@ -295,6 +296,66 @@
     } catch (error) {
       console.warn('Unable to load TNC uploader history.', error);
     }
+  }
+
+  function saveActivity() {
+    try {
+      localStorage.setItem(ACTIVITY_STORE_KEY, JSON.stringify(state.activity));
+    } catch (error) {
+      console.warn('Unable to persist TNC uploader activity.', error);
+    }
+  }
+
+  function loadActivity() {
+    try {
+      const raw = localStorage.getItem(ACTIVITY_STORE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      state.activity = Array.isArray(parsed) ? parsed.slice(0, MAX_ACTIVITY_ITEMS) : [];
+    } catch (error) {
+      console.warn('Unable to load TNC uploader activity.', error);
+      state.activity = [];
+    }
+  }
+
+  function addActivity(action, detail = '') {
+    state.activity.unshift({ action, detail, at: new Date().toISOString() });
+    state.activity = state.activity.slice(0, MAX_ACTIVITY_ITEMS);
+    saveActivity();
+    renderActivity();
+  }
+
+  function summarizeFileNames(files) {
+    const names = files.map((file) => file.name).filter(Boolean);
+    if (names.length <= 2) return names.join(', ');
+    return `${names.slice(0, 2).join(', ')} +${names.length - 2} more`;
+  }
+
+  function getActivityTone(action) {
+    const value = String(action || '').toLowerCase();
+    if (value.includes('removed') || value.includes('cleared') || value.includes('failed')) return 'is-danger';
+    if (value.includes('saved') || value.includes('selected') || value.includes('copied')) return 'is-success';
+    if (value.includes('checked')) return 'is-info';
+    return 'is-accent';
+  }
+
+  function renderActivity() {
+    if (!state.activity.length) {
+      elements.activityList.innerHTML = '<li class="tnc-activity-empty">No activity recorded yet.</li>';
+      return;
+    }
+    const activityItems = state.activity.map((entry, index) => `
+      <li class="tnc-activity-item ${getActivityTone(entry.action)}">
+        <div class="tnc-activity-item-head">
+          <div class="tnc-activity-item-label">
+            ${index === 0 ? '<span class="tnc-new-badge">New</span>' : ''}
+            <strong>${escapeHtml(entry.action)}</strong>
+          </div>
+          <time datetime="${escapeHtml(entry.at)}">${escapeHtml(formatTime(entry.at))}</time>
+        </div>
+        ${entry.detail ? `<span title="${escapeHtml(entry.detail)}">${escapeHtml(entry.detail)}</span>` : ''}
+      </li>
+    `).join('');
+    elements.activityList.innerHTML = activityItems;
   }
 
   function isPdf(file) {
@@ -424,6 +485,7 @@
     }
 
     saveHistory();
+    addActivity('Files added', `${incoming.length} PDF${incoming.length === 1 ? '' : 's'} queued: ${summarizeFileNames(incoming)}`);
     renderItems();
   }
 
@@ -459,7 +521,6 @@
     elements.fileCount.textContent = fileCountLabel;
     const hasInvalidNames = hasInvalidQueuedNames();
     elements.saveBtn.disabled = !fileBackedCount || !state.directoryHandle || hasInvalidNames;
-    elements.downloadBtn.disabled = !fileBackedCount || hasInvalidNames;
     elements.copyAllLinksBtn.disabled = !linkCount;
     elements.checkAllBtn.disabled = !linkCount;
   }
@@ -493,7 +554,7 @@
     if (item.status === 'cannot_verify') return `Browser could not verify · checked ${formatTime(item.checkedAt)}`;
     if (item.savedAt) return `Saved ${formatTime(item.savedAt)}`;
     if (item.downloadedAt) return `Downloaded ${formatTime(item.downloadedAt)}`;
-    if (!item.file) return 'Stored history only. Drop the PDF again to save/download.';
+    if (!item.file) return 'Stored history only. Drop the PDF again to save.';
     return 'Ready to save.';
   }
 
@@ -519,7 +580,9 @@
       return;
     }
 
-    elements.fileList.innerHTML = state.items.map((item) => {
+    // Keep active uploads visible first; saved history remains below the current queue.
+    const displayItems = [...state.items].sort((left, right) => Number(Boolean(right.file)) - Number(Boolean(left.file)));
+    elements.fileList.innerHTML = displayItems.map((item) => {
       const isRenameable = Boolean(item.file) && state.mode !== 'replace';
       const isEditing = isRenameable && state.editingItemId === item.id;
       const linkName = normalizeLinkName(item.linkName || getDefaultLinkName(item.originalName));
@@ -579,15 +642,27 @@
     }).join('');
   }
 
+  function renderDestination() {
+    const rootName = state.directoryHandle?.name;
+    const targetPath = getTargetPath();
+    elements.targetPath.textContent = rootName ? `${rootName}/${targetPath}` : `/${targetPath}`;
+    elements.destinationSummary.classList.toggle('is-selected', Boolean(rootName));
+    elements.destinationSummary.querySelector('strong').textContent = rootName
+      ? `Selected: ${rootName}`
+      : 'No destination folder selected';
+  }
+
   function findItem(id) {
     return state.items.find((item) => item.id === id);
   }
 
   function removeItem(id) {
+    const item = findItem(id);
     state.items = state.items.filter((item) => item.id !== id);
     if (state.editingItemId === id) state.editingItemId = null;
     saveHistory();
     renderItems();
+    addActivity('Item removed', item ? `${item.originalName} (${item.targetName})` : 'PDF item removed.');
     setStatus(state.items.length ? 'Item removed.' : 'Queue cleared.');
   }
 
@@ -618,6 +693,7 @@
       item.httpStatus = '';
       item.verifiedVia = '';
       item.checkedAt = '';
+      addActivity('Filename updated', `${item.originalName} -> ${item.targetName}`);
       setStatus('Final filename updated.', 'success');
     } else {
       setStatus(error, 'error');
@@ -663,6 +739,8 @@
     try {
       state.directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
       renderItems();
+      renderDestination();
+      addActivity('Folder selected', `${state.directoryHandle.name}/${getTargetPath()}`);
       setStatus(`Destination folder selected: ${state.directoryHandle.name}.`, 'success');
     } catch (error) {
       if (error?.name !== 'AbortError') {
@@ -720,44 +798,14 @@
       elements.fileInput.value = '';
       saveHistory();
       renderItems();
+      addActivity('PDFs saved', `${fileBackedItems.length} PDF${fileBackedItems.length === 1 ? '' : 's'} saved to ${state.directoryHandle.name}/${getTargetPath()}`);
       setStatus(`${fileBackedItems.length} PDF file(s) saved. Queue cleared; saved links remain in history.`, 'success');
     } catch (error) {
       console.error(error);
-      setStatus('Save failed. Check folder permission or download the ready PDFs.', 'error');
+      setStatus('Save failed. Check folder permission and try again.', 'error');
     } finally {
       renderItems();
     }
-  }
-
-  function downloadRenamedFiles() {
-    const fileBackedItems = getFileBackedItems();
-    if (!fileBackedItems.length) {
-      setStatus('Drop PDF files again before downloading. History rows only keep metadata.', 'error');
-      return;
-    }
-
-    if (hasInvalidQueuedNames()) {
-      setStatus('Fix invalid Link Name fields before downloading.', 'error');
-      return;
-    }
-
-    const now = new Date().toISOString();
-    fileBackedItems.forEach((item, index) => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(item.file);
-      link.download = item.targetName;
-      document.body.appendChild(link);
-      setTimeout(() => {
-        link.click();
-        URL.revokeObjectURL(link.href);
-        link.remove();
-      }, index * 120);
-      item.status = 'downloaded';
-      item.downloadedAt = now;
-    });
-    saveHistory();
-    renderItems();
-    setStatus(`${fileBackedItems.length} ready PDF download(s) started.`, 'success');
   }
 
   function clearQueue() {
@@ -765,6 +813,7 @@
     elements.fileInput.value = '';
     saveHistory();
     renderItems();
+    addActivity('Queue cleared', 'Active dropped files cleared.');
     setStatus(state.items.length ? 'Current file queue cleared. History remains.' : 'Queue cleared.');
   }
 
@@ -773,12 +822,14 @@
     elements.fileInput.value = '';
     saveHistory();
     renderItems();
+    addActivity('File history cleared', 'Saved file records were removed.');
     setStatus('TNC uploader history cleared.');
   }
 
   async function copyText(text) {
     try {
       await navigator.clipboard.writeText(text);
+      addActivity('Link copied', text.split('\n').length > 1 ? `${text.split('\n').length} public links copied.` : 'Public link copied.');
       setStatus('Link copied.', 'success');
     } catch (error) {
       console.error(error);
@@ -935,6 +986,9 @@
 
     saveHistory();
     renderItems();
+    const httpDetail = item.httpStatus ? `HTTP ${item.httpStatus}` : getStatusLabel(item);
+    const checker = item.verifiedVia ? ` via ${item.verifiedVia}` : '';
+    addActivity('Link checked', `${item.targetName}: ${httpDetail}${checker}`);
   }
 
   async function checkAllLinks() {
@@ -1017,6 +1071,7 @@
     elements.targetPath.textContent = getTargetPath();
     refreshItemTargets();
     renderItems();
+    renderDestination();
   }
 
   function updateSupportBadge() {
@@ -1025,10 +1080,10 @@
       elements.supportBadge.className = 'tnc-support-badge is-ready';
       return;
     }
-    elements.supportBadge.textContent = 'Download fallback only';
+    elements.supportBadge.textContent = 'Folder write unavailable';
     elements.supportBadge.className = 'tnc-support-badge is-limited';
     elements.chooseFolderBtn.disabled = true;
-    elements.saveBtn.title = 'This browser cannot write directly to a folder. Use Download ready PDFs.';
+    elements.saveBtn.title = 'This browser cannot write directly to a folder.';
   }
 
   function bindEvents() {
@@ -1043,8 +1098,13 @@
     elements.chooseFolderBtn.addEventListener('click', chooseFolder);
     elements.clearBtn.addEventListener('click', clearQueue);
     elements.clearHistoryBtn.addEventListener('click', clearHistory);
+    elements.clearActivityBtn.addEventListener('click', () => {
+      state.activity = [];
+      saveActivity();
+      renderActivity();
+      setStatus('Activity log cleared.');
+    });
     elements.saveBtn.addEventListener('click', saveFiles);
-    elements.downloadBtn.addEventListener('click', downloadRenamedFiles);
     elements.copyAllLinksBtn.addEventListener('click', copyAllLinks);
     elements.checkAllBtn.addEventListener('click', checkAllLinks);
     elements.normalModeBtn.addEventListener('click', () => setUploadMode('normal'));
@@ -1122,11 +1182,13 @@
   function init() {
     initElements();
     loadHistory();
+    loadActivity();
     updateSupportBadge();
     bindEvents();
     renderReplaceMode();
-    elements.targetPath.textContent = getTargetPath();
+    renderDestination();
     renderItems();
+    renderActivity();
   }
 
   if (document.readyState === 'loading') {

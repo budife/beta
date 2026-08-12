@@ -9,7 +9,7 @@
   <meta name="author" content="eDM Helper">
 
   <link rel="stylesheet" href="../css/theme.css?v=6.14.1">
-  <link rel="stylesheet" href="../css/pages-tnc-uploader.css?v=6.14.1">
+  <link rel="stylesheet" href="../css/pages-tnc-uploader.css?v=0.3.3">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.1">
 
   <title>TNC Uploader - eDM Helper</title>
@@ -53,8 +53,6 @@
             </label>
           </div>
 
-          <code class="tnc-hidden-path" id="targetPath">emailblast/MKT/2026/tnc</code>
-
           <div class="tnc-mode-card" aria-label="Upload mode">
             <div class="tnc-segmented" role="tablist" aria-label="TNC upload mode">
               <button class="is-active" type="button" id="normalModeBtn" role="tab" aria-selected="true">
@@ -83,28 +81,26 @@
             <span>No dropped PDFs yet.</span>
           </div>
 
+          <div class="tnc-destination" id="destinationSummary" aria-live="polite">
+            <span class="tnc-card-label">Save destination</span>
+            <strong>No destination folder selected</strong>
+            <code id="targetPath">Pick a folder to create the emailblast path.</code>
+          </div>
+
           <div class="tnc-actions">
-            <button class="tnc-button tnc-button-secondary" type="button" id="clearBtn">
-              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-              Clear queue
-            </button>
-            <button class="tnc-button tnc-button-secondary" type="button" id="downloadBtn" disabled>
-              <i class="fa-solid fa-download" aria-hidden="true"></i>
-              Download files
-            </button>
             <button class="tnc-button tnc-button-secondary" type="button" id="chooseFolderBtn">
               <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
-              Pick folder
+              Pick destination folder
             </button>
             <button class="tnc-button tnc-button-primary" type="button" id="saveBtn" disabled>
               <i class="fa-solid fa-upload" aria-hidden="true"></i>
               Save PDFs
             </button>
+            <button class="tnc-button tnc-button-secondary" type="button" id="clearBtn">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+              Clear queue
+            </button>
           </div>
-
-          <p class="tnc-status" id="statusText" role="status" aria-live="polite">
-            Choose files to begin.
-          </p>
 
         </section>
 
@@ -138,6 +134,19 @@
             </div>
           </div>
         </section>
+
+        <aside class="tnc-panel tnc-activity" aria-labelledby="tnc-activity-title">
+          <div class="tnc-activity-heading">
+            <div>
+              <span class="tnc-eyebrow">Local log</span>
+              <h2 id="tnc-activity-title">Recent activity</h2>
+              <p>Latest actions on this device.</p>
+            </div>
+            <button class="tnc-log-clear" type="button" id="clearActivityBtn">Clear</button>
+          </div>
+          <span class="sr-only" id="statusText" role="status" aria-live="polite"></span>
+          <ol class="tnc-activity-list" id="activityList" aria-live="polite"></ol>
+        </aside>
       </div>
     </section>
   </main>
@@ -171,6 +180,6 @@
   <script src="../js/footer.js" defer></script>
   <script src="../js/version-config.js?v=6.14.1" defer></script>
   <script src="../js/privacy-settings.js?v=6.14.1" defer></script>
-  <script src="../js/pages-tnc-uploader.js?v=6.14.1" defer></script>
+  <script src="../js/pages-tnc-uploader.js?v=0.3.9" defer></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 
 PORT = 8000
 
+
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     project_prefix = "/beta"
 
@@ -16,7 +17,11 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         "/database-checker",
         "/database-generator",
         "/layout-checker",
+        "/layout-slicer",
+        "/tnc-uploader",
         "/wfh-tracker",
+        "/docs",
+        "/maintenance",
     }
 
     legacy_routes = {
@@ -27,7 +32,10 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         "/database-checker.html": "/database-checker",
         "/database-generator.html": "/database-generator",
         "/layout-checker.html": "/layout-checker",
+        "/layout-slicer.html": "/layout-slicer",
+        "/tnc-uploader.html": "/tnc-uploader",
         "/wfh-tracker.html": "/wfh-tracker",
+        "/maintenance.html": "/maintenance",
     }
 
     def do_GET(self):
@@ -56,18 +64,19 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def end_headers(self):
-        # Add CORS headers
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        # Add MIME types for proper file serving
-        if self.path.endswith('.js'):
-            self.send_header('Content-Type', 'application/javascript')
-        elif self.path.endswith('.css'):
-            self.send_header('Content-Type', 'text/css')
-        elif self.path.endswith('.md'):
-            self.send_header('Content-Type', 'text/markdown; charset=utf-8')
+        # Add CORS headers.
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        # Add MIME types for proper file serving.
+        if self.path.endswith(".js"):
+            self.send_header("Content-Type", "application/javascript")
+        elif self.path.endswith(".css"):
+            self.send_header("Content-Type", "text/css")
+        elif self.path.endswith(".md"):
+            self.send_header("Content-Type", "text/markdown; charset=utf-8")
         super().end_headers()
+
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))

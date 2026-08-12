@@ -2,6 +2,37 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## TNC Uploader v0.3.9 beta - 13 August 2026
+
+- Removed the duplicate transient status row; the newest real activity now carries the compact `New` badge and timestamp.
+
+## TNC Uploader v0.3.8 beta - 13 August 2026
+
+- Merged the latest success, error, or info status into Recent Activity as a compact non-persistent `New` row.
+
+## TNC Uploader v0.3.7 beta - 13 August 2026
+
+- Expanded Recent Activity with file names, destination paths, filename changes, and link-check results, then added matching success, info, accent, and error colors for faster scanning.
+
+## TNC Uploader v0.3.6 beta - 13 August 2026
+
+- Made Recent Activity denser and easier to scan with compact action rows, inline timestamps, and semantic local action colors.
+
+## TNC Uploader v0.3.5 beta - 13 August 2026
+
+- Fixed saved PDF history not rendering on initial tool load; active queue and saved records now appear immediately.
+
+## TNC Uploader v0.3.4 beta - 13 August 2026
+
+- Reordered the PDF workspace so active dropped files always appear above saved history.
+- Simplified destination actions to Pick destination folder, Save PDFs, and Clear queue; the selected root and planned target path are now visible before saving.
+- Moved the live status message into Recent Activity and removed the obsolete download fallback.
+
+## TNC Uploader v0.3.3 beta - 13 August 2026
+
+- Added a compact right-side Recent Activity log that persists the latest 30 local actions, including file queueing, folder selection, saving, downloads, link copies, checks, and history cleanup.
+- Kept the activity log separate from saved PDF history, with its own Clear action so file records remain available unless explicitly cleared.
+
 ## Layout Slicer v0.4.2 beta - 3 August 2026
 
 - Reworked Copy Folder into a compact pre-copy workflow with the original template name, a new campaign-name field, editable Root/Team/Year/Campaign Folder segments, child-folder chips, and a separate multi-file HTML rename area.
