@@ -145,6 +145,16 @@ function clearConflicts() {
   document.querySelectorAll('.counter-folder-chip.is-conflict').forEach(el => el.classList.remove('is-conflict'));
 }
 
+function updateConflictState() {
+  const idEl = document.getElementById('counter-last-id');
+  const currentId = formatId(currentCampaignId);
+  if (scannedFolderIds.has(currentId)) {
+    idEl.classList.add('is-conflict');
+  } else {
+    idEl.classList.remove('is-conflict');
+  }
+}
+
 async function scanFolder() {
   if (typeof window.showDirectoryPicker !== 'function') {
     setMessage('Folder access is not supported in this browser.', 'error');
@@ -166,6 +176,7 @@ async function scanFolder() {
     if (btn) btn.classList.add('is-loaded');
     if (label) label.textContent = dirHandle.name;
     renderFolderList();
+    updateConflictState();
     setMessage(`${scannedFolderIds.size} unique campaign ID(s) found.`, 'success');
   } catch (error) {
     if (error.name !== 'AbortError') {
@@ -285,7 +296,7 @@ async function refreshDashboard() {
     currentCampaignId = Number(counterValue) || 0;
     const idEl = document.getElementById('counter-last-id');
     idEl.textContent = formatId(currentCampaignId);
-    idEl.classList.remove('is-conflict');
+    updateConflictState();
     updateEditButton();
     renderActivity(activity);
     setMessage('Supabase is connected.');
@@ -294,7 +305,7 @@ async function refreshDashboard() {
         currentCampaignId = Number(value) || 0;
         const idEl = document.getElementById('counter-last-id');
         idEl.textContent = formatId(currentCampaignId);
-        idEl.classList.remove('is-conflict');
+        updateConflictState();
         updateEditButton();
       });
     }
@@ -391,7 +402,7 @@ try {
     currentCampaignId = Number(result.campaign_id) || 0;
     const idEl = document.getElementById('counter-last-id');
     idEl.textContent = formatId(currentCampaignId);
-    idEl.classList.remove('is-conflict');
+    updateConflictState();
     updateEditButton();
     setMessage(`${formatId(currentCampaignId)} manually set.`, 'success');
     // Only refresh activity, don't reset counter from Supabase
@@ -418,9 +429,8 @@ async function stepBackCampaign() {
     const result = await campaignRegistryService.backCampaign(username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
     currentCampaignId = Number(result.campaign_id) || 0;
-    const idEl = document.getElementById('counter-last-id');
-    idEl.textContent = formatId(currentCampaignId);
-    idEl.classList.remove('is-conflict');
+    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    updateConflictState();
     updateEditButton();
     setMessage(`${formatId(currentCampaignId)} set.`, 'success');
   } catch (error) {
@@ -450,13 +460,12 @@ async function generateCampaign() {
     const copiedId = buildCopiedId(currentCampaignId, campaignName, dateStamp);
     await navigator.clipboard?.writeText(copiedId);
     document.getElementById('counter-last-id').textContent = newId;
+    updateConflictState();
     updateEditButton();
     if (scannedFolderIds.has(newId)) {
       markConflict(newId);
-      document.getElementById('counter-last-id').classList.add('is-conflict');
       setMessage(`${newId} generated and copied — conflict: folder already exists.`, 'error');
     } else {
-      document.getElementById('counter-last-id').classList.remove('is-conflict');
       setMessage(`${copiedId} generated and copied.`, 'success');
     }
   } catch (error) {
