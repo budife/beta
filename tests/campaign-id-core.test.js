@@ -143,10 +143,26 @@ test('Campaign Counter Phase 1 uses a dedicated Supabase service while the bookm
   const bookmarklet = fs.readFileSync(path.join(__dirname, '../js/monday-campaign-bookmarklet.js'), 'utf8');
   assert.match(adapter, /createClient/);
   assert.match(adapter, /set_next_campaign_id/);
-  assert.match(adapter, /Generated from active counter/);
+  assert.match(adapter, /generate_campaign_id/);
+  assert.match(adapter, /back_campaign_id/);
   assert.match(adapter, /campaign_registry/);
+  assert.match(adapter, /campaign_counter/);
+  assert.match(adapter, /subscribeCounter/);
   assert.match(counter, /CampaignRegistryService/);
   assert.doesNotMatch(bookmarklet, /supabase|campaign-id-bridge|neuyjcotcmjnndjyzbcq/i);
+});
+
+test('Campaign Counter Phase 1 makes Supabase the single source of truth for the counter', () => {
+  const counter = fs.readFileSync(path.join(__dirname, '../js/pages-campaign-counter.js'), 'utf8');
+  const sql = fs.readFileSync(path.join(__dirname, '../supabase/fix-set-next-campaign-id.sql'), 'utf8');
+  assert.match(sql, /create table if not exists public\.campaign_counter/);
+  assert.match(sql, /current_value = current_value \+ 1/);
+  assert.match(sql, /greatest\(current_value - 1, 1\)/);
+  assert.match(sql, /supabase_realtime add table public\.campaign_counter/);
+  assert.doesNotMatch(counter, /currentCampaignId\s*=\s*Math\.min\(currentCampaignId \+ 1, 9999\)/);
+  assert.match(counter, /campaignRegistryService\.generateCampaign\(username, dateStamp, campaignName\)/);
+  assert.match(counter, /campaignRegistryService\.backCampaign\(username\)/);
+  assert.match(counter, /subscribeCounter/);
 });
 
 test('Campaign Counter Phase 1 exposes only the dashboard workflow', () => {
@@ -176,7 +192,7 @@ test('Campaign Counter Phase 1 exposes only the dashboard workflow', () => {
   assert.match(manualFix, /v_next_campaign_id/);
   assert.doesNotMatch(manualFix, /greater than the current/i);
   assert.doesNotMatch(counterSource, /id="scan-folder"/);
-  assert.doesNotMatch(counterScript, /showDirectoryPicker/);
+  assert.match(counterScript, /showDirectoryPicker/);
   assert.match(bookmarkletSource, /<option value="merge">Merge<\/option>/);
   assert.match(bookmarkletSource, /<option value="replace">Replace<\/option>/);
   assert.match(bookmarkletSource, /Local backup downloaded/);

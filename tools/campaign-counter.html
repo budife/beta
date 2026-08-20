@@ -14,7 +14,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=1.7.3">
+<link rel="stylesheet" href="../css/pages-campaign-counter.css?v=2.0.0">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.0">
   
   <title>Campaign Counter - eDM Helper</title>
@@ -70,6 +70,20 @@
               <div class="activity-list" id="activity-list" aria-live="polite">
                 <p class="activity-empty">Loading activity...</p>
               </div>
+            </section>
+
+            <section class="counter-card counter-folder" aria-labelledby="folder-panel-title">
+              <header class="folder-heading">
+                <h2 id="folder-panel-title">Campaign Folder</h2>
+                <button class="counter-folder-btn" id="pick-folder" type="button">
+                  <i class="fa-solid fa-folder-open" aria-hidden="true"></i> <span id="folder-btn-label">Scan Folder</span>
+                </button>
+              </header>
+              <div class="folder-list" id="folder-list" hidden>
+                <p class="folder-list-heading">Existing Campaigns <span class="folder-count" id="folder-count"></span></p>
+                <div class="folder-items" id="folder-items"></div>
+              </div>
+              <p class="folder-empty" id="folder-empty">Scan a campaign folder to see existing IDs. Folder names should start with a 4-digit campaign number.</p>
             </section>
           </div>
         </section>
@@ -139,11 +153,12 @@
     </div>
   </footer>
 
+  <div id="tooltip-portal" aria-hidden="true"></div>
   <script src="../js/footer.js?v=6.14.0" defer></script>
   <script src="../js/version-config.js?v=6.14.0" defer></script>
-  <script src="../js/supabase-config.js?v=1.7.3" defer></script>
+<script src="../js/supabase-config.js?v=2.0.0" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  <script src="../js/campaign-counter-supabase.js?v=1.7.3" defer></script>
-  <script src="../js/pages-campaign-counter.js?v=1.7.3" defer></script>
+  <script src="../js/campaign-counter-supabase.js?v=2.0.0" defer></script>
+  <script src="../js/pages-campaign-counter.js?v=2.0.0" defer></script>
 </body>
 </html>

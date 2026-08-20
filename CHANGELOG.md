@@ -2,6 +2,42 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v2.0.0 beta - 21 August 2026
+
+- Made Supabase the single source of truth for the counter. Generate atomically increments a server-side `campaign_counter` row (+1) and Back atomically decrements it (-1) through dedicated RPCs, so concurrent users can never produce duplicate IDs. The UI updates only after Supabase returns the new value, and Supabase Realtime broadcasts the change so every open tab updates instantly without a refresh.
+
+## Campaign Counter v1.9.0 beta - 20 August 2026
+
+- Rewrote navigation to simple local counter: Generate = current ID + 1, Back = current ID - 1; current displayed ID is now the single source of truth, no Supabase round-trip on every click.
+
+## Campaign Counter v1.8.8 beta - 20 August 2026
+
+- Fixed generate to use server-side `generate_campaign_id` RPC so the next ID is always calculated from the latest registry state, preventing stale local counter issues when multiple users generate.
+
+## Campaign Counter v1.8.7 beta - 20 August 2026
+
+- Improved campaign folder scanner to detect the 4-digit campaign ID anywhere in the folder name (not just at the start), using word-boundary matching; folders like `JANC 0044 Portfolio asset Bianca 03-21` now parse correctly.
+
+## Campaign Counter v1.8.6 beta - 20 August 2026
+
+- Moved hover detail panel to a body-level portal with `position: fixed` so it floats freely without clipping or causing scrollbars on the campaign list; added viewport-edge flip and vertical boundary clamping.
+
+## Campaign Counter v1.8.5 beta - 20 August 2026
+
+- Improved UI/UX: compact Generate button, single-line activity rows, prominent Scan Folder button, 6-column folder grid, and informative empty-state guidance.
+
+## Campaign Counter v1.8.2 beta - 20 August 2026
+
+- Resized the folder list into a compact 10-column grid and added hover tooltips showing blast date, campaign name, and campaign manager parsed from folder names.
+
+## Campaign Counter v1.8.1 beta - 20 August 2026
+
+- Moved the Campaign Folder scanner into its own dedicated right-side panel with a compact vertical folder list.
+
+## Campaign Counter v1.8.0 beta - 20 August 2026
+
+- Added a Campaign Folder picker that scans a local folder for existing campaign directories, lists found campaign numbers, and highlights conflicts in red when a generated ID already has a matching folder.
+
 ## Campaign Counter v1.7.2 beta - 20 August 2026
 
 - Tidied the Date and Campaign Name fields into a clean side-by-side row with aligned labels and inputs.

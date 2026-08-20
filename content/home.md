@@ -32,6 +32,12 @@ category: Home
 
 ## Recent Updates
 
+- **Campaign Counter v2.0.0 beta - 21 August 2026** - Made Supabase the single source of truth for the counter: Generate and Back atomically increment or decrement a server-side counter row via RPC, the UI updates only after Supabase confirms the new ID, and Supabase Realtime keeps every open tab in sync instantly.
+- **Campaign Counter v1.9.0 beta - 20 August 2026** - Rewrote navigation to simple local counter: Generate = current ID + 1, Back = current ID - 1; current displayed ID is now the single source of truth, no Supabase round-trip on every click.
+- **Campaign Counter v1.8.8 beta - 20 August 2026** - Fixed generate to use server-side `generate_campaign_id` RPC so the next ID is always calculated from the latest registry state, preventing stale local counter issues when multiple users generate.
+- **Campaign Counter v1.8.2 beta - 20 August 2026** - Resized the folder list into a compact 10-column grid and added hover tooltips showing blast date, campaign name, and campaign manager parsed from folder names.
+- **Campaign Counter v1.8.1 beta - 20 August 2026** - Moved the Campaign Folder scanner into its own dedicated right-side panel with a compact vertical folder list.
+- **Campaign Counter v1.8.0 beta - 20 August 2026** - Added a Campaign Folder picker that scans a local folder for existing campaign directories, lists found campaign numbers, and highlights conflicts in red when a generated ID already has a matching folder.
 - **Campaign Counter v1.7.2 beta - 20 August 2026** - Tidied the Date and Campaign Name fields into a clean side-by-side row with aligned labels and inputs.
 - **Campaign Counter v1.7.1 beta - 20 August 2026** - Added a Date field next to Campaign Name so users can override the default date stamp before generating.
 - **Campaign Counter v1.7.0 beta - 20 August 2026** - Added an optional Campaign Name field so generated IDs copy as `YYYYMMDD_nama-campaign_XXXX` instead of just the four-digit number.
