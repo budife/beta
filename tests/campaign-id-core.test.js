@@ -176,7 +176,7 @@ test('Campaign Counter Phase 1 exposes only the dashboard workflow', () => {
   assert.match(manualFix, /v_next_campaign_id/);
   assert.doesNotMatch(manualFix, /greater than the current/i);
   assert.doesNotMatch(counterSource, /id="scan-folder"/);
-  assert.doesNotMatch(counterScript, /showDirectoryPicker/);
+  assert.match(counterScript, /showDirectoryPicker/);
   assert.match(bookmarkletSource, /<option value="merge">Merge<\/option>/);
   assert.match(bookmarkletSource, /<option value="replace">Replace<\/option>/);
   assert.match(bookmarkletSource, /Local backup downloaded/);

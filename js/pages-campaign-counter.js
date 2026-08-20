@@ -5,6 +5,7 @@ let connected = false;
 let generating = false;
 let lastCampaignId = 0;
 const GENERATED_FROM_POINTER_NOTE = 'Generated from active counter';
+let scannedFolderIds = new Map();
 
 function formatId(value) {
   return String(Number.parseInt(value, 10) || 0).padStart(4, '0');
@@ -27,6 +28,70 @@ function buildCopiedId(campaignId, campaignName, dateStamp) {
   const stamp = dateStamp || formatDatestamp(new Date());
   const slug = slugifyCampaignName(campaignName);
   return `${stamp}_${slug}_${formatId(campaignId)}`;
+}
+
+function parseFolderCampaignId(name) {
+  const match = name.match(/^(\d{4})\b/);
+  return match ? match[1] : null;
+}
+
+function renderFolderList() {
+  const container = document.getElementById('folder-items');
+  const countEl = document.getElementById('folder-count');
+  const listEl = document.getElementById('folder-list');
+  if (!container || !countEl || !listEl) return;
+
+  if (scannedFolderIds.size === 0) {
+    listEl.hidden = true;
+    return;
+  }
+
+  listEl.hidden = false;
+  countEl.textContent = `(${scannedFolderIds.size})`;
+  container.innerHTML = '';
+
+  const sorted = [...scannedFolderIds.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  for (const [id, name] of sorted) {
+    const chip = document.createElement('span');
+    chip.className = 'counter-folder-chip';
+    chip.dataset.folderId = id;
+    chip.innerHTML = `<code>${escapeHtml(id)}</code><span class="counter-folder-chip-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>`;
+    container.appendChild(chip);
+  }
+}
+
+function markConflict(folderId) {
+  const chip = document.querySelector(`.counter-folder-chip[data-folder-id="${folderId}"]`);
+  if (chip) chip.classList.add('is-conflict');
+}
+
+function clearConflicts() {
+  document.querySelectorAll('.counter-folder-chip.is-conflict').forEach(el => el.classList.remove('is-conflict'));
+}
+
+async function scanFolder() {
+  if (typeof window.showDirectoryPicker !== 'function') {
+    setMessage('Folder access is not supported in this browser.', 'error');
+    return;
+  }
+  try {
+    const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+    scannedFolderIds.clear();
+    for await (const [name] of dirHandle.entries()) {
+      const id = parseFolderCampaignId(name);
+      if (id) scannedFolderIds.set(id, name);
+    }
+    const btn = document.getElementById('pick-folder');
+    const label = document.getElementById('folder-btn-label');
+    if (btn) btn.classList.add('is-loaded');
+    if (label) label.textContent = dirHandle.name;
+    renderFolderList();
+    setMessage(`${scannedFolderIds.size} campaign folder(s) found.`, 'success');
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      setMessage('Unable to read folder. Please try again.', 'error');
+    }
+  }
 }
 
 function escapeHtml(value) {
@@ -265,14 +330,21 @@ async function generateCampaign() {
   const dateStamp = dateInput ? dateInput.value.trim() : '';
   const campaignName = nameInput ? nameInput.value : '';
   generating = true;
+  clearConflicts();
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
     const result = await campaignRegistryService.generateCampaign(lastCampaignId, username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
+    const newId = formatId(result.campaign_id);
+    if (scannedFolderIds.has(newId)) {
+      markConflict(newId);
+      setMessage(`${newId} generated and copied — conflict: folder already exists.`, 'error');
+    } else {
+      setMessage(`${buildCopiedId(result.campaign_id, campaignName, dateStamp)} generated and copied.`, 'success');
+    }
     const copiedId = buildCopiedId(result.campaign_id, campaignName, dateStamp);
     await navigator.clipboard?.writeText(copiedId);
-    setMessage(`${copiedId} generated and copied.`, 'success');
     await refreshDashboard();
   } catch (error) {
     setMessage('Unable to generate a Campaign ID. Please try again.', 'error');
@@ -288,6 +360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const nameInput = document.getElementById('campaign-name-input');
   if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
   nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
+  document.getElementById('pick-folder')?.addEventListener('click', scanFolder);
   bindWelcomeDialog();
   bindManualDialog();
   document.getElementById('generate-campaign')?.addEventListener('click', generateCampaign);
