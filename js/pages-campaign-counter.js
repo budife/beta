@@ -248,7 +248,10 @@ function renderActivity(items) {
   list.innerHTML = items.map(item => `
     <article class="activity-row">
       <code>${displayId(item)}</code>
-      <span>${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))} by ${escapeHtml(item.generated_by || 'Unknown')}</span>
+      <div class="activity-meta">
+        <span>${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))}</span>
+        <span>by ${escapeHtml(item.generated_by || 'Unknown')}</span>
+      </div>
     </article>`).join('');
 }
 
