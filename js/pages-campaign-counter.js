@@ -31,12 +31,12 @@ function buildCopiedId(campaignId, campaignName, dateStamp) {
 }
 
 function parseFolderCampaignId(name) {
-  const match = name.match(/^(\d{4})\b/);
+  const match = name.match(/\b(\d{4})\b/);
   return match ? match[1] : null;
 }
 
 function parseFolderInfo(name) {
-  const idMatch = name.match(/^(\d{4})\s+(.+)/);
+  const idMatch = name.match(/\b(\d{4})\b\s+(.+)/);
   if (!idMatch) return { id: null, name: name, date: '', manager: '' };
   const id = idMatch[1];
   let rest = idMatch[2].replace(/\s*-\s*Copy(\s*\(\d+\))?/gi, '').trim();

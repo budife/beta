@@ -32,8 +32,8 @@ category: Home
 
 ## Recent Updates
 
+- **Campaign Counter v1.8.7 beta - 20 August 2026** - Improved campaign folder scanner to detect the 4-digit campaign ID anywhere in the folder name (not just at the start), using word-boundary matching; folders like `JANC 0044 Portfolio asset Bianca 03-21` now parse correctly.
 - **Campaign Counter v1.8.6 beta - 20 August 2026** - Moved hover detail panel to a body-level portal with `position: fixed` so it floats freely without clipping or causing scrollbars on the campaign list; added viewport-edge flip and vertical boundary clamping.
-- **Campaign Counter v1.8.5 beta - 20 August 2026** - Fixed the folder hover panel to appear as a right-side flyout anchored to each campaign ID; added viewport-edge flip to left, internal scrolling, and keyboard focus support without affecting page layout or scroll.
 - **Campaign Counter v1.8.2 beta - 20 August 2026** - Resized the folder list into a compact 10-column grid and added hover tooltips showing blast date, campaign name, and campaign manager parsed from folder names.
 - **Campaign Counter v1.8.1 beta - 20 August 2026** - Moved the Campaign Folder scanner into its own dedicated right-side panel with a compact vertical folder list.
 - **Campaign Counter v1.8.0 beta - 20 August 2026** - Added a Campaign Folder picker that scans a local folder for existing campaign directories, lists found campaign numbers, and highlights conflicts in red when a generated ID already has a matching folder.
