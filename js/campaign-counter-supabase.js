@@ -140,6 +140,7 @@
     setNextCampaignId,
     subscribeCounter,
     subscribeActivity,
-    saveFolderScan
+    saveFolderScan,
+    loadFolderScans
   };
 });
