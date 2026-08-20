@@ -76,6 +76,7 @@ function renderFolderList() {
     const chip = document.createElement('div');
     chip.className = 'counter-folder-chip';
     chip.dataset.folderId = id;
+    chip.setAttribute('tabindex', '0');
 
     const campaignItems = entries.map(e => `
       <span class="tooltip-campaign-item">
@@ -83,12 +84,54 @@ function renderFolderList() {
         <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}${e.manager ? ' - ' + escapeHtml(e.manager) : ''}</span>
       </span>`).join('');
 
-    chip.innerHTML = `
-      <code>${escapeHtml(id)}</code>
-      <span class="counter-folder-tooltip">
-        <span class="tooltip-header">ID: ${escapeHtml(id)}</span>
-        <span class="tooltip-campaign-list">${campaignItems}</span>
-      </span>`;
+    chip.innerHTML = `<code>${escapeHtml(id)}</code>`;
+
+    // Create tooltip panel in portal
+    const panel = document.createElement('div');
+    panel.className = 'tooltip-panel';
+    panel.dataset.folderId = id;
+    panel.innerHTML = `
+      <span class="tooltip-header">ID: ${escapeHtml(id)}</span>
+      <span class="tooltip-campaign-list">${campaignItems}</span>`;
+    document.getElementById('tooltip-portal').appendChild(panel);
+
+    const showTooltip = () => {
+      const rect = chip.getBoundingClientRect();
+      panel.style.top = `${rect.top}px`;
+      panel.style.left = `${rect.right + 8}px`;
+      panel.classList.remove('flip-left');
+
+      // Check if panel would overflow viewport on right
+      const panelWidth = 280;
+      const gap = 8;
+      if (rect.right + gap + panelWidth > window.innerWidth - 12) {
+        panel.classList.add('flip-left');
+        panel.style.left = 'auto';
+        panel.style.right = `${window.innerWidth - rect.left + gap}px`;
+      } else {
+        panel.style.left = `${rect.right + 8}px`;
+        panel.style.right = 'auto';
+      }
+
+      // Check if panel would overflow viewport on bottom
+      const maxHeight = window.innerHeight - 120;
+      panel.style.maxHeight = `${maxHeight}px`;
+      if (rect.top + panel.offsetHeight > window.innerHeight - 20) {
+        panel.style.top = `${window.innerHeight - maxHeight - 20}px`;
+      }
+
+      panel.classList.add('visible');
+    };
+
+    const hideTooltip = () => {
+      panel.classList.remove('visible', 'flip-left');
+    };
+
+    chip.addEventListener('mouseenter', showTooltip);
+    chip.addEventListener('mouseleave', hideTooltip);
+    chip.addEventListener('focus', showTooltip);
+    chip.addEventListener('blur', hideTooltip);
+
     container.appendChild(chip);
   }
 }
@@ -398,45 +441,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
   nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   document.getElementById('pick-folder')?.addEventListener('click', scanFolder);
-
-  // Folder tooltip edge detection - flip to left when near right viewport edge
-  const folderItems = document.getElementById('folder-items');
-  if (folderItems) {
-    folderItems.addEventListener('mouseover', (e) => {
-      const chip = e.target.closest('.counter-folder-chip');
-      if (!chip) return;
-      const tooltip = chip.querySelector('.counter-folder-tooltip');
-      if (!tooltip) return;
-
-      // Reset flip state first
-      tooltip.classList.remove('flip-left');
-
-      // Check if tooltip would overflow viewport
-      const chipRect = chip.getBoundingClientRect();
-      const tooltipWidth = 280; // matches CSS width
-      const gap = 8; // matches CSS gap
-      const rightEdge = chipRect.right + gap + tooltipWidth;
-
-      if (rightEdge > window.innerWidth - 12) {
-        tooltip.classList.add('flip-left');
-      }
-    });
-
-    // Keyboard accessibility: show tooltip on focus
-    folderItems.addEventListener('focusin', (e) => {
-      const chip = e.target.closest('.counter-folder-chip');
-      if (chip) chip.classList.add('has-focus');
-    });
-    folderItems.addEventListener('focusout', (e) => {
-      const chip = e.target.closest('.counter-folder-chip');
-      if (chip) chip.classList.remove('has-focus');
-    });
-
-    // Make chips focusable
-    folderItems.querySelectorAll('.counter-folder-chip').forEach(chip => {
-      chip.setAttribute('tabindex', '0');
-    });
-  }
 
   bindWelcomeDialog();
   bindManualDialog();
