@@ -177,6 +177,29 @@ async function scanFolder() {
     if (label) label.textContent = dirHandle.name;
     renderFolderList();
     updateConflictState();
+
+    // Save to Supabase as backup
+    if (connected && username) {
+      const entries = [];
+      scannedFolderIds.forEach((infos, id) => {
+        infos.forEach(info => {
+          entries.push({
+            campaign_id: id,
+            campaign_name: info.name || '',
+            folder_date: info.date || '',
+            manager: info.manager || ''
+          });
+        });
+      });
+      if (entries.length) {
+        try {
+          await campaignRegistryService.saveFolderScan(username, dirHandle.name, entries);
+        } catch (e) {
+          console.warn('Folder scan backup failed', e);
+        }
+      }
+    }
+
     setMessage(`${scannedFolderIds.size} unique campaign ID(s) found.`, 'success');
   } catch (error) {
     if (error.name !== 'AbortError') {

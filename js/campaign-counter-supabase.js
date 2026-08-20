@@ -114,6 +114,15 @@
     return () => client().removeChannel(channel);
   }
 
+  async function saveFolderScan(scannedBy, folderName, entries) {
+    const data = unwrap(await client().rpc('save_folder_scan', {
+      p_scanned_by: scannedBy,
+      p_folder_name: folderName,
+      p_entries: entries
+    }));
+    return data;
+  }
+
   return {
     checkConnection,
     loadLastCampaign,
@@ -123,6 +132,7 @@
     backCampaign,
     setNextCampaignId,
     subscribeCounter,
-    subscribeActivity
+    subscribeActivity,
+    saveFolderScan
   };
 });
