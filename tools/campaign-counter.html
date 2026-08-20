@@ -14,7 +14,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=1.8.0">
+  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=1.8.1">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.0">
   
   <title>Campaign Counter - eDM Helper</title>
@@ -50,16 +50,6 @@
                   <span class="counter-field-label">Campaign Name <span class="counter-field-hint">(optional)</span></span>
                   <input id="campaign-name-input" type="text" maxlength="80" placeholder="nama-campaign" autocomplete="off">
                 </label>
-                <label class="counter-field counter-field--folder">
-                  <span class="counter-field-label">Campaign Folder</span>
-                  <button class="counter-folder-btn" id="pick-folder" type="button">
-                    <i class="fa-solid fa-folder-open" aria-hidden="true"></i> <span id="folder-btn-label">Scan Folder</span>
-                  </button>
-                </label>
-              </div>
-              <div class="counter-folder-list" id="folder-list" hidden>
-                <p class="counter-folder-heading">Existing Campaigns <span class="counter-folder-count" id="folder-count"></span></p>
-                <div class="counter-folder-items" id="folder-items"></div>
               </div>
               <div class="counter-actions">
                 <button class="counter-step-back" id="step-back-campaign" type="button" aria-label="Set Last Campaign back by one" title="Set Last Campaign back by one" disabled>
@@ -80,6 +70,19 @@
               <div class="activity-list" id="activity-list" aria-live="polite">
                 <p class="activity-empty">Loading activity...</p>
               </div>
+            </section>
+
+            <section class="counter-card counter-folders" id="folder-list" aria-labelledby="folder-title" hidden>
+              <header class="activity-heading">
+                <h2 id="folder-title">Campaign Folders <span class="counter-folder-count" id="folder-count"></span></h2>
+                <p>Existing campaign directories from scanned folder.</p>
+              </header>
+              <div class="folder-toolbar">
+                <button class="counter-folder-btn" id="pick-folder" type="button">
+                  <i class="fa-solid fa-folder-open" aria-hidden="true"></i> <span id="folder-btn-label">Scan Folder</span>
+                </button>
+              </div>
+              <div class="counter-folder-items" id="folder-items" aria-live="polite"></div>
             </section>
           </div>
         </section>
@@ -151,9 +154,9 @@
 
   <script src="../js/footer.js?v=6.14.0" defer></script>
   <script src="../js/version-config.js?v=6.14.0" defer></script>
-  <script src="../js/supabase-config.js?v=1.8.0" defer></script>
+  <script src="../js/supabase-config.js?v=1.8.1" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  <script src="../js/campaign-counter-supabase.js?v=1.8.0" defer></script>
-  <script src="../js/pages-campaign-counter.js?v=1.8.0" defer></script>
+  <script src="../js/campaign-counter-supabase.js?v=1.8.1" defer></script>
+  <script src="../js/pages-campaign-counter.js?v=1.8.1" defer></script>
 </body>
 </html>

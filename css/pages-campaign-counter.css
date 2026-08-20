@@ -51,7 +51,7 @@
 
 .counter-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr) minmax(0, 320px);
   gap: 16px;
 }
 
@@ -132,13 +132,26 @@
   flex: 0 0 auto;
 }
 
+.counter-folders {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.counter-folders[hidden] { display: none; }
+
+.folder-toolbar {
+  padding: 0 20px 14px;
+  border-bottom: 1px solid #e4e4e7;
+}
+
 .counter-folder-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   width: 100%;
-  min-height: 46px;
-  padding: 10px 12px;
+  min-height: 36px;
+  padding: 8px 12px;
   color: #52525b;
   background: #ffffff;
   border: 1px solid #d8dde5;
@@ -158,13 +171,6 @@
   background: #ecfdf5;
 }
 
-.counter-folder-list {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: #f8f9fa;
-  border: 1px solid #e4e4e7;
-}
-
 .counter-folder-heading {
   display: flex;
   align-items: center;
@@ -180,27 +186,27 @@
 .counter-folder-count {
   color: #71717a;
   font-weight: 400;
+  font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
 }
 
 .counter-folder-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-height: 120px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding: 8px 20px 20px;
 }
 
 .counter-folder-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
   background: #ffffff;
   border: 1px solid #e4e4e7;
-  font: 500 11px Consolas, Monaco, monospace;
+  margin-bottom: 6px;
 }
 
 .counter-folder-chip.is-conflict {
@@ -209,13 +215,18 @@
   border-color: #fecaca;
 }
 
+.counter-folder-chip code {
+  flex: 0 0 auto;
+  font: 500 13px Consolas, Monaco, monospace;
+}
+
 .counter-folder-chip-name {
-  max-width: 140px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #71717a;
-  font: 400 10px inherit;
+  font-size: 11px;
 }
 
 .counter-field-label {
@@ -339,11 +350,15 @@
 .manual-save { color: #ffffff; background: #f18c8e; border-color: #f18c8e !important; }
 .manual-save:disabled { color: #a1a1aa; background: #f1f2f4; border-color: #e4e4e7 !important; cursor: not-allowed; }
 
+@media (max-width: 1100px) {
+  .counter-workspace { grid-template-columns: minmax(0, 360px) minmax(0, 1fr); }
+  .counter-folders { grid-column: 1 / -1; }
+}
+
 @media (max-width: 760px) {
   .campaign-counter-page { padding: 24px 16px 32px; }
   .counter-workspace { grid-template-columns: minmax(0, 1fr); }
   .counter-input-group { flex-direction: column; }
   .counter-field--date { flex: none; }
-  .counter-field--folder { flex: none; }
   .activity-list { max-height: none; }
 }

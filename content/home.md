@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **Campaign Counter v1.8.1 beta - 20 August 2026** - Moved the Campaign Folders panel into its own right-side column next to Recent Activity, with a dedicated Scan Folder button and scrollable folder list.
 - **Campaign Counter v1.8.0 beta - 20 August 2026** - Added a Campaign Folder picker that scans a local folder for existing campaign directories, lists found campaign numbers, and highlights conflicts in red when a generated ID already has a matching folder.
 - **Campaign Counter v1.7.2 beta - 20 August 2026** - Tidied the Date and Campaign Name fields into a clean side-by-side row with aligned labels and inputs.
 - **Campaign Counter v1.7.1 beta - 20 August 2026** - Added a Date field next to Campaign Name so users can override the default date stamp before generating.

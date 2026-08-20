@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v1.8.1 beta - 20 August 2026
+
+- Moved the Campaign Folders panel into its own right-side column next to Recent Activity, with a dedicated Scan Folder button and scrollable folder list.
+
 ## Campaign Counter v1.8.0 beta - 20 August 2026
 
 - Added a Campaign Folder picker that scans a local folder for existing campaign directories, lists found campaign numbers, and highlights conflicts in red when a generated ID already has a matching folder.
