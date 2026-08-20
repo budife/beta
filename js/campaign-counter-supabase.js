@@ -60,9 +60,11 @@
     return data || [];
   }
 
-  async function generateCampaign(username) {
+  async function generateCampaign(username, dateStamp, campaignName) {
     const data = unwrap(await client().rpc('generate_campaign_id', {
-      p_generated_by: username
+      p_generated_by: username,
+      p_date_stamp: dateStamp,
+      p_campaign_name: campaignName
     }));
     return Array.isArray(data) ? data[0] : data;
   }

@@ -160,7 +160,7 @@ test('Campaign Counter Phase 1 makes Supabase the single source of truth for the
   assert.match(sql, /greatest\(current_value - 1, 1\)/);
   assert.match(sql, /supabase_realtime add table public\.campaign_counter/);
   assert.doesNotMatch(counter, /currentCampaignId\s*=\s*Math\.min\(currentCampaignId \+ 1, 9999\)/);
-  assert.match(counter, /campaignRegistryService\.generateCampaign\(username\)/);
+  assert.match(counter, /campaignRegistryService\.generateCampaign\(username, dateStamp, campaignName\)/);
   assert.match(counter, /campaignRegistryService\.backCampaign\(username\)/);
   assert.match(counter, /subscribeCounter/);
 });

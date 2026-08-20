@@ -21,8 +21,9 @@ select 1, coalesce((
 ), 0)
 on conflict (id) do nothing;
 
--- Allow the anonymous client to read the counter row (needed for initial load
--- and for Realtime broadcasts to be authorized).
+-- Add full_id column to store the complete generated ID (YYYYMMDD_name_XXXX)
+alter table if exists public.campaign_registry
+  add column if not exists full_id text;
 alter table public.campaign_counter enable row level security;
 drop policy if exists campaign_counter_select on public.campaign_counter;
 create policy campaign_counter_select on public.campaign_counter
@@ -49,7 +50,9 @@ drop function if exists public.back_campaign_id(text);
 drop function if exists public.set_next_campaign_id(integer, text, text);
 
 create function public.generate_campaign_id(
-  p_generated_by text
+  p_generated_by text,
+  p_date_stamp text default null,
+  p_campaign_name text default null
 )
 returns public.campaign_registry
 language plpgsql
@@ -60,6 +63,7 @@ declare
   v_registry public.campaign_registry;
   v_generated_by text;
   v_next_campaign_id integer;
+  v_full_id text;
 begin
   v_generated_by := nullif(btrim(p_generated_by), '');
   if v_generated_by is null then
@@ -80,17 +84,25 @@ begin
     raise exception 'Campaign ID must be between 0001 and 9999';
   end if;
 
+  v_full_id := format('%s_%s_%s',
+    coalesce(nullif(btrim(p_date_stamp), ''), to_char(now(), 'YYYYMMDD')),
+    coalesce(nullif(btrim(p_campaign_name), ''), 'nama-campaign'),
+    lpad(v_next_campaign_id::text, 4, '0')
+  );
+
   insert into public.campaign_registry (
     campaign_id,
     action,
     generated_by,
-    note
+    note,
+    full_id
   )
   values (
     v_next_campaign_id,
     'generated',
     v_generated_by,
-    null
+    null,
+    v_full_id
   )
   returning * into v_registry;
 

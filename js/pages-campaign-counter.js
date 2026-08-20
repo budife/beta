@@ -244,9 +244,10 @@ function renderActivity(items) {
   const actionLabel = item => item.action === 'manual_set' && item.note !== GENERATED_FROM_POINTER_NOTE
     ? 'manually set'
     : 'generated';
+  const displayId = item => item.full_id ? escapeHtml(item.full_id) : formatId(item.campaign_id);
   list.innerHTML = items.map(item => `
     <article class="activity-row">
-      <code>${formatId(item.campaign_id)}</code>
+      <code>${displayId(item)}</code>
       <span>${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))} by ${escapeHtml(item.generated_by || 'Unknown')}</span>
     </article>`).join('');
 }
@@ -453,7 +454,7 @@ async function generateCampaign() {
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
-    const result = await campaignRegistryService.generateCampaign(username);
+    const result = await campaignRegistryService.generateCampaign(username, dateStamp, campaignName);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
     currentCampaignId = Number(result.campaign_id) || 0;
     const newId = formatId(currentCampaignId);
