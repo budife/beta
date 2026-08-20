@@ -254,7 +254,7 @@ function updateEditButton() {
   if (button) button.disabled = !connected || !username || generating;
 
   const stepBack = document.getElementById('step-back-campaign');
-  if (stepBack) stepBack.disabled = !connected || !username || generating || lastCampaignId <= 1;
+  if (stepBack) stepBack.disabled = !connected || !username || generating || currentCampaignId <= 1;
 }
 
 async function refreshDashboard() {
