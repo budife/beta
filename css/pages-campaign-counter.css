@@ -61,7 +61,7 @@
   border: 1px solid #e4e4e7;
 }
 
-.counter-summary { padding: 24px; }
+.counter-summary { padding: 24px; overflow: hidden; }
 
 .counter-summary-top {
   display: flex;
@@ -110,11 +110,13 @@
   display: flex;
   gap: 10px;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
 .counter-field {
   display: grid;
   gap: 5px;
+  min-width: 0;
 }
 
 .counter-field--date {
@@ -141,6 +143,7 @@
 }
 
 .counter-field input {
+  display: block;
   width: 100%;
   min-height: 32px;
   padding: 6px 8px;
@@ -149,6 +152,7 @@
   border: 1px solid #d8dde5;
   font-family: inherit;
   font-size: 12px;
+  box-sizing: border-box;
 }
 
 .counter-field input:focus-visible {
