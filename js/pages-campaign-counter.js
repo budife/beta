@@ -418,7 +418,9 @@ async function stepBackCampaign() {
     const result = await campaignRegistryService.backCampaign(username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
     currentCampaignId = Number(result.campaign_id) || 0;
-    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    const idEl = document.getElementById('counter-last-id');
+    idEl.textContent = formatId(currentCampaignId);
+    idEl.classList.remove('is-conflict');
     updateEditButton();
     setMessage(`${formatId(currentCampaignId)} set.`, 'success');
   } catch (error) {
