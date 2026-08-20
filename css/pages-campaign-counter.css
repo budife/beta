@@ -51,7 +51,7 @@
 
 .counter-workspace {
   display: grid;
-  grid-template-columns: 2fr 3fr 2.5fr;
+  grid-template-columns: 2fr 1.5fr 3fr;
   gap: 16px;
 }
 
@@ -263,49 +263,73 @@
   display: none;
   position: absolute;
   top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: 220px;
-  padding: 8px 10px;
-  background: #212121;
-  color: #ffffff;
-  font-size: 11px;
-  line-height: 1.5;
-  white-space: normal;
+  left: 0;
+  width: 240px;
+  padding: 0;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  font-size: 12px;
+  line-height: 1.45;
   text-align: left;
   z-index: 100;
   pointer-events: none;
+  overflow: hidden;
 }
 
-.counter-folder-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-bottom-color: #212121;
+.tooltip-header {
+  display: block;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e4e4e7;
+  color: #52525b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.tooltip-campaign-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.tooltip-campaign-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f4f4f5;
+}
+
+.tooltip-campaign-item:last-child {
+  border-bottom: 0;
+}
+
+.tooltip-date {
+  flex: 0 0 auto;
+  color: #9f3f45;
+  font: 500 11px Consolas, Monaco, monospace;
+}
+
+.tooltip-name {
+  min-width: 0;
+  color: #52525b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip-manager {
+  flex: 0 0 auto;
+  color: #a1a1aa;
+  font-size: 11px;
 }
 
 .counter-folder-chip:hover .counter-folder-tooltip {
   display: block;
-}
-
-.tooltip-date {
-  display: block;
-  color: #f18c8e;
-  font-weight: 600;
-}
-
-.tooltip-name {
-  display: block;
-  color: #d4d4d8;
-}
-
-.tooltip-manager {
-  display: block;
-  color: #a1a1aa;
 }
 
 .folder-empty {

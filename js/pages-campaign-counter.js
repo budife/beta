@@ -72,17 +72,22 @@ function renderFolderList() {
   container.innerHTML = '';
 
   const sorted = [...scannedFolderIds.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  for (const [id, fullName] of sorted) {
-    const info = parseFolderInfo(fullName);
+  for (const [id, entries] of sorted) {
     const chip = document.createElement('div');
     chip.className = 'counter-folder-chip';
     chip.dataset.folderId = id;
+
+    const campaignItems = entries.map(e => `
+      <span class="tooltip-campaign-item">
+        <span class="tooltip-date">${escapeHtml(e.date || '—')}</span>
+        <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}${e.manager ? ' - ' + escapeHtml(e.manager) : ''}</span>
+      </span>`).join('');
+
     chip.innerHTML = `
       <code>${escapeHtml(id)}</code>
       <span class="counter-folder-tooltip">
-        <span class="tooltip-date">${escapeHtml(info.date || 'No date')}</span>
-        <span class="tooltip-name">${escapeHtml(info.name || 'Unknown')}</span>
-        <span class="tooltip-manager">${escapeHtml(info.manager || '')}</span>
+        <span class="tooltip-header">ID: ${escapeHtml(id)}</span>
+        <span class="tooltip-campaign-list">${campaignItems}</span>
       </span>`;
     container.appendChild(chip);
   }
@@ -107,14 +112,18 @@ async function scanFolder() {
     scannedFolderIds.clear();
     for await (const [name] of dirHandle.entries()) {
       const id = parseFolderCampaignId(name);
-      if (id) scannedFolderIds.set(id, name);
+      if (id) {
+        const info = parseFolderInfo(name);
+        if (!scannedFolderIds.has(id)) scannedFolderIds.set(id, []);
+        scannedFolderIds.get(id).push(info);
+      }
     }
     const btn = document.getElementById('pick-folder');
     const label = document.getElementById('folder-btn-label');
     if (btn) btn.classList.add('is-loaded');
     if (label) label.textContent = dirHandle.name;
     renderFolderList();
-    setMessage(`${scannedFolderIds.size} campaign folder(s) found.`, 'success');
+    setMessage(`${scannedFolderIds.size} unique campaign ID(s) found.`, 'success');
   } catch (error) {
     if (error.name !== 'AbortError') {
       setMessage('Unable to read folder. Please try again.', 'error');
