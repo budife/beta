@@ -93,6 +93,11 @@
   font: 300 clamp(64px, 10vw, 96px) Consolas, Monaco, "Courier New", monospace;
   letter-spacing: .04em;
   line-height: .95;
+  transition: color 0.2s ease;
+}
+
+.counter-last-id.is-conflict {
+  color: #dc2626;
 }
 
 .counter-edit {

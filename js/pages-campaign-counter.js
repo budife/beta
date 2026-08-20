@@ -283,14 +283,18 @@ async function refreshDashboard() {
       campaignRegistryService.loadRecentActivity()
     ]);
     currentCampaignId = Number(counterValue) || 0;
-    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    const idEl = document.getElementById('counter-last-id');
+    idEl.textContent = formatId(currentCampaignId);
+    idEl.classList.remove('is-conflict');
     updateEditButton();
     renderActivity(activity);
     setMessage('Supabase is connected.');
     if (typeof campaignRegistryService.subscribeCounter === 'function' && !unsubscribeCounter) {
       unsubscribeCounter = campaignRegistryService.subscribeCounter((value) => {
         currentCampaignId = Number(value) || 0;
-        document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+        const idEl = document.getElementById('counter-last-id');
+        idEl.textContent = formatId(currentCampaignId);
+        idEl.classList.remove('is-conflict');
         updateEditButton();
       });
     }
@@ -385,7 +389,9 @@ try {
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
     dialog.close();
     currentCampaignId = Number(result.campaign_id) || 0;
-    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    const idEl = document.getElementById('counter-last-id');
+    idEl.textContent = formatId(currentCampaignId);
+    idEl.classList.remove('is-conflict');
     updateEditButton();
     setMessage(`${formatId(currentCampaignId)} manually set.`, 'success');
     // Only refresh activity, don't reset counter from Supabase
@@ -445,8 +451,10 @@ async function generateCampaign() {
     updateEditButton();
     if (scannedFolderIds.has(newId)) {
       markConflict(newId);
+      document.getElementById('counter-last-id').classList.add('is-conflict');
       setMessage(`${newId} generated and copied — conflict: folder already exists.`, 'error');
     } else {
+      document.getElementById('counter-last-id').classList.remove('is-conflict');
       setMessage(`${copiedId} generated and copied.`, 'success');
     }
   } catch (error) {
