@@ -191,27 +191,32 @@
 }
 
 .folder-items {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
   max-height: min(400px, calc(100vh - 280px));
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 .counter-folder-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 5px 2px;
   background: #ffffff;
   border: 1px solid #e4e4e7;
+  cursor: default;
 }
 
 .counter-folder-chip code {
-  flex: 0 0 auto;
   color: #9f3f45;
-  font: 500 13px Consolas, Monaco, monospace;
+  font: 500 11px Consolas, Monaco, monospace;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .counter-folder-chip.is-conflict {
@@ -220,13 +225,55 @@
   border-color: #fecaca;
 }
 
-.counter-folder-chip-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #71717a;
+.counter-folder-chip:hover {
+  z-index: 5;
+  border-color: #9f3f45;
+  background: #fff7f7;
+}
+
+.counter-folder-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  padding: 8px 10px;
+  background: #212121;
+  color: #ffffff;
   font-size: 11px;
+  line-height: 1.5;
+  white-space: normal;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.counter-folder-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #212121;
+}
+
+.counter-folder-chip:hover .counter-folder-tooltip {
+  display: block;
+}
+
+.tooltip-date {
+  color: #f18c8e;
+  font-weight: 600;
+}
+
+.tooltip-name {
+  color: #d4d4d8;
+}
+
+.tooltip-manager {
+  color: #a1a1aa;
 }
 
 .folder-empty {

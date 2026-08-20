@@ -35,6 +35,24 @@ function parseFolderCampaignId(name) {
   return match ? match[1] : null;
 }
 
+function parseFolderInfo(name) {
+  const idMatch = name.match(/^(\d{4})\s+(.+)/);
+  if (!idMatch) return { id: null, name: name, date: '', manager: '' };
+  const id = idMatch[1];
+  let rest = idMatch[2].replace(/\s*-\s*Copy(\s*\(\d+\))?/gi, '').trim();
+  const dateMatch = rest.match(/\b(\d{1,2})-(\d{2,4})\b/);
+  let date = '';
+  let namePart = rest;
+  if (dateMatch) {
+    date = dateMatch[0];
+    namePart = rest.slice(0, dateMatch.index).trim();
+  }
+  const parts = namePart.split(/\s+/);
+  const campaignName = parts[0] || '';
+  const manager = parts[1] || '';
+  return { id, name: campaignName, date, manager };
+}
+
 function renderFolderList() {
   const container = document.getElementById('folder-items');
   const countEl = document.getElementById('folder-count');
@@ -54,11 +72,18 @@ function renderFolderList() {
   container.innerHTML = '';
 
   const sorted = [...scannedFolderIds.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  for (const [id, name] of sorted) {
+  for (const [id, fullName] of sorted) {
+    const info = parseFolderInfo(fullName);
     const chip = document.createElement('div');
     chip.className = 'counter-folder-chip';
     chip.dataset.folderId = id;
-    chip.innerHTML = `<code>${escapeHtml(id)}</code><span class="counter-folder-chip-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>`;
+    chip.innerHTML = `
+      <code>${escapeHtml(id)}</code>
+      <span class="counter-folder-tooltip">
+        <span class="tooltip-date">${escapeHtml(info.date || 'No date')}</span>
+        <span class="tooltip-name">${escapeHtml(info.name || 'Unknown')}</span>
+        <span class="tooltip-manager">${escapeHtml(info.manager || '')}</span>
+      </span>`;
     container.appendChild(chip);
   }
 }
