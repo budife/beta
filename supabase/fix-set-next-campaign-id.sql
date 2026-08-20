@@ -198,7 +198,8 @@ create table if not exists public.campaign_folder_scans (
   campaign_name text,
   folder_date text,
   manager text,
-  scanned_at timestamptz not null default now()
+  scanned_at timestamptz not null default now(),
+  unique (scanned_by, folder_name, campaign_id)
 );
 
 alter table public.campaign_folder_scans enable row level security;
@@ -242,8 +243,11 @@ begin
       v_entry->>'campaign_name',
       v_entry->>'folder_date',
       v_entry->>'manager'
-    );
-    v_count := v_count + 1;
+    )
+    on conflict (scanned_by, folder_name, campaign_id) do nothing;
+    if found then
+      v_count := v_count + 1;
+    end if;
   end loop;
 
   return v_count;
