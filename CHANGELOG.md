@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v1.8.8 beta - 20 August 2026
+
+- Fixed generate to use server-side `generate_campaign_id` RPC so the next ID is always calculated from the latest registry state, preventing stale local counter issues when multiple users generate.
+
 ## Campaign Counter v1.8.7 beta - 20 August 2026
 
 - Improved campaign folder scanner to detect the 4-digit campaign ID anywhere in the folder name (not just at the start), using word-boundary matching; folders like `JANC 0044 Portfolio asset Bianca 03-21` now parse correctly.

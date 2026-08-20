@@ -51,12 +51,9 @@
     return data || [];
   }
 
-  async function generateCampaign(activeCampaignId, username) {
-    const nextCampaignId = Math.max(1, Number.parseInt(activeCampaignId, 10) + 1 || 1);
-    const data = unwrap(await client().rpc('set_next_campaign_id', {
-      p_next_campaign_id: nextCampaignId,
-      p_generated_by: username,
-      p_note: 'Generated from active counter'
+  async function generateCampaign(username) {
+    const data = unwrap(await client().rpc('generate_campaign_id', {
+      p_generated_by: username
     }));
     return Array.isArray(data) ? data[0] : data;
   }

@@ -414,7 +414,7 @@ async function generateCampaign() {
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
-    const result = await campaignRegistryService.generateCampaign(lastCampaignId, username);
+    const result = await campaignRegistryService.generateCampaign(username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
     const newId = formatId(result.campaign_id);
     if (scannedFolderIds.has(newId)) {

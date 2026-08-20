@@ -142,8 +142,8 @@ test('Campaign Counter Phase 1 uses a dedicated Supabase service while the bookm
   const counter = fs.readFileSync(path.join(__dirname, '../js/pages-campaign-counter.js'), 'utf8');
   const bookmarklet = fs.readFileSync(path.join(__dirname, '../js/monday-campaign-bookmarklet.js'), 'utf8');
   assert.match(adapter, /createClient/);
-  assert.match(adapter, /set_next_campaign_id/);
-  assert.match(adapter, /Generated from active counter/);
+assert.match(adapter, /set_next_campaign_id/);
+  assert.match(adapter, /generate_campaign_id/);
   assert.match(adapter, /campaign_registry/);
   assert.match(counter, /CampaignRegistryService/);
   assert.doesNotMatch(bookmarklet, /supabase|campaign-id-bridge|neuyjcotcmjnndjyzbcq/i);
