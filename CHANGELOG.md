@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v1.8.3 beta - 20 August 2026
+
+- Improved UI/UX: compact Generate button, single-line activity rows, prominent Scan Folder button, 6-column folder grid, and informative empty-state guidance.
+
 ## Campaign Counter v1.8.2 beta - 20 August 2026
 
 - Resized the folder list into a compact 10-column grid and added hover tooltips showing blast date, campaign name, and campaign manager parsed from folder names.
