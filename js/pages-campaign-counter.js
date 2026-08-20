@@ -285,7 +285,9 @@ async function generateCampaign() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const dateInput = document.getElementById('campaign-date-input');
+  const nameInput = document.getElementById('campaign-name-input');
   if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
+  nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   bindWelcomeDialog();
   bindManualDialog();
   document.getElementById('generate-campaign')?.addEventListener('click', generateCampaign);
