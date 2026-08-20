@@ -398,6 +398,15 @@ async function stepBackCampaign() {
     currentCampaignId = Math.max(currentCampaignId - 1, 1);
     document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
     updateEditButton();
+    
+    // Save to Supabase in background
+    try {
+      await campaignRegistryService.setNextCampaignId(currentCampaignId, username, 'Stepped back one Campaign ID');
+    } catch (supabaseError) {
+      console.warn('Failed to save to Supabase:', supabaseError);
+      setMessage('Set locally but failed to save to Supabase.', 'error');
+    }
+    
     setMessage(`${formatId(currentCampaignId)} set.`, 'success');
   } catch (error) {
     setMessage('Unable to step back Campaign ID. Please try again.', 'error');
@@ -421,6 +430,15 @@ async function generateCampaign() {
   try {
     currentCampaignId = Math.min(currentCampaignId + 1, 9999);
     const newId = formatId(currentCampaignId);
+    
+    // Save to Supabase in background
+    try {
+      await campaignRegistryService.generateCampaign(username);
+    } catch (supabaseError) {
+      console.warn('Failed to save to Supabase:', supabaseError);
+      setMessage('Generated locally but failed to save to Supabase.', 'error');
+    }
+    
     if (scannedFolderIds.has(newId)) {
       markConflict(newId);
       setMessage(`${newId} generated and copied — conflict: folder already exists.`, 'error');
@@ -431,7 +449,6 @@ async function generateCampaign() {
     await navigator.clipboard?.writeText(copiedId);
     document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
     updateEditButton();
-    setMessage(`${buildCopiedId(currentCampaignId, campaignName, dateStamp)} generated and copied.`, 'success');
   } catch (error) {
     setMessage('Unable to generate a Campaign ID. Please try again.', 'error');
   } finally {
