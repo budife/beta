@@ -61,7 +61,7 @@
   border: 1px solid #e4e4e7;
 }
 
-.counter-summary { padding: 24px; }
+.counter-summary { padding: 24px; overflow: hidden; }
 
 .counter-summary-top {
   display: flex;
@@ -105,6 +105,65 @@
 }
 .counter-edit:hover:not(:disabled) { color: #9f3f45; border-color: #f1b4b6; background: #fff7f7; }
 .counter-edit:disabled { color: #c5c5cc; cursor: not-allowed; }
+
+.counter-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.counter-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.counter-field--date {
+  flex: 0 0 110px;
+}
+
+.counter-field--name {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.counter-field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #52525b;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.counter-field-hint {
+  color: #71717a;
+  font-weight: 400;
+}
+
+.counter-field input {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  color: #212121;
+  background: #ffffff;
+  border: 1px solid #d8dde5;
+  font-family: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.counter-field input:focus-visible {
+  outline: 2px solid #9f3f45;
+  outline-offset: 2px;
+}
+
+.counter-field input::placeholder {
+  color: #a1a1aa;
+  font-style: italic;
+}
 
 .counter-actions {
   display: flex;
@@ -193,5 +252,7 @@
 @media (max-width: 760px) {
   .campaign-counter-page { padding: 24px 16px 32px; }
   .counter-workspace { grid-template-columns: minmax(0, 1fr); }
+  .counter-input-group { flex-direction: column; }
+  .counter-field--date { flex: none; }
   .activity-list { max-height: none; }
 }

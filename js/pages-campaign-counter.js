@@ -10,6 +10,25 @@ function formatId(value) {
   return String(Number.parseInt(value, 10) || 0).padStart(4, '0');
 }
 
+function formatDatestamp(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}${m}${d}`;
+}
+
+function slugifyCampaignName(name) {
+  return name
+    .trim()
+    .replace(/\s+/g, '') || 'nama-campaign';
+}
+
+function buildCopiedId(campaignId, campaignName, dateStamp) {
+  const stamp = dateStamp || formatDatestamp(new Date());
+  const slug = slugifyCampaignName(campaignName);
+  return `${stamp}_${slug}_${formatId(campaignId)}`;
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -241,14 +260,19 @@ async function stepBackCampaign() {
 
 async function generateCampaign() {
   if (!connected || !username || generating) return;
+  const dateInput = document.getElementById('campaign-date-input');
+  const nameInput = document.getElementById('campaign-name-input');
+  const dateStamp = dateInput ? dateInput.value.trim() : '';
+  const campaignName = nameInput ? nameInput.value : '';
   generating = true;
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
     const result = await campaignRegistryService.generateCampaign(lastCampaignId, username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
-    await navigator.clipboard?.writeText(formatId(result.campaign_id));
-    setMessage(`${formatId(result.campaign_id)} generated and copied.`, 'success');
+    const copiedId = buildCopiedId(result.campaign_id, campaignName, dateStamp);
+    await navigator.clipboard?.writeText(copiedId);
+    setMessage(`${copiedId} generated and copied.`, 'success');
     await refreshDashboard();
   } catch (error) {
     setMessage('Unable to generate a Campaign ID. Please try again.', 'error');
@@ -260,6 +284,10 @@ async function generateCampaign() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const dateInput = document.getElementById('campaign-date-input');
+  const nameInput = document.getElementById('campaign-name-input');
+  if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
+  nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   bindWelcomeDialog();
   bindManualDialog();
   document.getElementById('generate-campaign')?.addEventListener('click', generateCampaign);

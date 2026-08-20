@@ -2,6 +2,18 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v1.7.2 beta - 20 August 2026
+
+- Tidied the Date and Campaign Name fields into a clean side-by-side row with aligned labels and inputs.
+
+## Campaign Counter v1.7.1 beta - 20 August 2026
+
+- Added a Date field next to Campaign Name so users can override the default `YYYYMMDD` stamp before generating.
+
+## Campaign Counter v1.7.0 beta - 20 August 2026
+
+- Added an optional Campaign Name field so generated IDs copy as `YYYYMMDD_nama-campaign_XXXX` instead of just the four-digit number; leaving the field empty defaults to `nama-campaign`.
+
 ## TNC Uploader v0.3.9 beta - 13 August 2026
 
 - Removed the duplicate transient status row; the newest real activity now carries the compact `New` badge and timestamp.
