@@ -108,15 +108,22 @@
 
 .counter-input-group {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 16px;
 }
 
 .counter-field {
+  display: grid;
+  gap: 5px;
+}
+
+.counter-field--date {
+  flex: 0 0 110px;
+}
+
+.counter-field--name {
   flex: 1 1 0;
   min-width: 0;
-  display: grid;
-  gap: 6px;
 }
 
 .counter-field-label {
@@ -124,7 +131,7 @@
   align-items: center;
   gap: 6px;
   color: #52525b;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -135,13 +142,13 @@
 
 .counter-field input {
   width: 100%;
-  min-height: 36px;
-  padding: 8px 10px;
+  min-height: 32px;
+  padding: 6px 8px;
   color: #212121;
   background: #ffffff;
   border: 1px solid #d8dde5;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .counter-field input:focus-visible {
@@ -242,5 +249,6 @@
   .campaign-counter-page { padding: 24px 16px 32px; }
   .counter-workspace { grid-template-columns: minmax(0, 1fr); }
   .counter-input-group { flex-direction: column; }
+  .counter-field--date { flex: none; }
   .activity-list { max-height: none; }
 }
