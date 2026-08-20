@@ -124,10 +124,17 @@
   }
 
   async function loadFolderScans(scannedBy) {
-    const data = unwrap(await client().rpc('load_folder_scans', {
-      p_scanned_by: scannedBy
-    }));
-    return data || [];
+    try {
+      const data = unwrap(await client()
+        .from('campaign_folder_scans')
+        .select('campaign_id, campaign_name, folder_date, manager')
+        .eq('scanned_by', scannedBy)
+        .order('scanned_at', { ascending: false }));
+      return data || [];
+    } catch (err) {
+      // Table may not exist yet (SQL migration pending)
+      return [];
+    }
   }
 
   return {
