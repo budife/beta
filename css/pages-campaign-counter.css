@@ -443,11 +443,10 @@
 .activity-heading p { font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; }
 
 .activity-list { max-height: min(560px, calc(100vh - 230px)); overflow: auto; }
-.activity-row { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 20px; border-bottom: 1px solid #eceef1; }
+.activity-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 20px; border-bottom: 1px solid #eceef1; }
 .activity-row:last-child { border-bottom: 0; }
 .activity-row code { color: #9f3f45; font: 500 14px Consolas, Monaco, monospace; }
-.activity-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.activity-meta span { color: #52525b; font-size: 12px; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.activity-row .activity-meta { color: #52525b; font-size: 12px; line-height: 1.45; }
 .activity-empty { padding: 36px 20px; color: #71717a; font-size: 13px; text-align: center; }
 
 .welcome-dialog { width: min(420px, calc(100vw - 32px)); padding: 24px; color: #212121; background: #ffffff; border: 1px solid #d8dde5; }

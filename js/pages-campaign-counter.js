@@ -249,8 +249,7 @@ function renderActivity(items) {
     <article class="activity-row">
       <code>${displayId(item)}</code>
       <div class="activity-meta">
-        <span>${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))}</span>
-        <span>by ${escapeHtml(item.generated_by || 'Unknown')}</span>
+        ${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))} by ${escapeHtml(item.generated_by || 'Unknown')}
       </div>
     </article>`).join('');
 }
