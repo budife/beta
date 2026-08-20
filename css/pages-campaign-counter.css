@@ -106,6 +106,41 @@
 .counter-edit:hover:not(:disabled) { color: #9f3f45; border-color: #f1b4b6; background: #fff7f7; }
 .counter-edit:disabled { color: #c5c5cc; cursor: not-allowed; }
 
+.counter-campaign-name {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  color: #52525b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.counter-campaign-name span {
+  color: #71717a;
+  font-weight: 400;
+}
+
+.counter-campaign-name input {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  color: #212121;
+  background: #ffffff;
+  border: 1px solid #d8dde5;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.counter-campaign-name input:focus-visible {
+  outline: 2px solid #9f3f45;
+  outline-offset: 2px;
+}
+
+.counter-campaign-name input::placeholder {
+  color: #a1a1aa;
+  font-style: italic;
+}
+
 .counter-actions {
   display: flex;
   align-items: stretch;

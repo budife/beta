@@ -10,6 +10,26 @@ function formatId(value) {
   return String(Number.parseInt(value, 10) || 0).padStart(4, '0');
 }
 
+function formatDatestamp(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}${m}${d}`;
+}
+
+function slugifyCampaignName(name) {
+  return name
+    .trim()
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .replace(/\s+/g, '') || 'nama-campaign';
+}
+
+function buildCopiedId(campaignId, campaignName) {
+  const stamp = formatDatestamp(new Date());
+  const slug = slugifyCampaignName(campaignName);
+  return `${stamp}_${slug}_${formatId(campaignId)}`;
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -241,14 +261,17 @@ async function stepBackCampaign() {
 
 async function generateCampaign() {
   if (!connected || !username || generating) return;
+  const nameInput = document.getElementById('campaign-name-input');
+  const campaignName = nameInput ? nameInput.value : '';
   generating = true;
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
     const result = await campaignRegistryService.generateCampaign(lastCampaignId, username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
-    await navigator.clipboard?.writeText(formatId(result.campaign_id));
-    setMessage(`${formatId(result.campaign_id)} generated and copied.`, 'success');
+    const copiedId = buildCopiedId(result.campaign_id, campaignName);
+    await navigator.clipboard?.writeText(copiedId);
+    setMessage(`${copiedId} generated and copied.`, 'success');
     await refreshDashboard();
   } catch (error) {
     setMessage('Unable to generate a Campaign ID. Please try again.', 'error');

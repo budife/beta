@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **Campaign Counter v1.7.0 beta - 20 August 2026** - Added an optional Campaign Name field so generated IDs copy as `YYYYMMDD_nama-campaign_XXXX` instead of just the four-digit number.
 - **TNC Uploader v0.3.9 beta - 13 August 2026** - Removed the duplicate status row so the newest real activity carries the `New` badge instead.
 - **TNC Uploader v0.3.8 beta - 13 August 2026** - Merged the latest status into Recent Activity as a compact colored `New` row.
 - **TNC Uploader v0.3.7 beta - 13 August 2026** - Expanded Recent Activity with file names, paths, filename changes, link-check results, and colored action content.
