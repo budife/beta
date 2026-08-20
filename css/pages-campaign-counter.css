@@ -97,7 +97,8 @@
 }
 
 .counter-last-id.is-conflict {
-  color: #dc2626;
+  color: #dc2626 !important;
+  text-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
 }
 
 .counter-edit {
