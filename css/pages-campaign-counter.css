@@ -106,21 +106,31 @@
 .counter-edit:hover:not(:disabled) { color: #9f3f45; border-color: #f1b4b6; background: #fff7f7; }
 .counter-edit:disabled { color: #c5c5cc; cursor: not-allowed; }
 
-.counter-campaign-name {
+.counter-input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.counter-field {
   display: grid;
   gap: 6px;
-  margin-bottom: 16px;
   color: #52525b;
   font-size: 12px;
   font-weight: 500;
 }
 
-.counter-campaign-name span {
+.counter-field--grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.counter-field span {
   color: #71717a;
   font-weight: 400;
 }
 
-.counter-campaign-name input {
+.counter-field input {
   width: 100%;
   min-height: 36px;
   padding: 8px 10px;
@@ -131,12 +141,12 @@
   font-size: 13px;
 }
 
-.counter-campaign-name input:focus-visible {
+.counter-field input:focus-visible {
   outline: 2px solid #9f3f45;
   outline-offset: 2px;
 }
 
-.counter-campaign-name input::placeholder {
+.counter-field input::placeholder {
   color: #a1a1aa;
   font-style: italic;
 }
@@ -228,5 +238,6 @@
 @media (max-width: 760px) {
   .campaign-counter-page { padding: 24px 16px 32px; }
   .counter-workspace { grid-template-columns: minmax(0, 1fr); }
+  .counter-input-row { flex-direction: column; }
   .activity-list { max-height: none; }
 }

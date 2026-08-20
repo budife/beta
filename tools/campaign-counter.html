@@ -14,7 +14,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.0">
-  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=1.7.0">
+  <link rel="stylesheet" href="../css/pages-campaign-counter.css?v=1.7.1">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.0">
   
   <title>Campaign Counter - eDM Helper</title>
@@ -41,9 +41,14 @@
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </button>
               </div>
-              <label class="counter-campaign-name" for="campaign-name-input">Campaign Name <span>(optional)</span>
-                <input id="campaign-name-input" type="text" maxlength="80" placeholder="Leave empty for default name" autocomplete="off">
-              </label>
+              <div class="counter-input-row">
+                <label class="counter-field" for="campaign-date-input">Date
+                  <input id="campaign-date-input" type="text" maxlength="8" placeholder="YYYYMMDD" autocomplete="off">
+                </label>
+                <label class="counter-field counter-field--grow" for="campaign-name-input">Campaign Name <span>(optional)</span>
+                  <input id="campaign-name-input" type="text" maxlength="80" placeholder="nama-campaign" autocomplete="off">
+                </label>
+              </div>
               <div class="counter-actions">
                 <button class="counter-step-back" id="step-back-campaign" type="button" aria-label="Set Last Campaign back by one" title="Set Last Campaign back by one" disabled>
                   <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
@@ -134,9 +139,9 @@
 
   <script src="../js/footer.js?v=6.14.0" defer></script>
   <script src="../js/version-config.js?v=6.14.0" defer></script>
-  <script src="../js/supabase-config.js?v=1.7.0" defer></script>
+  <script src="../js/supabase-config.js?v=1.7.1" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  <script src="../js/campaign-counter-supabase.js?v=1.7.0" defer></script>
-  <script src="../js/pages-campaign-counter.js?v=1.7.0" defer></script>
+  <script src="../js/campaign-counter-supabase.js?v=1.7.1" defer></script>
+  <script src="../js/pages-campaign-counter.js?v=1.7.1" defer></script>
 </body>
 </html>

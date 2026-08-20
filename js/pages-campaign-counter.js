@@ -20,12 +20,11 @@ function formatDatestamp(date) {
 function slugifyCampaignName(name) {
   return name
     .trim()
-    .replace(/[^a-zA-Z0-9\s]/g, '')
     .replace(/\s+/g, '') || 'nama-campaign';
 }
 
-function buildCopiedId(campaignId, campaignName) {
-  const stamp = formatDatestamp(new Date());
+function buildCopiedId(campaignId, campaignName, dateStamp) {
+  const stamp = dateStamp || formatDatestamp(new Date());
   const slug = slugifyCampaignName(campaignName);
   return `${stamp}_${slug}_${formatId(campaignId)}`;
 }
@@ -261,7 +260,9 @@ async function stepBackCampaign() {
 
 async function generateCampaign() {
   if (!connected || !username || generating) return;
+  const dateInput = document.getElementById('campaign-date-input');
   const nameInput = document.getElementById('campaign-name-input');
+  const dateStamp = dateInput ? dateInput.value.trim() : '';
   const campaignName = nameInput ? nameInput.value : '';
   generating = true;
   updateGenerateButton();
@@ -269,7 +270,7 @@ async function generateCampaign() {
   try {
     const result = await campaignRegistryService.generateCampaign(lastCampaignId, username);
     if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
-    const copiedId = buildCopiedId(result.campaign_id, campaignName);
+    const copiedId = buildCopiedId(result.campaign_id, campaignName, dateStamp);
     await navigator.clipboard?.writeText(copiedId);
     setMessage(`${copiedId} generated and copied.`, 'success');
     await refreshDashboard();
@@ -283,6 +284,8 @@ async function generateCampaign() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const dateInput = document.getElementById('campaign-date-input');
+  if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
   bindWelcomeDialog();
   bindManualDialog();
   document.getElementById('generate-campaign')?.addEventListener('click', generateCampaign);
