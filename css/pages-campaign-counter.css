@@ -145,13 +145,13 @@
 .counter-field input {
   display: block;
   width: 100%;
-  min-height: 32px;
-  padding: 6px 8px;
+  min-height: 46px;
+  padding: 10px 12px;
   color: #212121;
   background: #ffffff;
   border: 1px solid #d8dde5;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   box-sizing: border-box;
 }
 
