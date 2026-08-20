@@ -54,7 +54,7 @@
   async function loadRecentActivity() {
     const data = unwrap(await client()
       .from('campaign_registry')
-      .select('campaign_id,generated_at,generated_by,action,note')
+      .select('campaign_id,generated_at,generated_by,action,note,full_id')
       .order('generated_at', { ascending: false })
       .limit(20));
     return data || [];
