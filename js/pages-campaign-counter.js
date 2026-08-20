@@ -39,20 +39,23 @@ function renderFolderList() {
   const container = document.getElementById('folder-items');
   const countEl = document.getElementById('folder-count');
   const listEl = document.getElementById('folder-list');
+  const emptyEl = document.getElementById('folder-empty');
   if (!container || !countEl || !listEl) return;
 
   if (scannedFolderIds.size === 0) {
     listEl.hidden = true;
+    if (emptyEl) emptyEl.hidden = false;
     return;
   }
 
   listEl.hidden = false;
+  if (emptyEl) emptyEl.hidden = true;
   countEl.textContent = `(${scannedFolderIds.size})`;
   container.innerHTML = '';
 
   const sorted = [...scannedFolderIds.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   for (const [id, name] of sorted) {
-    const chip = document.createElement('span');
+    const chip = document.createElement('div');
     chip.className = 'counter-folder-chip';
     chip.dataset.folderId = id;
     chip.innerHTML = `<code>${escapeHtml(id)}</code><span class="counter-folder-chip-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>`;

@@ -72,17 +72,18 @@
               </div>
             </section>
 
-            <section class="counter-card counter-folders" id="folder-list" aria-labelledby="folder-title" hidden>
-              <header class="activity-heading">
-                <h2 id="folder-title">Campaign Folders <span class="counter-folder-count" id="folder-count"></span></h2>
-                <p>Existing campaign directories from scanned folder.</p>
-              </header>
-              <div class="folder-toolbar">
+            <section class="counter-card counter-folder" aria-labelledby="folder-panel-title">
+              <header class="folder-heading">
+                <h2 id="folder-panel-title">Campaign Folder</h2>
                 <button class="counter-folder-btn" id="pick-folder" type="button">
                   <i class="fa-solid fa-folder-open" aria-hidden="true"></i> <span id="folder-btn-label">Scan Folder</span>
                 </button>
+              </header>
+              <div class="folder-list" id="folder-list" hidden>
+                <p class="folder-list-heading">Existing Campaigns <span class="folder-count" id="folder-count"></span></p>
+                <div class="folder-items" id="folder-items"></div>
               </div>
-              <div class="counter-folder-items" id="folder-items" aria-live="polite"></div>
+              <p class="folder-empty" id="folder-empty">Pick a folder to scan existing campaign numbers.</p>
             </section>
           </div>
         </section>
