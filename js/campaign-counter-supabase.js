@@ -23,6 +23,15 @@
     return result.data;
   }
 
+  async function loadCounter() {
+    const data = unwrap(await client()
+      .from('campaign_counter')
+      .select('current_value')
+      .eq('id', 1)
+      .maybeSingle());
+    return data?.current_value ?? 0;
+  }
+
   async function loadLastCampaign() {
     const data = unwrap(await client()
       .from('campaign_registry')
@@ -35,7 +44,7 @@
   async function checkConnection() {
     if (!getConfig()) return { connected: false, reason: 'config' };
     try {
-      await loadLastCampaign();
+      await loadCounter();
       return { connected: true };
     } catch (error) {
       return { connected: false, reason: 'network' };
@@ -58,6 +67,13 @@
     return Array.isArray(data) ? data[0] : data;
   }
 
+  async function backCampaign(username) {
+    const data = unwrap(await client().rpc('back_campaign_id', {
+      p_generated_by: username
+    }));
+    return Array.isArray(data) ? data[0] : data;
+  }
+
   async function setNextCampaignId(nextCampaignId, username, note) {
     const data = unwrap(await client().rpc('set_next_campaign_id', {
       p_next_campaign_id: nextCampaignId,
@@ -67,5 +83,29 @@
     return Array.isArray(data) ? data[0] : data;
   }
 
-  return { checkConnection, loadLastCampaign, loadRecentActivity, generateCampaign, setNextCampaignId };
+  function subscribeCounter(onChange) {
+    const channel = client()
+      .channel('campaign-counter-sync')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'campaign_counter'
+      }, (payload) => {
+        const value = payload.new?.current_value;
+        if (typeof value === 'number') onChange(value);
+      })
+      .subscribe();
+    return () => client().removeChannel(channel);
+  }
+
+  return {
+    checkConnection,
+    loadLastCampaign,
+    loadCounter,
+    loadRecentActivity,
+    generateCampaign,
+    backCampaign,
+    setNextCampaignId,
+    subscribeCounter
+  };
 });

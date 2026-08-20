@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v2.0.0 beta - 21 August 2026
+
+- Made Supabase the single source of truth for the counter. Generate atomically increments a server-side `campaign_counter` row (+1) and Back atomically decrements it (-1) through dedicated RPCs, so concurrent users can never produce duplicate IDs. The UI updates only after Supabase returns the new value, and Supabase Realtime broadcasts the change so every open tab updates instantly without a refresh.
+
 ## Campaign Counter v1.9.0 beta - 20 August 2026
 
 - Rewrote navigation to simple local counter: Generate = current ID + 1, Back = current ID - 1; current displayed ID is now the single source of truth, no Supabase round-trip on every click.

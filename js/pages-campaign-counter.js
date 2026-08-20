@@ -257,6 +257,8 @@ function updateEditButton() {
   if (stepBack) stepBack.disabled = !connected || !username || generating || currentCampaignId <= 1;
 }
 
+let unsubscribeCounter = null;
+
 async function refreshDashboard() {
   const connection = await campaignRegistryService.checkConnection();
   connected = connection.connected;
@@ -275,16 +277,22 @@ async function refreshDashboard() {
   }
 
   try {
-    const [lastCampaign, activity] = await Promise.all([
-      campaignRegistryService.loadLastCampaign(),
+    const [counterValue, activity] = await Promise.all([
+      campaignRegistryService.loadCounter(),
       campaignRegistryService.loadRecentActivity()
     ]);
-    // Initialize local counter from Supabase on initial load
-    currentCampaignId = Number(lastCampaign?.campaign_id) || 0;
+    currentCampaignId = Number(counterValue) || 0;
     document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
     updateEditButton();
     renderActivity(activity);
     setMessage('Supabase is connected.');
+    if (typeof campaignRegistryService.subscribeCounter === 'function' && !unsubscribeCounter) {
+      unsubscribeCounter = campaignRegistryService.subscribeCounter((value) => {
+        currentCampaignId = Number(value) || 0;
+        document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+        updateEditButton();
+      });
+    }
   } catch (error) {
     connected = false;
     currentCampaignId = 0;
@@ -395,18 +403,11 @@ async function stepBackCampaign() {
   updateEditButton();
   setMessage(`Setting Campaign ID to ${formatId(currentCampaignId - 1)}...`);
   try {
-    currentCampaignId = Math.max(currentCampaignId - 1, 1);
+    const result = await campaignRegistryService.backCampaign(username);
+    if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
+    currentCampaignId = Number(result.campaign_id) || 0;
     document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
     updateEditButton();
-    
-    // Save to Supabase in background
-    try {
-      await campaignRegistryService.setNextCampaignId(currentCampaignId, username, 'Stepped back one Campaign ID');
-    } catch (supabaseError) {
-      console.warn('Failed to save to Supabase:', supabaseError);
-      setMessage('Set locally but failed to save to Supabase.', 'error');
-    }
-    
     setMessage(`${formatId(currentCampaignId)} set.`, 'success');
   } catch (error) {
     setMessage('Unable to step back Campaign ID. Please try again.', 'error');
@@ -428,27 +429,20 @@ async function generateCampaign() {
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
-    currentCampaignId = Math.min(currentCampaignId + 1, 9999);
+    const result = await campaignRegistryService.generateCampaign(username);
+    if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
+    currentCampaignId = Number(result.campaign_id) || 0;
     const newId = formatId(currentCampaignId);
-    
-    // Save to Supabase in background
-    try {
-      await campaignRegistryService.generateCampaign(username);
-    } catch (supabaseError) {
-      console.warn('Failed to save to Supabase:', supabaseError);
-      setMessage('Generated locally but failed to save to Supabase.', 'error');
-    }
-    
+    const copiedId = buildCopiedId(currentCampaignId, campaignName, dateStamp);
+    await navigator.clipboard?.writeText(copiedId);
+    document.getElementById('counter-last-id').textContent = newId;
+    updateEditButton();
     if (scannedFolderIds.has(newId)) {
       markConflict(newId);
       setMessage(`${newId} generated and copied — conflict: folder already exists.`, 'error');
     } else {
-      setMessage(`${buildCopiedId(currentCampaignId, campaignName, dateStamp)} generated and copied.`, 'success');
+      setMessage(`${copiedId} generated and copied.`, 'success');
     }
-    const copiedId = buildCopiedId(currentCampaignId, campaignName, dateStamp);
-    await navigator.clipboard?.writeText(copiedId);
-    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
-    updateEditButton();
   } catch (error) {
     setMessage('Unable to generate a Campaign ID. Please try again.', 'error');
   } finally {

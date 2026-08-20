@@ -12,6 +12,8 @@
   min-height: 0;
   margin: 0 auto;
   padding: 24px;
+  display: flex;
+  justify-content: center;
 }
 
 .counter-eyebrow {
@@ -53,6 +55,7 @@
   display: grid;
   grid-template-columns: 400px 400px 400px;
   gap: 16px;
+  width: fit-content;
 }
 
 .counter-card {
