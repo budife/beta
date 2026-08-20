@@ -1262,6 +1262,34 @@ select {
   content: "";
 }
 
+.slicer-slice-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.slicer-slice-label {
+  position: absolute;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  background: #f3838b;
+  border-radius: 4px;
+  font: 600 11px Consolas, "Courier New", monospace;
+  transform: translateY(-50%);
+  opacity: .9;
+}
+
+.slicer-slice-label.is-excluded {
+  color: #6b7280;
+  background: #d1d5db;
+  text-decoration: line-through;
+}
+
 .slicer-empty {
   position: absolute;
   inset: 0;
@@ -1289,6 +1317,28 @@ select {
   padding: 12px;
   border: 1px solid var(--border, #e5e7eb);
   border-left: 3px solid var(--accent-primary, #f3838b);
+}
+
+.slicer-slice-card.is-excluded {
+  border-left-color: #9ca3af;
+  opacity: .55;
+}
+
+.slicer-slice-card.is-excluded .slicer-slice-title {
+  text-decoration: line-through;
+}
+
+.slicer-slice-include {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center;
+}
+
+.slicer-slice-include input {
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
 
 .slicer-slice-card + .slicer-slice-card {

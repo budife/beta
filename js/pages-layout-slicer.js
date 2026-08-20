@@ -7,6 +7,7 @@
     lines: [],
     draggingLine: null,
     slices: [],
+    excluded: [],
     generated: null,
     templateDir: null,
     campaignParentDir: null,
@@ -77,6 +78,7 @@
     stage: document.getElementById('slicer-stage'),
     canvas: document.getElementById('source-canvas'),
     guideLayer: document.getElementById('guide-layer'),
+    sliceLabelLayer: document.getElementById('slice-label-layer'),
     canvasEmpty: document.getElementById('canvas-empty'),
     zoomOut: document.getElementById('zoom-out'),
     zoomIn: document.getElementById('zoom-in'),
@@ -433,6 +435,10 @@
     els.stage.style.height = `${scaledHeight}px`;
     els.guideLayer.style.width = `${scaledWidth}px`;
     els.guideLayer.style.height = `${scaledHeight}px`;
+    if (els.sliceLabelLayer) {
+      els.sliceLabelLayer.style.width = `${scaledWidth}px`;
+      els.sliceLabelLayer.style.height = `${scaledHeight}px`;
+    }
     els.rulerTop.style.width = `${scaledWidth}px`;
     els.rulerLeft.style.height = `${scaledHeight}px`;
     els.zoomLevel.value = state.zoomMode === 'fit' ? 'fit' : String(state.zoom);
@@ -462,10 +468,12 @@
 
   function preserveSliceLinks(ranges) {
     const oldLinks = state.slices.map((slice) => slice.link || '');
+    const oldExcluded = state.excluded;
     state.slices = ranges.map((range, index) => ({
       ...range,
       link: oldLinks[index] || range.link || ''
     }));
+    state.excluded = ranges.map((range, index) => Boolean(oldExcluded[index]));
   }
 
   function drawCanvas() {
@@ -569,7 +577,8 @@
   function renderImageSlices() {
     const ranges = getSliceRanges();
     preserveSliceLinks(ranges);
-    els.sliceCount.textContent = `${state.slices.length} slice${state.slices.length === 1 ? '' : 's'}`;
+    const excludedCount = state.excluded.filter(Boolean).length;
+    els.sliceCount.textContent = `${state.slices.length} slice${state.slices.length === 1 ? '' : 's'}${excludedCount ? ` · ${excludedCount} excluded` : ''}`;
 
     if (!state.image) {
       els.sliceList.innerHTML = '<p class="slicer-muted">Slices will appear after you load an image.</p>';
@@ -577,16 +586,34 @@
     }
 
     els.sliceList.innerHTML = state.slices.map((slice, index) => `
-      <article class="slicer-slice-card">
+      <article class="slicer-slice-card${state.excluded[index] ? ' is-excluded' : ''}">
         <div class="slicer-slice-head">
           <div>
-            <div class="slicer-slice-title">${slice.fileName}</div>
+            <div class="slicer-slice-title">${index + 1}. ${slice.fileName}</div>
             <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
             <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px</div>
           </div>
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
+        <label class="slicer-slice-include">
+          <span>Include in export</span>
+          <input type="checkbox" data-slice-include="${index}" ${state.excluded[index] ? '' : 'checked'}>
+        </label>
       </article>
+    `).join('');
+  }
+
+  function renderSliceLabels() {
+    if (!state.image || !els.sliceLabelLayer) {
+      if (els.sliceLabelLayer) els.sliceLabelLayer.innerHTML = '';
+      return;
+    }
+    const displayScale = getDisplayScale();
+    els.sliceLabelLayer.innerHTML = state.slices.map((slice, index) => `
+      <div class="slicer-slice-label${state.excluded[index] ? ' is-excluded' : ''}" data-slice-label="${index}"
+           style="top:${(slice.top + slice.height / 2) * displayScale}px">
+        ${index + 1}
+      </div>
     `).join('');
   }
 
@@ -595,6 +622,7 @@
     renderRulers();
     renderGuides();
     renderImageSlices();
+    renderSliceLabels();
     renderImageMeta();
     const hasImage = Boolean(state.image);
     els.autoSlice.disabled = !hasImage;
@@ -728,15 +756,21 @@
     if (!state.image) return;
     const type = els.imageFormat.value;
     const generatedSlices = [];
+    let skipped = 0;
 
-    for (const slice of state.slices) {
+    for (let index = 0; index < state.slices.length; index += 1) {
+      const slice = state.slices[index];
+      if (state.excluded[index]) {
+        skipped += 1;
+        continue;
+      }
       const canvas = createSliceCanvas(slice);
       const blob = await canvasToBlob(canvas, type);
       generatedSlices.push({ ...slice, blob });
     }
 
     state.generated = { slices: generatedSlices };
-    setStatus(`Generated ${generatedSlices.length} image slice(s) at ${getExportWidth()}px export width.`, 'success');
+    setStatus(`Generated ${generatedSlices.length} image slice(s) at ${getExportWidth()}px export width${skipped ? ` · ${skipped} excluded` : ''}.`, 'success');
     updateUi();
   }
 
@@ -1221,6 +1255,15 @@
     const index = Number(button.dataset.removeLine);
     state.lines.splice(index, 1);
     state.lines = normalizeLines(state.lines);
+    state.generated = null;
+    updateUi();
+  });
+  els.sliceList.addEventListener('change', (event) => {
+    const checkbox = event.target.closest('[data-slice-include]');
+    if (!checkbox) return;
+    const index = Number(checkbox.dataset.sliceInclude);
+    if (state.excluded[index] === undefined) return;
+    state.excluded[index] = !checkbox.checked;
     state.generated = null;
     updateUi();
   });
