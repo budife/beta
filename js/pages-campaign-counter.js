@@ -398,6 +398,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
   nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   document.getElementById('pick-folder')?.addEventListener('click', scanFolder);
+
+  // Folder tooltip edge detection - flip to left when near right viewport edge
+  const folderItems = document.getElementById('folder-items');
+  if (folderItems) {
+    folderItems.addEventListener('mouseover', (e) => {
+      const chip = e.target.closest('.counter-folder-chip');
+      if (!chip) return;
+      const tooltip = chip.querySelector('.counter-folder-tooltip');
+      if (!tooltip) return;
+
+      // Reset flip state first
+      tooltip.classList.remove('flip-left');
+
+      // Check if tooltip would overflow viewport
+      const chipRect = chip.getBoundingClientRect();
+      const tooltipWidth = 280; // matches CSS width
+      const gap = 8; // matches CSS gap
+      const rightEdge = chipRect.right + gap + tooltipWidth;
+
+      if (rightEdge > window.innerWidth - 12) {
+        tooltip.classList.add('flip-left');
+      }
+    });
+
+    // Keyboard accessibility: show tooltip on focus
+    folderItems.addEventListener('focusin', (e) => {
+      const chip = e.target.closest('.counter-folder-chip');
+      if (chip) chip.classList.add('has-focus');
+    });
+    folderItems.addEventListener('focusout', (e) => {
+      const chip = e.target.closest('.counter-folder-chip');
+      if (chip) chip.classList.remove('has-focus');
+    });
+
+    // Make chips focusable
+    folderItems.querySelectorAll('.counter-folder-chip').forEach(chip => {
+      chip.setAttribute('tabindex', '0');
+    });
+  }
+
   bindWelcomeDialog();
   bindManualDialog();
   document.getElementById('generate-campaign')?.addEventListener('click', generateCampaign);

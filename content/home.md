@@ -32,8 +32,8 @@ category: Home
 
 ## Recent Updates
 
+- **Campaign Counter v1.8.5 beta - 20 August 2026** - Fixed the folder hover panel to appear as a right-side flyout anchored to each campaign ID; added viewport-edge flip to left, internal scrolling, and keyboard focus support without affecting page layout or scroll.
 - **Campaign Counter v1.8.4 beta - 20 August 2026** - Narrowed the Recent Activity column and upgraded the folder hover into a detailed campaign list panel showing ID, date, campaign name, and manager for every matching folder entry.
-- **Campaign Counter v1.8.3 beta - 20 August 2026** - Improved UI/UX: compact Generate button, single-line activity rows, prominent Scan Folder button, 6-column folder grid, and informative empty-state guidance.
 - **Campaign Counter v1.8.2 beta - 20 August 2026** - Resized the folder list into a compact 10-column grid and added hover tooltips showing blast date, campaign name, and campaign manager parsed from folder names.
 - **Campaign Counter v1.8.1 beta - 20 August 2026** - Moved the Campaign Folder scanner into its own dedicated right-side panel with a compact vertical folder list.
 - **Campaign Counter v1.8.0 beta - 20 August 2026** - Added a Campaign Folder picker that scans a local folder for existing campaign directories, lists found campaign numbers, and highlights conflicts in red when a generated ID already has a matching folder.
