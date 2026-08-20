@@ -247,11 +247,34 @@ function renderActivity(items) {
   const displayId = item => item.full_id ? escapeHtml(item.full_id) : formatId(item.campaign_id);
   list.innerHTML = items.map(item => `
     <article class="activity-row">
-      <code>${displayId(item)}</code>
+      <div class="activity-id-wrap">
+        <code>${displayId(item)}</code>
+        <button class="activity-copy" type="button" aria-label="Copy Campaign ID" title="Copy Campaign ID" data-id="${displayId(item)}">
+          <i class="fa-regular fa-copy" aria-hidden="true"></i>
+        </button>
+      </div>
       <div class="activity-meta">
         ${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))} by ${escapeHtml(item.generated_by || 'Unknown')}
       </div>
     </article>`).join('');
+
+  list.querySelectorAll('.activity-copy').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      try {
+        await navigator.clipboard.writeText(id);
+        const icon = btn.querySelector('i');
+        const original = icon?.className;
+        if (icon) {
+          icon.className = 'fa-solid fa-check';
+          setTimeout(() => { icon.className = original; }, 1200);
+        }
+      } catch (err) {
+        console.warn('Copy failed', err);
+      }
+    });
+  });
 }
 
 function updateGenerateButton() {
