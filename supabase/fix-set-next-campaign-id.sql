@@ -29,10 +29,17 @@ create policy campaign_counter_select on public.campaign_counter
   for select to anon, authenticated
   using (true);
 
--- Publish counter changes through Realtime.
+-- Publish counter and registry changes through Realtime.
 do $$
 begin
   alter publication supabase_realtime add table public.campaign_counter;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.campaign_registry;
 exception
   when duplicate_object then null;
 end $$;

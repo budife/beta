@@ -98,6 +98,20 @@
     return () => client().removeChannel(channel);
   }
 
+  function subscribeActivity(onInsert) {
+    const channel = client()
+      .channel('campaign-activity-sync')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'campaign_registry'
+      }, (payload) => {
+        onInsert(payload.new);
+      })
+      .subscribe();
+    return () => client().removeChannel(channel);
+  }
+
   return {
     checkConnection,
     loadLastCampaign,
@@ -106,6 +120,7 @@
     generateCampaign,
     backCampaign,
     setNextCampaignId,
-    subscribeCounter
+    subscribeCounter,
+    subscribeActivity
   };
 });

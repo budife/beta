@@ -258,6 +258,7 @@ function updateEditButton() {
 }
 
 let unsubscribeCounter = null;
+let unsubscribeActivity = null;
 
 async function refreshDashboard() {
   const connection = await campaignRegistryService.checkConnection();
@@ -291,6 +292,11 @@ async function refreshDashboard() {
         currentCampaignId = Number(value) || 0;
         document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
         updateEditButton();
+      });
+    }
+    if (typeof campaignRegistryService.subscribeActivity === 'function' && !unsubscribeActivity) {
+      unsubscribeActivity = campaignRegistryService.subscribeActivity(() => {
+        campaignRegistryService.loadRecentActivity().then(renderActivity);
       });
     }
   } catch (error) {
