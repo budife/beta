@@ -3,7 +3,7 @@ const campaignRegistryService = window.CampaignRegistryService;
 let username = localStorage.getItem('edm_username') || '';
 let connected = false;
 let generating = false;
-let lastCampaignId = 0;
+let currentCampaignId = 0;
 const GENERATED_FROM_POINTER_NOTE = 'Generated from active counter';
 let scannedFolderIds = new Map();
 
@@ -265,7 +265,7 @@ async function refreshDashboard() {
   updateEditButton();
 
   if (!connected) {
-    lastCampaignId = 0;
+    currentCampaignId = 0;
     document.getElementById('counter-last-id').textContent = '----';
     renderActivity([]);
     setMessage(connection.reason === 'config'
@@ -279,14 +279,15 @@ async function refreshDashboard() {
       campaignRegistryService.loadLastCampaign(),
       campaignRegistryService.loadRecentActivity()
     ]);
-    lastCampaignId = Number(lastCampaign?.campaign_id) || 0;
-    document.getElementById('counter-last-id').textContent = formatId(lastCampaignId);
+    // Initialize local counter from Supabase on initial load
+    currentCampaignId = Number(lastCampaign?.campaign_id) || 0;
+    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
     updateEditButton();
     renderActivity(activity);
     setMessage('Supabase is connected.');
   } catch (error) {
     connected = false;
-    lastCampaignId = 0;
+    currentCampaignId = 0;
     setConnectionStatus(false);
     updateGenerateButton();
     updateEditButton();
@@ -329,11 +330,11 @@ function openManualDialog() {
   if (!connected || !username || generating) return;
   const dialog = document.getElementById('manual-dialog');
   if (!dialog) return;
-  document.getElementById('manual-current-id').textContent = formatId(lastCampaignId);
+  document.getElementById('manual-current-id').textContent = formatId(currentCampaignId);
   const input = document.getElementById('manual-next-id');
   const reason = document.getElementById('manual-reason');
   const error = document.getElementById('manual-error');
-  input.value = String(lastCampaignId + 1).padStart(4, '0');
+  input.value = String(currentCampaignId + 1).padStart(4, '0');
   reason.value = '';
   error.textContent = '';
   dialog.showModal();
@@ -361,21 +362,26 @@ function bindManualDialog() {
     updateGenerateButton();
     updateEditButton();
     document.getElementById('manual-save').disabled = true;
-    try {
-      const result = await campaignRegistryService.setNextCampaignId(
-        nextId,
-        username,
-        document.getElementById('manual-reason').value.trim()
-      );
-      if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
-      dialog.close();
-      setMessage(`${formatId(result.campaign_id)} manually set.`, 'success');
-      await refreshDashboard();
-    } catch (serviceError) {
-      error.textContent = getManualSetErrorMessage(serviceError, nextId);
-    } finally {
-      generating = false;
-      document.getElementById('manual-save').disabled = false;
+try {
+    const result = await campaignRegistryService.setNextCampaignId(
+      nextId,
+      username,
+      document.getElementById('manual-reason').value.trim()
+    );
+    if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
+    dialog.close();
+    currentCampaignId = Number(result.campaign_id) || 0;
+    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    updateEditButton();
+    setMessage(`${formatId(currentCampaignId)} manually set.`, 'success');
+    // Only refresh activity, don't reset counter from Supabase
+    const activity = await campaignRegistryService.loadRecentActivity();
+    renderActivity(activity);
+  } catch (serviceError) {
+    error.textContent = getManualSetErrorMessage(serviceError, nextId);
+  } finally {
+    generating = false;
+    document.getElementById('manual-save').disabled = false;
       updateGenerateButton();
       updateEditButton();
     }
@@ -383,19 +389,18 @@ function bindManualDialog() {
 }
 
 async function stepBackCampaign() {
-  if (!connected || !username || generating || lastCampaignId <= 1) return;
-  const nextId = lastCampaignId - 1;
+  if (!connected || !username || generating || currentCampaignId <= 1) return;
   generating = true;
   updateGenerateButton();
   updateEditButton();
-  setMessage(`Setting Last Campaign to ${formatId(nextId)}...`);
+  setMessage(`Setting Campaign ID to ${formatId(currentCampaignId - 1)}...`);
   try {
-    const result = await campaignRegistryService.setNextCampaignId(nextId, username, 'Stepped back one Campaign ID');
-    if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
-    setMessage(`${formatId(result.campaign_id)} manually set.`, 'success');
-    await refreshDashboard();
+    currentCampaignId = Math.max(currentCampaignId - 1, 1);
+    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    updateEditButton();
+    setMessage(`${formatId(currentCampaignId)} set.`, 'success');
   } catch (error) {
-    setMessage(getManualSetErrorMessage(error, nextId), 'error');
+    setMessage('Unable to step back Campaign ID. Please try again.', 'error');
   } finally {
     generating = false;
     updateGenerateButton();
@@ -414,18 +419,19 @@ async function generateCampaign() {
   updateGenerateButton();
   setMessage('Generating Campaign ID...');
   try {
-    const result = await campaignRegistryService.generateCampaign(username);
-    if (!result?.campaign_id) throw new Error('EMPTY_RESULT');
-    const newId = formatId(result.campaign_id);
+    currentCampaignId = Math.min(currentCampaignId + 1, 9999);
+    const newId = formatId(currentCampaignId);
     if (scannedFolderIds.has(newId)) {
       markConflict(newId);
       setMessage(`${newId} generated and copied — conflict: folder already exists.`, 'error');
     } else {
-      setMessage(`${buildCopiedId(result.campaign_id, campaignName, dateStamp)} generated and copied.`, 'success');
+      setMessage(`${buildCopiedId(currentCampaignId, campaignName, dateStamp)} generated and copied.`, 'success');
     }
-    const copiedId = buildCopiedId(result.campaign_id, campaignName, dateStamp);
+    const copiedId = buildCopiedId(currentCampaignId, campaignName, dateStamp);
     await navigator.clipboard?.writeText(copiedId);
-    await refreshDashboard();
+    document.getElementById('counter-last-id').textContent = formatId(currentCampaignId);
+    updateEditButton();
+    setMessage(`${buildCopiedId(currentCampaignId, campaignName, dateStamp)} generated and copied.`, 'success');
   } catch (error) {
     setMessage('Unable to generate a Campaign ID. Please try again.', 'error');
   } finally {
