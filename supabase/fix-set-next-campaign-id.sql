@@ -255,3 +255,22 @@ end;
 $$;
 
 grant execute on function public.save_folder_scan(text, text, jsonb) to anon, authenticated;
+
+-- Load previous scans for a user
+create function public.load_folder_scans(
+  p_scanned_by text
+)
+returns setof public.campaign_folder_scans
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  select * from public.campaign_folder_scans
+  where scanned_by = p_scanned_by
+  order by scanned_at desc;
+end;
+$$;
+
+grant execute on function public.load_folder_scans(text) to anon, authenticated;

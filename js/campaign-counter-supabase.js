@@ -123,6 +123,13 @@
     return data;
   }
 
+  async function loadFolderScans(scannedBy) {
+    const data = unwrap(await client().rpc('load_folder_scans', {
+      p_scanned_by: scannedBy
+    }));
+    return data || [];
+  }
+
   return {
     checkConnection,
     loadLastCampaign,

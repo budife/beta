@@ -340,13 +340,28 @@ async function refreshDashboard() {
   }
 
   try {
-    const [counterValue, activity] = await Promise.all([
+    const [counterValue, activity, scans] = await Promise.all([
       campaignRegistryService.loadCounter(),
-      campaignRegistryService.loadRecentActivity()
+      campaignRegistryService.loadRecentActivity(),
+      campaignRegistryService.loadFolderScans(username)
     ]);
     currentCampaignId = Number(counterValue) || 0;
     const idEl = document.getElementById('counter-last-id');
     idEl.textContent = formatId(currentCampaignId);
+
+    // Populate scannedFolderIds from previous scans
+    scannedFolderIds.clear();
+    scans.forEach(row => {
+      const id = row.campaign_id;
+      if (!scannedFolderIds.has(id)) scannedFolderIds.set(id, []);
+      scannedFolderIds.get(id).push({
+        name: row.campaign_name,
+        date: row.folder_date,
+        manager: row.manager
+      });
+    });
+    renderFolderList();
+
     updateConflictState();
     updateEditButton();
     renderActivity(activity);
