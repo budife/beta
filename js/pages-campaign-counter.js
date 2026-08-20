@@ -162,13 +162,25 @@ async function scanFolder() {
   }
   try {
     const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
-    scannedFolderIds.clear();
+    let newCount = 0;
+    let skippedCount = 0;
+    const newEntries = [];
     for await (const [name] of dirHandle.entries()) {
       const id = parseFolderCampaignId(name);
       if (id) {
         const info = parseFolderInfo(name);
-        if (!scannedFolderIds.has(id)) scannedFolderIds.set(id, []);
-        scannedFolderIds.get(id).push(info);
+        if (scannedFolderIds.has(id)) {
+          skippedCount += 1;
+          continue;
+        }
+        scannedFolderIds.set(id, [info]);
+        newCount += 1;
+        newEntries.push({
+          campaign_id: id,
+          campaign_name: info.name || '',
+          folder_date: info.date || '',
+          manager: info.manager || ''
+        });
       }
     }
     const btn = document.getElementById('pick-folder');
@@ -178,29 +190,21 @@ async function scanFolder() {
     renderFolderList();
     updateConflictState();
 
-    // Save to Supabase as backup
-    if (connected && username) {
-      const entries = [];
-      scannedFolderIds.forEach((infos, id) => {
-        infos.forEach(info => {
-          entries.push({
-            campaign_id: id,
-            campaign_name: info.name || '',
-            folder_date: info.date || '',
-            manager: info.manager || ''
-          });
-        });
-      });
-      if (entries.length) {
-        try {
-          await campaignRegistryService.saveFolderScan(username, dirHandle.name, entries);
-        } catch (e) {
-          console.warn('Folder scan backup failed', e);
-        }
+    // Save only the newly found IDs to Supabase as backup
+    if (connected && username && newEntries.length) {
+      try {
+        const saved = await campaignRegistryService.saveFolderScan(username, dirHandle.name, newEntries);
+        const savedCount = Number.isFinite(Number(saved)) ? Number(saved) : newCount;
+        setMessage(`${savedCount} new campaign ID(s) saved to Supabase.`, 'success');
+      } catch (e) {
+        console.warn('Folder scan backup failed', e);
+        setMessage(`${newCount} new campaign ID(s) found (backup failed).`, 'error');
       }
+    } else if (connected && username) {
+      setMessage(`${skippedCount} campaign ID(s) already backed up — skipped.`, 'success');
+    } else {
+      setMessage(`${newCount} unique campaign ID(s) found.`, 'success');
     }
-
-    setMessage(`${scannedFolderIds.size} unique campaign ID(s) found.`, 'success');
   } catch (error) {
     if (error.name !== 'AbortError') {
       setMessage('Unable to read folder. Please try again.', 'error');
