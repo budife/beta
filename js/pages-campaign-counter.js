@@ -176,6 +176,8 @@ async function scanFolder() {
     if (btn) btn.classList.add('is-loaded');
     if (label) label.textContent = dirHandle.name;
     renderFolderList();
+    console.log('[scanFolder] Found IDs:', [...scannedFolderIds.keys()]);
+    console.log('[scanFolder] Current counter:', formatId(currentCampaignId));
     updateConflictState();
 
     // Save to Supabase as backup
