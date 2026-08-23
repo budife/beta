@@ -1137,8 +1137,8 @@ select {
 
 .slicer-ruler-corner {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: -32px;
+  left: -32px;
   z-index: 6;
   width: 32px;
   height: 32px;
@@ -1156,15 +1156,15 @@ select {
 }
 
 .slicer-ruler-top {
-  top: 0;
-  left: 32px;
+  top: -32px;
+  left: 0;
   height: 32px;
   border-bottom: 1px solid #5a5a5a;
 }
 
 .slicer-ruler-left {
-  top: 32px;
-  left: 0;
+  top: 0;
+  left: -32px;
   width: 32px;
   border-right: 1px solid #5a5a5a;
 }
