@@ -93,8 +93,9 @@
       </div>
     </footer>`;
 
-  function wrapWithDocumentTemplate(content) {
-    return `${documentHeaderHtml}\n<main class="document-content">${content}</main>\n${documentFooterHtml}`;
+  function wrapWithDocumentTemplate(content, embedInDocumentContent = true) {
+    const inner = `${documentHeaderHtml}\n${content}\n${documentFooterHtml}`;
+    return embedInDocumentContent ? `<main class="document-content">${inner}</main>` : inner;
   }
 
   const styleMap = [
@@ -685,7 +686,7 @@
       .join(' ')
       || currentFileName;
     const safeTitle = escapeHtml(documentTitle);
-    const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(els.htmlOutput.value));
+    const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(els.htmlOutput.value, false));
     return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${documentCss}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>`;
   }
 
