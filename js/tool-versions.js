@@ -22,7 +22,7 @@ const TOOL_VERSIONS = {
   'campaign-counter': {
     label: 'Campaign Counter',
     version: '2.0.0',
-    status: 'beta'
+    status: 'stable'
   },
   'config-edm': {
     label: 'Config eDM',
@@ -47,12 +47,12 @@ const TOOL_VERSIONS = {
   'layout-slicer': {
     label: 'Layout Slicer',
     version: '0.5.0',
-    status: 'beta'
+    status: 'stable'
   },
   'tnc-uploader': {
     label: 'TNC Uploader',
     version: '0.3.9',
-    status: 'beta'
+    status: 'stable'
   },
   'wfh-tracker': {
     label: 'WFH Tracker',
