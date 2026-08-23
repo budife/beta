@@ -23,6 +23,7 @@
     saveBtn: document.getElementById('d2h-save-btn'),
     tabPreview: document.getElementById('d2h-tab-preview'),
     tabHtml: document.getElementById('d2h-tab-html'),
+    openTab: document.getElementById('d2h-open-tab'),
     panelPreview: document.getElementById('d2h-panel-preview'),
     panelHtml: document.getElementById('d2h-panel-html'),
     pdfMode: document.getElementById('d2h-pdf-mode'),
@@ -891,6 +892,11 @@
 
   els.tabPreview.addEventListener('click', () => switchTab('preview'));
   els.tabHtml.addEventListener('click', () => switchTab('html'));
+  els.openTab.addEventListener('click', () => {
+    const blob = new Blob([buildFullDocument()], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  });
 
   els.chooseBtn.addEventListener('click', (event) => { event.stopPropagation(); els.fileInput.click(); });
   els.dropzone.addEventListener('click', () => els.fileInput.click());

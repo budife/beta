@@ -361,6 +361,28 @@ textarea {
   font-size: 12px;
 }
 
+.d2h-tab-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 4px;
+  color: var(--text-muted, #6b7280);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: .15s ease;
+}
+
+.d2h-tab-action:hover {
+  color: var(--accent-primary, #f3838b);
+  border-color: var(--border, #e5e7eb);
+  background: #fff;
+}
+
 /* ── Panels ───────────────────────────────────────── */
 
 .d2h-panel {
