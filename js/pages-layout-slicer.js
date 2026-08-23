@@ -79,6 +79,7 @@
     canvas: document.getElementById('source-canvas'),
     guideLayer: document.getElementById('guide-layer'),
     sliceLabelLayer: document.getElementById('slice-label-layer'),
+    rulerCorner: document.querySelector('.slicer-ruler-corner'),
     canvasEmpty: document.getElementById('canvas-empty'),
     zoomOut: document.getElementById('zoom-out'),
     zoomIn: document.getElementById('zoom-in'),
@@ -439,7 +440,24 @@
     }
     els.rulerTop.style.width = `${scaledWidth}px`;
     els.rulerLeft.style.height = `${scaledHeight}px`;
+    syncRulerPositions();
     els.zoomLevel.value = state.zoomMode === 'fit' ? 'fit' : String(state.zoom);
+  }
+
+  function syncRulerPositions() {
+    if (!state.image) return;
+    const wrapRect = els.canvasWrap.getBoundingClientRect();
+    const stageRect = els.stage.getBoundingClientRect();
+    const left = stageRect.left - wrapRect.left - 32;
+    const top = stageRect.top - wrapRect.top - 32;
+    if (els.rulerCorner) {
+      els.rulerCorner.style.left = `${left}px`;
+      els.rulerCorner.style.top = `${top}px`;
+    }
+    els.rulerTop.style.left = `${left + 32}px`;
+    els.rulerTop.style.top = `${top}px`;
+    els.rulerLeft.style.left = `${left}px`;
+    els.rulerLeft.style.top = `${top + 32}px`;
   }
 
   function normalizeLines(lines) {
