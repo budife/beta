@@ -41,7 +41,7 @@ const TOOL_VERSIONS = {
   },
   'doc-to-html': {
     label: 'Doc to HTML',
-    version: '1.0.0',
+    version: '1.1.0',
     status: 'stable'
   },
   'layout-checker': {
