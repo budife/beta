@@ -10,9 +10,6 @@
     workspace: document.getElementById('d2h-workspace'),
     fileIcon: document.getElementById('d2h-file-icon'),
     outputFileName: document.getElementById('d2h-output-name'),
-    pathMarket: document.getElementById('d2h-path-market'),
-    pathYear: document.getElementById('d2h-path-year'),
-    pathType: document.getElementById('d2h-path-type'),
     fileSize: document.getElementById('d2h-file-size'),
     resetBtn: document.getElementById('d2h-reset-btn'),
     messages: document.getElementById('d2h-messages'),
@@ -846,14 +843,24 @@
     }
 
     try {
-      const market = els.pathMarket.value.trim() || 'MKT';
-      const year = els.pathYear.value.trim() || '2026';
-      const type = els.pathType.value.trim() || 'tnc';
-      const fileName = `${currentFileName}.html`;
-      const subPath = `${market}\\${year}\\${type}`;
+      const fullPathInput = els.outputFileName.value.trim();
+      if (!fullPathInput) {
+        alert('Please enter a file path.');
+        return;
+      }
+
+      // Parse path: split by \ or /
+      const parts = fullPathInput.split(/[\\/]/).filter(Boolean);
+      if (parts.length < 2) {
+        alert('Please enter full path like: emailblast\\MKT\\2026\\tnc\\filename');
+        return;
+      }
+
+      const fileName = parts.pop() + '.html';
+      const dirParts = parts;
 
       let currentDir = directoryHandle;
-      for (const part of [market, year, type]) {
+      for (const part of dirParts) {
         currentDir = await currentDir.getDirectoryHandle(part, { create: true });
       }
 
@@ -862,7 +869,7 @@
       await writable.write(buildFullDocument());
       await writable.close();
 
-      const fullPath = `${directoryHandle.name}\\${subPath}\\${fileName}`;
+      const fullPath = `${directoryHandle.name}\\${dirParts.join('\\')}\\${fileName}`;
       els.savePath.innerHTML = `<i class="fa-solid fa-check-circle" aria-hidden="true"></i> Saved to: ${fullPath}`;
       els.savePath.classList.remove('d2h-hidden');
     } catch (error) {

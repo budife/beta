@@ -277,49 +277,6 @@ textarea {
   border-color: var(--accent-primary, #f3838b);
 }
 
-.d2h-path-fields {
-  min-width: 0;
-}
-
-.d2h-path-fields label {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--text-muted, #6b7280);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.d2h-path-inputs {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.d2h-path-inputs input {
-  width: 70px;
-  padding: 4px 6px;
-  color: var(--text, #111827);
-  background: #fff;
-  border: 1px solid var(--border, #d8dde5);
-  border-radius: 0;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.d2h-path-inputs input:focus {
-  outline: 1px solid var(--accent-primary, #f3838b);
-  border-color: var(--accent-primary, #f3838b);
-}
-
-.d2h-path-sep {
-  color: var(--text-muted, #9ca3af);
-  font-size: 12px;
-  padding: 0 2px;
-}
-
 .d2h-filebar small {
   color: var(--text-muted, #6b7280);
   font-size: 12px;
