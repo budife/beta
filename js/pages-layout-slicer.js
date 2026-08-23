@@ -85,7 +85,6 @@
     zoomIn: document.getElementById('zoom-in'),
     zoomLevel: document.getElementById('zoom-level'),
     sliceList: document.getElementById('slice-list'),
-    downloadImages: document.getElementById('download-images'),
     saveFolder: document.getElementById('save-folder'),
     exportSummary: document.getElementById('export-summary'),
     exportSummaryText: document.getElementById('export-summary-text'),
@@ -667,7 +666,6 @@
     els.zoomIn.disabled = !hasImage;
     els.zoomLevel.disabled = !hasImage;
     const hasGenerated = Boolean(state.generated);
-    if (els.downloadImages) els.downloadImages.disabled = !hasGenerated;
     if (els.saveFolder) els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
     updateCampaignPathPreview();
   }
@@ -1297,7 +1295,6 @@
     updateUi();
   });
   els.generateOutput.addEventListener('click', generateOutput);
-  els.downloadImages?.addEventListener('click', downloadImages);
   els.zoomOut?.addEventListener('click', () => setZoom(state.zoom - 0.1));
   els.zoomIn?.addEventListener('click', () => setZoom(state.zoom + 0.1));
   els.zoomLevel?.addEventListener('change', () => {
