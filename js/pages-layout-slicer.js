@@ -493,12 +493,14 @@
     if (!state.image) {
       els.rulerTop.innerHTML = '';
       els.rulerLeft.innerHTML = '';
-      els.rulerTop.style.width = '0px';
-      els.rulerLeft.style.height = '0px';
       return;
     }
 
     applyZoom();
+    els.rulerTop.style.width = '';
+    els.rulerTop.style.height = '';
+    els.rulerLeft.style.width = '';
+    els.rulerLeft.style.height = '';
     const wrapRect = els.canvasWrap.getBoundingClientRect();
     const canvasRect = els.canvas.getBoundingClientRect();
     const xOffset = canvasRect.left - wrapRect.left;
