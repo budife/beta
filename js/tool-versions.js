@@ -7,7 +7,8 @@ const TOOL_VERSIONS = {
   core: {
     label: 'Core',
     version: '6.14.6',
-    status: 'stable'
+    status: 'stable',
+    updated: '2026-08-24'
   },
   home: {
     label: 'Home',
@@ -22,7 +23,8 @@ const TOOL_VERSIONS = {
   'campaign-counter': {
     label: 'Campaign Counter',
     version: '2.0.0',
-    status: 'stable'
+    status: 'stable',
+    updated: '2026-08-23'
   },
   'config-edm': {
     label: 'Config eDM',
@@ -42,7 +44,8 @@ const TOOL_VERSIONS = {
   'doc-to-html': {
     label: 'Doc to HTML',
     version: '1.0.0',
-    status: 'stable'
+    status: 'stable',
+    updated: '2026-08-24'
   },
   'layout-checker': {
     label: 'Layout Checker',
@@ -52,12 +55,14 @@ const TOOL_VERSIONS = {
   'layout-slicer': {
     label: 'Layout Slicer',
     version: '0.5.1',
-    status: 'stable'
+    status: 'stable',
+    updated: '2026-08-24'
   },
   'tnc-uploader': {
     label: 'TNC Uploader',
     version: '0.3.9',
-    status: 'stable'
+    status: 'stable',
+    updated: '2026-08-23'
   },
   'wfh-tracker': {
     label: 'WFH Tracker',

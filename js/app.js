@@ -667,6 +667,22 @@ function setActiveLink(path) {
   });
 }
 
+function applySidebarBadges() {
+  if (typeof TOOL_VERSIONS === 'undefined') return;
+  document.querySelectorAll('.sidebar-link[data-route]').forEach((link) => {
+    const routePath = link.getAttribute('href');
+    const tool = TOOL_VERSIONS[routePath];
+    if (!tool?.updated) return;
+    const updatedDate = new Date(tool.updated);
+    if (!isWithinRecentDays(updatedDate)) return;
+    if (link.querySelector('.sidebar-new-badge')) return;
+    const badge = document.createElement('span');
+    badge.className = 'sidebar-new-badge';
+    badge.textContent = 'new';
+    link.appendChild(badge);
+  });
+}
+
 function closeSidebar() {
   sidebar.classList.remove('open');
   backdrop.hidden = true;
@@ -1014,6 +1030,7 @@ backdrop.addEventListener('click', closeSidebar);
 document.getElementById('footer-year').textContent = '2025';
 
 configureRouteLinks();
+applySidebarBadges();
 viewport.replaceChildren();
 
 const initialPath = getCurrentPath();

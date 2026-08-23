@@ -184,6 +184,21 @@ a {
   font-size: 10px;
 }
 
+.sidebar-link .sidebar-new-badge {
+  flex: 0 0 auto;
+  min-height: 16px;
+  padding: 0 6px;
+  margin-left: 6px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: .03em;
+  text-transform: lowercase;
+  background: #16a34a;
+  border-radius: 3px;
+}
+
 .sidebar-footer {
   flex: 0 0 auto;
   padding: 16px 20px;
