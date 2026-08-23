@@ -32,6 +32,7 @@ category: Home
 
 ## Recent Updates
 
+- **Layout Slicer v0.5.1 - 24 August 2026** - Improved Generate/Export UX with step-based workflow, loading spinner, export summary, save-folder confirmation, per-slice size estimates, and customizable file name prefix.
 - **Campaign Counter v2.0.0, Layout Slicer v0.5.0, TNC Uploader v0.3.9 - 23 August 2026** - Promoted to stable. Removed beta warnings and sidebar beta badges.
 - **Layout Slicer v0.5.0 beta - 23 August 2026** - Full Photoshop-like rulers spanning the canvas wrap with tick-0 aligned to image top-left, exclude-checkbox per slice with sequential renumbering, and numbered canvas overlay badges.
 - **Campaign Counter v2.0.0 beta - 21 August 2026** - Made Supabase the single source of truth for the counter: Generate and Back atomically increment or decrement a server-side counter row via RPC, the UI updates only after Supabase confirms the new ID, and Supabase Realtime keeps every open tab in sync instantly.
