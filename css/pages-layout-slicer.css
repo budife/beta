@@ -1228,6 +1228,7 @@ select {
 .slicer-guides {
   position: absolute;
   inset: 0;
+  z-index: 7;
   pointer-events: none;
 }
 
