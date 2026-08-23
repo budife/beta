@@ -620,6 +620,10 @@
       : '<i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX File';
   }
 
+  function renderPreview(html) {
+    els.preview.innerHTML = `<style>${documentCss}</style>${wrapWithDocumentTemplate(html)}`;
+  }
+
   async function convertFile(file) {
     if (!file || !file.name.toLowerCase().endsWith('.docx')) {
       alert('Please choose a .docx file.');
@@ -648,7 +652,7 @@
       currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
       els.outputFileName.value = currentFileName;
       els.fileSize.textContent = formatBytes(file.size);
-      els.preview.innerHTML = wrapWithDocumentTemplate(normalizedHtml || '<p>Document has no convertible content.</p>');
+      renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
       els.htmlOutput.value = formatHtmlWithTabs(normalizedHtml);
       const count = els.preview.querySelectorAll('*').length;
       els.elementCount.textContent = `${count} elements`;
@@ -736,6 +740,6 @@
     event.currentTarget.value = currentFileName;
   });
   els.htmlOutput.addEventListener('input', () => {
-    els.preview.innerHTML = wrapWithDocumentTemplate(els.htmlOutput.value);
+    renderPreview(els.htmlOutput.value);
   });
 })();
