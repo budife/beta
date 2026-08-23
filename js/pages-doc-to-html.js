@@ -692,7 +692,8 @@
 
     const normalizedHtml = normalizeNumbering(conversion.value, tableHeaderStyles, leadingTitleBreakCount);
     currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
-    els.outputFileName.value = currentFileName;
+    const pathPrefix = 'MKT\\2026\\tnc\\';
+    els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'W';
     renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
@@ -746,7 +747,8 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    els.outputFileName.value = currentFileName;
+    const pathPrefix = 'MKT\\2026\\tnc\\';
+    els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
 
@@ -783,7 +785,8 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    els.outputFileName.value = currentFileName;
+    const pathPrefix = 'MKT\\2026\\tnc\\';
+    els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
 
