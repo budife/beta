@@ -4,7 +4,7 @@
 
 html,
 body {
-  min-height: 100%;
+  height: 100%;
   margin: 0;
   color: var(--text, #111827);
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -24,43 +24,39 @@ textarea {
   display: none !important;
 }
 
+/* ── App shell ────────────────────────────────────── */
+
 .d2h-app {
-  min-height: 100vh;
-  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.d2h-control-panel {
-  padding: 24px;
-  background: #fff;
-  border: 1px solid var(--border, #e5e7eb);
-  border-width: 0 0 1px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.d2h-location-head {
+.d2h-header {
   display: flex;
   gap: 12px;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  padding: 18px 24px;
+  flex-shrink: 0;
 }
 
-.d2h-location-head h1 {
+.d2h-header h1 {
   display: flex;
   gap: 10px;
   align-items: center;
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
 }
 
-.d2h-location-head h1 i {
+.d2h-header h1 i {
   color: var(--accent-primary, #f3838b);
 }
 
 .d2h-kicker {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   color: var(--accent-primary, #f3838b);
   font-size: 11px;
   font-weight: 700;
@@ -85,22 +81,20 @@ textarea {
   box-shadow: 0 0 0 3px #dcfce7;
 }
 
-.d2h-workspace {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+/* ── Dropzone ─────────────────────────────────────── */
 
 .d2h-dropzone {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 280px;
+  margin: 0 24px;
+  min-height: 240px;
   padding: 32px;
   color: var(--text-muted, #6b7280);
   text-align: center;
   border: 1.5px dashed var(--border, #d8dde5);
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, .6);
   cursor: pointer;
   transition: .2s ease;
@@ -143,6 +137,8 @@ textarea {
   font-size: 12px;
 }
 
+/* ── Buttons ──────────────────────────────────────── */
+
 .d2h-primary,
 .d2h-secondary,
 .d2h-mini-button,
@@ -151,8 +147,8 @@ textarea {
   gap: 8px;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
-  padding: 0 16px;
+  min-height: 36px;
+  padding: 0 14px;
   border: 0;
   border-radius: 0;
   cursor: pointer;
@@ -202,39 +198,42 @@ textarea {
   background: var(--ui-accent-soft, #fff1f2);
 }
 
-.d2h-result {
-  margin-top: 16px;
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #fff;
-}
+/* ── Filebar ──────────────────────────────────────── */
 
 .d2h-filebar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 64px;
-  padding: 12px 18px;
+  gap: 12px;
+  padding: 10px 24px;
   background: #f7f7f8;
   border-bottom: 1px solid var(--border, #e5e7eb);
+  flex-shrink: 0;
 }
 
-.d2h-filebar > div {
+.d2h-filebar-left {
   display: flex;
   gap: 12px;
   align-items: center;
   min-width: 0;
 }
 
+.d2h-filebar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .d2h-word-icon {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   color: #fff;
   background: #2b579a;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 700;
   flex: none;
 }
@@ -245,9 +244,9 @@ textarea {
 
 .d2h-file-details label {
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   color: var(--text-muted, #6b7280);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -262,9 +261,9 @@ textarea {
 }
 
 .d2h-file-name-field input {
-  width: min(360px, 40vw);
-  min-width: 120px;
-  padding: 6px 8px;
+  width: min(300px, 40vw);
+  min-width: 100px;
+  padding: 4px 8px;
   color: var(--text, #111827);
   background: #fff;
   border: 1px solid var(--border, #d8dde5);
@@ -278,29 +277,39 @@ textarea {
 }
 
 .d2h-filebar small {
-  display: block;
-  overflow: hidden;
   color: var(--text-muted, #6b7280);
   font-size: 12px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* ── Messages ─────────────────────────────────────── */
+
 .d2h-messages {
-  margin: 12px 18px 0;
-  padding: 10px 14px;
+  padding: 10px 24px;
   background: #fffbeb;
-  border: 1px solid #fde68a;
+  border-bottom: 1px solid #fde68a;
   color: #92400e;
   font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ── Workspace (tabs + panels) ────────────────────── */
+
+.d2h-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .d2h-view-toggle {
   display: flex;
   gap: 0;
-  padding: 0 18px;
+  padding: 0 24px;
   border-bottom: 1px solid var(--border, #e5e7eb);
   background: #f7f7f8;
+  flex-shrink: 0;
 }
 
 .d2h-tab {
@@ -333,46 +342,23 @@ textarea {
   font-size: 12px;
 }
 
-.d2h-result-grid {
-  position: relative;
-  min-height: 500px;
-}
+/* ── Panels ───────────────────────────────────────── */
 
 .d2h-panel {
-  min-width: 0;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-}
-
-.d2h-panel + .d2h-panel {
-  border-left: 1px solid var(--border, #e5e7eb);
 }
 
 .d2h-panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 50px;
-  padding: 0 18px;
+  min-height: 44px;
+  padding: 0 24px;
   border-bottom: 1px solid var(--border, #e5e7eb);
-}
-
-.d2h-panel-head h2 {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.d2h-panel-head h2 i {
-  color: var(--accent-primary, #f3838b);
-}
-
-.d2h-panel-head span {
-  color: var(--text-muted, #6b7280);
-  font-size: 12px;
+  flex-shrink: 0;
 }
 
 .d2h-panel-tools {
@@ -382,8 +368,8 @@ textarea {
 }
 
 .d2h-preview {
+  flex: 1;
   overflow: auto;
-  height: 500px;
   background: #f2f2f2;
   color: #111;
 }
@@ -391,7 +377,6 @@ textarea {
 textarea#d2h-html-output {
   flex: 1;
   width: 100%;
-  min-height: 500px;
   resize: none;
   border: 0;
   outline: none;
@@ -401,36 +386,42 @@ textarea#d2h-html-output {
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.d2h-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border, #e5e7eb);
-  background: #f7f7f8;
-}
+/* ── Utilities ────────────────────────────────────── */
 
 .d2h-hidden {
   display: none !important;
 }
 
+/* ── Responsive ───────────────────────────────────── */
+
 @media (max-width: 760px) {
-  .d2h-control-panel {
-    padding: 16px;
+  .d2h-header {
+    padding: 14px 16px;
+    flex-direction: column;
+    gap: 6px;
   }
 
-  .d2h-location-head {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .d2h-actions {
-    flex-direction: column;
+  .d2h-dropzone {
+    margin: 0 16px;
   }
 
   .d2h-filebar {
     flex-direction: column;
     align-items: flex-start;
+    padding: 10px 16px;
     gap: 10px;
+  }
+
+  .d2h-filebar-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .d2h-messages {
+    padding: 10px 16px;
+  }
+
+  .d2h-view-toggle {
+    padding: 0 16px;
   }
 }

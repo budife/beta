@@ -6,7 +6,8 @@
     dropzone: document.getElementById('d2h-dropzone'),
     fileInput: document.getElementById('d2h-file-input'),
     chooseBtn: document.getElementById('d2h-choose-btn'),
-    result: document.getElementById('d2h-result'),
+    filebar: document.getElementById('d2h-filebar'),
+    workspace: document.getElementById('d2h-workspace'),
     outputFileName: document.getElementById('d2h-output-name'),
     fileSize: document.getElementById('d2h-file-size'),
     resetBtn: document.getElementById('d2h-reset-btn'),
@@ -665,7 +666,8 @@
       }
 
       els.dropzone.classList.add('d2h-hidden');
-      els.result.classList.remove('d2h-hidden');
+      els.filebar.classList.remove('d2h-hidden');
+      els.workspace.classList.remove('d2h-hidden');
     } catch (error) {
       console.error(error);
       alert('Unable to convert this document. Make sure the DOCX file is not corrupted or password-protected.');
@@ -723,7 +725,8 @@
   ['dragleave', 'drop'].forEach((name) => els.dropzone.addEventListener(name, (event) => { event.preventDefault(); els.dropzone.classList.remove('dragging'); }));
   els.dropzone.addEventListener('drop', (event) => convertFile(event.dataTransfer.files[0]));
   els.resetBtn.addEventListener('click', () => {
-    els.result.classList.add('d2h-hidden');
+    els.filebar.classList.add('d2h-hidden');
+    els.workspace.classList.add('d2h-hidden');
     els.dropzone.classList.remove('d2h-hidden');
     els.fileInput.value = '';
   });
