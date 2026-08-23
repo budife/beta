@@ -56,17 +56,22 @@
 
           <div id="d2h-messages" class="d2h-messages d2h-hidden"></div>
 
+          <div class="d2h-view-toggle">
+            <button id="d2h-tab-preview" class="d2h-tab is-active" type="button">
+              <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
+            </button>
+            <button id="d2h-tab-html" class="d2h-tab" type="button">
+              <i class="fa-solid fa-code" aria-hidden="true"></i> HTML
+            </button>
+            <span id="d2h-element-count" class="d2h-tab-meta"></span>
+          </div>
+
           <div class="d2h-result-grid">
-            <section class="d2h-panel">
-              <div class="d2h-panel-head">
-                <h2><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</h2>
-                <span id="d2h-element-count"></span>
-              </div>
+            <section id="d2h-panel-preview" class="d2h-panel">
               <article id="d2h-preview" class="d2h-preview"></article>
             </section>
-            <section class="d2h-panel">
+            <section id="d2h-panel-html" class="d2h-panel d2h-hidden">
               <div class="d2h-panel-head">
-                <h2><i class="fa-solid fa-code" aria-hidden="true"></i> HTML</h2>
                 <div class="d2h-panel-tools">
                   <button id="d2h-copy-btn" class="d2h-mini-button" type="button">
                     <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy HTML

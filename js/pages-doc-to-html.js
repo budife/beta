@@ -16,7 +16,11 @@
     elementCount: document.getElementById('d2h-element-count'),
     copyBtn: document.getElementById('d2h-copy-btn'),
     copyBottomBtn: document.getElementById('d2h-copy-bottom-btn'),
-    downloadBtn: document.getElementById('d2h-download-btn')
+    downloadBtn: document.getElementById('d2h-download-btn'),
+    tabPreview: document.getElementById('d2h-tab-preview'),
+    tabHtml: document.getElementById('d2h-tab-html'),
+    panelPreview: document.getElementById('d2h-panel-preview'),
+    panelHtml: document.getElementById('d2h-panel-html')
   };
 
   const documentCss = `
@@ -695,6 +699,17 @@
     anchor.click();
     URL.revokeObjectURL(url);
   }
+
+  function switchTab(tab) {
+    const isPreview = tab === 'preview';
+    els.tabPreview.classList.toggle('is-active', isPreview);
+    els.tabHtml.classList.toggle('is-active', !isPreview);
+    els.panelPreview.classList.toggle('d2h-hidden', !isPreview);
+    els.panelHtml.classList.toggle('d2h-hidden', isPreview);
+  }
+
+  els.tabPreview.addEventListener('click', () => switchTab('preview'));
+  els.tabHtml.addEventListener('click', () => switchTab('html'));
 
   els.chooseBtn.addEventListener('click', (event) => { event.stopPropagation(); els.fileInput.click(); });
   els.dropzone.addEventListener('click', () => els.fileInput.click());
