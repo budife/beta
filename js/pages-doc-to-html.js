@@ -241,7 +241,7 @@
     return value
       .normalize('NFKD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^A-Za-z0-9_-]+/g, '_')
+      .replace(/[^A-Za-z0-9_\\-]+/g, '_')
       .replace(/_+/g, '_')
       .slice(0, 100);
   }
