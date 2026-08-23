@@ -747,9 +747,8 @@
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
 
-    const fullHtml = wrapWithDocumentTemplate(pagesHtml);
-    renderPreview(fullHtml);
-    els.htmlOutput.value = formatHtmlWithTabs(fullHtml);
+    renderPreview(pagesHtml || '<p>PDF has no extractable text.</p>');
+    els.htmlOutput.value = formatHtmlWithTabs(pagesHtml);
     els.elementCount.textContent = `${totalPages} pages`;
     els.messages.textContent = `PDF converted as editable text (${totalPages} pages). Layout may differ slightly from original.`;
     els.messages.classList.remove('d2h-hidden');
@@ -785,7 +784,7 @@
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
 
-    const fullHtml = wrapWithDocumentTemplate(pagesHtml);
+    const fullHtml = `<div class="pdf-pages">${pagesHtml}</div>`;
     renderPreview(fullHtml);
     els.htmlOutput.value = formatHtmlWithTabs(fullHtml);
     els.elementCount.textContent = `${totalPages} pages`;
@@ -802,9 +801,10 @@
       .join(' ')
       || currentFileName;
     const safeTitle = escapeHtml(documentTitle);
-    const isPdf = els.htmlOutput.value.includes('pdf-page');
+    const isPdf = els.htmlOutput.value.includes('pdf-page') || els.htmlOutput.value.includes('pdf-page-content');
     if (isPdf) {
-      return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>body{margin:0;padding:24px;background:#e8e8e8;font-family:Arial,sans-serif;}.pdf-pages{max-width:min(210mm,calc(100% - 48px));margin:0 auto;}.pdf-page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12);margin-bottom:20px;}.pdf-page img{display:block;width:100%;height:auto;}.pdf-page-label{padding:6px 0;text-align:center;color:#6b7280;font-size:12px;}</style>\n</head>\n<body>\n${els.htmlOutput.value}\n</body>\n</html>`;
+      const pdfCss = `body{margin:0;padding:24px;background:#e8e8e8;font-family:Arial,sans-serif;}.pdf-pages{max-width:min(210mm,calc(100% - 48px));margin:0 auto;}.pdf-page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12);margin-bottom:20px;}.pdf-page img{display:block;width:100%;height:auto;}.pdf-page-label{padding:6px 0;text-align:center;color:#6b7280;font-size:12px;}.pdf-page-content{padding:8px 0;line-height:1.6;font-size:11pt;}.pdf-page-content+.pdf-page-content{margin-top:16px;padding-top:16px;border-top:1px solid #e5e5e5;}`;
+      return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${pdfCss}</style>\n</head>\n<body>\n${els.htmlOutput.value}\n</body>\n</html>`;
     }
     const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(els.htmlOutput.value, false));
     return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${documentCss}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>`;
