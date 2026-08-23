@@ -944,11 +944,40 @@ select {
 }
 
 .slicer-actions {
-  display: grid;
-  grid-template-columns: auto minmax(180px, 1fr) auto;
-  gap: 12px;
-  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
   margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-action-step {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.slicer-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--border, #e5e7eb);
+  border-radius: 50%;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.slicer-action-step.is-primary .slicer-step-badge {
+  color: #fff;
+  background: var(--accent-primary, #f3838b);
 }
 
 .slicer-action-group {
@@ -959,16 +988,30 @@ select {
 }
 
 .slicer-action-group > span {
-  flex-basis: 100%;
-  color: var(--text-muted, #6b7280);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  display: none;
 }
 
-.slicer-action-group.is-primary {
-  justify-content: center;
+.slicer-btn-loading {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.slicer-export-summary {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  margin-top: 8px;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 500;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.slicer-export-summary i {
+  flex-shrink: 0;
 }
 
 .slicer-primary,
@@ -1103,6 +1146,31 @@ select {
   color: var(--text, #111827);
   background: #fff;
   border: 1px solid var(--border, #d8dde5);
+}
+
+.slicer-toolbar-field {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.slicer-toolbar-field span {
+  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.slicer-toolbar-field input {
+  width: 80px;
+  min-height: 32px;
+  padding: 0 8px;
+  color: var(--text, #111827);
+  background: #fff;
+  border: 1px solid var(--border, #d8dde5);
+  font-size: 12px;
 }
 
 .slicer-preview-tools span {
@@ -1490,11 +1558,12 @@ select {
   }
 
   .slicer-actions {
-    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .slicer-action-group.is-primary {
-    justify-content: flex-start;
+  .slicer-action-step.is-primary {
+    order: -1;
+    flex-basis: 100%;
   }
 
   .slicer-panel-header h1 {

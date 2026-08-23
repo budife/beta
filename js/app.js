@@ -18,8 +18,7 @@ const ROUTES = {
   },
   '/campaign-counter': {
     content: 'campaign-counter.md',
-    label: 'Campaign Counter',
-    status: 'beta'
+    label: 'Campaign Counter'
   },
   '/config-edm': {
     content: 'config-edm.md',
@@ -39,8 +38,7 @@ const ROUTES = {
   },
   '/layout-slicer': {
     content: 'layout-slicer.md',
-    label: 'Layout Slicer',
-    status: 'beta'
+    label: 'Layout Slicer'
   },
   '/tnc-uploader': {
     content: 'tnc-uploader.md',
@@ -91,8 +89,7 @@ const TOOL_META = {
   },
   '/campaign-counter': {
     icon: 'fa-solid fa-chart-line',
-    label: 'Campaign Counter',
-    status: 'beta'
+    label: 'Campaign Counter'
   },
   '/config-edm': {
     icon: 'fa-solid fa-sliders',
@@ -112,8 +109,7 @@ const TOOL_META = {
   },
   '/layout-slicer': {
     icon: 'fa-solid fa-scissors',
-    label: 'Layout Slicer',
-    status: 'beta'
+    label: 'Layout Slicer'
   },
   '/tnc-uploader': {
     icon: 'fa-solid fa-file-pdf',
