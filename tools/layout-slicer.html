@@ -7,7 +7,7 @@
   <meta name="author" content="eDM Helper">
 
   <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
-  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.14.9">
+  <link rel="stylesheet" href="../css/pages-layout-slicer.css?v=6.14.13">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -169,12 +169,8 @@
             <option value="0.98" selected>Very high</option>
           </select>
         </label>
-        <label>
-          <span>File name</span>
-          <input id="file-prefix" type="text" value="img" placeholder="img" autocomplete="off">
-        </label>
       </div>
-      <p class="slicer-form-note">Export width controls the generated image pixel width. File name prefix is used for exported slices (e.g. <code>banner_01.jpg</code>). Change these settings any time, then generate again to refresh the slices.</p>
+      <p class="slicer-form-note">Export width controls the generated image pixel width. Change these settings any time, then generate again to refresh the slices.</p>
 
       <div class="slicer-actions">
         <div class="slicer-action-step" aria-label="Step 1: Guides">
@@ -227,6 +223,10 @@
             <h2>Source Layout</h2>
           </div>
           <div class="slicer-preview-tools">
+            <label class="slicer-toolbar-field">
+              <span>File name</span>
+              <input id="file-prefix" type="text" value="img" placeholder="img" autocomplete="off">
+            </label>
             <button id="zoom-out" type="button" class="slicer-secondary" disabled>-</button>
             <select id="zoom-level" disabled>
               <option value="fit">Fit</option>
@@ -274,6 +274,6 @@
   </main>
 
   <script src="../js/version-config.js?v=6.14.5" defer></script>
-  <script src="../js/pages-layout-slicer.js?v=6.14.12" defer></script>
+  <script src="../js/pages-layout-slicer.js?v=6.14.13" defer></script>
 </body>
 </html>

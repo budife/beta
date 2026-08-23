@@ -1075,23 +1075,6 @@ select {
   color: #b91c1c;
 }
 
-.slicer-status-link {
-  display: inline;
-  padding: 0;
-  color: #b4232c;
-  font: inherit;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  background: 0;
-  border: 0;
-  cursor: pointer;
-}
-
-.slicer-status-link:hover {
-  color: #9a1c24;
-}
-
 .slicer-workspace {
   display: grid;
   grid-template-columns: minmax(420px, 1fr) minmax(300px, 360px);
@@ -1163,6 +1146,31 @@ select {
   color: var(--text, #111827);
   background: #fff;
   border: 1px solid var(--border, #d8dde5);
+}
+
+.slicer-toolbar-field {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.slicer-toolbar-field span {
+  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.slicer-toolbar-field input {
+  width: 80px;
+  min-height: 32px;
+  padding: 0 8px;
+  color: var(--text, #111827);
+  background: #fff;
+  border: 1px solid var(--border, #d8dde5);
+  font-size: 12px;
 }
 
 .slicer-preview-tools span {
