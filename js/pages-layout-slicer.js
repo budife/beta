@@ -585,11 +585,16 @@
       return;
     }
 
-    els.sliceList.innerHTML = state.slices.map((slice, index) => `
-      <article class="slicer-slice-card${state.excluded[index] ? ' is-excluded' : ''}">
+    let exportIndex = 0;
+    els.sliceList.innerHTML = state.slices.map((slice, index) => {
+      const excluded = state.excluded[index];
+      const exportNumber = excluded ? null : (exportIndex += 1);
+      const exportFileName = excluded ? slice.fileName : formatFileName(exportNumber - 1);
+      return `
+      <article class="slicer-slice-card${excluded ? ' is-excluded' : ''}">
         <div class="slicer-slice-head">
           <div>
-            <div class="slicer-slice-title">${index + 1}. ${slice.fileName}</div>
+            <div class="slicer-slice-title">${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</div>
             <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
             <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px</div>
           </div>
@@ -597,10 +602,11 @@
         </div>
         <label class="slicer-slice-include">
           <span>Include in export</span>
-          <input type="checkbox" data-slice-include="${index}" ${state.excluded[index] ? '' : 'checked'}>
+          <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
         </label>
       </article>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderSliceLabels() {
