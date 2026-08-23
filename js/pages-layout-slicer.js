@@ -766,7 +766,7 @@
       }
       const canvas = createSliceCanvas(slice);
       const blob = await canvasToBlob(canvas, type);
-      generatedSlices.push({ ...slice, blob });
+      generatedSlices.push({ ...slice, fileName: formatFileName(generatedSlices.length), blob });
     }
 
     state.generated = { slices: generatedSlices };
