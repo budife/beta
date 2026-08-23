@@ -1178,16 +1178,29 @@ select {
 }
 
 .slicer-ruler-top .slicer-ruler-tick {
-  bottom: 0;
-  height: 7px;
-  padding-top: 11px;
-  border-left: 1px solid #6b6b6b;
+  top: 0;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  transform: translateX(-50%);
+}
+
+.slicer-ruler-top .slicer-ruler-tick::before {
+  display: block;
+  width: 1px;
+  height: 8px;
+  margin: 0 auto 3px;
+  content: "";
+  background: #6b6b6b;
 }
 
 .slicer-ruler-top .slicer-ruler-tick.is-major {
-  height: 14px;
   color: #d4d4d4;
-  border-left-color: #8a8a8a;
+}
+
+.slicer-ruler-top .slicer-ruler-tick.is-major::before {
+  height: 13px;
+  background: #8a8a8a;
 }
 
 .slicer-ruler-left .slicer-ruler-tick {
