@@ -8,6 +8,7 @@
     chooseBtn: document.getElementById('d2h-choose-btn'),
     filebar: document.getElementById('d2h-filebar'),
     workspace: document.getElementById('d2h-workspace'),
+    fileIcon: document.getElementById('d2h-file-icon'),
     outputFileName: document.getElementById('d2h-output-name'),
     fileSize: document.getElementById('d2h-file-size'),
     resetBtn: document.getElementById('d2h-reset-btn'),
@@ -112,7 +113,19 @@
     "p[style-name='Centered'] => p.centered:fresh",
     "p[style-name='Center'] => p.center:fresh",
     "p[style-name='DocuHTML Centered'] => p.docx-center:fresh",
-    "p[style-name='DocuHTML Justified'] => p.docx-justify:fresh"
+    "p[style-name='DocuHTML Justified'] => p.docx-justify:fresh",
+    "p[style-name='List Paragraph'] => p:fresh",
+    "p[style-name='Normal'] => p:fresh",
+    "p[style-name='Body Text'] => p:fresh",
+    "p[style-name='Heading 1'] => h1:fresh",
+    "p[style-name='Heading 2'] => h2:fresh",
+    "p[style-name='Heading 3'] => h3:fresh",
+    "p[style-name='Heading 4'] => h4:fresh",
+    "p[style-name='Heading 5'] => h5:fresh",
+    "p[style-name='Heading 6'] => h6:fresh",
+    "p[style-name='Block Text'] => blockquote:p:fresh",
+    "p[style-name='Quote'] => blockquote:p:fresh",
+    "p[style-name='Intense Quote'] => blockquote:p:fresh"
   ];
 
   function escapeHtml(value) {
@@ -619,7 +632,7 @@
     els.dropzone.classList.toggle('busy', busy);
     els.chooseBtn.innerHTML = busy
       ? '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Converting...'
-      : '<i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX File';
+      : '<i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX / PDF File';
   }
 
   function renderPreview(html) {
@@ -627,8 +640,9 @@
   }
 
   async function convertFile(file) {
-    if (!file || !file.name.toLowerCase().endsWith('.docx')) {
-      alert('Please choose a .docx file.');
+    const ext = file?.name?.toLowerCase().split('.').pop();
+    if (!file || (ext !== 'docx' && ext !== 'pdf')) {
+      alert('Please choose a .docx or .pdf file.');
       return;
     }
     if (file.size > 20 * 1024 * 1024) {
@@ -638,43 +652,87 @@
 
     setBusy(true);
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const tableHeaderStyles = await extractTableHeaderStyles(arrayBuffer);
-      const leadingTitleBreakCount = await extractLeadingTitleBreakCount(arrayBuffer);
-      const conversion = await mammoth.convertToHtml({ arrayBuffer }, {
-        includeDefaultStyleMap: true,
-        styleMap,
-        transformDocument: correctWordNumberingLevels,
-        convertImage: mammoth.images.imgElement((image) => image.read('base64').then((data) => ({
-          src: `data:${image.contentType};base64,${data}`
-        })))
-      });
-
-      const normalizedHtml = normalizeNumbering(conversion.value, tableHeaderStyles, leadingTitleBreakCount);
-      currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
-      els.outputFileName.value = currentFileName;
-      els.fileSize.textContent = formatBytes(file.size);
-      renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
-      els.htmlOutput.value = formatHtmlWithTabs(normalizedHtml);
-      const count = els.preview.querySelectorAll('*').length;
-      els.elementCount.textContent = `${count} elements`;
-
-      if (conversion.messages.length) {
-        els.messages.textContent = `${conversion.messages.length} conversion note(s) - some Word formatting may be simplified.`;
-        els.messages.classList.remove('d2h-hidden');
+      if (ext === 'pdf') {
+        await convertPdf(file);
       } else {
-        els.messages.classList.add('d2h-hidden');
+        await convertDocx(file);
       }
-
       els.dropzone.classList.add('d2h-hidden');
       els.filebar.classList.remove('d2h-hidden');
       els.workspace.classList.remove('d2h-hidden');
     } catch (error) {
       console.error(error);
-      alert('Unable to convert this document. Make sure the DOCX file is not corrupted or password-protected.');
+      alert('Unable to convert this document. Make sure the file is not corrupted or password-protected.');
     } finally {
       setBusy(false);
     }
+  }
+
+  async function convertDocx(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const tableHeaderStyles = await extractTableHeaderStyles(arrayBuffer);
+    const leadingTitleBreakCount = await extractLeadingTitleBreakCount(arrayBuffer);
+    const conversion = await mammoth.convertToHtml({ arrayBuffer }, {
+      includeDefaultStyleMap: true,
+      styleMap,
+      transformDocument: correctWordNumberingLevels,
+      convertImage: mammoth.images.imgElement((image) => image.read('base64').then((data) => ({
+        src: `data:${image.contentType};base64,${data}`
+      })))
+    });
+
+    const normalizedHtml = normalizeNumbering(conversion.value, tableHeaderStyles, leadingTitleBreakCount);
+    currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
+    els.outputFileName.value = currentFileName;
+    els.fileSize.textContent = formatBytes(file.size);
+    els.fileIcon.textContent = 'W';
+    renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
+    els.htmlOutput.value = formatHtmlWithTabs(normalizedHtml);
+    const count = els.preview.querySelectorAll('*').length;
+    els.elementCount.textContent = `${count} elements`;
+
+    if (conversion.messages.length) {
+      els.messages.textContent = `${conversion.messages.length} conversion note(s) - some Word formatting may be simplified.`;
+      els.messages.classList.remove('d2h-hidden');
+    } else {
+      els.messages.classList.add('d2h-hidden');
+    }
+  }
+
+  async function convertPdf(file) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const totalPages = pdf.numPages;
+    const scale = 2;
+
+    let pagesHtml = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      const imgDataUrl = canvas.toDataURL('image/png');
+      pagesHtml += `<div class="pdf-page"><img src="${imgDataUrl}" alt="Page ${i}" style="width:100%;height:auto;display:block;"><p class="pdf-page-label">Page ${i} of ${totalPages}</p></div>\n`;
+    }
+
+    currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
+    els.outputFileName.value = currentFileName;
+    els.fileSize.textContent = formatBytes(file.size);
+    els.fileIcon.textContent = 'PDF';
+    els.preview.innerHTML = `<div class="pdf-pages">${pagesHtml}</div>`;
+    els.htmlOutput.value = `<div class="pdf-pages">\n${pagesHtml}</div>`;
+    els.elementCount.textContent = `${totalPages} pages`;
+    els.messages.textContent = `PDF converted as ${totalPages} page image(s). Text is not editable in HTML.`;
+    els.messages.classList.remove('d2h-hidden');
   }
 
   function buildFullDocument() {
@@ -686,6 +744,10 @@
       .join(' ')
       || currentFileName;
     const safeTitle = escapeHtml(documentTitle);
+    const isPdf = els.htmlOutput.value.includes('pdf-page');
+    if (isPdf) {
+      return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>body{margin:0;padding:24px;background:#e8e8e8;font-family:Arial,sans-serif;}.pdf-pages{max-width:min(210mm,calc(100% - 48px));margin:0 auto;}.pdf-page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12);margin-bottom:20px;}.pdf-page img{display:block;width:100%;height:auto;}.pdf-page-label{padding:6px 0;text-align:center;color:#6b7280;font-size:12px;}</style>\n</head>\n<body>\n${els.htmlOutput.value}\n</body>\n</html>`;
+    }
     const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(els.htmlOutput.value, false));
     return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${documentCss}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>`;
   }

@@ -228,12 +228,13 @@ textarea {
 .d2h-word-icon {
   display: grid;
   place-items: center;
-  width: 32px;
+  min-width: 32px;
   height: 32px;
+  padding: 0 6px;
   color: #fff;
   background: #2b579a;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   flex: none;
 }
@@ -393,6 +394,32 @@ textarea#d2h-html-output {
   background: #1f2937;
   color: #d1d5db;
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── PDF pages ────────────────────────────────────── */
+
+.pdf-pages {
+  max-width: min(210mm, calc(100% - 48px));
+  margin: 24px auto;
+}
+
+.pdf-page {
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, .12);
+  margin-bottom: 20px;
+}
+
+.pdf-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pdf-page-label {
+  padding: 6px 0;
+  text-align: center;
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
 }
 
 /* ── Utilities ────────────────────────────────────── */

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Konverter DOCX ke HTML yang bekerja langsung di browser.">
+  <meta name="description" content="Konverter DOCX dan PDF ke HTML yang bekerja langsung di browser.">
   <meta name="author" content="eDM Helper">
 
   <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
@@ -18,25 +18,25 @@
     <header class="d2h-header">
       <div>
         <p class="d2h-kicker">Tool</p>
-        <h1><i class="fa-solid fa-file-word" aria-hidden="true"></i> Doc to HTML</h1>
+        <h1><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Doc to HTML</h1>
       </div>
       <span class="d2h-privacy"><span class="d2h-privacy-dot"></span> Processed locally in browser</span>
     </header>
 
-    <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX file">
-      <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+    <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX or PDF file">
+      <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf" hidden>
       <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
-      <strong>Drop DOCX file here</strong>
+      <strong>Drop DOCX or PDF file here</strong>
       <span>or click to choose a document</span>
       <button id="d2h-choose-btn" class="d2h-primary" type="button">
-        <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX File
+        <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX / PDF File
       </button>
-      <small>Max 20 MB - Format .docx</small>
+      <small>Max 20 MB - Format .docx / .pdf</small>
     </div>
 
     <div id="d2h-filebar" class="d2h-filebar d2h-hidden">
       <div class="d2h-filebar-left">
-        <span class="d2h-word-icon">W</span>
+        <span class="d2h-word-icon" id="d2h-file-icon">W</span>
         <div class="d2h-file-details">
           <label for="d2h-output-name">Output file name</label>
           <span class="d2h-file-name-field">
@@ -91,6 +91,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="../js/version-config.js?v=6.14.5" defer></script>
   <script src="../js/pages-doc-to-html.js?v=1.0.0" defer></script>
 </body>
