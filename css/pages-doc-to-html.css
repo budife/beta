@@ -294,6 +294,23 @@ textarea {
   flex-shrink: 0;
 }
 
+.d2h-save-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  background: #f0fdf4;
+  border-bottom: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  flex-shrink: 0;
+}
+
+.d2h-save-path i {
+  color: #16a34a;
+}
+
 /* ── Workspace (tabs + panels) ────────────────────── */
 
 .d2h-workspace {

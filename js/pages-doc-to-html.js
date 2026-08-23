@@ -13,12 +13,14 @@
     fileSize: document.getElementById('d2h-file-size'),
     resetBtn: document.getElementById('d2h-reset-btn'),
     messages: document.getElementById('d2h-messages'),
+    savePath: document.getElementById('d2h-save-path'),
     preview: document.getElementById('d2h-preview'),
     htmlOutput: document.getElementById('d2h-html-output'),
     elementCount: document.getElementById('d2h-element-count'),
     copyBtn: document.getElementById('d2h-copy-btn'),
     copyBottomBtn: document.getElementById('d2h-copy-bottom-btn'),
     downloadBtn: document.getElementById('d2h-download-btn'),
+    saveBtn: document.getElementById('d2h-save-btn'),
     tabPreview: document.getElementById('d2h-tab-preview'),
     tabHtml: document.getElementById('d2h-tab-html'),
     panelPreview: document.getElementById('d2h-panel-preview'),
@@ -30,6 +32,7 @@
   };
 
   let pendingPdfFile = null;
+  let directoryHandle = null;
 
   const documentCss = `
     :root { color: #111; background: #ececec; font-family: Arial, Helvetica, sans-serif; }
@@ -827,6 +830,34 @@
     URL.revokeObjectURL(url);
   }
 
+  async function saveToFolder() {
+    if (!directoryHandle) {
+      try {
+        directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          alert('Unable to open folder picker.');
+        }
+        return;
+      }
+    }
+
+    try {
+      const fileName = `${currentFileName}.html`;
+      const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(buildFullDocument());
+      await writable.close();
+
+      const path = `${directoryHandle.name}\\${fileName}`;
+      els.savePath.innerHTML = `<i class="fa-solid fa-check-circle" aria-hidden="true"></i> Saved to: ${path}`;
+      els.savePath.classList.remove('d2h-hidden');
+    } catch (error) {
+      console.error(error);
+      alert('Save failed. Check folder permission and try again.');
+    }
+  }
+
   function switchTab(tab) {
     const isPreview = tab === 'preview';
     els.tabPreview.classList.toggle('is-active', isPreview);
@@ -849,6 +880,7 @@
     els.filebar.classList.add('d2h-hidden');
     els.workspace.classList.add('d2h-hidden');
     els.pdfMode.classList.add('d2h-hidden');
+    els.savePath.classList.add('d2h-hidden');
     els.dropzone.classList.remove('d2h-hidden');
     els.fileInput.value = '';
   });
@@ -894,6 +926,7 @@
   els.copyBtn.addEventListener('click', (event) => copyHtml(event.currentTarget));
   els.copyBottomBtn.addEventListener('click', (event) => copyHtml(event.currentTarget));
   els.downloadBtn.addEventListener('click', downloadHtml);
+  els.saveBtn.addEventListener('click', saveToFolder);
   els.outputFileName.addEventListener('input', (event) => {
     const normalized = normalizeFileNameCharacters(event.currentTarget.value);
     event.currentTarget.value = normalized;
