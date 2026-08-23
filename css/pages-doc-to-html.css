@@ -384,6 +384,18 @@ textarea {
   box-shadow: 0 2px 24px rgba(0, 0, 0, .15);
 }
 
+.d2h-preview .document-content .pdf-page {
+  background: none;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.d2h-preview .document-content .pdf-page img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #e5e5e5;
+}
+
 textarea#d2h-html-output {
   flex: 1;
   width: 100%;
@@ -394,6 +406,83 @@ textarea#d2h-html-output {
   background: #1f2937;
   color: #d1d5db;
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── PDF mode selector ────────────────────────────── */
+
+.d2h-pdf-mode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.d2h-pdf-mode-card {
+  max-width: 520px;
+  padding: 28px 32px;
+  background: #fff;
+  border: 1px solid var(--border, #e5e7eb);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, .08);
+}
+
+.d2h-pdf-mode-card h3 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.d2h-pdf-mode-card h3 i {
+  color: var(--accent-primary, #f3838b);
+}
+
+.d2h-pdf-mode-card > p {
+  margin: 0 0 18px;
+  color: var(--text-muted, #6b7280);
+  font-size: 14px;
+}
+
+.d2h-pdf-mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.d2h-pdf-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px;
+  background: #f9fafb;
+  border: 2px solid var(--border, #e5e7eb);
+  cursor: pointer;
+  text-align: left;
+  transition: .15s ease;
+}
+
+.d2h-pdf-option:hover {
+  border-color: var(--accent-primary, #f3838b);
+  background: var(--ui-accent-soft, #fff1f2);
+}
+
+.d2h-pdf-option i {
+  font-size: 20px;
+  color: var(--accent-primary, #f3838b);
+}
+
+.d2h-pdf-option strong {
+  font-size: 14px;
+  color: var(--text, #111827);
+}
+
+.d2h-pdf-option span {
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+  line-height: 1.4;
 }
 
 /* ── PDF pages ────────────────────────────────────── */
@@ -420,6 +509,18 @@ textarea#d2h-html-output {
   text-align: center;
   color: var(--text-muted, #6b7280);
   font-size: 12px;
+}
+
+.pdf-page-content {
+  padding: 8px 0;
+  line-height: 1.6;
+  font-size: 11pt;
+}
+
+.pdf-page-content + .pdf-page-content {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
 }
 
 /* ── Utilities ────────────────────────────────────── */

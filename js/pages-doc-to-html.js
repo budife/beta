@@ -22,8 +22,14 @@
     tabPreview: document.getElementById('d2h-tab-preview'),
     tabHtml: document.getElementById('d2h-tab-html'),
     panelPreview: document.getElementById('d2h-panel-preview'),
-    panelHtml: document.getElementById('d2h-panel-html')
+    panelHtml: document.getElementById('d2h-panel-html'),
+    pdfMode: document.getElementById('d2h-pdf-mode'),
+    pdfEditableBtn: document.getElementById('d2h-pdf-editable'),
+    pdfImageBtn: document.getElementById('d2h-pdf-image'),
+    pdfCancelBtn: document.getElementById('d2h-pdf-cancel')
   };
+
+  let pendingPdfFile = null;
 
   const documentCss = `
     :root { color: #111; background: #ececec; font-family: Arial, Helvetica, sans-serif; }
@@ -700,6 +706,56 @@
   }
 
   async function convertPdf(file) {
+    pendingPdfFile = file;
+    els.dropzone.classList.add('d2h-hidden');
+    els.pdfMode.classList.remove('d2h-hidden');
+    setBusy(false);
+  }
+
+  async function convertPdfEditable(file) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const totalPages = pdf.numPages;
+
+    let pagesHtml = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+
+      let lastY = null;
+      let pageContent = '';
+
+      textContent.items.forEach((item) => {
+        const y = Math.round(item.transform[5]);
+        if (lastY !== null && Math.abs(y - lastY) > 5) {
+          pageContent += '<br>';
+        }
+        const style = item.fontName?.includes('Bold') ? 'font-weight:700;' : '';
+        const fontSize = Math.round(Math.abs(item.height) * 0.75) || 11;
+        pageContent += `<span style="${style}font-size:${fontSize}pt;">${escapeHtml(item.str)}</span>`;
+        lastY = y;
+      });
+
+      pagesHtml += `<div class="pdf-page-content">\n${pageContent}\n</div>\n`;
+    }
+
+    currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
+    els.outputFileName.value = currentFileName;
+    els.fileSize.textContent = formatBytes(file.size);
+    els.fileIcon.textContent = 'PDF';
+
+    const fullHtml = wrapWithDocumentTemplate(pagesHtml);
+    renderPreview(fullHtml);
+    els.htmlOutput.value = formatHtmlWithTabs(fullHtml);
+    els.elementCount.textContent = `${totalPages} pages`;
+    els.messages.textContent = `PDF converted as editable text (${totalPages} pages). Layout may differ slightly from original.`;
+    els.messages.classList.remove('d2h-hidden');
+  }
+
+  async function convertPdfImage(file) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     const arrayBuffer = await file.arrayBuffer();
@@ -728,8 +784,10 @@
     els.outputFileName.value = currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
-    els.preview.innerHTML = `<div class="pdf-pages">${pagesHtml}</div>`;
-    els.htmlOutput.value = `<div class="pdf-pages">\n${pagesHtml}</div>`;
+
+    const fullHtml = wrapWithDocumentTemplate(pagesHtml);
+    renderPreview(fullHtml);
+    els.htmlOutput.value = formatHtmlWithTabs(fullHtml);
     els.elementCount.textContent = `${totalPages} pages`;
     els.messages.textContent = `PDF converted as ${totalPages} page image(s). Text is not editable in HTML.`;
     els.messages.classList.remove('d2h-hidden');
@@ -790,8 +848,48 @@
   els.resetBtn.addEventListener('click', () => {
     els.filebar.classList.add('d2h-hidden');
     els.workspace.classList.add('d2h-hidden');
+    els.pdfMode.classList.add('d2h-hidden');
     els.dropzone.classList.remove('d2h-hidden');
     els.fileInput.value = '';
+  });
+  els.pdfEditableBtn.addEventListener('click', async () => {
+    els.pdfMode.classList.add('d2h-hidden');
+    setBusy(true);
+    try {
+      await convertPdfEditable(pendingPdfFile);
+      els.dropzone.classList.add('d2h-hidden');
+      els.filebar.classList.remove('d2h-hidden');
+      els.workspace.classList.remove('d2h-hidden');
+    } catch (error) {
+      console.error(error);
+      alert('Unable to convert this PDF. Make sure the file is not corrupted or password-protected.');
+      els.dropzone.classList.remove('d2h-hidden');
+    } finally {
+      setBusy(false);
+      pendingPdfFile = null;
+    }
+  });
+  els.pdfImageBtn.addEventListener('click', async () => {
+    els.pdfMode.classList.add('d2h-hidden');
+    setBusy(true);
+    try {
+      await convertPdfImage(pendingPdfFile);
+      els.dropzone.classList.add('d2h-hidden');
+      els.filebar.classList.remove('d2h-hidden');
+      els.workspace.classList.remove('d2h-hidden');
+    } catch (error) {
+      console.error(error);
+      alert('Unable to convert this PDF. Make sure the file is not corrupted or password-protected.');
+      els.dropzone.classList.remove('d2h-hidden');
+    } finally {
+      setBusy(false);
+      pendingPdfFile = null;
+    }
+  });
+  els.pdfCancelBtn.addEventListener('click', () => {
+    els.pdfMode.classList.add('d2h-hidden');
+    els.dropzone.classList.remove('d2h-hidden');
+    pendingPdfFile = null;
   });
   els.copyBtn.addEventListener('click', (event) => copyHtml(event.currentTarget));
   els.copyBottomBtn.addEventListener('click', (event) => copyHtml(event.currentTarget));
