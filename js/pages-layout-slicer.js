@@ -38,6 +38,7 @@
     exportWidth: document.getElementById('export-width'),
     exportDpi: document.getElementById('export-dpi'),
     imageQuality: document.getElementById('image-quality'),
+    filePrefix: document.getElementById('file-prefix'),
     duplicateFolderName: document.getElementById('duplicate-folder-name'),
     templateOriginalFolderName: document.getElementById('template-original-folder-name'),
     campaignPathPreview: document.getElementById('campaign-path-preview'),
@@ -412,7 +413,8 @@
   }
 
   function formatFileName(index) {
-    return `img_${String(index + 1).padStart(2, '0')}.${getExtension()}`;
+    const prefix = (els.filePrefix?.value || 'img').trim().replace(/[^a-zA-Z0-9_-]/g, '_') || 'img';
+    return `${prefix}_${String(index + 1).padStart(2, '0')}.${getExtension()}`;
   }
 
   function getScale() {
@@ -685,7 +687,6 @@
       state.generated = null;
       state.zoomMode = 'fit';
       state.zoom = getFitZoom();
-      state.savedDirHandle = null;
       if (els.exportSummary) els.exportSummary.hidden = true;
       if (els.exportWidth) els.exportWidth.value = image.naturalWidth;
       setStatus(`Image loaded at ${image.naturalWidth}px wide. Click the preview to add slice lines.`, 'success');
@@ -870,24 +871,7 @@
     for (const slice of state.generated.slices) {
       await writeFile(assetDir, slice.fileName, slice.blob);
     }
-    state.savedDirHandle = root;
     setStatus(`Saved ${count} image(s) to ${getAssetsFolder()}.`, 'success');
-    showOpenFolderLink();
-  }
-
-  function showOpenFolderLink() {
-    if (!els.status || !state.savedDirHandle) return;
-    const link = document.createElement('button');
-    link.type = 'button';
-    link.className = 'slicer-status-link';
-    link.textContent = 'Click here to open folder';
-    link.addEventListener('click', async () => {
-      try {
-        await window.showDirectoryPicker({ mode: 'read', startIn: state.savedDirHandle });
-      } catch (_) {}
-    });
-    els.status.appendChild(document.createTextNode(' '));
-    els.status.appendChild(link);
   }
 
   async function writeFile(dirHandle, name, content) {
@@ -1353,6 +1337,7 @@
     els.exportWidth,
     els.exportDpi,
     els.imageQuality,
+    els.filePrefix,
     els.duplicateFolderName
   ].forEach((input) => {
     if (!input) return;
