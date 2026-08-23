@@ -32,6 +32,10 @@ const ROUTES = {
     content: 'database-generator.md',
     label: 'Database Generator'
   },
+  '/doc-to-html': {
+    content: 'doc-to-html.md',
+    label: 'Doc to HTML'
+  },
   '/layout-checker': {
     content: 'layout-checker.md',
     label: 'Layout Checker'
@@ -66,6 +70,7 @@ const LEGACY_PATHS = {
   '/config.html': '/config-edm',
   '/database-checker.html': '/database-checker',
   '/database-generator.html': '/database-generator',
+  '/doc-to-html.html': '/doc-to-html',
   '/layout-checker.html': '/layout-checker',
   '/layout-slicer.html': '/layout-slicer',
   '/tnc-uploader.html': '/tnc-uploader',
@@ -102,6 +107,10 @@ const TOOL_META = {
   '/database-generator': {
     icon: 'fa-solid fa-database',
     label: 'Database Generator'
+  },
+  '/doc-to-html': {
+    icon: 'fa-solid fa-file-word',
+    label: 'Doc to HTML'
   },
   '/layout-checker': {
     icon: 'fa-solid fa-ruler-combined',
@@ -658,6 +667,39 @@ function setActiveLink(path) {
   });
 }
 
+const recentUpdateDates = new Map();
+
+function parseRecentUpdateDates(markdown) {
+  const lines = markdown.split('\n');
+  let inRecentUpdates = false;
+  for (const line of lines) {
+    if (/^##\s+Recent Updates/i.test(line)) { inRecentUpdates = true; continue; }
+    if (inRecentUpdates && /^##\s/.test(line)) break;
+    if (!inRecentUpdates) continue;
+    const match = line.match(/\*\*(.+?)\s+v[\d.]+.*?-\s+(\d{1,2}\s+\w+\s+\d{4})\*\*/i);
+    if (!match) continue;
+    const toolName = match[1].trim();
+    const date = parseUpdateDate(match[2]);
+    if (date) recentUpdateDates.set(toolName.toLowerCase(), date);
+  }
+}
+
+function applySidebarBadges() {
+  document.querySelectorAll('.sidebar-link[data-route]').forEach((link) => {
+    const existing = link.querySelector('.sidebar-new-badge');
+    if (existing) existing.remove();
+    const routePath = link.getAttribute('href');
+    const meta = TOOL_META[routePath];
+    if (!meta) return;
+    const date = recentUpdateDates.get(meta.label.toLowerCase());
+    if (!date || !isWithinRecentDays(date)) return;
+    const badge = document.createElement('span');
+    badge.className = 'sidebar-new-badge';
+    badge.textContent = 'new';
+    link.appendChild(badge);
+  });
+}
+
 function closeSidebar() {
   sidebar.classList.remove('open');
   backdrop.hidden = true;
@@ -860,6 +902,7 @@ function renderPage(path, route, markdown) {
     if (isHome) {
       markdownContainer.classList.add('home-dashboard');
       enhanceHomeDashboard(markdownContainer);
+      applySidebarBadges();
     }
     if (path === '/maintenance') {
       markdownContainer.classList.add('docs-content');
@@ -1005,6 +1048,13 @@ backdrop.addEventListener('click', closeSidebar);
 document.getElementById('footer-year').textContent = '2025';
 
 configureRouteLinks();
+
+const homeContentUrl = `${BASE_PATH}/content/home.md`;
+fetch(homeContentUrl, { cache: 'no-cache' })
+  .then((res) => res.ok ? res.text() : '')
+  .then((md) => { parseRecentUpdateDates(md); applySidebarBadges(); })
+  .catch(() => applySidebarBadges());
+
 viewport.replaceChildren();
 
 const initialPath = getCurrentPath();

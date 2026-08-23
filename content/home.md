@@ -25,6 +25,7 @@ category: Home
 - [Bookmarklet](/bookmarklet) - Browser shortcuts for repetitive daily tasks.
 - [Campaign Counter](/campaign-counter) - Campaign tracking workspace.
 - [Config eDM](/config-edm) - eDM configuration editor.
+- [Doc to HTML](/doc-to-html) - Convert DOCX and PDF documents to HTML in the browser.
 - [Layout Checker](/layout-checker) - HTML and layout inspection.
 - [Layout Slicer](/layout-slicer) - Convert flat JPG/PNG layouts into ordered image slices.
 - [TNC Uploader](/tnc-uploader) - Drop PDF terms and conditions into the server folder structure.
@@ -32,6 +33,7 @@ category: Home
 
 ## Recent Updates
 
+- **Doc to HTML v1.1.0 - 24 August 2026** - Added PDF support (editable text + image modes), Save to Folder with auto nested subfolders (emailblast\MKT\2026\tnc\), Open in New Tab, improved Word styleMap, redesigned full-height A4 preview.
 - **Layout Slicer v0.5.1 - 24 August 2026** - Improved Generate/Export UX with step-based workflow, loading spinner, export summary, save-folder confirmation, per-slice size estimates, and customizable file name prefix.
 - **Campaign Counter v2.0.0, Layout Slicer v0.5.0, TNC Uploader v0.3.9 - 23 August 2026** - Promoted to stable. Removed beta warnings and sidebar beta badges.
 - **Layout Slicer v0.5.0 beta - 23 August 2026** - Full Photoshop-like rulers spanning the canvas wrap with tick-0 aligned to image top-left, exclude-checkbox per slice with sequential renumbering, and numbered canvas overlay badges.
@@ -135,6 +137,6 @@ category: Home
 
 ## System Info
 
-- **Available tools:** `8`
+- **Available tools:** `9`
 - **Deployment:** GitHub Pages and local server
 - **Status:** All tools available

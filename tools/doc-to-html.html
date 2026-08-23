@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Konverter DOCX dan PDF ke HTML yang bekerja langsung di browser.">
+  <meta name="author" content="eDM Helper">
+
+  <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
+  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=1.0.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <title>Doc to HTML - eDM Helper</title>
+</head>
+<body>
+  <main class="d2h-app" id="d2h-app">
+    <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX or PDF file">
+      <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf" hidden>
+      <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+      <strong>Drop DOCX or PDF file here</strong>
+      <span>or click to choose a document</span>
+      <button id="d2h-choose-btn" class="d2h-primary" type="button">
+        <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX / PDF File
+      </button>
+      <small>Max 20 MB - Format .docx / .pdf</small>
+    </div>
+
+    <div id="d2h-filebar" class="d2h-filebar d2h-hidden">
+      <div class="d2h-filebar-left">
+        <span class="d2h-word-icon" id="d2h-file-icon">W</span>
+        <div class="d2h-file-details">
+          <label for="d2h-output-name">Output file name</label>
+          <span class="d2h-file-name-field">
+            <input id="d2h-output-name" type="text" aria-label="Output file name" placeholder="emailblast\MKT\2026\tnc\filename">
+            <span>.html</span>
+          </span>
+        </div>
+        <small id="d2h-file-size"></small>
+      </div>
+      <div class="d2h-filebar-right">
+        <button id="d2h-copy-bottom-btn" class="d2h-mini-button" type="button">
+          <i class="fa-solid fa-clipboard" aria-hidden="true"></i> Copy
+        </button>
+        <button id="d2h-download-btn" class="d2h-secondary" type="button">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Download
+        </button>
+        <button id="d2h-save-btn" class="d2h-primary" type="button">
+          <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Save to Folder
+        </button>
+        <button id="d2h-reset-btn" class="d2h-text-button" type="button">
+          <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Change file
+        </button>
+      </div>
+    </div>
+
+    <div id="d2h-save-path" class="d2h-save-path d2h-hidden"></div>
+
+    <div id="d2h-pdf-mode" class="d2h-pdf-mode d2h-hidden">
+      <div class="d2h-pdf-mode-card">
+        <h3><i class="fa-solid fa-file-pdf" aria-hidden="true"></i> Choose PDF conversion mode</h3>
+        <p>Select how you want to convert this PDF:</p>
+        <div class="d2h-pdf-mode-options">
+          <button id="d2h-pdf-editable" class="d2h-pdf-option" type="button">
+            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+            <strong>Editable Text</strong>
+            <span>Extract text, editable in HTML. Text may differ slightly from original layout.</span>
+          </button>
+          <button id="d2h-pdf-image" class="d2h-pdf-option" type="button">
+            <i class="fa-solid fa-image" aria-hidden="true"></i>
+            <strong>Image (Exact)</strong>
+            <span>Render as images, 100% visually identical. Text not editable.</span>
+          </button>
+        </div>
+        <button id="d2h-pdf-cancel" class="d2h-text-button" type="button">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancel
+        </button>
+      </div>
+    </div>
+
+    <div id="d2h-messages" class="d2h-messages d2h-hidden"></div>
+
+    <div id="d2h-workspace" class="d2h-workspace d2h-hidden">
+      <div class="d2h-view-toggle">
+        <button id="d2h-tab-preview" class="d2h-tab is-active" type="button">
+          <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
+        </button>
+        <button id="d2h-tab-html" class="d2h-tab" type="button">
+          <i class="fa-solid fa-code" aria-hidden="true"></i> HTML
+        </button>
+        <span id="d2h-element-count" class="d2h-tab-meta"></span>
+        <button id="d2h-open-tab" class="d2h-tab-action" type="button" title="Open in new tab">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <section id="d2h-panel-preview" class="d2h-panel">
+        <article id="d2h-preview" class="d2h-preview"></article>
+      </section>
+
+      <section id="d2h-panel-html" class="d2h-panel d2h-hidden">
+        <div class="d2h-panel-head">
+          <div class="d2h-panel-tools">
+            <button id="d2h-copy-btn" class="d2h-mini-button" type="button">
+              <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy HTML
+            </button>
+          </div>
+        </div>
+        <textarea id="d2h-html-output" spellcheck="false" aria-label="HTML output"></textarea>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="../js/version-config.js?v=6.14.5" defer></script>
+  <script src="../js/pages-doc-to-html.js?v=1.0.0" defer></script>
+</body>
+</html>

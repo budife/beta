@@ -6,6 +6,14 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Promoted Campaign Counter, Layout Slicer and TNC Uploader from beta to stable. Removed in-tool beta warnings and sidebar beta badges.
 
+## Doc to HTML v1.1.0 - 24 August 2026
+
+- Added PDF support via PDF.js: two conversion modes - Editable Text (extracts text for copy-paste) and Image (renders pages as images, 100% visually identical). Both modes show a mode selector dialog when a PDF is dropped. Added Save to Folder button using File System Access API with auto-created nested subfolders (emailblast\MKT\2026\tnc\filename.html). Output filename auto-fills with path prefix on document load. Added Open in New Tab button on preview tab bar. Improved mammoth.js styleMap with additional Word style mappings (List Paragraph, Normal, Body Text, Heading 1-6, Block Text, Quote). Preview uses same CSS as downloaded HTML for pixel-perfect rendering. Redesigned layout: filebar separated from preview, full-height preview with A4 paper card on gray background, compact UI.
+
+## Doc to HTML v1.0.0 - 24 August 2026
+
+- New tool: convert DOCX documents to HTML directly in the browser. Features drag-and-drop or file picker, converts headings, paragraphs, lists, tables, links, and images. Side-by-side preview and HTML editor with copy and download. Based on mammoth.js with local processing (no server upload).
+
 ## Layout Slicer v0.5.1 - 24 August 2026
 
 - Improved Generate/Export UX: step-based action bar with numbered workflow badges, loading spinner on Generate slices, and green export summary bar showing slice count, format, width, and total file size after generation. Replaced Download and Save folder with a single Save to folder primary action that shows a confirmation dialog before writing files. Added per-slice file size estimates on slice cards (estimated before generate, actual after). Added customizable file name prefix in the preview toolbar so exported slices can use any prefix instead of the default `img_`.
