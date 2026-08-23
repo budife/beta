@@ -32,6 +32,10 @@ const ROUTES = {
     content: 'database-generator.md',
     label: 'Database Generator'
   },
+  '/doc-to-html': {
+    content: 'doc-to-html.md',
+    label: 'Doc to HTML'
+  },
   '/layout-checker': {
     content: 'layout-checker.md',
     label: 'Layout Checker'
@@ -66,6 +70,7 @@ const LEGACY_PATHS = {
   '/config.html': '/config-edm',
   '/database-checker.html': '/database-checker',
   '/database-generator.html': '/database-generator',
+  '/doc-to-html.html': '/doc-to-html',
   '/layout-checker.html': '/layout-checker',
   '/layout-slicer.html': '/layout-slicer',
   '/tnc-uploader.html': '/tnc-uploader',
@@ -102,6 +107,10 @@ const TOOL_META = {
   '/database-generator': {
     icon: 'fa-solid fa-database',
     label: 'Database Generator'
+  },
+  '/doc-to-html': {
+    icon: 'fa-solid fa-file-word',
+    label: 'Doc to HTML'
   },
   '/layout-checker': {
     icon: 'fa-solid fa-ruler-combined',

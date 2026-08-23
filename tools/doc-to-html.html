@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Konverter DOCX ke HTML yang bekerja langsung di browser.">
+  <meta name="author" content="eDM Helper">
+
+  <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
+  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=1.0.0">
+  <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <title>Doc to HTML - eDM Helper</title>
+</head>
+<body>
+  <main class="d2h-app" id="d2h-app">
+    <section class="d2h-control-panel">
+      <div class="d2h-location-head">
+        <div>
+          <p class="d2h-kicker">Tool</p>
+          <h1><i class="fa-solid fa-file-word" aria-hidden="true"></i> Doc to HTML</h1>
+        </div>
+        <span class="d2h-privacy"><span class="d2h-privacy-dot"></span> Processed locally in browser</span>
+      </div>
+
+      <div class="d2h-workspace">
+        <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX file">
+          <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+          <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+          <strong>Drop DOCX file here</strong>
+          <span>or click to choose a document</span>
+          <button id="d2h-choose-btn" class="d2h-primary" type="button">
+            <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX File
+          </button>
+          <small>Max 20 MB - Format .docx</small>
+        </div>
+
+        <div id="d2h-result" class="d2h-result d2h-hidden">
+          <div class="d2h-filebar">
+            <div>
+              <span class="d2h-word-icon">W</span>
+              <span class="d2h-file-details">
+                <label for="d2h-output-name">Output file name</label>
+                <span class="d2h-file-name-field">
+                  <input id="d2h-output-name" type="text" aria-label="Output file name">
+                  <span>.html</span>
+                </span>
+                <small id="d2h-file-size"></small>
+              </span>
+            </div>
+            <button id="d2h-reset-btn" class="d2h-text-button" type="button">
+              <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Change file
+            </button>
+          </div>
+
+          <div id="d2h-messages" class="d2h-messages d2h-hidden"></div>
+
+          <div class="d2h-result-grid">
+            <section class="d2h-panel">
+              <div class="d2h-panel-head">
+                <h2><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</h2>
+                <span id="d2h-element-count"></span>
+              </div>
+              <article id="d2h-preview" class="d2h-preview"></article>
+            </section>
+            <section class="d2h-panel">
+              <div class="d2h-panel-head">
+                <h2><i class="fa-solid fa-code" aria-hidden="true"></i> HTML</h2>
+                <div class="d2h-panel-tools">
+                  <button id="d2h-copy-btn" class="d2h-mini-button" type="button">
+                    <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy HTML
+                  </button>
+                </div>
+              </div>
+              <textarea id="d2h-html-output" spellcheck="false" aria-label="HTML output"></textarea>
+            </section>
+          </div>
+
+          <div class="d2h-actions">
+            <button id="d2h-download-btn" class="d2h-primary" type="button">
+              <i class="fa-solid fa-download" aria-hidden="true"></i> Download HTML
+            </button>
+            <button id="d2h-copy-bottom-btn" class="d2h-secondary" type="button">
+              <i class="fa-solid fa-clipboard" aria-hidden="true"></i> Copy to clipboard
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="../js/version-config.js?v=6.14.5" defer></script>
+  <script src="../js/pages-doc-to-html.js?v=1.0.0" defer></script>
+</body>
+</html>
