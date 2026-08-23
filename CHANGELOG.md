@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v2.0.0, Layout Slicer v0.5.0, TNC Uploader v0.3.9 - 23 August 2026
+
+- Promoted Campaign Counter, Layout Slicer and TNC Uploader from beta to stable. Removed in-tool beta warnings and sidebar beta badges.
+
 ## Campaign Counter v2.0.0 beta - 21 August 2026
 
 - Made Supabase the single source of truth for the counter. Generate atomically increments a server-side `campaign_counter` row (+1) and Back atomically decrements it (-1) through dedicated RPCs, so concurrent users can never produce duplicate IDs. The UI updates only after Supabase returns the new value, and Supabase Realtime broadcasts the change so every open tab updates instantly without a refresh.
