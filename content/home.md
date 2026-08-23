@@ -33,6 +33,7 @@ category: Home
 ## Recent Updates
 
 - **Campaign Counter v2.0.0, Layout Slicer v0.5.0, TNC Uploader v0.3.9 - 23 August 2026** - Promoted to stable. Removed beta warnings and sidebar beta badges.
+- **Layout Slicer v0.5.0 beta - 23 August 2026** - Full Photoshop-like rulers spanning the canvas wrap with tick-0 aligned to image top-left, exclude-checkbox per slice with sequential renumbering, and numbered canvas overlay badges.
 - **Campaign Counter v2.0.0 beta - 21 August 2026** - Made Supabase the single source of truth for the counter: Generate and Back atomically increment or decrement a server-side counter row via RPC, the UI updates only after Supabase confirms the new ID, and Supabase Realtime keeps every open tab in sync instantly.
 - **Campaign Counter v1.9.0 beta - 20 August 2026** - Rewrote navigation to simple local counter: Generate = current ID + 1, Back = current ID - 1; current displayed ID is now the single source of truth, no Supabase round-trip on every click.
 - **Campaign Counter v1.8.8 beta - 20 August 2026** - Fixed generate to use server-side `generate_campaign_id` RPC so the next ID is always calculated from the latest registry state, preventing stale local counter issues when multiple users generate.
