@@ -667,15 +667,32 @@ function setActiveLink(path) {
   });
 }
 
+const recentUpdateDates = new Map();
+
+function parseRecentUpdateDates(markdown) {
+  const lines = markdown.split('\n');
+  let inRecentUpdates = false;
+  for (const line of lines) {
+    if (/^##\s+Recent Updates/i.test(line)) { inRecentUpdates = true; continue; }
+    if (inRecentUpdates && /^##\s/.test(line)) break;
+    if (!inRecentUpdates) continue;
+    const match = line.match(/\*\*(.+?)\s+v[\d.]+.*?-\s+(\d{1,2}\s+\w+\s+\d{4})\*\*/i);
+    if (!match) continue;
+    const toolName = match[1].trim();
+    const date = parseUpdateDate(match[2]);
+    if (date) recentUpdateDates.set(toolName.toLowerCase(), date);
+  }
+}
+
 function applySidebarBadges() {
-  if (typeof TOOL_VERSIONS === 'undefined') return;
   document.querySelectorAll('.sidebar-link[data-route]').forEach((link) => {
+    const existing = link.querySelector('.sidebar-new-badge');
+    if (existing) existing.remove();
     const routePath = link.getAttribute('href');
-    const tool = TOOL_VERSIONS[routePath];
-    if (!tool?.updated) return;
-    const updatedDate = new Date(tool.updated);
-    if (!isWithinRecentDays(updatedDate)) return;
-    if (link.querySelector('.sidebar-new-badge')) return;
+    const meta = TOOL_META[routePath];
+    if (!meta) return;
+    const date = recentUpdateDates.get(meta.label.toLowerCase());
+    if (!date || !isWithinRecentDays(date)) return;
     const badge = document.createElement('span');
     badge.className = 'sidebar-new-badge';
     badge.textContent = 'new';
@@ -885,6 +902,7 @@ function renderPage(path, route, markdown) {
     if (isHome) {
       markdownContainer.classList.add('home-dashboard');
       enhanceHomeDashboard(markdownContainer);
+      applySidebarBadges();
     }
     if (path === '/maintenance') {
       markdownContainer.classList.add('docs-content');
@@ -1030,7 +1048,13 @@ backdrop.addEventListener('click', closeSidebar);
 document.getElementById('footer-year').textContent = '2025';
 
 configureRouteLinks();
-applySidebarBadges();
+
+const homeContentUrl = `${BASE_PATH}/content/home.md`;
+fetch(homeContentUrl, { cache: 'no-cache' })
+  .then((res) => res.ok ? res.text() : '')
+  .then((md) => { parseRecentUpdateDates(md); applySidebarBadges(); })
+  .catch(() => applySidebarBadges());
+
 viewport.replaceChildren();
 
 const initialPath = getCurrentPath();
