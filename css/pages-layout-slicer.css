@@ -1124,19 +1124,15 @@ select {
 
 .slicer-canvas-wrap {
   position: relative;
+  display: flex;
+  align-items: safe center;
+  justify-content: safe center;
   min-height: 360px;
-  padding: 32px 0 0 32px;
+  padding: 72px 40px 40px 72px;
   margin-top: 16px;
   overflow: auto;
-  background:
-    linear-gradient(45deg, #f3f4f6 25%, transparent 25%),
-    linear-gradient(-45deg, #f3f4f6 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #f3f4f6 75%),
-    linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
-  background-color: #fff;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
-  background-size: 20px 20px;
-  border: 1px solid var(--border, #e5e7eb);
+  background-color: #3b3b3b;
+  border: 1px solid #2a2a2a;
 }
 
 .slicer-ruler-corner {
@@ -1146,9 +1142,9 @@ select {
   z-index: 6;
   width: 32px;
   height: 32px;
-  background: #f7f7f8;
-  border-right: 1px solid var(--border, #d8dde5);
-  border-bottom: 1px solid var(--border, #d8dde5);
+  background: #4a4a4a;
+  border-right: 1px solid #5a5a5a;
+  border-bottom: 1px solid #5a5a5a;
 }
 
 .slicer-ruler {
@@ -1156,57 +1152,74 @@ select {
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
-  background: #fafafa;
+  background: #4a4a4a;
 }
 
 .slicer-ruler-top {
   top: 0;
-  left: 32px;
+  left: 0;
+  right: 0;
+  width: auto;
   height: 32px;
-  border-bottom: 1px solid var(--border, #d8dde5);
+  border-bottom: 1px solid #5a5a5a;
 }
 
 .slicer-ruler-left {
-  top: 32px;
+  top: 0;
   left: 0;
+  bottom: 0;
   width: 32px;
-  border-right: 1px solid var(--border, #d8dde5);
+  height: auto;
+  border-right: 1px solid #5a5a5a;
 }
 
 .slicer-ruler-tick {
   position: absolute;
-  color: #9ca3af;
+  color: #a3a3a3;
   font-family: Consolas, "Courier New", monospace;
   font-size: 10px;
   line-height: 1;
 }
 
 .slicer-ruler-top .slicer-ruler-tick {
-  bottom: 0;
-  height: 7px;
-  padding-top: 11px;
-  border-left: 1px solid #d8dde5;
+  top: 0;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  transform: translateX(-50%);
+}
+
+.slicer-ruler-top .slicer-ruler-tick::before {
+  display: block;
+  width: 1px;
+  height: 8px;
+  margin: 0 auto 3px;
+  content: "";
+  background: #6b6b6b;
 }
 
 .slicer-ruler-top .slicer-ruler-tick.is-major {
-  height: 14px;
-  color: #374151;
-  border-left-color: #9ca3af;
+  color: #d4d4d4;
+}
+
+.slicer-ruler-top .slicer-ruler-tick.is-major::before {
+  height: 13px;
+  background: #8a8a8a;
 }
 
 .slicer-ruler-left .slicer-ruler-tick {
   right: 0;
   width: 7px;
   padding-top: 2px;
-  border-top: 1px solid #d8dde5;
+  border-top: 1px solid #6b6b6b;
 }
 
 .slicer-ruler-left .slicer-ruler-tick.is-major {
   right: 0;
   width: 28px;
-  color: #374151;
+  color: #d4d4d4;
   text-align: left;
-  border-top-color: #9ca3af;
+  border-top-color: #8a8a8a;
   transform: translateY(-5px);
 }
 
@@ -1225,13 +1238,14 @@ select {
 .slicer-guides {
   position: absolute;
   inset: 0;
+  z-index: 7;
   pointer-events: none;
 }
 
 .slicer-guide {
   position: absolute;
-  right: 0;
   left: 0;
+  right: 0;
   height: 0;
   border-top: 1px solid #00a3ff;
   cursor: row-resize;
@@ -1241,8 +1255,8 @@ select {
 .slicer-guide::before {
   position: absolute;
   top: -8px;
-  left: -28px;
-  width: 24px;
+  left: 4px;
+  width: 26px;
   height: 16px;
   color: #fff;
   font-family: Consolas, "Courier New", monospace;
@@ -1260,6 +1274,34 @@ select {
   width: 100%;
   height: 8px;
   content: "";
+}
+
+.slicer-slice-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.slicer-slice-label {
+  position: absolute;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  background: #f3838b;
+  border-radius: 4px;
+  font: 600 11px Consolas, "Courier New", monospace;
+  transform: translateY(-50%);
+  opacity: .9;
+}
+
+.slicer-slice-label.is-excluded {
+  color: #6b7280;
+  background: #d1d5db;
+  text-decoration: line-through;
 }
 
 .slicer-empty {
@@ -1289,6 +1331,28 @@ select {
   padding: 12px;
   border: 1px solid var(--border, #e5e7eb);
   border-left: 3px solid var(--accent-primary, #f3838b);
+}
+
+.slicer-slice-card.is-excluded {
+  border-left-color: #9ca3af;
+  opacity: .55;
+}
+
+.slicer-slice-card.is-excluded .slicer-slice-title {
+  text-decoration: line-through;
+}
+
+.slicer-slice-include {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center;
+}
+
+.slicer-slice-include input {
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
 
 .slicer-slice-card + .slicer-slice-card {

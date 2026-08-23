@@ -7,6 +7,7 @@
     lines: [],
     draggingLine: null,
     slices: [],
+    excluded: [],
     generated: null,
     templateDir: null,
     campaignParentDir: null,
@@ -72,11 +73,13 @@
     imageMeta: document.getElementById('image-meta'),
     sliceCount: document.getElementById('slice-count'),
     canvasWrap: document.getElementById('canvas-wrap'),
+    rulerCorner: document.querySelector('.slicer-ruler-corner'),
     rulerTop: document.getElementById('ruler-top'),
     rulerLeft: document.getElementById('ruler-left'),
     stage: document.getElementById('slicer-stage'),
     canvas: document.getElementById('source-canvas'),
     guideLayer: document.getElementById('guide-layer'),
+    sliceLabelLayer: document.getElementById('slice-label-layer'),
     canvasEmpty: document.getElementById('canvas-empty'),
     zoomOut: document.getElementById('zoom-out'),
     zoomIn: document.getElementById('zoom-in'),
@@ -431,10 +434,10 @@
     els.canvas.style.height = `${scaledHeight}px`;
     els.stage.style.width = `${scaledWidth}px`;
     els.stage.style.height = `${scaledHeight}px`;
-    els.guideLayer.style.width = `${scaledWidth}px`;
-    els.guideLayer.style.height = `${scaledHeight}px`;
-    els.rulerTop.style.width = `${scaledWidth}px`;
-    els.rulerLeft.style.height = `${scaledHeight}px`;
+    if (els.sliceLabelLayer) {
+      els.sliceLabelLayer.style.width = `${scaledWidth}px`;
+      els.sliceLabelLayer.style.height = `${scaledHeight}px`;
+    }
     els.zoomLevel.value = state.zoomMode === 'fit' ? 'fit' : String(state.zoom);
   }
 
@@ -462,10 +465,12 @@
 
   function preserveSliceLinks(ranges) {
     const oldLinks = state.slices.map((slice) => slice.link || '');
+    const oldExcluded = state.excluded;
     state.slices = ranges.map((range, index) => ({
       ...range,
       link: oldLinks[index] || range.link || ''
     }));
+    state.excluded = ranges.map((range, index) => Boolean(oldExcluded[index]));
   }
 
   function drawCanvas() {
@@ -488,14 +493,20 @@
     if (!state.image) {
       els.rulerTop.innerHTML = '';
       els.rulerLeft.innerHTML = '';
-      els.rulerTop.style.width = '0px';
-      els.rulerLeft.style.height = '0px';
       return;
     }
 
     applyZoom();
-    els.rulerTop.innerHTML = buildRulerTicks(state.image.naturalWidth, 'x');
-    els.rulerLeft.innerHTML = buildRulerTicks(state.image.naturalHeight, 'y');
+    els.rulerTop.style.width = '';
+    els.rulerTop.style.height = '';
+    els.rulerLeft.style.width = '';
+    els.rulerLeft.style.height = '';
+    const wrapRect = els.canvasWrap.getBoundingClientRect();
+    const canvasRect = els.canvas.getBoundingClientRect();
+    const xOffset = canvasRect.left - wrapRect.left;
+    const yOffset = canvasRect.top - wrapRect.top;
+    els.rulerTop.innerHTML = buildRulerTicks(state.image.naturalWidth, 'x', xOffset);
+    els.rulerLeft.innerHTML = buildRulerTicks(state.image.naturalHeight, 'y', yOffset);
   }
 
   function getNiceRulerStep(rawStep) {
@@ -503,7 +514,7 @@
     return steps.find((step) => step >= rawStep) || 5000;
   }
 
-  function buildRulerTicks(length, axis) {
+  function buildRulerTicks(length, axis, offset = 0) {
     const ticks = [];
     const displayScale = getDisplayScale();
     const majorStep = getNiceRulerStep(72 / Math.max(displayScale, 0.01));
@@ -514,8 +525,8 @@
       const major = rounded % majorStep === 0;
       const label = major ? rounded : '';
       const style = axis === 'x'
-        ? `left:${rounded * displayScale}px;`
-        : `top:${rounded * displayScale}px;`;
+        ? `left:${offset + rounded * displayScale}px;`
+        : `top:${offset + rounded * displayScale}px;`;
       ticks.push(`<span class="slicer-ruler-tick${major ? ' is-major' : ''}" style="${style}">${label}</span>`);
     }
     return ticks.join('');
@@ -526,8 +537,11 @@
       els.guideLayer.innerHTML = '';
       return;
     }
+    const wrapRect = els.canvasWrap.getBoundingClientRect();
+    const stageRect = els.stage.getBoundingClientRect();
+    const offsetY = stageRect.top - wrapRect.top;
     els.guideLayer.innerHTML = state.lines.map((line, index) => (
-      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${line * getDisplayScale()}px"></div>`
+      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${offsetY + line * getDisplayScale()}px"></div>`
     )).join('');
   }
 
@@ -569,24 +583,49 @@
   function renderImageSlices() {
     const ranges = getSliceRanges();
     preserveSliceLinks(ranges);
-    els.sliceCount.textContent = `${state.slices.length} slice${state.slices.length === 1 ? '' : 's'}`;
+    const excludedCount = state.excluded.filter(Boolean).length;
+    els.sliceCount.textContent = `${state.slices.length} slice${state.slices.length === 1 ? '' : 's'}${excludedCount ? ` · ${excludedCount} excluded` : ''}`;
 
     if (!state.image) {
       els.sliceList.innerHTML = '<p class="slicer-muted">Slices will appear after you load an image.</p>';
       return;
     }
 
-    els.sliceList.innerHTML = state.slices.map((slice, index) => `
-      <article class="slicer-slice-card">
+    let exportIndex = 0;
+    els.sliceList.innerHTML = state.slices.map((slice, index) => {
+      const excluded = state.excluded[index];
+      const exportNumber = excluded ? null : (exportIndex += 1);
+      const exportFileName = excluded ? slice.fileName : formatFileName(exportNumber - 1);
+      return `
+      <article class="slicer-slice-card${excluded ? ' is-excluded' : ''}">
         <div class="slicer-slice-head">
           <div>
-            <div class="slicer-slice-title">${slice.fileName}</div>
+            <div class="slicer-slice-title">${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</div>
             <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
             <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px</div>
           </div>
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
+        <label class="slicer-slice-include">
+          <span>Include in export</span>
+          <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
+        </label>
       </article>
+    `;
+    }).join('');
+  }
+
+  function renderSliceLabels() {
+    if (!state.image || !els.sliceLabelLayer) {
+      if (els.sliceLabelLayer) els.sliceLabelLayer.innerHTML = '';
+      return;
+    }
+    const displayScale = getDisplayScale();
+    els.sliceLabelLayer.innerHTML = state.slices.map((slice, index) => `
+      <div class="slicer-slice-label${state.excluded[index] ? ' is-excluded' : ''}" data-slice-label="${index}"
+           style="top:${(slice.top + slice.height / 2) * displayScale}px">
+        ${index + 1}
+      </div>
     `).join('');
   }
 
@@ -595,6 +634,7 @@
     renderRulers();
     renderGuides();
     renderImageSlices();
+    renderSliceLabels();
     renderImageMeta();
     const hasImage = Boolean(state.image);
     els.autoSlice.disabled = !hasImage;
@@ -728,15 +768,21 @@
     if (!state.image) return;
     const type = els.imageFormat.value;
     const generatedSlices = [];
+    let skipped = 0;
 
-    for (const slice of state.slices) {
+    for (let index = 0; index < state.slices.length; index += 1) {
+      const slice = state.slices[index];
+      if (state.excluded[index]) {
+        skipped += 1;
+        continue;
+      }
       const canvas = createSliceCanvas(slice);
       const blob = await canvasToBlob(canvas, type);
-      generatedSlices.push({ ...slice, blob });
+      generatedSlices.push({ ...slice, fileName: formatFileName(generatedSlices.length), blob });
     }
 
     state.generated = { slices: generatedSlices };
-    setStatus(`Generated ${generatedSlices.length} image slice(s) at ${getExportWidth()}px export width.`, 'success');
+    setStatus(`Generated ${generatedSlices.length} image slice(s) at ${getExportWidth()}px export width${skipped ? ` · ${skipped} excluded` : ''}.`, 'success');
     updateUi();
   }
 
@@ -1221,6 +1267,15 @@
     const index = Number(button.dataset.removeLine);
     state.lines.splice(index, 1);
     state.lines = normalizeLines(state.lines);
+    state.generated = null;
+    updateUi();
+  });
+  els.sliceList.addEventListener('change', (event) => {
+    const checkbox = event.target.closest('[data-slice-include]');
+    if (!checkbox) return;
+    const index = Number(checkbox.dataset.sliceInclude);
+    if (state.excluded[index] === undefined) return;
+    state.excluded[index] = !checkbox.checked;
     state.generated = null;
     updateUi();
   });
