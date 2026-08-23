@@ -34,6 +34,8 @@ textarea {
   background: #fff;
   border: 1px solid var(--border, #e5e7eb);
   border-width: 0 0 1px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .d2h-location-head {
@@ -85,6 +87,7 @@ textarea {
 
 .d2h-workspace {
   max-width: 1200px;
+  margin: 0 auto;
 }
 
 .d2h-dropzone {
