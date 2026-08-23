@@ -1128,7 +1128,7 @@ select {
   align-items: safe center;
   justify-content: safe center;
   min-height: 360px;
-  padding: 32px 0 0 32px;
+  padding: 72px 40px 40px 72px;
   margin-top: 16px;
   overflow: auto;
   background-color: #3b3b3b;
@@ -1137,8 +1137,8 @@ select {
 
 .slicer-ruler-corner {
   position: absolute;
-  top: -32px;
-  left: -32px;
+  top: 0;
+  left: 0;
   z-index: 6;
   width: 32px;
   height: 32px;
@@ -1156,16 +1156,20 @@ select {
 }
 
 .slicer-ruler-top {
-  top: -32px;
+  top: 0;
   left: 0;
+  right: 0;
+  width: auto;
   height: 32px;
   border-bottom: 1px solid #5a5a5a;
 }
 
 .slicer-ruler-left {
   top: 0;
-  left: -32px;
+  left: 0;
+  bottom: 0;
   width: 32px;
+  height: auto;
   border-right: 1px solid #5a5a5a;
 }
 

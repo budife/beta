@@ -73,13 +73,13 @@
     imageMeta: document.getElementById('image-meta'),
     sliceCount: document.getElementById('slice-count'),
     canvasWrap: document.getElementById('canvas-wrap'),
+    rulerCorner: document.querySelector('.slicer-ruler-corner'),
     rulerTop: document.getElementById('ruler-top'),
     rulerLeft: document.getElementById('ruler-left'),
     stage: document.getElementById('slicer-stage'),
     canvas: document.getElementById('source-canvas'),
     guideLayer: document.getElementById('guide-layer'),
     sliceLabelLayer: document.getElementById('slice-label-layer'),
-    rulerCorner: document.querySelector('.slicer-ruler-corner'),
     canvasEmpty: document.getElementById('canvas-empty'),
     zoomOut: document.getElementById('zoom-out'),
     zoomIn: document.getElementById('zoom-in'),
@@ -438,26 +438,7 @@
       els.sliceLabelLayer.style.width = `${scaledWidth}px`;
       els.sliceLabelLayer.style.height = `${scaledHeight}px`;
     }
-    els.rulerTop.style.width = `${scaledWidth}px`;
-    els.rulerLeft.style.height = `${scaledHeight}px`;
-    syncRulerPositions();
     els.zoomLevel.value = state.zoomMode === 'fit' ? 'fit' : String(state.zoom);
-  }
-
-  function syncRulerPositions() {
-    if (!state.image) return;
-    const wrapRect = els.canvasWrap.getBoundingClientRect();
-    const stageRect = els.stage.getBoundingClientRect();
-    const left = stageRect.left - wrapRect.left - 32;
-    const top = stageRect.top - wrapRect.top - 32;
-    if (els.rulerCorner) {
-      els.rulerCorner.style.left = `${left}px`;
-      els.rulerCorner.style.top = `${top}px`;
-    }
-    els.rulerTop.style.left = `${left + 32}px`;
-    els.rulerTop.style.top = `${top}px`;
-    els.rulerLeft.style.left = `${left}px`;
-    els.rulerLeft.style.top = `${top + 32}px`;
   }
 
   function normalizeLines(lines) {
@@ -518,8 +499,12 @@
     }
 
     applyZoom();
-    els.rulerTop.innerHTML = buildRulerTicks(state.image.naturalWidth, 'x');
-    els.rulerLeft.innerHTML = buildRulerTicks(state.image.naturalHeight, 'y');
+    const wrapRect = els.canvasWrap.getBoundingClientRect();
+    const canvasRect = els.canvas.getBoundingClientRect();
+    const xOffset = canvasRect.left - wrapRect.left;
+    const yOffset = canvasRect.top - wrapRect.top;
+    els.rulerTop.innerHTML = buildRulerTicks(state.image.naturalWidth, 'x', xOffset);
+    els.rulerLeft.innerHTML = buildRulerTicks(state.image.naturalHeight, 'y', yOffset);
   }
 
   function getNiceRulerStep(rawStep) {
@@ -527,7 +512,7 @@
     return steps.find((step) => step >= rawStep) || 5000;
   }
 
-  function buildRulerTicks(length, axis) {
+  function buildRulerTicks(length, axis, offset = 0) {
     const ticks = [];
     const displayScale = getDisplayScale();
     const majorStep = getNiceRulerStep(72 / Math.max(displayScale, 0.01));
@@ -538,8 +523,8 @@
       const major = rounded % majorStep === 0;
       const label = major ? rounded : '';
       const style = axis === 'x'
-        ? `left:${rounded * displayScale}px;`
-        : `top:${rounded * displayScale}px;`;
+        ? `left:${offset + rounded * displayScale}px;`
+        : `top:${offset + rounded * displayScale}px;`;
       ticks.push(`<span class="slicer-ruler-tick${major ? ' is-major' : ''}" style="${style}">${label}</span>`);
     }
     return ticks.join('');
