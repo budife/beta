@@ -692,7 +692,7 @@
 
     const normalizedHtml = normalizeNumbering(conversion.value, tableHeaderStyles, leadingTitleBreakCount);
     currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
-    const pathPrefix = 'MKT\\2026\\tnc\\';
+    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'W';
@@ -747,7 +747,7 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const pathPrefix = 'MKT\\2026\\tnc\\';
+    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
@@ -785,7 +785,7 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const pathPrefix = 'MKT\\2026\\tnc\\';
+    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
