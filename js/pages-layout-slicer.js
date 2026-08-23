@@ -86,7 +86,11 @@
     zoomLevel: document.getElementById('zoom-level'),
     sliceList: document.getElementById('slice-list'),
     downloadImages: document.getElementById('download-images'),
-    saveFolder: document.getElementById('save-folder')
+    saveFolder: document.getElementById('save-folder'),
+    exportSummary: document.getElementById('export-summary'),
+    exportSummaryText: document.getElementById('export-summary-text'),
+    generateBtnLabel: document.querySelector('#generate-output .slicer-btn-label'),
+    generateBtnLoading: document.querySelector('#generate-output .slicer-btn-loading')
   };
 
   const ctx = els.canvas.getContext('2d');
@@ -371,6 +375,24 @@
     return `${Math.round(bytes / 1024)} KB`;
   }
 
+  function estimateSliceSize(slice) {
+    if (!state.image) return '';
+    const exportScale = getExportScale();
+    const w = Math.max(1, Math.round(state.image.naturalWidth * exportScale));
+    const h = Math.max(1, Math.round(slice.height * exportScale));
+    const pixels = w * h;
+    const isPng = els.imageFormat.value === 'image/png';
+    const bytes = isPng ? pixels * 3 : Math.round(pixels * 0.15 * getImageQuality());
+    return formatFileSize(bytes);
+  }
+
+  function getSliceSizeLabel(index) {
+    const generated = state.generated?.slices?.[index];
+    if (generated?.blob) return formatFileSize(generated.blob.size);
+    const slice = state.slices[index];
+    return slice ? `~${estimateSliceSize(slice)}` : '';
+  }
+
   function getQualityLabel() {
     return els.imageQuality?.selectedOptions?.[0]?.text || 'Very high';
   }
@@ -596,13 +618,14 @@
       const excluded = state.excluded[index];
       const exportNumber = excluded ? null : (exportIndex += 1);
       const exportFileName = excluded ? slice.fileName : formatFileName(exportNumber - 1);
+      const sizeLabel = getSliceSizeLabel(index);
       return `
       <article class="slicer-slice-card${excluded ? ' is-excluded' : ''}">
         <div class="slicer-slice-head">
           <div>
             <div class="slicer-slice-title">${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</div>
             <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
-            <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px</div>
+            <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
           </div>
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
@@ -664,6 +687,7 @@
       state.generated = null;
       state.zoomMode = 'fit';
       state.zoom = getFitZoom();
+      if (els.exportSummary) els.exportSummary.hidden = true;
       if (els.exportWidth) els.exportWidth.value = image.naturalWidth;
       setStatus(`Image loaded at ${image.naturalWidth}px wide. Click the preview to add slice lines.`, 'success');
       updateUi();
@@ -722,6 +746,7 @@
   function addLine(y) {
     state.lines = normalizeLines([...state.lines, y]);
     state.generated = null;
+    if (els.exportSummary) els.exportSummary.hidden = true;
     updateUi();
   }
 
@@ -734,6 +759,7 @@
     }
     state.lines = normalizeLines(lines);
     state.generated = null;
+    if (els.exportSummary) els.exportSummary.hidden = true;
     setStatus(`Created ${state.lines.length} automatic slice line(s). Adjust if needed.`, 'success');
     updateUi();
   }
@@ -767,6 +793,12 @@
   async function generateOutput() {
     if (!state.image) return;
     const type = els.imageFormat.value;
+
+    if (els.generateBtnLabel) els.generateBtnLabel.hidden = true;
+    if (els.generateBtnLoading) els.generateBtnLoading.hidden = false;
+    els.generateOutput.disabled = true;
+
+    await nextPaint();
     const generatedSlices = [];
     let skipped = 0;
 
@@ -782,7 +814,20 @@
     }
 
     state.generated = { slices: generatedSlices };
+    if (els.generateBtnLabel) els.generateBtnLabel.hidden = false;
+    if (els.generateBtnLoading) els.generateBtnLoading.hidden = true;
+    els.generateOutput.disabled = false;
+
+    const totalSize = generatedSlices.reduce((sum, s) => sum + (s.blob?.size || 0), 0);
+    const sizeLabel = formatFileSize(totalSize);
     setStatus(`Generated ${generatedSlices.length} image slice(s) at ${getExportWidth()}px export width${skipped ? ` · ${skipped} excluded` : ''}.`, 'success');
+
+    if (els.exportSummary && els.exportSummaryText) {
+      const ext = getExtension().toUpperCase();
+      els.exportSummaryText.textContent = `${generatedSlices.length} slice(s) ready · ${ext} · ${getExportWidth()}px wide · ${sizeLabel || 'done'}`;
+      els.exportSummary.hidden = false;
+    }
+
     updateUi();
   }
 
@@ -813,12 +858,20 @@
 
   async function saveToFolder() {
     if (!state.generated || typeof window.showDirectoryPicker !== 'function') return;
+    const count = state.generated.slices.length;
+    const ext = getExtension().toUpperCase();
+    const totalSize = state.generated.slices.reduce((sum, s) => sum + (s.blob?.size || 0), 0);
+    const sizeLabel = formatFileSize(totalSize);
+    const confirmed = window.confirm(
+      `Save ${count} ${ext} slice(s) to a folder?${sizeLabel ? `\nEstimated total size: ${sizeLabel}` : ''}`
+    );
+    if (!confirmed) return;
     const root = await window.showDirectoryPicker({ mode: 'readwrite' });
     const assetDir = await root.getDirectoryHandle(getAssetsFolder(), { create: true });
     for (const slice of state.generated.slices) {
       await writeFile(assetDir, slice.fileName, slice.blob);
     }
-    setStatus(`Saved ${state.generated.slices.length} image(s) to ${getAssetsFolder()}.`, 'success');
+    setStatus(`Saved ${count} image(s) to ${getAssetsFolder()}.`, 'success');
   }
 
   async function writeFile(dirHandle, name, content) {
@@ -1239,6 +1292,7 @@
   els.clearLines.addEventListener('click', () => {
     state.lines = [];
     state.generated = null;
+    if (els.exportSummary) els.exportSummary.hidden = true;
     setStatus('Slice lines cleared.', 'success');
     updateUi();
   });
