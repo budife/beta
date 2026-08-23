@@ -433,8 +433,6 @@
     els.canvas.style.height = `${scaledHeight}px`;
     els.stage.style.width = `${scaledWidth}px`;
     els.stage.style.height = `${scaledHeight}px`;
-    els.guideLayer.style.width = `${scaledWidth}px`;
-    els.guideLayer.style.height = `${scaledHeight}px`;
     if (els.sliceLabelLayer) {
       els.sliceLabelLayer.style.width = `${scaledWidth}px`;
       els.sliceLabelLayer.style.height = `${scaledHeight}px`;
@@ -534,8 +532,11 @@
       els.guideLayer.innerHTML = '';
       return;
     }
+    const wrapRect = els.canvasWrap.getBoundingClientRect();
+    const stageRect = els.stage.getBoundingClientRect();
+    const offsetY = stageRect.top - wrapRect.top;
     els.guideLayer.innerHTML = state.lines.map((line, index) => (
-      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${line * getDisplayScale()}px"></div>`
+      `<div class="slicer-guide" data-guide-index="${index}" data-y="${line}" style="top:${offsetY + line * getDisplayScale()}px"></div>`
     )).join('');
   }
 

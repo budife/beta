@@ -1233,8 +1233,8 @@ select {
 
 .slicer-guide {
   position: absolute;
-  right: -40px;
-  left: -40px;
+  left: 0;
+  right: 0;
   height: 0;
   border-top: 1px solid #00a3ff;
   cursor: row-resize;
