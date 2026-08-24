@@ -256,6 +256,11 @@
     return sanitized || 'document';
   }
 
+  function extractFileName(path) {
+    if (!path) return '';
+    return path.split(/[\\/]/).pop().trim();
+  }
+
   function formatBytes(bytes) {
     return bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
   }
@@ -642,7 +647,7 @@
     els.dropzone.classList.toggle('busy', busy);
     els.chooseBtn.innerHTML = busy
       ? '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Converting...'
-      : '<i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX / PDF File';
+      : 'browse from folder';
   }
 
   function renderPreview(html) {
@@ -693,7 +698,8 @@
 
     const normalizedHtml = normalizeNumbering(conversion.value, tableHeaderStyles, leadingTitleBreakCount);
     currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
-    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
+    const year = new Date().getFullYear();
+    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'W';
@@ -748,7 +754,8 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
+    const year = new Date().getFullYear();
+    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
@@ -786,7 +793,8 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
+    const year = new Date().getFullYear();
+    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
@@ -856,7 +864,8 @@
       // Parse path: split by \ or /
       const parts = fullPathInput.split(/[\\/]/).filter(Boolean);
       if (parts.length < 2) {
-        alert('Please enter full path like: emailblast\\MKT\\2026\\tnc\\filename');
+        const year = new Date().getFullYear();
+        alert(`Please enter full path like: emailblast\\MKT\\${year}\\tnc\\filename`);
         return;
       }
 
@@ -959,11 +968,10 @@
   els.outputFileName.addEventListener('input', (event) => {
     const normalized = normalizeFileNameCharacters(event.currentTarget.value);
     event.currentTarget.value = normalized;
-    currentFileName = normalized || 'document';
+    currentFileName = extractFileName(normalized) || 'document';
   });
   els.outputFileName.addEventListener('blur', (event) => {
-    currentFileName = sanitizeFileName(event.currentTarget.value);
-    event.currentTarget.value = currentFileName;
+    currentFileName = extractFileName(sanitizeFileName(event.currentTarget.value)) || 'document';
   });
   els.htmlOutput.addEventListener('input', () => {
     renderPreview(els.htmlOutput.value);

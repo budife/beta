@@ -6,6 +6,7 @@ html,
 body {
   height: 100%;
   margin: 0;
+  overflow: hidden;
   color: var(--text, #111827);
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
@@ -84,28 +85,35 @@ textarea {
 /* ── Dropzone ─────────────────────────────────────── */
 
 .d2h-dropzone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   margin: 24px 24px 0;
-  min-height: 240px;
-  padding: 32px;
-  color: var(--text-muted, #6b7280);
-  text-align: center;
-  border: 1.5px dashed var(--border, #d8dde5);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, .6);
+  padding: 6px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
   cursor: pointer;
   transition: .2s ease;
 }
 
-.d2h-dropzone:hover,
-.d2h-dropzone.dragging {
-  color: var(--accent-primary, #f3838b);
-  border-color: var(--accent-primary, #f3838b);
-  background: var(--ui-accent-soft, #fff1f2);
+.d2h-dropzone-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 280px;
+  padding: 40px 32px;
+  text-align: center;
+  border: 2px dashed var(--accent-primary, #f3838b);
+  border-radius: 12px;
+  background: #fff;
+  transition: .2s ease;
+}
+
+.d2h-dropzone:hover .d2h-dropzone-inner,
+.d2h-dropzone.dragging .d2h-dropzone-inner {
+  background: #fff8f8;
+  border-style: solid;
+  border-color: var(--accent-hover, #b8323d);
+  box-shadow: 0 8px 30px rgba(179, 50, 61, .1);
 }
 
 .d2h-dropzone.busy {
@@ -113,29 +121,71 @@ textarea {
   pointer-events: none;
 }
 
-.d2h-dropzone i {
-  margin-bottom: 12px;
-  color: var(--accent-primary, #f3838b);
-  font-size: 36px;
+.d2h-dropzone-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.d2h-doc-icon,
+.d2h-pdf-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 60px;
+  border-radius: 6px;
+  font-size: 22px;
+  color: #fff;
+}
+
+.d2h-doc-icon {
+  background: #2b579a;
+}
+
+.d2h-pdf-icon {
+  background: #db0011;
+}
+
+.d2h-plus {
+  color: var(--text-muted, #9ca3af);
+  font-size: 14px;
 }
 
 .d2h-dropzone strong {
-  display: block;
-  margin-bottom: 6px;
   color: var(--text, #111827);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
 }
 
-.d2h-dropzone span {
-  margin-bottom: 16px;
+.d2h-dropzone-sub {
   color: var(--text-muted, #6b7280);
+  font-size: 14px;
 }
 
 .d2h-dropzone small {
-  margin-top: 12px;
-  color: var(--text-muted, #9ca3af);
+  margin-top: 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: var(--text-muted, #6b7280);
   font-size: 12px;
+  font-weight: 500;
+}
+
+.d2h-text-link {
+  padding: 0;
+  color: var(--accent-primary, #f3838b);
+  background: none;
+  border: 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.d2h-text-link:hover {
+  color: var(--accent-hover, #b8323d);
 }
 
 /* ── Buttons ──────────────────────────────────────── */
@@ -210,6 +260,8 @@ textarea {
   background: #f7f7f8;
   border-bottom: 1px solid var(--border, #e5e7eb);
   flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .d2h-filebar-left {
@@ -217,6 +269,7 @@ textarea {
   gap: 12px;
   align-items: center;
   min-width: 0;
+  flex: 1;
 }
 
 .d2h-filebar-right {
@@ -224,6 +277,8 @@ textarea {
   gap: 8px;
   align-items: center;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .d2h-word-icon {
@@ -263,8 +318,9 @@ textarea {
 }
 
 .d2h-file-name-field input {
-  width: min(300px, 40vw);
-  min-width: 100px;
+  width: min(420px, 35vw);
+  min-width: 80px;
+  max-width: 100%;
   padding: 4px 8px;
   color: var(--text, #111827);
   background: #fff;
@@ -579,19 +635,38 @@ textarea#d2h-html-output {
   }
 
   .d2h-dropzone {
-    margin: 0 16px;
+    margin: 16px 16px 0;
+  }
+
+  .d2h-dropzone-inner {
+    min-height: 220px;
+    padding: 28px 20px;
   }
 
   .d2h-filebar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 10px 16px;
     gap: 10px;
   }
 
+  .d2h-filebar-left {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
   .d2h-filebar-right {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start;
+  }
+
+  .d2h-file-name-field input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .d2h-filebar small {
+    width: 100%;
   }
 
   .d2h-messages {

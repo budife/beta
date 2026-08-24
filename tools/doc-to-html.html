@@ -17,13 +17,16 @@
   <main class="d2h-app" id="d2h-app">
     <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX or PDF file">
       <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf" hidden>
-      <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
-      <strong>Drop DOCX or PDF file here</strong>
-      <span>or click to choose a document</span>
-      <button id="d2h-choose-btn" class="d2h-primary" type="button">
-        <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX / PDF File
-      </button>
-      <small>Max 20 MB - Format .docx / .pdf</small>
+      <div class="d2h-dropzone-inner">
+        <div class="d2h-dropzone-icons">
+          <span class="d2h-doc-icon"><i class="fa-solid fa-file-word" aria-hidden="true"></i></span>
+          <span class="d2h-plus"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+          <span class="d2h-pdf-icon"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
+        </div>
+        <strong>Drop your file here</strong>
+        <span class="d2h-dropzone-sub">or <button id="d2h-choose-btn" class="d2h-text-link" type="button">browse from folder</button></span>
+        <small>Supports .docx and .pdf up to 20 MB</small>
+      </div>
     </div>
 
     <div id="d2h-filebar" class="d2h-filebar d2h-hidden">
