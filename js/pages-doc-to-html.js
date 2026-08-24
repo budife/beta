@@ -256,6 +256,11 @@
     return sanitized || 'document';
   }
 
+  function extractFileName(path) {
+    if (!path) return '';
+    return path.split(/[\\/]/).pop().trim();
+  }
+
   function formatBytes(bytes) {
     return bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
   }
@@ -963,11 +968,10 @@
   els.outputFileName.addEventListener('input', (event) => {
     const normalized = normalizeFileNameCharacters(event.currentTarget.value);
     event.currentTarget.value = normalized;
-    currentFileName = normalized || 'document';
+    currentFileName = extractFileName(normalized) || 'document';
   });
   els.outputFileName.addEventListener('blur', (event) => {
-    currentFileName = sanitizeFileName(event.currentTarget.value);
-    event.currentTarget.value = currentFileName;
+    currentFileName = extractFileName(sanitizeFileName(event.currentTarget.value)) || 'document';
   });
   els.htmlOutput.addEventListener('input', () => {
     renderPreview(els.htmlOutput.value);
