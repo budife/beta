@@ -642,7 +642,7 @@
     els.dropzone.classList.toggle('busy', busy);
     els.chooseBtn.innerHTML = busy
       ? '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Converting...'
-      : '<i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Choose DOCX / PDF File';
+      : 'browse from folder';
   }
 
   function renderPreview(html) {
