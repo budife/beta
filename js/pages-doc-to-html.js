@@ -693,7 +693,8 @@
 
     const normalizedHtml = normalizeNumbering(conversion.value, tableHeaderStyles, leadingTitleBreakCount);
     currentFileName = sanitizeFileName(file.name.replace(/\.docx$/i, ''));
-    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
+    const year = new Date().getFullYear();
+    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'W';
@@ -748,7 +749,8 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
+    const year = new Date().getFullYear();
+    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
@@ -786,7 +788,8 @@
     }
 
     currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const pathPrefix = 'emailblast\\MKT\\2026\\tnc\\';
+    const year = new Date().getFullYear();
+    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'PDF';
@@ -856,7 +859,8 @@
       // Parse path: split by \ or /
       const parts = fullPathInput.split(/[\\/]/).filter(Boolean);
       if (parts.length < 2) {
-        alert('Please enter full path like: emailblast\\MKT\\2026\\tnc\\filename');
+        const year = new Date().getFullYear();
+        alert(`Please enter full path like: emailblast\\MKT\\${year}\\tnc\\filename`);
         return;
       }
 
