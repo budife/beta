@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Layout Checker v1.5.2 - 24 August 2026
+
+- Subject field moved to source bar below Layout URL input, processes KRHRED placeholders live as unit values are entered. Removed old subject panel section and unused Add Unit button.
+
 ## Layout Checker v1.5.1 - 24 August 2026
 
 - Added a Subject field in the sidebar. Subject lines can include KRHRED placeholders and are processed when Apply is clicked, showing the replaced subject below the input. Removed the unused Add Unit button and normalized Reset/Apply button widths. Added a highlighter icon and hover state to the Highlight KRHRED toggle.

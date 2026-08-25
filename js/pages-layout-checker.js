@@ -511,6 +511,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     bindReplaceOnFocus(input);
     input.addEventListener('input', () => {
       updateKrhredInputFeedback(input);
+      if (subjectOutput) {
+        const { values } = collectKrhredValues();
+        subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
+      }
       if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
       clearTimeout(krhredPreviewTimer);
       krhredPreviewTimer = setTimeout(() => {
@@ -1081,13 +1085,24 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     // Apply KRHRED replacements to subject field if present
     if (subjectInput && subjectOutput) {
       const { values } = collectKrhredValues();
-      const processedSubject = replaceKrhredPlaceholders(subjectInput.value, values, false);
-      subjectOutput.textContent = processedSubject;
+      subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
     }
 
     if (Object.keys(krhredValues).length && editor.getValue().trim()) {
       renderLayoutWithKrhredValues();
     }
+  });
+
+  // Update processed subject when KRHRED unit inputs change
+  function updateSubjectFromKrhred() {
+    if (!subjectInput || !subjectOutput) return;
+    const { values } = collectKrhredValues();
+    subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
+  }
+
+  // Add listeners to existing KRHRED unit inputs
+  getKrhredInputs().forEach(input => {
+    input.addEventListener('input', updateSubjectFromKrhred);
   });
 
   function performClearAll() {
@@ -1103,7 +1118,7 @@ const originalUrlInput = document.getElementById('originalUrlInput');
 
     // Clear subject fields
     if (subjectInput) subjectInput.value = '';
-    if (subjectOutput) subjectOutput.textContent = '';
+    if (subjectOutput) subjectOutput.value = '';
   }
 
   // Handle F5 refresh - clear data without prompt
