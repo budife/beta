@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Layout Checker v1.5.0 - 24 August 2026
+
+- Replaced public CORS proxies (corsproxy.io, CodeTabs, r.jina.ai, AllOrigins, ThingProxy) with a dedicated Cloudflare Worker for fetching remote HTML. The Worker only allows the target host `mail.hsbc.com.hk` and returns CORS headers for the GitHub Pages frontend. Added Worker source at `workers/html-fetcher.js` and deployment documentation at `workers/README.md`. Updated `fetchRemoteHtmlFast()` to use the Worker exclusively. Normalized action bar button heights and added hover state and highlighter icon to the Highlight KRHRED toggle.
+
 ## Campaign Counter v2.0.0, Layout Slicer v0.5.0, TNC Uploader v0.3.9 - 23 August 2026
 
 - Promoted Campaign Counter, Layout Slicer and TNC Uploader from beta to stable. Removed in-tool beta warnings and sidebar beta badges.
