@@ -90,7 +90,8 @@ function renderFolderList() {
     const campaignItems = entries.map(e => `
       <span class="tooltip-campaign-item">
         <span class="tooltip-date">${escapeHtml(e.date || '—')}</span>
-        <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')} ${escapeHtml(e.manager || '')}</span>
+        <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}</span>
+        <span class="tooltip-manager">${escapeHtml(e.manager || '')}</span>
       </span>`).join('');
 
     chip.innerHTML = `<code>${escapeHtml(id)}</code>`;
