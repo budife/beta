@@ -13,24 +13,6 @@ category: Home
 - [Layout Slicer](/layout-slicer)
 - [Campaign Counter](/campaign-counter)
 
-## Tool Sitemap
-
-### Database
-
-- [Database Checker](/database-checker) - Validate campaign database files.
-- [Database Generator](/database-generator) - Generate campaign data and formatted output.
-
-### Tools
-
-- [Bookmarklet](/bookmarklet) - Browser shortcuts for repetitive daily tasks.
-- [Campaign Counter](/campaign-counter) - Campaign tracking workspace.
-- [Config eDM](/config-edm) - eDM configuration editor.
-- [Doc to HTML](/doc-to-html) - Convert DOCX and PDF documents to HTML in the browser.
-- [Layout Checker](/layout-checker) - HTML and layout inspection.
-- [Layout Slicer](/layout-slicer) - Convert flat JPG/PNG layouts into ordered image slices.
-- [TNC Uploader](/tnc-uploader) - Drop PDF terms and conditions into the server folder structure.
-- [WFH Tracker](/wfh-tracker) - WFH and office-day calendar.
-
 ## Recent Updates
 
 - **Layout Checker v1.5.2 - 24 August 2026** - Subject field integrated in source bar below URL, auto-processes KRHRED placeholders live as unit values are entered. Removed old subject panel and Add Unit button.
@@ -134,7 +116,6 @@ category: Home
 - [Report an Issue](https://github.com/budife/beta/issues) - Submit a bug or improvement request.
 - [Changelog](https://github.com/budife/beta/blob/main/CHANGELOG.md) - Read full release notes.
 - [Maintenance](/maintenance) - Local backup/restore, privacy switches, and release checklist.
-- [Tool Sitemap](#tool-sitemap) - Browse every available eDM Helper tool.
 
 ## System Info
 
