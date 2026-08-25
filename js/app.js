@@ -678,9 +678,11 @@ function parseRecentUpdateDates(markdown) {
     if (!inRecentUpdates) continue;
     const match = line.match(/\*\*(.+?)\s+v[\d.]+.*?-\s+(\d{1,2}\s+\w+\s+\d{4})\*\*/i);
     if (!match) continue;
-    const toolName = match[1].trim();
+    const toolName = match[1].trim().toLowerCase();
     const date = parseUpdateDate(match[2]);
-    if (date) recentUpdateDates.set(toolName.toLowerCase(), date);
+    if (!date) continue;
+    const existing = recentUpdateDates.get(toolName);
+    if (!existing || date > existing) recentUpdateDates.set(toolName, date);
   }
 }
 

@@ -8,7 +8,7 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 ## Core - 24 August 2026
 
-- Fixed sidebar recent-update badge matching so tool links without a leading slash correctly map to `TOOL_META` entries. Badges now auto-hide after three days based on `home.md` Recent Updates dates.
+- Fixed sidebar recent-update badge matching so tool links without a leading slash correctly map to `TOOL_META` entries. Fixed badge date selection to use the most recent update per tool instead of the last parsed entry. Badges now auto-hide after three days based on `home.md` Recent Updates dates.
 
 ## Layout Checker v1.5.0 - 24 August 2026
 
