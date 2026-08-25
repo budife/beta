@@ -6,6 +6,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Reworked Recent Updates on home page from chronological list into date-based tab navigation. Dates are now `###` headings in markdown, transformed into clickable tabs by JavaScript. Tabs show last 6 update dates (24 Aug, 23 Aug, 21 Aug, 20 Aug, 13 Aug), oldest entries link to full Changelog. Leftmost tab selected by default.
 
+## Layout Checker - Screenshot Full Height Fix
+
+- Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
+
 ## Layout Checker v1.5.2 - 24 August 2026
 
 - Subject field moved to source bar below Layout URL input, processes KRHRED placeholders live as unit values are entered. Removed old subject panel section and unused Add Unit button.

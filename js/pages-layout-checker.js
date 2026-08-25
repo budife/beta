@@ -361,16 +361,27 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       const target = previewDocument.body || previewDocument.documentElement;
       if (!target) throw new Error('Preview is not ready yet');
       const html2canvas = await loadHtml2Canvas();
-      const canvas = await html2canvas(target, {
-        backgroundColor: '#ffffff',
-        scale: Math.min(2, window.devicePixelRatio || 1),
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-        imageTimeout: 12000,
-        windowWidth: target.scrollWidth,
-        windowHeight: target.scrollHeight,
-      });
+      const originalHeight = layoutPreviewFrame.style.height;
+      const originalOverflow = layoutPreviewFrame.style.overflow;
+      layoutPreviewFrame.style.height = `${target.scrollHeight}px`;
+      layoutPreviewFrame.style.overflow = 'visible';
+      await new Promise(r => setTimeout(r, 100));
+      let canvas;
+      try {
+        canvas = await html2canvas(target, {
+          backgroundColor: '#ffffff',
+          scale: Math.min(2, window.devicePixelRatio || 1),
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+          imageTimeout: 12000,
+          windowWidth: target.scrollWidth,
+          windowHeight: target.scrollHeight,
+        });
+      } finally {
+        layoutPreviewFrame.style.height = originalHeight;
+        layoutPreviewFrame.style.overflow = originalOverflow;
+      }
       canvas.toBlob((blob) => {
         if (!blob) {
           setLayoutStatus('error', 'Screenshot could not be created');
