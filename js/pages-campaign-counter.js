@@ -36,20 +36,29 @@ function parseFolderCampaignId(name) {
 }
 
 function parseFolderInfo(name) {
-  const idMatch = name.match(/\b(\d{4})\b\s+(.+)/);
-  if (!idMatch) return { id: null, name: name, date: '', manager: '' };
-  const id = idMatch[1];
-  let rest = idMatch[2].replace(/\s*-\s*Copy(\s*\(\d+\))?/gi, '').trim();
-  const dateMatch = rest.match(/\b(\d{1,2})-(\d{2,4})\b/);
-  let date = '';
-  let namePart = rest;
-  if (dateMatch) {
-    date = dateMatch[0];
-    namePart = rest.slice(0, dateMatch.index).trim();
+  const trimmed = name.replace(/\s*-\s*Copy(\s*\(\d+\))?$/gi, '').trim();
+  const pipeParts = trimmed.split(/\s*\|\s*/).map(p => p.trim()).filter(p => p);
+  if (pipeParts.length < 2) {
+    const idMatch = trimmed.match(/^(\d{4})/);
+    return { id: idMatch ? idMatch[1] : null, name: trimmed, date: '', manager: '' };
   }
-  const parts = namePart.split(/\s+/);
-  const campaignName = parts[0] || '';
-  const manager = parts[1] || '';
+  const id = pipeParts[0].match(/\d{4}/)?.[0] || pipeParts[0];
+  let campaignName = '';
+  let date = '';
+  let manager = '';
+  if (pipeParts.length === 3) {
+    campaignName = pipeParts[1];
+    const dateOrMgr = pipeParts[2];
+    if (/\d{1,2}-\d{2,4}/.test(dateOrMgr)) date = dateOrMgr;
+    else manager = dateOrMgr;
+  } else if (pipeParts.length >= 4) {
+    campaignName = pipeParts[1];
+    const f3 = pipeParts[2];
+    const f4 = pipeParts[3];
+    if (/\d{1,2}-\d{2,4}/.test(f3)) { date = f3; manager = f4; }
+    else if (/\d{1,2}-\d{2,4}/.test(f4)) { date = f4; manager = f3; }
+    else { manager = f3; }
+  }
   return { id, name: campaignName, date, manager };
 }
 
