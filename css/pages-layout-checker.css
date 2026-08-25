@@ -2694,7 +2694,8 @@ body *::after {
   flex: 0 0 auto;
 }
 
-#applyKrhredBtn {
+#applyKrhredBtn,
+#resetKrhredBtn {
   min-width: 84px;
   padding-right: 16px;
   padding-left: 16px;
@@ -2711,6 +2712,34 @@ body *::after {
 .lc-units-container {
   min-height: 0;
   flex: 1 1 auto;
+}
+
+.lc-subject-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.lc-subject-input {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.lc-subject-output {
+  min-height: 28px;
+  padding: 7px 9px;
+  color: #52525b;
+  font-size: 11px;
+  line-height: 1.4;
+  background: #f4f4f5;
+  border-top: 1px solid #e4e4e7;
+  word-break: break-word;
+}
+
+.lc-subject-output:empty::before {
+  content: 'Processed subject will appear here';
+  color: #a1a1aa;
+  font-style: italic;
 }
 
 .lc-input-grid {

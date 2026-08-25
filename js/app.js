@@ -688,7 +688,8 @@ function applySidebarBadges() {
   document.querySelectorAll('.sidebar-link[data-route]').forEach((link) => {
     const existing = link.querySelector('.sidebar-new-badge');
     if (existing) existing.remove();
-    const routePath = link.getAttribute('href');
+    const rawHref = link.getAttribute('href') || '';
+    const routePath = rawHref.startsWith('/') ? rawHref : `/${rawHref}`;
     const meta = TOOL_META[routePath];
     if (!meta) return;
     const date = recentUpdateDates.get(meta.label.toLowerCase());
