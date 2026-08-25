@@ -178,18 +178,32 @@ async function scanFolder() {
       const id = parseFolderCampaignId(name);
       if (id) {
         const info = parseFolderInfo(name);
+        const entryKey = `${id}|${info.date}|${info.name}|${info.manager}`;
         if (scannedFolderIds.has(id)) {
-          skippedCount += 1;
-          continue;
+          const existing = scannedFolderIds.get(id);
+          const isDuplicate = existing.some(e => `${e.date}|${e.name}|${e.manager}` === `${info.date}|${info.name}|${info.manager}`);
+          if (!isDuplicate) {
+            existing.push(info);
+            newCount += 1;
+            newEntries.push({
+              campaign_id: id,
+              campaign_name: info.name || '',
+              folder_date: info.date || '',
+              manager: info.manager || ''
+            });
+          } else {
+            skippedCount += 1;
+          }
+        } else {
+          scannedFolderIds.set(id, [info]);
+          newCount += 1;
+          newEntries.push({
+            campaign_id: id,
+            campaign_name: info.name || '',
+            folder_date: info.date || '',
+            manager: info.manager || ''
+          });
         }
-        scannedFolderIds.set(id, [info]);
-        newCount += 1;
-        newEntries.push({
-          campaign_id: id,
-          campaign_name: info.name || '',
-          folder_date: info.date || '',
-          manager: info.manager || ''
-        });
       }
     }
     const btn = document.getElementById('pick-folder');
