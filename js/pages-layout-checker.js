@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
    ORIGINAL CODE
    =================================== */
 
+// Cloudflare Worker URL for fetching remote HTML.
+// Replace with your deployed Worker URL.
+const HTML_FETCHER_WORKER_URL = 'https://html-fetcher.budi-indra94.workers.dev';
 
 // ---- Extracted scripts from inline <script> blocks ----
 // Initialize CodeMirror editor for htmlInput textarea
@@ -983,56 +986,34 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       throw new Error('External URL checks are disabled in Documentation privacy settings.');
     }
 
-    const cleanUrl = url.replace(/^https?:\/\//, '');
-    const directAttempt = { url, via: 'direct' };
-    const proxyAttempts = [
-      { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, via: 'AllOrigins', json: true },
-      { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, via: 'CodeTabs' },
-      { url: `https://r.jina.ai/http://${cleanUrl}`, via: 'Jina HTTP' },
-      { url: `https://r.jina.ai/https://${cleanUrl}`, via: 'Jina HTTPS' },
-      { url: `https://corsproxy.io/?${encodeURIComponent(url)}`, via: 'CorsProxy' },
-      { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, via: 'AllOrigins Raw' },
-      { url: `https://thingproxy.freeboard.io/fetch/${url}`, via: 'ThingProxy' }
-    ];
-    const attempts = window.EDM_PRIVACY?.get?.('proxyFallbacks') === false
-      ? [directAttempt]
-      : [directAttempt, ...proxyAttempts];
-    const controllers = [];
+    const targetUrl = new URL(url);
+    if (targetUrl.host.toLowerCase() !== 'mail.hsbc.com.hk') {
+      throw new Error('Only mail.hsbc.com.hk URLs are allowed.');
+    }
 
-    const fetchAttempt = async (attempt) => {
-      const controller = new AbortController();
-      controllers.push(controller);
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
-      const abortFromGlobal = () => controller.abort();
-      abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
-
-      try {
-        const response = await fetch(attempt.url, {
-          signal: controller.signal,
-          headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
-        });
-        if (!response.ok) throw new Error(`${attempt.via} HTTP ${response.status}`);
-        const html = attempt.json
-          ? (await response.json()).contents || ''
-          : await response.text();
-        if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
-          throw new Error(`${attempt.via} response is not valid HTML`);
-        }
-        return { html, via: attempt.via };
-      } finally {
-        clearTimeout(timeoutId);
-        abortController?.signal?.removeEventListener('abort', abortFromGlobal);
-      }
-    };
+    const workerUrl = `${HTML_FETCHER_WORKER_URL}?url=${encodeURIComponent(url)}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const abortFromGlobal = () => controller.abort();
+    abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
 
     try {
-      const result = await Promise.any(attempts.map(fetchAttempt));
-      controllers.forEach(controller => controller.abort());
-      return result;
-    } catch (error) {
-      controllers.forEach(controller => controller.abort());
-      const lastError = error.errors?.findLast?.(item => item?.message) || error;
-      throw new Error(lastError?.message || 'All fetch attempts failed');
+      const response = await fetch(workerUrl, {
+        signal: controller.signal,
+        headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
+      });
+      if (!response.ok) {
+        const message = await response.text().catch(() => '');
+        throw new Error(`Worker HTTP ${response.status}: ${message}`);
+      }
+      const html = await response.text();
+      if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
+        throw new Error('Worker response is not valid HTML');
+      }
+      return { html, via: 'Cloudflare Worker' };
+    } finally {
+      clearTimeout(timeoutId);
+      abortController?.signal?.removeEventListener('abort', abortFromGlobal);
     }
   }
 

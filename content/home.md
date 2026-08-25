@@ -33,6 +33,7 @@ category: Home
 
 ## Recent Updates
 
+- **Layout Checker v1.5.0 - 24 August 2026** - Replaced public CORS proxies with a Cloudflare Worker for fetching remote HTML from mail.hsbc.com.hk. Added Worker source and deployment docs. Unified action bar button sizes and improved Highlight KRHRED toggle hover/icon.
 - **Doc to HTML v1.1.0 - 24 August 2026** - Added PDF support (editable text + image modes), Save to Folder with auto nested subfolders (emailblast\MKT\2026\tnc\), Open in New Tab, improved Word styleMap, redesigned full-height A4 preview.
 - **Layout Slicer v0.5.1 - 24 August 2026** - Improved Generate/Export UX with step-based workflow, loading spinner, export summary, save-folder confirmation, per-slice size estimates, and customizable file name prefix.
 - **Campaign Counter v2.0.0, Layout Slicer v0.5.0, TNC Uploader v0.3.9 - 23 August 2026** - Promoted to stable. Removed beta warnings and sidebar beta badges.

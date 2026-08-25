@@ -2489,6 +2489,19 @@ body *::after {
   align-self: end;
 }
 
+.lc-editor-actions > .lc-btn,
+.lc-editor-actions > .lc-btn.lc-btn-sm,
+.lc-editor-actions > .lc-tab,
+.lc-editor-actions > .lc-toggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  height: 34px;
+  padding: 7px 11px;
+  font-size: 10px;
+  box-sizing: border-box;
+}
+
 .lc-btn {
   display: inline-flex;
   min-height: 34px;
@@ -2560,6 +2573,13 @@ body *::after {
   background: #fff;
   border: 1px solid #d4d4d8;
   cursor: pointer;
+  transition: .15s ease;
+}
+
+.lc-toggle:hover {
+  color: #b4232d;
+  background: #fff0f1;
+  border-color: #f27f86;
 }
 
 .lc-toggle input {
@@ -2748,21 +2768,21 @@ body *::after {
 }
 
 .lc-tab {
-  min-height: 26px;
-  padding: 4px 9px;
+  min-height: 34px;
+  padding: 7px 11px;
   color: #52525b;
   font: inherit;
   font-size: 10px;
   font-weight: 500;
   background: transparent;
-  border: 0;
+  border: 1px solid transparent;
   cursor: pointer;
 }
 
 .lc-tab.is-active {
   color: #b4232d;
   background: #fff;
-  border: 1px solid #fecdd3;
+  border-color: #fecdd3;
 }
 
 .lc-editor-body {
