@@ -210,9 +210,9 @@
 }
 
 .folder-items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(44px, auto));
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   max-height: min(400px, calc(100vh - 280px));
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -239,6 +239,40 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+}
+
+.counter-folder-row {
+  display: grid;
+  grid-template-columns: 60px 70px 1fr 80px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  font-size: 12px;
+}
+
+.counter-folder-row code {
+  color: #9f3f45;
+  font: 500 11px Consolas, Monaco, monospace;
+}
+
+.counter-folder-row .folder-row-date {
+  color: #71717a;
+  font-size: 11px;
+}
+
+.counter-folder-row .folder-row-name {
+  color: #27272a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.counter-folder-row .folder-row-manager {
+  color: #52525b;
+  font-size: 11px;
+  text-align: right;
 }
 
 .counter-folder-chip.is-conflict {

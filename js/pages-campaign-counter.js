@@ -77,71 +77,27 @@ function renderFolderList() {
 
   listEl.hidden = false;
   if (emptyEl) emptyEl.hidden = true;
-  countEl.textContent = `(${scannedFolderIds.size})`;
+
+  const allEntries = [];
+  for (const [id, entries] of scannedFolderIds) {
+    for (const entry of entries) {
+      allEntries.push({ id, ...entry });
+    }
+  }
+  allEntries.sort((a, b) => a.id.localeCompare(b.id));
+
+  countEl.textContent = `(${allEntries.length})`;
   container.innerHTML = '';
 
-  const sorted = [...scannedFolderIds.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  for (const [id, entries] of sorted) {
-    const chip = document.createElement('div');
-    chip.className = 'counter-folder-chip';
-    chip.dataset.folderId = id;
-    chip.setAttribute('tabindex', '0');
-
-    const campaignItems = entries.map(e => `
-      <span class="tooltip-campaign-item">
-        <span class="tooltip-date">${escapeHtml(e.date || '—')}</span>
-        <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}${e.manager ? ' - ' + escapeHtml(e.manager) : ''}</span>
-      </span>`).join('');
-
-    chip.innerHTML = `<code>${escapeHtml(id)}</code>`;
-
-    // Create tooltip panel in portal
-    const panel = document.createElement('div');
-    panel.className = 'tooltip-panel';
-    panel.dataset.folderId = id;
-    panel.innerHTML = `
-      <span class="tooltip-header">ID: ${escapeHtml(id)}</span>
-      <span class="tooltip-campaign-list">${campaignItems}</span>`;
-    document.getElementById('tooltip-portal').appendChild(panel);
-
-    const showTooltip = () => {
-      const rect = chip.getBoundingClientRect();
-      panel.style.top = `${rect.top}px`;
-      panel.style.left = `${rect.right + 8}px`;
-      panel.classList.remove('flip-left');
-
-      // Check if panel would overflow viewport on right
-      const panelWidth = 280;
-      const gap = 8;
-      if (rect.right + gap + panelWidth > window.innerWidth - 12) {
-        panel.classList.add('flip-left');
-        panel.style.left = 'auto';
-        panel.style.right = `${window.innerWidth - rect.left + gap}px`;
-      } else {
-        panel.style.left = `${rect.right + 8}px`;
-        panel.style.right = 'auto';
-      }
-
-      // Check if panel would overflow viewport on bottom
-      const maxHeight = window.innerHeight - 120;
-      panel.style.maxHeight = `${maxHeight}px`;
-      if (rect.top + panel.offsetHeight > window.innerHeight - 20) {
-        panel.style.top = `${window.innerHeight - maxHeight - 20}px`;
-      }
-
-      panel.classList.add('visible');
-    };
-
-    const hideTooltip = () => {
-      panel.classList.remove('visible', 'flip-left');
-    };
-
-    chip.addEventListener('mouseenter', showTooltip);
-    chip.addEventListener('mouseleave', hideTooltip);
-    chip.addEventListener('focus', showTooltip);
-    chip.addEventListener('blur', hideTooltip);
-
-    container.appendChild(chip);
+  for (const entry of allEntries) {
+    const row = document.createElement('div');
+    row.className = 'counter-folder-row';
+    row.innerHTML = `
+      <code class="folder-row-id">${escapeHtml(entry.id)}</code>
+      <span class="folder-row-date">${escapeHtml(entry.date || '—')}</span>
+      <span class="folder-row-name">${escapeHtml(entry.name || 'Unknown')}</span>
+      <span class="folder-row-manager">${escapeHtml(entry.manager || '—')}</span>`;
+    container.appendChild(row);
   }
 }
 
