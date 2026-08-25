@@ -1273,3 +1273,87 @@ a {
     transition: none;
   }
 }
+
+/* ── Recent Updates Tabs ─────────────────────────────── */
+.updates-tabs {
+  margin-top: 12px;
+}
+
+.updates-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--app-border);
+  margin-bottom: 12px;
+}
+
+.updates-tab-btn {
+  padding: 6px 12px;
+  color: var(--app-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.updates-tab-btn:hover {
+  color: var(--app-accent);
+  background: var(--app-soft);
+}
+
+.updates-tab-btn.active {
+  color: var(--app-accent);
+  background: var(--app-soft);
+  border-color: var(--app-border);
+  border-bottom-color: var(--app-soft);
+}
+
+.updates-tab-content {
+  min-height: 80px;
+}
+
+.updates-tab-panel {
+  display: none;
+}
+
+.updates-tab-panel.active {
+  display: block;
+}
+
+.updates-tab-panel ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.updates-tab-panel li {
+  padding: 8px 10px;
+  background: var(--app-soft);
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.updates-tab-panel li:first-child {
+  border-left: 3px solid var(--app-accent);
+}
+
+.updates-tab-panel li.latest-update {
+  border-left: 3px solid var(--app-accent);
+}
+
+.recent-update-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  color: #fff;
+  background: var(--app-accent);
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+}

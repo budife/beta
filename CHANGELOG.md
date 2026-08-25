@@ -2,6 +2,22 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Home - Recent Updates Tab Redesign
+
+- Reworked Recent Updates on home page from chronological list into date-based tab navigation. Dates are now `###` headings in markdown, transformed into clickable tabs by JavaScript. Tabs show last 6 update dates (24 Aug, 23 Aug, 21 Aug, 20 Aug, 13 Aug), oldest entries link to full Changelog. Leftmost tab selected by default.
+
+## Layout Checker v1.5.2 - 24 August 2026
+
+- Subject field moved to source bar below Layout URL input, processes KRHRED placeholders live as unit values are entered. Removed old subject panel section and unused Add Unit button.
+
+## Layout Checker v1.5.1 - 24 August 2026
+
+- Added a Subject field in the sidebar. Subject lines can include KRHRED placeholders and are processed when Apply is clicked, showing the replaced subject below the input. Removed the unused Add Unit button and normalized Reset/Apply button widths. Added a highlighter icon and hover state to the Highlight KRHRED toggle.
+
+## Core - 24 August 2026
+
+- Fixed sidebar recent-update badge matching so tool links without a leading slash correctly map to `TOOL_META` entries. Fixed badge date selection to use the most recent update per tool instead of the last parsed entry. Badges now auto-hide after three days based on `home.md` Recent Updates dates.
+
 ## Layout Checker v1.5.0 - 24 August 2026
 
 - Replaced public CORS proxies (corsproxy.io, CodeTabs, r.jina.ai, AllOrigins, ThingProxy) with a dedicated Cloudflare Worker for fetching remote HTML. The Worker only allows the target host `mail.hsbc.com.hk` and returns CORS headers for the GitHub Pages frontend. Added Worker source at `workers/html-fetcher.js` and deployment documentation at `workers/README.md`. Updated `fetchRemoteHtmlFast()` to use the Worker exclusively. Normalized action bar button heights and added hover state and highlighter icon to the Highlight KRHRED toggle.

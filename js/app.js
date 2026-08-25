@@ -507,32 +507,80 @@ function enhanceHomeDashboard(container) {
 
   const updates = container.querySelector('[data-section="recent-updates"]');
   if (updates) {
-    const updateItems = Array.from(updates.querySelectorAll('li'));
-    updateItems[0]?.classList.add('latest-update');
-    updateItems.forEach((item) => {
-      const updateDate = parseUpdateDate(item.textContent);
-      if (!isWithinRecentDays(updateDate)) return;
+    const subsections = Array.from(updates.querySelectorAll('.markdown-subsection'));
+    if (subsections.length > 1) {
+      const tabsWrapper = document.createElement('div');
+      tabsWrapper.className = 'updates-tabs';
 
-      const badge = document.createElement('span');
-      badge.className = 'recent-update-badge';
-      badge.textContent = 'new update';
-      badge.title = 'Added within the last 3 days';
-      const title = item.querySelector('strong');
-      if (title) {
-        title.insertAdjacentElement('afterend', badge);
-      } else {
-        item.insertAdjacentElement('afterbegin', badge);
+      const tabBar = document.createElement('div');
+      tabBar.className = 'updates-tab-bar';
+      tabsWrapper.appendChild(tabBar);
+
+      const tabContent = document.createElement('div');
+      tabContent.className = 'updates-tab-content';
+      tabsWrapper.appendChild(tabContent);
+
+      const tabIds = [];
+      subsections.forEach((sub, i) => {
+        const h3 = sub.querySelector('h3');
+        const dateText = h3?.textContent || `Tab ${i + 1}`;
+        const tabId = `update-tab-${i}`;
+        tabIds.push(tabId);
+
+        const tabBtn = document.createElement('button');
+        tabBtn.type = 'button';
+        tabBtn.className = `updates-tab-btn${i === 0 ? ' active' : ''}`;
+        tabBtn.dataset.tab = tabId;
+        tabBtn.textContent = dateText;
+        tabBar.appendChild(tabBtn);
+
+        const panel = document.createElement('div');
+        panel.className = `updates-tab-panel${i === 0 ? ' active' : ''}`;
+        panel.id = tabId;
+        panel.append(...Array.from(sub.querySelectorAll('ul, p')));
+
+        sub.querySelectorAll('code').forEach((code) => {
+          if (code.textContent.trim().toLowerCase() !== 'budd') return;
+          const creatorLink = document.createElement('button');
+          creatorLink.className = 'creator-link recent-creator-link';
+          creatorLink.type = 'button';
+          creatorLink.dataset.creatorModal = '';
+          creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span>';
+          code.replaceWith(creatorLink);
+        });
+
+        tabContent.appendChild(panel);
+      });
+
+      tabBar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.updates-tab-btn');
+        if (!btn) return;
+        const tabId = btn.dataset.tab;
+        tabBar.querySelectorAll('.updates-tab-btn').forEach((b) => b.classList.remove('active'));
+        tabContent.querySelectorAll('.updates-tab-panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        tabContent.querySelector(`#${tabId}`)?.classList.add('active');
+      });
+
+      subsections.forEach((sub) => sub.remove());
+      const existingLink = updates.querySelector('p:last-child a');
+      updates.appendChild(tabsWrapper);
+      if (existingLink) {
+        updates.appendChild(existingLink);
       }
-    });
-    updates.querySelectorAll('code').forEach((code) => {
-      if (code.textContent.trim().toLowerCase() !== 'budd') return;
-      const creatorLink = document.createElement('button');
-      creatorLink.className = 'creator-link recent-creator-link';
-      creatorLink.type = 'button';
-      creatorLink.dataset.creatorModal = '';
-      creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span>';
-      code.replaceWith(creatorLink);
-    });
+    } else {
+      const updateItems = Array.from(updates.querySelectorAll('li'));
+      updateItems[0]?.classList.add('latest-update');
+      updates.querySelectorAll('code').forEach((code) => {
+        if (code.textContent.trim().toLowerCase() !== 'budd') return;
+        const creatorLink = document.createElement('button');
+        creatorLink.className = 'creator-link recent-creator-link';
+        creatorLink.type = 'button';
+        creatorLink.dataset.creatorModal = '';
+        creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span>';
+        code.replaceWith(creatorLink);
+      });
+    }
   }
 
   const usefulLinks = container.querySelector('[data-section="useful-links"]');
@@ -672,15 +720,23 @@ const recentUpdateDates = new Map();
 function parseRecentUpdateDates(markdown) {
   const lines = markdown.split('\n');
   let inRecentUpdates = false;
+  let currentDate = null;
   for (const line of lines) {
     if (/^##\s+Recent Updates/i.test(line)) { inRecentUpdates = true; continue; }
     if (inRecentUpdates && /^##\s/.test(line)) break;
     if (!inRecentUpdates) continue;
-    const match = line.match(/\*\*(.+?)\s+v[\d.]+.*?-\s+(\d{1,2}\s+\w+\s+\d{4})\*\*/i);
+    const headingMatch = line.match(/^###\s+(\d{1,2}\s+\w+\s+\d{4})/i);
+    if (headingMatch) {
+      currentDate = parseUpdateDate(headingMatch[1]);
+      continue;
+    }
+    const match = line.match(/\*\*(.+?)\s+v[\d.]+\s/i);
     if (!match) continue;
-    const toolName = match[1].trim();
-    const date = parseUpdateDate(match[2]);
-    if (date) recentUpdateDates.set(toolName.toLowerCase(), date);
+    const toolName = match[1].trim().toLowerCase();
+    const date = currentDate || parseUpdateDate(line);
+    if (!date) continue;
+    const existing = recentUpdateDates.get(toolName);
+    if (!existing || date > existing) recentUpdateDates.set(toolName, date);
   }
 }
 
@@ -688,7 +744,8 @@ function applySidebarBadges() {
   document.querySelectorAll('.sidebar-link[data-route]').forEach((link) => {
     const existing = link.querySelector('.sidebar-new-badge');
     if (existing) existing.remove();
-    const routePath = link.getAttribute('href');
+    const rawHref = link.getAttribute('href') || '';
+    const routePath = rawHref.startsWith('/') ? rawHref : `/${rawHref}`;
     const meta = TOOL_META[routePath];
     if (!meta) return;
     const date = recentUpdateDates.get(meta.label.toLowerCase());

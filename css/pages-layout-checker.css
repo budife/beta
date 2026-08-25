@@ -2694,7 +2694,8 @@ body *::after {
   flex: 0 0 auto;
 }
 
-#applyKrhredBtn {
+#applyKrhredBtn,
+#resetKrhredBtn {
   min-width: 84px;
   padding-right: 16px;
   padding-left: 16px;
@@ -2711,6 +2712,14 @@ body *::after {
 .lc-units-container {
   min-height: 0;
   flex: 1 1 auto;
+}
+
+.lc-subject-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
 }
 
 .lc-input-grid {

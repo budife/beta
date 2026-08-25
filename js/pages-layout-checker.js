@@ -511,6 +511,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     bindReplaceOnFocus(input);
     input.addEventListener('input', () => {
       updateKrhredInputFeedback(input);
+      if (subjectOutput) {
+        const { values } = collectKrhredValues();
+        subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
+      }
       if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
       clearTimeout(krhredPreviewTimer);
       krhredPreviewTimer = setTimeout(() => {
@@ -704,22 +708,6 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       }
     });
   }
-
-  addKrhredBtn.addEventListener('click', () => {
-    // Find the highest current krhred_unit number
-    const inputs = getKrhredInputs();
-    let maxNum = 29;
-    inputs.forEach(input => {
-      const num = parseInt(input.id.replace('krhred_unit_', ''), 10);
-      if (num > maxNum) maxNum = num;
-    });
-    const newNum = maxNum + 1;
-
-    ensureKrhredInput(newNum);
-
-    // Show success message
-    console.log(`Unit ${newNum} added successfully!`);
-  });
 
   // Input color feedback for existing inputs
   const existingInputs = getKrhredInputs();
@@ -1020,8 +1008,12 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   // Apply krhred values functionality
   const applyKrhredBtn = document.getElementById('applyKrhredBtn');
   const krhredInput = document.getElementById('krhredInput');
+  const subjectInput = document.getElementById('subjectInput');
+  const subjectOutput = document.getElementById('subjectOutput');
+
   bindReplaceOnFocus(originalUrlInput);
   bindReplaceOnFocus(krhredInput);
+  bindReplaceOnFocus(subjectInput);
 
   if (resetKrhredBtn) {
     resetKrhredBtn.addEventListener('click', () => {
@@ -1089,9 +1081,28 @@ const originalUrlInput = document.getElementById('originalUrlInput');
     });
     
     console.log('KRHRED values applied successfully!');
+
+    // Apply KRHRED replacements to subject field if present
+    if (subjectInput && subjectOutput) {
+      const { values } = collectKrhredValues();
+      subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
+    }
+
     if (Object.keys(krhredValues).length && editor.getValue().trim()) {
       renderLayoutWithKrhredValues();
     }
+  });
+
+  // Update processed subject when KRHRED unit inputs change
+  function updateSubjectFromKrhred() {
+    if (!subjectInput || !subjectOutput) return;
+    const { values } = collectKrhredValues();
+    subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
+  }
+
+  // Add listeners to existing KRHRED unit inputs
+  getKrhredInputs().forEach(input => {
+    input.addEventListener('input', updateSubjectFromKrhred);
   });
 
   function performClearAll() {
@@ -1101,9 +1112,13 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       input.value = '';
       input.style.backgroundColor = '';
     });
-    
+
     // Clear KRHRED textarea only
     document.getElementById('krhredInput').value = '';
+
+    // Clear subject fields
+    if (subjectInput) subjectInput.value = '';
+    if (subjectOutput) subjectOutput.value = '';
   }
 
   // Handle F5 refresh - clear data without prompt

@@ -1,20 +1,35 @@
 # Agent Rules
 
-This file contains instructions for AI agents working on the eDM Helper project.
+Rules for AI coding agents working on the eDM Helper project.
 
-## 1. Commit Policy
+## Scope & Authority
+
+- **The user's request is the source of truth.** Do not invent requirements or assume behavior that was not requested.
+- **Make the smallest change necessary** to complete the task.
+- **Do not fix unrelated bugs**, perform unrelated cleanup, refactor unrelated code, redesign unrelated UI, or rename unrelated files or variables.
+- **Do not add dependencies** unless genuinely necessary and approved.
+- **Do not change architecture, API contracts, database/storage behavior, or data flow** unless required by the task.
+- **Inspect existing implementation and usages** before modifying shared code.
+- **Reuse existing functions, utilities, CSS tokens, and patterns** before creating new ones.
+- **Prefer extending existing code** over creating duplicate implementations.
+- **Never overwrite, discard, or reset the user's uncommitted work.**
+- **Ask before destructive or broad architectural changes.**
+- **Validate only what is relevant** to the actual changes.
+- **Clearly report anything discovered but intentionally left untouched.**
+
+## Commit Policy
 
 - **Only commit when explicitly asked by the user.**
-- When the user says "commit", **always** update before committing:
+- When the user says "commit", update before committing:
   1. `CHANGELOG.md` with user-facing changes
   2. `content/home.md` Recent Updates section
   3. `js/tool-versions.js` version if a tool version changed
-  4. Cache-busters in affected HTML files when CSS or JavaScript changes (see STYLE-GUIDE.md)
-- After updating docs, include them in the same commit.
-- Never commit without the user's explicit request.
+  4. Cache-busters in affected HTML files when CSS or JavaScript changes
+- Include documentation updates in the same commit.
+- Never commit without explicit user request.
 - Do not run `git push --force` or destructive git operations unless explicitly asked.
 
-## 2. Release Hygiene
+## Release Hygiene
 
 See `STYLE-GUIDE.md` section "Release Hygiene" for the full checklist. Key items:
 
@@ -24,7 +39,7 @@ See `STYLE-GUIDE.md` section "Release Hygiene" for the full checklist. Key items
 - Refresh cache-busters in affected HTML files when CSS or JavaScript changes.
 - Run `git diff --check` before handing work back.
 
-## 3. General Coding Rules
+## Coding Rules
 
 - Make minimal changes to achieve the goal.
 - Follow existing code style in the project.
@@ -34,15 +49,25 @@ See `STYLE-GUIDE.md` section "Release Hygiene" for the full checklist. Key items
 - Prefer editing existing files over creating new ones unless explicitly required.
 - Keep it stupidly simple; do not overcomplicate.
 
-## 4. Project Context
+## Project Context
 
 - eDM Helper is a static web application hosted on GitHub Pages.
 - Branch: `dev`.
 - Main technologies: vanilla HTML/CSS/JS, no build step.
 - Supabase is used only for Campaign Counter.
 
-## 5. Communication
+## Communication
 
 - Respond in the same language as the user (Indonesian for this project).
 - Be concise and accurate.
 - Ask for clarification when requirements are unclear.
+
+## Documentation Hierarchy
+
+- `README.md` → project/setup/development overview
+- `STYLE-GUIDE.md` → UI/design rules and release hygiene
+- `TOOLS_AND_FUNCTIONS.md` → tool/function documentation
+- `CHANGELOG.md` → change history
+- `AGENTS.md` → rules for AI agents (this file)
+
+Do not duplicate detailed documentation from those files.

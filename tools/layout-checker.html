@@ -58,6 +58,10 @@
       <div class="lc-source-field">
         <label for="originalUrlInput">Layout URL</label>
         <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+        <div class="lc-subject-row">
+          <input type="text" id="subjectInput" placeholder="Subject (KRHRED placeholders)" class="lc-input" />
+          <input type="text" id="subjectOutput" readonly class="lc-input" placeholder="Processed" />
+        </div>
       </div>
       <div class="lc-source-actions">
         <label for="htmlFileInput" class="lc-btn lc-btn-secondary">
@@ -98,7 +102,6 @@
               <span class="lc-eyebrow">Detected placeholders</span>
               <strong>KRHRED Units</strong>
             </div>
-            <button id="addKrhredBtn" class="lc-btn lc-btn-secondary lc-btn-sm"><i class="fa-solid fa-plus"></i> Unit</button>
           </div>
           <div id="inputGrid" class="lc-input-grid">
             <div><input type="text" id="krhred_unit_30" name="krhred_unit_30" placeholder="30" class="lc-input-field" /></div>
@@ -111,6 +114,7 @@
             <div><input type="text" id="krhred_unit_37" name="krhred_unit_37" placeholder="37" class="lc-input-field" /></div>
           </div>
         </section>
+
       </aside>
 
       <section class="lc-editor-panel">
