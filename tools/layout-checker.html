@@ -63,12 +63,26 @@
           <input type="text" id="subjectOutput" readonly class="lc-input" placeholder="Processed" />
         </div>
         <details class="lc-worker-setting">
-          <summary>HTML fetcher worker</summary>
+          <summary>HTML fetcher</summary>
           <div class="lc-worker-row">
-            <input type="url" id="customWorkerUrlInput" placeholder="https://html-fetcher.budi-indra94.workers.dev" class="lc-input" />
-            <button id="resetWorkerUrlBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Reset</button>
+            <select id="fetcherProviderSelect" class="lc-input">
+              <option value="google-apps-script">Google Apps Script</option>
+              <option value="cloudflare-worker">Cloudflare Worker</option>
+              <option value="jina">Jina AI</option>
+              <option value="scrapingbee">ScrapingBee</option>
+              <option value="scraperapi">ScraperAPI</option>
+              <option value="browserless">Browserless</option>
+              <option value="custom">Custom URL</option>
+            </select>
+            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Reset</button>
           </div>
-          <p class="lc-worker-hint">Default fetcher uses Google Apps Script. If it fails, the app falls back to Cloudflare Worker. You can also set your own worker URL here.</p>
+          <div class="lc-worker-row lc-worker-api-row hidden" id="fetcherApiKeyRow">
+            <input type="text" id="fetcherApiKeyInput" placeholder="API key / token" class="lc-input" />
+          </div>
+          <div class="lc-worker-row lc-worker-custom-row hidden" id="fetcherCustomUrlRow">
+            <input type="url" id="fetcherCustomUrlInput" placeholder="https://your-worker.com/?url=" class="lc-input" />
+          </div>
+          <p class="lc-worker-hint">Google Apps Script is the default. Services like ScrapingBee, ScraperAPI, and Browserless require your own API key. Select Custom URL to use any other fetcher.</p>
         </details>
       </div>
       <div class="lc-source-actions">

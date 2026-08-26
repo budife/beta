@@ -12,8 +12,7 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 ## Layout Checker v1.5.3 - 26 August 2026
 
-- Added a configurable **HTML Fetcher Worker URL** in Layout Checker. Users can now set their own worker URL via a settings panel below the Layout URL input. The custom URL is saved to localStorage and used when fetching remote HTML. A Reset button restores the default fetcher.
-- Changed the default HTML fetcher to Google Apps Script. The previous Cloudflare Worker is now used as a fallback if Google Apps Script fails.
+- Added a configurable **HTML Fetcher** dropdown in Layout Checker. Users can now choose between Google Apps Script, Cloudflare Worker, Jina AI, ScrapingBee, ScraperAPI, Browserless, or a custom URL. API-key services show an API key input; selections and keys are saved to localStorage. A Reset button restores the default Google Apps Script fetcher.
 
 ## Campaign Counter - Reset Folder Scans
 

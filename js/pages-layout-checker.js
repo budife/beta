@@ -11,8 +11,55 @@ document.addEventListener('DOMContentLoaded', () => {
 // Cloudflare Worker URL for fetching remote HTML.
 // Replace with your deployed Worker URL.
 const HTML_FETCHER_WORKER_URL = 'https://html-fetcher.budi-indra94.workers.dev';
-const FALLBACK_FETCHER_URL = 'https://script.google.com/macros/s/AKfycbw29ldtoG5eq2I0bmeF055VWaZ_Ejk59E1wMrhY2pSdWuEHTDRL3saPCR2BoAC6-nmP/exec';
-const CUSTOM_WORKER_URL_KEY = 'edm_layout_checker_worker_url';
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw29ldtoG5eq2I0bmeF055VWaZ_Ejk59E1wMrhY2pSdWuEHTDRL3saPCR2BoAC6-nmP/exec';
+const FETCHER_PROVIDER_KEY = 'edm_layout_checker_fetcher_provider';
+const FETCHER_API_KEY_KEY = 'edm_layout_checker_fetcher_api_key';
+const FETCHER_CUSTOM_URL_KEY = 'edm_layout_checker_fetcher_custom_url';
+
+const FETCHER_PROVIDERS = {
+  'google-apps-script': {
+    label: 'Google Apps Script',
+    needsKey: false,
+    buildUrl: (targetUrl) => `${GOOGLE_APPS_SCRIPT_URL}?url=${encodeURIComponent(targetUrl)}`
+  },
+  'cloudflare-worker': {
+    label: 'Cloudflare Worker',
+    needsKey: false,
+    buildUrl: (targetUrl) => `${HTML_FETCHER_WORKER_URL}?url=${encodeURIComponent(targetUrl)}`
+  },
+  'jina': {
+    label: 'Jina AI',
+    needsKey: false,
+    buildUrl: (targetUrl) => `https://r.jina.ai/http://${targetUrl.replace(/^https?:\/\//, '')}`
+  },
+  'scrapingbee': {
+    label: 'ScrapingBee',
+    needsKey: true,
+    buildUrl: (targetUrl, key) => `https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`
+  },
+  'scraperapi': {
+    label: 'ScraperAPI',
+    needsKey: true,
+    buildUrl: (targetUrl, key) => `https://api.scraperapi.com/?api_key=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`
+  },
+  'browserless': {
+    label: 'Browserless',
+    needsKey: true,
+    buildUrl: (targetUrl, key) => `https://chrome.browserless.io/content?token=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`
+  },
+  'custom': {
+    label: 'Custom URL',
+    needsKey: false,
+    buildUrl: (targetUrl, _key, customBaseUrl) => {
+      const base = customBaseUrl.trim();
+      if (base.includes('?')) {
+        const separator = base.endsWith('?') || base.endsWith('&') ? '' : '&';
+        return `${base}${separator}url=${encodeURIComponent(targetUrl)}`;
+      }
+      return `${base}?url=${encodeURIComponent(targetUrl)}`;
+    }
+  }
+};
 
 // ---- Extracted scripts from inline <script> blocks ----
 // Initialize CodeMirror editor for htmlInput textarea
@@ -39,8 +86,12 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const openPreviewBtn = document.getElementById('openPreviewBtn');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
 const textModeBtn = document.getElementById('textModeBtn');
-const customWorkerUrlInput = document.getElementById('customWorkerUrlInput');
-const resetWorkerUrlBtn = document.getElementById('resetWorkerUrlBtn');
+const fetcherProviderSelect = document.getElementById('fetcherProviderSelect');
+const fetcherApiKeyInput = document.getElementById('fetcherApiKeyInput');
+const fetcherApiKeyRow = document.getElementById('fetcherApiKeyRow');
+const fetcherCustomUrlInput = document.getElementById('fetcherCustomUrlInput');
+const fetcherCustomUrlRow = document.getElementById('fetcherCustomUrlRow');
+const resetFetcherBtn = document.getElementById('resetFetcherBtn');
 const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
@@ -994,40 +1045,38 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       throw new Error('Only mail.hsbc.com.hk URLs are allowed.');
     }
 
-    const customBaseUrl = (customWorkerUrlInput?.value || localStorage.getItem(CUSTOM_WORKER_URL_KEY) || '').trim();
-    const primaryBaseUrl = customBaseUrl || FALLBACK_FETCHER_URL;
+    const providerKey = (fetcherProviderSelect?.value || localStorage.getItem(FETCHER_PROVIDER_KEY) || 'google-apps-script').trim();
+    const apiKey = (fetcherApiKeyInput?.value || localStorage.getItem(FETCHER_API_KEY_KEY) || '').trim();
+    const customBaseUrl = (fetcherCustomUrlInput?.value || localStorage.getItem(FETCHER_CUSTOM_URL_KEY) || '').trim();
+    const provider = FETCHER_PROVIDERS[providerKey] || FETCHER_PROVIDERS['google-apps-script'];
+
+    if (provider.needsKey && !apiKey) {
+      throw new Error(`${provider.label} requires an API key. Please enter it in the HTML fetcher settings.`);
+    }
+    if (providerKey === 'custom' && !customBaseUrl) {
+      throw new Error('Custom URL fetcher requires a worker URL. Please enter it in the HTML fetcher settings.');
+    }
+
+    const fetchUrl = provider.buildUrl(url, apiKey, customBaseUrl);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     const abortFromGlobal = () => controller.abort();
     abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
 
-    async function tryFetcher(baseUrl, label) {
-      const workerUrl = `${baseUrl}?url=${encodeURIComponent(url)}`;
-      const response = await fetch(workerUrl, {
+    try {
+      const response = await fetch(fetchUrl, {
         signal: controller.signal,
         headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
       });
       if (!response.ok) {
         const message = await response.text().catch(() => '');
-        throw new Error(`${label} HTTP ${response.status}: ${message}`);
+        throw new Error(`${provider.label} HTTP ${response.status}: ${message}`);
       }
       const html = await response.text();
       if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
-        throw new Error(`${label} response is not valid HTML`);
+        throw new Error(`${provider.label} response is not valid HTML`);
       }
-      return { html, via: label };
-    }
-
-    try {
-      try {
-        return await tryFetcher(primaryBaseUrl, 'Google Apps Script');
-      } catch (primaryError) {
-        if (primaryBaseUrl !== HTML_FETCHER_WORKER_URL) {
-          console.warn('Primary fetcher failed, trying Cloudflare Worker fallback:', primaryError.message);
-          return await tryFetcher(HTML_FETCHER_WORKER_URL, 'Cloudflare Worker');
-        }
-        throw primaryError;
-      }
+      return { html, via: provider.label };
     } finally {
       clearTimeout(timeoutId);
       abortController?.signal?.removeEventListener('abort', abortFromGlobal);
@@ -1252,30 +1301,60 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   // Save state before leaving page - DISABLED
   // window.addEventListener('beforeunload', saveState); // DISABLED
 
-  // Custom HTML fetcher worker URL
-  if (customWorkerUrlInput) {
-    const savedWorkerUrl = localStorage.getItem(CUSTOM_WORKER_URL_KEY);
-    if (savedWorkerUrl) {
-      customWorkerUrlInput.value = savedWorkerUrl;
+  function updateFetcherUi() {
+    const providerKey = fetcherProviderSelect?.value || 'google-apps-script';
+    const provider = FETCHER_PROVIDERS[providerKey] || FETCHER_PROVIDERS['google-apps-script'];
+    if (fetcherApiKeyRow) fetcherApiKeyRow.classList.toggle('hidden', !provider.needsKey);
+    if (fetcherCustomUrlRow) fetcherCustomUrlRow.classList.toggle('hidden', providerKey !== 'custom');
+  }
+
+  if (fetcherProviderSelect) {
+    const savedProvider = localStorage.getItem(FETCHER_PROVIDER_KEY);
+    if (savedProvider && FETCHER_PROVIDERS[savedProvider]) {
+      fetcherProviderSelect.value = savedProvider;
     }
-    customWorkerUrlInput.addEventListener('change', () => {
-      const value = customWorkerUrlInput.value.trim();
+    const savedApiKey = localStorage.getItem(FETCHER_API_KEY_KEY);
+    if (savedApiKey && fetcherApiKeyInput) fetcherApiKeyInput.value = savedApiKey;
+    const savedCustomUrl = localStorage.getItem(FETCHER_CUSTOM_URL_KEY);
+    if (savedCustomUrl && fetcherCustomUrlInput) fetcherCustomUrlInput.value = savedCustomUrl;
+    updateFetcherUi();
+
+    fetcherProviderSelect.addEventListener('change', () => {
+      localStorage.setItem(FETCHER_PROVIDER_KEY, fetcherProviderSelect.value);
+      updateFetcherUi();
+    });
+  }
+  if (fetcherApiKeyInput) {
+    fetcherApiKeyInput.addEventListener('change', () => {
+      const value = fetcherApiKeyInput.value.trim();
+      if (value) localStorage.setItem(FETCHER_API_KEY_KEY, value);
+      else localStorage.removeItem(FETCHER_API_KEY_KEY);
+    });
+  }
+  if (fetcherCustomUrlInput) {
+    fetcherCustomUrlInput.addEventListener('change', () => {
+      const value = fetcherCustomUrlInput.value.trim();
       if (value) {
         try {
           new URL(value);
-          localStorage.setItem(CUSTOM_WORKER_URL_KEY, value);
+          localStorage.setItem(FETCHER_CUSTOM_URL_KEY, value);
         } catch {
-          setLayoutStatus('error', 'Invalid worker URL');
+          setLayoutStatus('error', 'Invalid custom fetcher URL');
         }
       } else {
-        localStorage.removeItem(CUSTOM_WORKER_URL_KEY);
+        localStorage.removeItem(FETCHER_CUSTOM_URL_KEY);
       }
     });
   }
-  if (resetWorkerUrlBtn) {
-    resetWorkerUrlBtn.addEventListener('click', () => {
-      localStorage.removeItem(CUSTOM_WORKER_URL_KEY);
-      if (customWorkerUrlInput) customWorkerUrlInput.value = '';
-      setLayoutStatus('ready', 'Worker URL reset to default');
+  if (resetFetcherBtn) {
+    resetFetcherBtn.addEventListener('click', () => {
+      localStorage.removeItem(FETCHER_PROVIDER_KEY);
+      localStorage.removeItem(FETCHER_API_KEY_KEY);
+      localStorage.removeItem(FETCHER_CUSTOM_URL_KEY);
+      if (fetcherProviderSelect) fetcherProviderSelect.value = 'google-apps-script';
+      if (fetcherApiKeyInput) fetcherApiKeyInput.value = '';
+      if (fetcherCustomUrlInput) fetcherCustomUrlInput.value = '';
+      updateFetcherUi();
+      setLayoutStatus('ready', 'Fetcher reset to Google Apps Script');
     });
   }
