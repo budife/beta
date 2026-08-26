@@ -24,10 +24,6 @@ const FETCHER_PROVIDERS = {
     label: 'Cloudflare Worker',
     buildUrl: (targetUrl) => `${HTML_FETCHER_WORKER_URL}?url=${encodeURIComponent(targetUrl)}`
   },
-  'jina': {
-    label: 'Jina AI',
-    buildUrl: (targetUrl) => `https://r.jina.ai/http://${targetUrl.replace(/^https?:\/\//, '')}`
-  },
   'custom': {
     label: 'Custom URL',
     buildUrl: (targetUrl, _key, customBaseUrl) => {
