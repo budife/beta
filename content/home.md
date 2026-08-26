@@ -15,6 +15,11 @@ category: Home
 
 ## Recent Updates
 
+### 26 August 2026
+- **Campaign Counter v2.0.1** - Added Reset button next to Scan Folder to clear all saved folder scans from Supabase.
+- **Campaign Counter v2.0.1** - Fixed campaign folder tooltip to show all entries with the same campaign ID but different dates.
+- **Campaign Counter v2.0.1** - Fixed folder name parsing to handle pipe-separated format with date and manager in either order.
+
 ### 24 August 2026
 - **Layout Checker v1.5.2** - Subject field integrated in source bar below URL, auto-processes KRHRED placeholders live as unit values are entered. Removed old subject panel and Add Unit button.
 - **Doc to HTML v1.1.0** - Added PDF support (editable text + image modes), Save to Folder with auto nested subfolders (emailblast\MKT\2026\tnc\), Open in New Tab, improved Word styleMap, redesigned full-height A4 preview.

@@ -14,6 +14,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Added a **Reset** button next to **Scan Folder** in Campaign Counter. Clicking Reset clears all saved folder scan results from Supabase and empties the local folder list.
 
+## Campaign Counter - Tooltip Multiple Entries Fix
+
+- Fixed campaign folder tooltip to display all scanned entries that share the same campaign ID but have different dates. Previously only the first entry was shown on hover.
+
 ## Campaign Counter - Folder Name Parsing Fix
 
 - Fixed campaign folder name parsing to properly handle `ID | Campaign Name | Date | Manager` format with pipe separators. Date and manager fields are now correctly identified regardless of their order (date can be before or after manager).
