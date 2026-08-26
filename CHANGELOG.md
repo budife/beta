@@ -12,8 +12,8 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 ## Layout Checker v1.5.3 - 26 August 2026
 
-- Added a configurable **HTML Fetcher Worker URL** in Layout Checker. Users can now set their own Cloudflare Worker domain via a settings panel below the Layout URL input. The custom URL is saved to localStorage and used when fetching remote HTML. Useful when the default `*.workers.dev` domain is blocked by corporate firewalls (e.g. HSBC network). A Reset button restores the default worker URL.
-- Added automatic fallback to a Google Apps Script fetcher when the primary Cloudflare Worker fails on restricted networks.
+- Added a configurable **HTML Fetcher Worker URL** in Layout Checker. Users can now set their own worker URL via a settings panel below the Layout URL input. The custom URL is saved to localStorage and used when fetching remote HTML. A Reset button restores the default fetcher.
+- Changed the default HTML fetcher to Google Apps Script. The previous Cloudflare Worker is now used as a fallback if Google Apps Script fails.
 
 ## Campaign Counter - Reset Folder Scans
 

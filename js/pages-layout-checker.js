@@ -995,7 +995,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     const customBaseUrl = (customWorkerUrlInput?.value || localStorage.getItem(CUSTOM_WORKER_URL_KEY) || '').trim();
-    const primaryBaseUrl = customBaseUrl || HTML_FETCHER_WORKER_URL;
+    const primaryBaseUrl = customBaseUrl || FALLBACK_FETCHER_URL;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     const abortFromGlobal = () => controller.abort();
@@ -1020,11 +1020,11 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
     try {
       try {
-        return await tryFetcher(primaryBaseUrl, 'Cloudflare Worker');
+        return await tryFetcher(primaryBaseUrl, 'Google Apps Script');
       } catch (primaryError) {
-        if (primaryBaseUrl !== FALLBACK_FETCHER_URL) {
-          console.warn('Primary fetcher failed, trying Google Apps Script fallback:', primaryError.message);
-          return await tryFetcher(FALLBACK_FETCHER_URL, 'Google Apps Script');
+        if (primaryBaseUrl !== HTML_FETCHER_WORKER_URL) {
+          console.warn('Primary fetcher failed, trying Cloudflare Worker fallback:', primaryError.message);
+          return await tryFetcher(HTML_FETCHER_WORKER_URL, 'Cloudflare Worker');
         }
         throw primaryError;
       }
