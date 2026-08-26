@@ -38,26 +38,48 @@ function parseFolderCampaignId(name) {
 function parseFolderInfo(name) {
   const trimmed = name.replace(/\s*-\s*Copy(\s*\(\d+\))?$/gi, '').trim();
   const pipeParts = trimmed.split(/\s*\|\s*/).map(p => p.trim()).filter(p => p);
-  if (pipeParts.length < 2) {
-    const idMatch = trimmed.match(/^(\d{4})/);
-    return { id: idMatch ? idMatch[1] : null, name: trimmed, date: '', manager: '' };
+
+  if (pipeParts.length >= 3) {
+    const id = pipeParts[0].match(/\d{4}/)?.[0] || pipeParts[0];
+    let campaignName = pipeParts[1];
+    let date = '';
+    let manager = '';
+    if (pipeParts.length === 3) {
+      const dateOrMgr = pipeParts[2];
+      if (/\d{1,2}-\d{2,4}/.test(dateOrMgr)) date = dateOrMgr;
+      else manager = dateOrMgr;
+    } else {
+      const f3 = pipeParts[2];
+      const f4 = pipeParts[3];
+      if (/\d{1,2}-\d{2,4}/.test(f3)) { date = f3; manager = f4; }
+      else if (/\d{1,2}-\d{2,4}/.test(f4)) { date = f4; manager = f3; }
+      else { manager = f3; }
+    }
+    return { id, name: campaignName, date, manager };
   }
-  const id = pipeParts[0].match(/\d{4}/)?.[0] || pipeParts[0];
-  let campaignName = '';
+
+  const idMatch = trimmed.match(/^(\d{4})/);
+  const id = idMatch ? idMatch[1] : null;
+  let rest = trimmed.replace(/^\d{4}\s*/, '').trim();
+  const dateMatch = rest.match(/\b(\d{1,2}-\d{2,4})\b/);
   let date = '';
+  let campaignName = rest;
   let manager = '';
-  if (pipeParts.length === 3) {
-    campaignName = pipeParts[1];
-    const dateOrMgr = pipeParts[2];
-    if (/\d{1,2}-\d{2,4}/.test(dateOrMgr)) date = dateOrMgr;
-    else manager = dateOrMgr;
-  } else if (pipeParts.length >= 4) {
-    campaignName = pipeParts[1];
-    const f3 = pipeParts[2];
-    const f4 = pipeParts[3];
-    if (/\d{1,2}-\d{2,4}/.test(f3)) { date = f3; manager = f4; }
-    else if (/\d{1,2}-\d{2,4}/.test(f4)) { date = f4; manager = f3; }
-    else { manager = f3; }
+  if (dateMatch) {
+    date = dateMatch[1];
+    const before = rest.slice(0, dateMatch.index).trim();
+    const after = rest.slice(dateMatch.index + dateMatch[0].length).trim();
+    const beforeWords = before.split(/\s+/);
+    const afterWords = after.split(/\s+/).filter(w => w);
+    if (afterWords.length) {
+      campaignName = before;
+      manager = afterWords.join(' ');
+    } else if (beforeWords.length >= 2) {
+      manager = beforeWords.pop();
+      campaignName = beforeWords.join(' ');
+    } else {
+      campaignName = before;
+    }
   }
   return { id, name: campaignName, date, manager };
 }
@@ -89,7 +111,7 @@ function renderFolderList() {
 
     const campaignItems = entries.map(e => `
       <span class="tooltip-campaign-item">
-        <span class="tooltip-date">${escapeHtml(e.date || '—')}</span>
+        <span class="tooltip-date">${escapeHtml(e.date || '')}</span>
         <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}</span>
         <span class="tooltip-manager">${escapeHtml(e.manager || '')}</span>
       </span>`).join('');
