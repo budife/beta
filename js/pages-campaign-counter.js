@@ -36,20 +36,51 @@ function parseFolderCampaignId(name) {
 }
 
 function parseFolderInfo(name) {
-  const idMatch = name.match(/\b(\d{4})\b\s+(.+)/);
-  if (!idMatch) return { id: null, name: name, date: '', manager: '' };
-  const id = idMatch[1];
-  let rest = idMatch[2].replace(/\s*-\s*Copy(\s*\(\d+\))?/gi, '').trim();
-  const dateMatch = rest.match(/\b(\d{1,2})-(\d{2,4})\b/);
-  let date = '';
-  let namePart = rest;
-  if (dateMatch) {
-    date = dateMatch[0];
-    namePart = rest.slice(0, dateMatch.index).trim();
+  const trimmed = name.replace(/\s*-\s*Copy(\s*\(\d+\))?$/gi, '').trim();
+  const pipeParts = trimmed.split(/\s*\|\s*/).map(p => p.trim()).filter(p => p);
+
+  if (pipeParts.length >= 3) {
+    const id = pipeParts[0].match(/\d{4}/)?.[0] || pipeParts[0];
+    let campaignName = pipeParts[1];
+    let date = '';
+    let manager = '';
+    if (pipeParts.length === 3) {
+      const dateOrMgr = pipeParts[2];
+      if (/\d{1,2}-\d{2,4}/.test(dateOrMgr)) date = dateOrMgr;
+      else manager = dateOrMgr;
+    } else {
+      const f3 = pipeParts[2];
+      const f4 = pipeParts[3];
+      if (/\d{1,2}-\d{2,4}/.test(f3)) { date = f3; manager = f4; }
+      else if (/\d{1,2}-\d{2,4}/.test(f4)) { date = f4; manager = f3; }
+      else { manager = f3; }
+    }
+    return { id, name: campaignName, date, manager };
   }
-  const parts = namePart.split(/\s+/);
-  const campaignName = parts[0] || '';
-  const manager = parts[1] || '';
+
+  const idMatch = trimmed.match(/^(\d{4})/);
+  const id = idMatch ? idMatch[1] : null;
+  let rest = trimmed.replace(/^\d{4}\s*/, '').trim();
+  const dateMatch = rest.match(/\b(\d{1,2}-\d{2,4})\b/);
+  let date = '';
+  let campaignName = rest;
+  let manager = '';
+  if (dateMatch) {
+    date = dateMatch[1];
+    const before = rest.slice(0, dateMatch.index).trim();
+    const after = rest.slice(dateMatch.index + dateMatch[0].length).trim();
+    const beforeWords = before.split(/\s+/);
+    const afterWords = after.split(/\s+/).filter(w => w);
+    if (afterWords.length) {
+      campaignName = before;
+      manager = afterWords.join(' ');
+    } else if (beforeWords.length >= 2) {
+      manager = beforeWords.pop();
+      campaignName = beforeWords.join(' ');
+    } else {
+      campaignName = before;
+    }
+  }
   return { id, name: campaignName, date, manager };
 }
 
@@ -80,8 +111,9 @@ function renderFolderList() {
 
     const campaignItems = entries.map(e => `
       <span class="tooltip-campaign-item">
-        <span class="tooltip-date">${escapeHtml(e.date || '—')}</span>
-        <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}${e.manager ? ' - ' + escapeHtml(e.manager) : ''}</span>
+        <span class="tooltip-date">${escapeHtml(e.date || '')}</span>
+        <span class="tooltip-name">${escapeHtml(e.name || 'Unknown')}</span>
+        <span class="tooltip-manager">${escapeHtml(e.manager || '')}</span>
       </span>`).join('');
 
     chip.innerHTML = `<code>${escapeHtml(id)}</code>`;
@@ -169,18 +201,32 @@ async function scanFolder() {
       const id = parseFolderCampaignId(name);
       if (id) {
         const info = parseFolderInfo(name);
+        const entryKey = `${id}|${info.date}|${info.name}|${info.manager}`;
         if (scannedFolderIds.has(id)) {
-          skippedCount += 1;
-          continue;
+          const existing = scannedFolderIds.get(id);
+          const isDuplicate = existing.some(e => `${e.date}|${e.name}|${e.manager}` === `${info.date}|${info.name}|${info.manager}`);
+          if (!isDuplicate) {
+            existing.push(info);
+            newCount += 1;
+            newEntries.push({
+              campaign_id: id,
+              campaign_name: info.name || '',
+              folder_date: info.date || '',
+              manager: info.manager || ''
+            });
+          } else {
+            skippedCount += 1;
+          }
+        } else {
+          scannedFolderIds.set(id, [info]);
+          newCount += 1;
+          newEntries.push({
+            campaign_id: id,
+            campaign_name: info.name || '',
+            folder_date: info.date || '',
+            manager: info.manager || ''
+          });
         }
-        scannedFolderIds.set(id, [info]);
-        newCount += 1;
-        newEntries.push({
-          campaign_id: id,
-          campaign_name: info.name || '',
-          folder_date: info.date || '',
-          manager: info.manager || ''
-        });
       }
     }
     const btn = document.getElementById('pick-folder');
@@ -209,6 +255,32 @@ async function scanFolder() {
     if (error.name !== 'AbortError') {
       setMessage('Unable to read folder. Please try again.', 'error');
     }
+  }
+}
+
+async function resetFolderScans() {
+  if (!scannedFolderIds.size) {
+    setMessage('No folder scans to reset.', 'info');
+    return;
+  }
+  if (!confirm('Are you sure you want to clear all saved folder scans? This cannot be undone.')) {
+    return;
+  }
+  try {
+    if (connected && username) {
+      await campaignRegistryService.clearFolderScans(username);
+    }
+    scannedFolderIds.clear();
+    renderFolderList();
+    updateConflictState();
+    const btn = document.getElementById('pick-folder');
+    const label = document.getElementById('folder-btn-label');
+    if (btn) btn.classList.remove('is-loaded');
+    if (label) label.textContent = 'Scan Folder';
+    setMessage('Folder scans cleared.', 'success');
+  } catch (error) {
+    console.error('Unable to clear folder scans.', error);
+    setMessage('Unable to clear folder scans. Please try again.', 'error');
   }
 }
 
@@ -555,6 +627,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
   nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   document.getElementById('pick-folder')?.addEventListener('click', scanFolder);
+  document.getElementById('reset-folder')?.addEventListener('click', resetFolderScans);
 
   bindWelcomeDialog();
   bindManualDialog();
