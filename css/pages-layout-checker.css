@@ -2720,6 +2720,35 @@ body *::after {
   gap: 8px;
   margin-top: 6px;
 }
+
+.lc-worker-setting {
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.lc-worker-setting summary {
+  color: #71717a;
+  cursor: pointer;
+  user-select: none;
+  font-size: 10px;
+}
+
+.lc-worker-setting summary:hover {
+  color: #b4232d;
+}
+
+.lc-worker-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.lc-worker-hint {
+  margin: 6px 0 0;
+  color: #a1a1aa;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .lc-input-grid {

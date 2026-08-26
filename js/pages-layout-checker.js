@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Cloudflare Worker URL for fetching remote HTML.
 // Replace with your deployed Worker URL.
 const HTML_FETCHER_WORKER_URL = 'https://html-fetcher.budi-indra94.workers.dev';
+const CUSTOM_WORKER_URL_KEY = 'edm_layout_checker_worker_url';
 
 // ---- Extracted scripts from inline <script> blocks ----
 // Initialize CodeMirror editor for htmlInput textarea
@@ -36,8 +37,10 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const downloadScreenshotBtn = document.getElementById('downloadScreenshotBtn');
   const openPreviewBtn = document.getElementById('openPreviewBtn');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
-  const textModeBtn = document.getElementById('textModeBtn');
-  const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
+const textModeBtn = document.getElementById('textModeBtn');
+const customWorkerUrlInput = document.getElementById('customWorkerUrlInput');
+const resetWorkerUrlBtn = document.getElementById('resetWorkerUrlBtn');
+const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
@@ -990,7 +993,8 @@ const originalUrlInput = document.getElementById('originalUrlInput');
       throw new Error('Only mail.hsbc.com.hk URLs are allowed.');
     }
 
-    const workerUrl = `${HTML_FETCHER_WORKER_URL}?url=${encodeURIComponent(url)}`;
+    const workerBaseUrl = (customWorkerUrlInput?.value || localStorage.getItem(CUSTOM_WORKER_URL_KEY) || HTML_FETCHER_WORKER_URL).trim();
+    const workerUrl = `${workerBaseUrl}?url=${encodeURIComponent(url)}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     const abortFromGlobal = () => controller.abort();
@@ -1233,3 +1237,31 @@ const originalUrlInput = document.getElementById('originalUrlInput');
 
   // Save state before leaving page - DISABLED
   // window.addEventListener('beforeunload', saveState); // DISABLED
+
+  // Custom HTML fetcher worker URL
+  if (customWorkerUrlInput) {
+    const savedWorkerUrl = localStorage.getItem(CUSTOM_WORKER_URL_KEY);
+    if (savedWorkerUrl) {
+      customWorkerUrlInput.value = savedWorkerUrl;
+    }
+    customWorkerUrlInput.addEventListener('change', () => {
+      const value = customWorkerUrlInput.value.trim();
+      if (value) {
+        try {
+          new URL(value);
+          localStorage.setItem(CUSTOM_WORKER_URL_KEY, value);
+        } catch {
+          setLayoutStatus('error', 'Invalid worker URL');
+        }
+      } else {
+        localStorage.removeItem(CUSTOM_WORKER_URL_KEY);
+      }
+    });
+  }
+  if (resetWorkerUrlBtn) {
+    resetWorkerUrlBtn.addEventListener('click', () => {
+      localStorage.removeItem(CUSTOM_WORKER_URL_KEY);
+      if (customWorkerUrlInput) customWorkerUrlInput.value = '';
+      setLayoutStatus('ready', 'Worker URL reset to default');
+    });
+  }

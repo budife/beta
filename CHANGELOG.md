@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v1.5.3 - 26 August 2026
+
+- Added a configurable **HTML Fetcher Worker URL** in Layout Checker. Users can now set their own Cloudflare Worker domain via a settings panel below the Layout URL input. The custom URL is saved to localStorage and used when fetching remote HTML. Useful when the default `*.workers.dev` domain is blocked by corporate firewalls (e.g. HSBC network). A Reset button restores the default worker URL.
+
 ## Campaign Counter - Reset Folder Scans
 
 - Added a **Reset** button next to **Scan Folder** in Campaign Counter. Clicking Reset clears all saved folder scan results from Supabase and empties the local folder list.
