@@ -12,7 +12,8 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 ## Layout Checker v1.5.3 - 26 August 2026
 
-- Added a configurable **HTML Fetcher Worker URL** in Layout Checker. Users can now set their own Cloudflare Worker domain via a settings panel below the Layout URL input. The custom URL is saved to localStorage and used when fetching remote HTML. Useful when the default `*.workers.dev` domain is blocked by corporate firewalls (e.g. HSBC network). A Reset button restores the default worker URL.
+- Added a configurable **HTML Fetcher Worker URL** in Layout Checker. Users can now set one or more worker URLs in a settings panel below the Layout URL input, separated by commas or new lines. Layout Checker tries each URL in order until one succeeds and remembers the last working URL. Useful when the default `*.workers.dev` domain is blocked by corporate firewalls (e.g. HSBC network). A Reset button restores the default worker URL.
+- Added deployment examples for Deno Deploy, Vercel Edge Functions, Netlify Edge Functions, and Node.js/Express in `workers/`.
 
 ## Campaign Counter - Reset Folder Scans
 

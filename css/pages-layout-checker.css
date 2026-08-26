@@ -2742,6 +2742,13 @@ body *::after {
   grid-template-columns: 1fr auto;
   gap: 8px;
   margin-top: 6px;
+  align-items: start;
+}
+
+.lc-worker-row .lc-input {
+  min-height: 60px;
+  height: auto;
+  resize: vertical;
 }
 
 .lc-worker-hint {

@@ -993,31 +993,65 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       throw new Error('Only mail.hsbc.com.hk URLs are allowed.');
     }
 
-    const workerBaseUrl = (customWorkerUrlInput?.value || localStorage.getItem(CUSTOM_WORKER_URL_KEY) || HTML_FETCHER_WORKER_URL).trim();
-    const workerUrl = `${workerBaseUrl}?url=${encodeURIComponent(url)}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-    const abortFromGlobal = () => controller.abort();
-    abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
-
-    try {
-      const response = await fetch(workerUrl, {
-        signal: controller.signal,
-        headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
-      });
-      if (!response.ok) {
-        const message = await response.text().catch(() => '');
-        throw new Error(`Worker HTTP ${response.status}: ${message}`);
-      }
-      const html = await response.text();
-      if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
-        throw new Error('Worker response is not valid HTML');
-      }
-      return { html, via: 'Cloudflare Worker' };
-    } finally {
-      clearTimeout(timeoutId);
-      abortController?.signal?.removeEventListener('abort', abortFromGlobal);
+    const workerUrls = getWorkerUrls();
+    if (!workerUrls.length) {
+      throw new Error('No HTML fetcher worker URL configured.');
     }
+
+    const lastWorkingUrl = localStorage.getItem(`${CUSTOM_WORKER_URL_KEY}_last`);
+    const orderedUrls = lastWorkingUrl && workerUrls.includes(lastWorkingUrl)
+      ? [lastWorkingUrl, ...workerUrls.filter(u => u !== lastWorkingUrl)]
+      : workerUrls;
+
+    let lastError = null;
+    for (const baseUrl of orderedUrls) {
+      const workerUrl = `${baseUrl}?url=${encodeURIComponent(url)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const abortFromGlobal = () => controller.abort();
+      abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
+
+      try {
+        const response = await fetch(workerUrl, {
+          signal: controller.signal,
+          headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
+        });
+        if (!response.ok) {
+          const message = await response.text().catch(() => '');
+          throw new Error(`Worker HTTP ${response.status}: ${message}`);
+        }
+        const html = await response.text();
+        if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
+          throw new Error('Worker response is not valid HTML');
+        }
+        localStorage.setItem(`${CUSTOM_WORKER_URL_KEY}_last`, baseUrl);
+        return { html, via: baseUrl };
+      } catch (error) {
+        lastError = error;
+        console.warn(`Worker failed: ${baseUrl}`, error.message);
+      } finally {
+        clearTimeout(timeoutId);
+        abortController?.signal?.removeEventListener('abort', abortFromGlobal);
+      }
+    }
+
+    throw lastError || new Error('All worker URLs failed.');
+  }
+
+  function getWorkerUrls() {
+    const raw = (customWorkerUrlInput?.value || localStorage.getItem(CUSTOM_WORKER_URL_KEY) || HTML_FETCHER_WORKER_URL);
+    return raw
+      .split(/[\n,]+/)
+      .map(u => u.trim())
+      .filter(u => u)
+      .map(u => {
+        try {
+          return new URL(u).toString().replace(/\/$/, '');
+        } catch {
+          return '';
+        }
+      })
+      .filter(u => u);
   }
 
   // Apply krhred values functionality
@@ -1247,20 +1281,29 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     customWorkerUrlInput.addEventListener('change', () => {
       const value = customWorkerUrlInput.value.trim();
       if (value) {
-        try {
-          new URL(value);
-          localStorage.setItem(CUSTOM_WORKER_URL_KEY, value);
-        } catch {
-          setLayoutStatus('error', 'Invalid worker URL');
+        const urls = value
+          .split(/[\n,]+/)
+          .map(u => u.trim())
+          .filter(u => u);
+        const invalid = urls.find(u => {
+          try { new URL(u); return false; } catch { return true; }
+        });
+        if (invalid) {
+          setLayoutStatus('error', `Invalid worker URL: ${invalid}`);
+          return;
         }
+        localStorage.setItem(CUSTOM_WORKER_URL_KEY, value);
+        localStorage.removeItem(`${CUSTOM_WORKER_URL_KEY}_last`);
       } else {
         localStorage.removeItem(CUSTOM_WORKER_URL_KEY);
+        localStorage.removeItem(`${CUSTOM_WORKER_URL_KEY}_last`);
       }
     });
   }
   if (resetWorkerUrlBtn) {
     resetWorkerUrlBtn.addEventListener('click', () => {
       localStorage.removeItem(CUSTOM_WORKER_URL_KEY);
+      localStorage.removeItem(`${CUSTOM_WORKER_URL_KEY}_last`);
       if (customWorkerUrlInput) customWorkerUrlInput.value = '';
       setLayoutStatus('ready', 'Worker URL reset to default');
     });
