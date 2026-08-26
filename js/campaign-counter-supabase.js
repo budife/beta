@@ -137,6 +137,14 @@
     }
   }
 
+  async function clearFolderScans(scannedBy) {
+    const result = unwrap(await client()
+      .from('campaign_folder_scans')
+      .delete()
+      .eq('scanned_by', scannedBy));
+    return result;
+  }
+
   return {
     checkConnection,
     loadLastCampaign,
@@ -148,6 +156,7 @@
     subscribeCounter,
     subscribeActivity,
     saveFolderScan,
-    loadFolderScans
+    loadFolderScans,
+    clearFolderScans
   };
 });

@@ -166,6 +166,23 @@
   border-color: #6ee7b7;
 }
 
+.folder-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.counter-folder-btn--reset {
+  color: #9f3f45;
+  background: #ffffff;
+  border-color: #f18c8e;
+}
+
+.counter-folder-btn--reset:hover {
+  color: #ffffff;
+  background: #f18c8e;
+  border-color: #f18c8e;
+}
+
 .counter-folder {
   position: relative;
   overflow: visible;

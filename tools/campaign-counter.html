@@ -75,9 +75,14 @@
             <section class="counter-card counter-folder" aria-labelledby="folder-panel-title">
               <header class="folder-heading">
                 <h2 id="folder-panel-title">Campaign Folder</h2>
-                <button class="counter-folder-btn" id="pick-folder" type="button">
-                  <i class="fa-solid fa-folder-open" aria-hidden="true"></i> <span id="folder-btn-label">Scan Folder</span>
-                </button>
+                <div class="folder-actions">
+                  <button class="counter-folder-btn" id="pick-folder" type="button">
+                    <i class="fa-solid fa-folder-open" aria-hidden="true"></i> <span id="folder-btn-label">Scan Folder</span>
+                  </button>
+                  <button class="counter-folder-btn counter-folder-btn--reset" id="reset-folder" type="button">
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i> <span>Reset</span>
+                  </button>
+                </div>
               </header>
               <div class="folder-list" id="folder-list" hidden>
                 <p class="folder-list-heading">Existing Campaigns <span class="folder-count" id="folder-count"></span></p>

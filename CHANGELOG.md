@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Campaign Counter - Reset Folder Scans
+
+- Added a **Reset** button next to **Scan Folder** in Campaign Counter. Clicking Reset clears all saved folder scan results from Supabase and empties the local folder list.
+
 ## Campaign Counter - Folder Name Parsing Fix
 
 - Fixed campaign folder name parsing to properly handle `ID | Campaign Name | Date | Manager` format with pipe separators. Date and manager fields are now correctly identified regardless of their order (date can be before or after manager).

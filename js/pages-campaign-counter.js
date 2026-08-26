@@ -258,6 +258,32 @@ async function scanFolder() {
   }
 }
 
+async function resetFolderScans() {
+  if (!scannedFolderIds.size) {
+    setMessage('No folder scans to reset.', 'info');
+    return;
+  }
+  if (!confirm('Are you sure you want to clear all saved folder scans? This cannot be undone.')) {
+    return;
+  }
+  try {
+    if (connected && username) {
+      await campaignRegistryService.clearFolderScans(username);
+    }
+    scannedFolderIds.clear();
+    renderFolderList();
+    updateConflictState();
+    const btn = document.getElementById('pick-folder');
+    const label = document.getElementById('folder-btn-label');
+    if (btn) btn.classList.remove('is-loaded');
+    if (label) label.textContent = 'Scan Folder';
+    setMessage('Folder scans cleared.', 'success');
+  } catch (error) {
+    console.error('Unable to clear folder scans.', error);
+    setMessage('Unable to clear folder scans. Please try again.', 'error');
+  }
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -601,6 +627,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (dateInput && !dateInput.value) dateInput.value = formatDatestamp(new Date());
   nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   document.getElementById('pick-folder')?.addEventListener('click', scanFolder);
+  document.getElementById('reset-folder')?.addEventListener('click', resetFolderScans);
 
   bindWelcomeDialog();
   bindManualDialog();
