@@ -2748,7 +2748,6 @@ body *::after {
   display: none;
 }
 
-.lc-worker-api-row,
 .lc-worker-custom-row {
   grid-template-columns: 1fr;
 }

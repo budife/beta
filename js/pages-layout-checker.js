@@ -13,43 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
 const HTML_FETCHER_WORKER_URL = 'https://html-fetcher.budi-indra94.workers.dev';
 const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw29ldtoG5eq2I0bmeF055VWaZ_Ejk59E1wMrhY2pSdWuEHTDRL3saPCR2BoAC6-nmP/exec';
 const FETCHER_PROVIDER_KEY = 'edm_layout_checker_fetcher_provider';
-const FETCHER_API_KEY_KEY = 'edm_layout_checker_fetcher_api_key';
 const FETCHER_CUSTOM_URL_KEY = 'edm_layout_checker_fetcher_custom_url';
 
 const FETCHER_PROVIDERS = {
   'google-apps-script': {
     label: 'Google Apps Script',
-    needsKey: false,
     buildUrl: (targetUrl) => `${GOOGLE_APPS_SCRIPT_URL}?url=${encodeURIComponent(targetUrl)}`
   },
   'cloudflare-worker': {
     label: 'Cloudflare Worker',
-    needsKey: false,
     buildUrl: (targetUrl) => `${HTML_FETCHER_WORKER_URL}?url=${encodeURIComponent(targetUrl)}`
   },
   'jina': {
     label: 'Jina AI',
-    needsKey: false,
     buildUrl: (targetUrl) => `https://r.jina.ai/http://${targetUrl.replace(/^https?:\/\//, '')}`
-  },
-  'scrapingbee': {
-    label: 'ScrapingBee',
-    needsKey: true,
-    buildUrl: (targetUrl, key) => `https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`
-  },
-  'scraperapi': {
-    label: 'ScraperAPI',
-    needsKey: true,
-    buildUrl: (targetUrl, key) => `https://api.scraperapi.com/?api_key=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`
-  },
-  'browserless': {
-    label: 'Browserless',
-    needsKey: true,
-    buildUrl: (targetUrl, key) => `https://chrome.browserless.io/content?token=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`
   },
   'custom': {
     label: 'Custom URL',
-    needsKey: false,
     buildUrl: (targetUrl, _key, customBaseUrl) => {
       const base = customBaseUrl.trim();
       if (base.includes('?')) {
@@ -87,8 +67,6 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
 const textModeBtn = document.getElementById('textModeBtn');
 const fetcherProviderSelect = document.getElementById('fetcherProviderSelect');
-const fetcherApiKeyInput = document.getElementById('fetcherApiKeyInput');
-const fetcherApiKeyRow = document.getElementById('fetcherApiKeyRow');
 const fetcherCustomUrlInput = document.getElementById('fetcherCustomUrlInput');
 const fetcherCustomUrlRow = document.getElementById('fetcherCustomUrlRow');
 const resetFetcherBtn = document.getElementById('resetFetcherBtn');
@@ -1046,18 +1024,14 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     const providerKey = (fetcherProviderSelect?.value || localStorage.getItem(FETCHER_PROVIDER_KEY) || 'google-apps-script').trim();
-    const apiKey = (fetcherApiKeyInput?.value || localStorage.getItem(FETCHER_API_KEY_KEY) || '').trim();
     const customBaseUrl = (fetcherCustomUrlInput?.value || localStorage.getItem(FETCHER_CUSTOM_URL_KEY) || '').trim();
     const provider = FETCHER_PROVIDERS[providerKey] || FETCHER_PROVIDERS['google-apps-script'];
 
-    if (provider.needsKey && !apiKey) {
-      throw new Error(`${provider.label} requires an API key. Please enter it in the HTML fetcher settings.`);
-    }
     if (providerKey === 'custom' && !customBaseUrl) {
       throw new Error('Custom URL fetcher requires a worker URL. Please enter it in the HTML fetcher settings.');
     }
 
-    const fetchUrl = provider.buildUrl(url, apiKey, customBaseUrl);
+    const fetchUrl = provider.buildUrl(url, '', customBaseUrl);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     const abortFromGlobal = () => controller.abort();
@@ -1303,8 +1277,6 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
   function updateFetcherUi() {
     const providerKey = fetcherProviderSelect?.value || 'google-apps-script';
-    const provider = FETCHER_PROVIDERS[providerKey] || FETCHER_PROVIDERS['google-apps-script'];
-    if (fetcherApiKeyRow) fetcherApiKeyRow.classList.toggle('hidden', !provider.needsKey);
     if (fetcherCustomUrlRow) fetcherCustomUrlRow.classList.toggle('hidden', providerKey !== 'custom');
   }
 
@@ -1313,8 +1285,6 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     if (savedProvider && FETCHER_PROVIDERS[savedProvider]) {
       fetcherProviderSelect.value = savedProvider;
     }
-    const savedApiKey = localStorage.getItem(FETCHER_API_KEY_KEY);
-    if (savedApiKey && fetcherApiKeyInput) fetcherApiKeyInput.value = savedApiKey;
     const savedCustomUrl = localStorage.getItem(FETCHER_CUSTOM_URL_KEY);
     if (savedCustomUrl && fetcherCustomUrlInput) fetcherCustomUrlInput.value = savedCustomUrl;
     updateFetcherUi();
@@ -1322,13 +1292,6 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     fetcherProviderSelect.addEventListener('change', () => {
       localStorage.setItem(FETCHER_PROVIDER_KEY, fetcherProviderSelect.value);
       updateFetcherUi();
-    });
-  }
-  if (fetcherApiKeyInput) {
-    fetcherApiKeyInput.addEventListener('change', () => {
-      const value = fetcherApiKeyInput.value.trim();
-      if (value) localStorage.setItem(FETCHER_API_KEY_KEY, value);
-      else localStorage.removeItem(FETCHER_API_KEY_KEY);
     });
   }
   if (fetcherCustomUrlInput) {
@@ -1349,10 +1312,8 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   if (resetFetcherBtn) {
     resetFetcherBtn.addEventListener('click', () => {
       localStorage.removeItem(FETCHER_PROVIDER_KEY);
-      localStorage.removeItem(FETCHER_API_KEY_KEY);
       localStorage.removeItem(FETCHER_CUSTOM_URL_KEY);
       if (fetcherProviderSelect) fetcherProviderSelect.value = 'google-apps-script';
-      if (fetcherApiKeyInput) fetcherApiKeyInput.value = '';
       if (fetcherCustomUrlInput) fetcherCustomUrlInput.value = '';
       updateFetcherUi();
       setLayoutStatus('ready', 'Fetcher reset to Google Apps Script');

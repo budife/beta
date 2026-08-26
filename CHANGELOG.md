@@ -12,7 +12,7 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 ## Layout Checker v1.5.3 - 26 August 2026
 
-- Added a configurable **HTML Fetcher** dropdown in Layout Checker. Users can now choose between Google Apps Script, Cloudflare Worker, Jina AI, ScrapingBee, ScraperAPI, Browserless, or a custom URL. API-key services show an API key input; selections and keys are saved to localStorage. A Reset button restores the default Google Apps Script fetcher.
+- Added a configurable **HTML Fetcher** dropdown in Layout Checker. Users can now choose between Google Apps Script, Cloudflare Worker, Jina AI, or a custom URL. Selections are saved to localStorage. A Reset button restores the default Google Apps Script fetcher.
 
 ## Campaign Counter - Reset Folder Scans
 

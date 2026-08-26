@@ -16,7 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
-- **Layout Checker v1.5.3** - Added configurable HTML fetcher dropdown: Google Apps Script, Cloudflare Worker, Jina AI, ScrapingBee, ScraperAPI, Browserless, or Custom URL.
+- **Layout Checker v1.5.3** - Added configurable HTML fetcher dropdown: Google Apps Script, Cloudflare Worker, Jina AI, or Custom URL.
 - **Campaign Counter v2.0.1** - Added Reset button next to Scan Folder to clear all saved folder scans from Supabase.
 - **Campaign Counter v2.0.1** - Fixed campaign folder tooltip to show all entries with the same campaign ID but different dates.
 - **Campaign Counter v2.0.1** - Fixed folder name parsing to handle pipe-separated format with date and manager in either order.
