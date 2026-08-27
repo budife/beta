@@ -1024,29 +1024,44 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     const fetchUrl = provider.buildUrl(url, '', customBaseUrl);
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-    const abortFromGlobal = () => controller.abort();
-    abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
+    const isGoogleScript = providerKey === 'google-apps-script';
+    const maxRetries = isGoogleScript ? 2 : 0;
+    let lastError;
 
-    try {
-      const response = await fetch(fetchUrl, {
-        signal: controller.signal,
-        headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
-      });
-      if (!response.ok) {
-        const message = await response.text().catch(() => '');
-        throw new Error(`${provider.label} HTTP ${response.status}: ${message}`);
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const abortFromGlobal = () => controller.abort();
+      abortController?.signal?.addEventListener('abort', abortFromGlobal, { once: true });
+
+      try {
+        if (attempt > 0) {
+          if (fetchOverlayStatus) fetchOverlayStatus.textContent = `Retrying (${attempt}/${maxRetries})...`;
+          await new Promise(r => setTimeout(r, 2000));
+        }
+
+        const response = await fetch(fetchUrl, {
+          signal: controller.signal,
+          headers: { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
+        });
+        if (!response.ok) {
+          const message = await response.text().catch(() => '');
+          throw new Error(`${provider.label} HTTP ${response.status}: ${message}`);
+        }
+        const html = await response.text();
+        if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
+          throw new Error(`${provider.label} response is not valid HTML`);
+        }
+        return { html, via: provider.label };
+      } catch (err) {
+        lastError = err;
+        if (attempt < maxRetries) continue;
+      } finally {
+        clearTimeout(timeoutId);
+        abortController?.signal?.removeEventListener('abort', abortFromGlobal);
       }
-      const html = await response.text();
-      if (!html || !/<html|<!doctype|<table|<body/i.test(html)) {
-        throw new Error(`${provider.label} response is not valid HTML`);
-      }
-      return { html, via: provider.label };
-    } finally {
-      clearTimeout(timeoutId);
-      abortController?.signal?.removeEventListener('abort', abortFromGlobal);
     }
+    throw lastError;
   }
 
   // Apply krhred values functionality
