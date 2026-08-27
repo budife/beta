@@ -3015,6 +3015,33 @@ body *::after {
   margin-top: 6px;
 }
 
+.lc-fetch-error-icon {
+  font-size: 32px;
+  color: #f59e0b;
+}
+
+.lc-btn-retry {
+  background: transparent;
+  color: #f1f5f9;
+  border: 1px solid #475569;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.lc-btn-retry:hover {
+  background: #334155;
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
 .lc-panel + .lc-panel {
   margin-top: 0;
 }

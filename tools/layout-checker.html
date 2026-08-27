@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.6">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.7">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -171,6 +171,14 @@
               <i class="fa-solid fa-circle-notch fa-spin lc-fetch-overlay-spinner"></i>
             </div>
           </div>
+          <div id="fetchErrorOverlay" class="lc-fetch-overlay hidden">
+            <div class="lc-fetch-overlay-content">
+              <i class="fa-solid fa-triangle-exclamation lc-fetch-error-icon"></i>
+              <div id="fetchErrorTitle" class="lc-fetch-overlay-title">Failed to fetch</div>
+              <div id="fetchErrorMsg" class="lc-fetch-overlay-status">Please try again</div>
+              <button id="fetchRetryBtn" class="lc-btn lc-btn-retry"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+            </div>
+          </div>
           <iframe id="layoutPreviewFrame" title="Layout preview" sandbox="allow-same-origin allow-popups"></iframe>
         </div>
       </section>
@@ -206,8 +214,8 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.15.6" defer></script>
+<script src="../js/version-config.js?v=6.15.7" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.15.6" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.15.7" defer></script>
 </body>
 </html>

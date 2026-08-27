@@ -64,6 +64,10 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const fetchOverlayTitle = document.getElementById('fetchOverlayTitle');
   const fetchOverlayStatus = document.getElementById('fetchOverlayStatus');
   const fetchOverlayProvider = document.getElementById('fetchOverlayProvider');
+  const fetchErrorOverlay = document.getElementById('fetchErrorOverlay');
+  const fetchErrorTitle = document.getElementById('fetchErrorTitle');
+  const fetchErrorMsg = document.getElementById('fetchErrorMsg');
+  const fetchRetryBtn = document.getElementById('fetchRetryBtn');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
   const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
@@ -466,6 +470,16 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     if (fetchOverlay) fetchOverlay.classList.add('hidden');
   }
 
+  function showErrorOverlay(title = 'Failed to fetch', msg = 'Please try again') {
+    if (fetchErrorTitle) fetchErrorTitle.textContent = title;
+    if (fetchErrorMsg) fetchErrorMsg.textContent = msg;
+    if (fetchErrorOverlay) fetchErrorOverlay.classList.remove('hidden');
+  }
+
+  function hideErrorOverlay() {
+    if (fetchErrorOverlay) fetchErrorOverlay.classList.add('hidden');
+  }
+
   // Stop button functionality
   stopBtn.addEventListener('click', () => {
     if (abortController) {
@@ -473,6 +487,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       console.log('Operation stopped');
       hideProgress();
       hideLoadingOverlay();
+      hideErrorOverlay();
       originalUrlInput.disabled = false;
       resetUrlBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
       resetUrlBtn.title = 'Reset URL';
@@ -480,6 +495,14 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
     }
   });
+
+  // Retry button
+  if (fetchRetryBtn) {
+    fetchRetryBtn.addEventListener('click', () => {
+      hideErrorOverlay();
+      downloadBtn.click();
+    });
+  }
 
   // Helper function to validate URL
   function isValidUrl(url) {
@@ -970,7 +993,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
     } catch (error) {
       console.error('Error fetching HTML:', error);
-      console.log('Failed to fetch HTML content. Please try again or use Manual Paste option.');
+      showErrorOverlay('Failed to fetch', error.message || 'Please try again');
     } finally {
       downloadBtn.disabled = false;
       downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
