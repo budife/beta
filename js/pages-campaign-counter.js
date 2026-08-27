@@ -424,7 +424,7 @@ async function refreshDashboard() {
 
     // Load previous folder scans (best-effort — SQL migration may not exist yet)
     try {
-      const scans = await campaignRegistryService.loadFolderScans(username);
+      const scans = await campaignRegistryService.loadFolderScans();
       scannedFolderIds.clear();
       scans.forEach(row => {
         const id = row.campaign_id;

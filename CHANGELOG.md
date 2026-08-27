@@ -14,7 +14,9 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Moved collapse button into action buttons row, aligned with other action buttons.
 
-## Layout Checker v2.1.4 - 26 August 2026
+## Campaign Counter v1.6.2 - 27 August 2026
+
+- Folder scans now visible to all users. Everyone sees all scanned campaigns regardless of who scanned them.
 
 - Improved collapse button layout: own grid column, no overlap with action buttons.
 

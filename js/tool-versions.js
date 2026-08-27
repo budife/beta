@@ -21,7 +21,7 @@ const TOOL_VERSIONS = {
   },
   'campaign-counter': {
     label: 'Campaign Counter',
-    version: '2.0.0',
+    version: '1.6.2',
     status: 'stable'
   },
   'config-edm': {

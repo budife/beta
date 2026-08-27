@@ -15,7 +15,8 @@ category: Home
 
 ## Recent Updates
 
-### 26 August 2026
+### 27 August 2026
+- **Campaign Counter v1.6.2** - Folder scans visible to all users.
 - **Layout Checker v2.1.5** - Collapse button moved into action buttons row.
 - **Layout Checker v2.1.4** - Collapse button has own grid column, no overlap with action buttons.
 - **Layout Checker v2.1.1** - Improved collapse button visibility.
