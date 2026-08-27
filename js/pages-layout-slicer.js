@@ -635,7 +635,7 @@
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
         <div class="slicer-slice-fields">
-          <div class="slicer-slice-field full-width">
+          <div class="slicer-slice-field full-width slicer-slice-cta-row">
             <label class="slicer-slice-cta-toggle">
               <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
               <span>CTA Link</span>
