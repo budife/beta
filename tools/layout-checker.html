@@ -13,16 +13,13 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.12">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.4">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
   <meta name="theme-color" content="#0f172a" />
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-  <!-- CodeMirror CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material.min.css" />
 </head>
 <body>
   <!-- Navigation Bar -->
@@ -100,10 +97,21 @@
         <button id="stopBtn" class="lc-stop-btn" type="button">Stop</button>
       </div>
 
-      <div id="loadingOverlay" class="lc-loading-overlay hidden">
-        <div class="lc-loading-content">
-          <i class="fa-solid fa-circle-notch fa-spin lc-loading-icon"></i>
-          <p id="loadingText">Fetching HTML...</p>
+      <div id="fetchModal" class="lc-modal-overlay hidden">
+        <div class="lc-modal">
+          <div class="lc-modal-header">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <div>
+              <div id="fetchModalTitle">Fetching HTML...</div>
+              <div id="fetchModalProvider" class="lc-modal-subtitle">Google Apps Script</div>
+            </div>
+          </div>
+          <div class="lc-modal-progress">
+            <div id="fetchModalProgressBar" class="lc-modal-progress-bar"></div>
+          </div>
+          <div class="lc-modal-footer">
+            <button id="fetchModalStopBtn" class="lc-btn lc-btn-danger">Stop</button>
+          </div>
         </div>
       </div>
     </section>
@@ -151,10 +159,7 @@
             <span class="lc-eyebrow">Source</span>
             <strong>HTML Content</strong>
           </div>
-          <div class="lc-view-tabs" role="tablist" aria-label="Layout view">
-            <button id="codeTabBtn" class="lc-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="codePanel">Code</button>
-            <button id="previewTabBtn" class="lc-tab" type="button" role="tab" aria-selected="false" aria-controls="previewPanel">Preview</button>
-          </div>
+
           <div class="lc-editor-actions">
             <button id="downloadScreenshotBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
               <i class="fa-solid fa-download"></i> Screenshot
@@ -169,10 +174,12 @@
             </label>
           </div>
         </div>
-        <div id="codePanel" class="lc-editor-body lc-view-panel is-active" role="tabpanel" aria-labelledby="codeTabBtn">
-          <textarea id="htmlInput" placeholder="Paste HTML content here" class="lc-textarea lc-textarea-sm"></textarea>
-        </div>
-        <div id="previewPanel" class="lc-preview-panel lc-view-panel" role="tabpanel" aria-labelledby="previewTabBtn" hidden>
+        <textarea id="htmlInput" class="lc-textarea lc-textarea-sm" style="display:none;"></textarea>
+        <div id="previewPanel" class="lc-preview-panel lc-view-panel">
+          <div id="previewPlaceholder" class="lc-preview-placeholder">
+            <i class="fa-solid fa-image"></i>
+            <p>Load a URL or paste HTML to preview the layout</p>
+          </div>
           <iframe id="layoutPreviewFrame" title="Layout preview" sandbox="allow-same-origin allow-popups"></iframe>
         </div>
       </section>
@@ -207,15 +214,9 @@
     </div>
   </footer>
 
-<!-- CodeMirror JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.14.12" defer></script>
+<script src="../js/version-config.js?v=6.15.4" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.14.12" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.15.4" defer></script>
 </body>
 </html>

@@ -38,23 +38,13 @@ const FETCHER_PROVIDERS = {
 };
 
 // ---- Extracted scripts from inline <script> blocks ----
-// Initialize CodeMirror editor for htmlInput textarea
-  const textarea = document.getElementById('htmlInput');
-  const editor = CodeMirror.fromTextArea(textarea, {
-    mode: 'htmlmixed',
-    theme: 'material',
-    lineNumbers: true,
-    lineWrapping: true,
-    autoCloseTags: true,
-    matchBrackets: true,
-  });
+// Simple textarea for HTML content
+  const htmlInput = document.getElementById('htmlInput');
 
 const originalUrlInput = document.getElementById('originalUrlInput');
   const resetUrlBtn = document.getElementById('resetUrlBtn');
   const layoutStatus = document.getElementById('layoutStatus');
-  const codeTabBtn = document.getElementById('codeTabBtn');
-  const previewTabBtn = document.getElementById('previewTabBtn');
-  const codePanel = document.getElementById('codePanel');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
   const previewPanel = document.getElementById('previewPanel');
   const layoutPreviewFrame = document.getElementById('layoutPreviewFrame');
   const downloadBtn = document.getElementById('downloadBtn');
@@ -70,8 +60,10 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  const loadingText = document.getElementById('loadingText');
+  const fetchModal = document.getElementById('fetchModal');
+  const fetchModalTitle = document.getElementById('fetchModalTitle');
+  const fetchModalProvider = document.getElementById('fetchModalProvider');
+  const fetchModalStopBtn = document.getElementById('fetchModalStopBtn');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
   const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
@@ -125,6 +117,9 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     latestPreviewHtml = html || '';
     latestPreviewSourceUrl = sourceUrl || '';
     layoutPreviewFrame.srcdoc = preparePreviewHtml(latestPreviewHtml, latestPreviewSourceUrl);
+    if (previewPlaceholder) {
+      previewPlaceholder.style.display = html ? 'none' : 'flex';
+    }
     updatePreviewActions();
     setLayoutStatus(html ? 'ready' : 'empty', html ? statusText : 'No layout loaded');
   }
@@ -436,40 +431,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   }
 
   function setLayoutView(view) {
-    const showPreview = view === 'preview';
-    if (codeTabBtn) {
-      codeTabBtn.classList.toggle('is-active', !showPreview);
-      codeTabBtn.setAttribute('aria-selected', String(!showPreview));
-    }
-    if (previewTabBtn) {
-      previewTabBtn.classList.toggle('is-active', showPreview);
-      previewTabBtn.setAttribute('aria-selected', String(showPreview));
-    }
-    if (codePanel) {
-      codePanel.hidden = showPreview;
-      codePanel.classList.toggle('is-active', !showPreview);
-    }
-    if (previewPanel) {
-      previewPanel.hidden = !showPreview;
-      previewPanel.classList.toggle('is-active', showPreview);
-    }
-    if (!showPreview) {
-      setTimeout(() => editor.refresh(), 0);
-    }
-  }
-
-  if (codeTabBtn) codeTabBtn.addEventListener('click', () => setLayoutView('code'));
-  if (previewTabBtn) {
-    previewTabBtn.addEventListener('click', () => {
-      const currentHtml = editor.getValue();
-      if (currentHtml.trim()) {
-        const rendered = renderLayoutWithKrhredValues();
-        if (!rendered) {
-          renderPreview(currentHtml, 'Preview ready', originalUrlInput.value.trim());
-        }
-      }
-      setLayoutView('preview');
-    });
+    // Simplified: preview is always shown, placeholder toggled by renderPreview
   }
   if (openPreviewBtn) openPreviewBtn.addEventListener('click', openPreviewInNewTab);
   if (downloadScreenshotBtn) downloadScreenshotBtn.addEventListener('click', downloadPreviewScreenshot);
@@ -487,17 +449,18 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     progressContainer.classList.add('hidden');
     currentOperation = null;
     abortController = null;
-    const hasContent = editor.getValue().trim().length > 0;
+    const hasContent = htmlInput.value.trim().length > 0;
     setLayoutStatus(hasContent ? 'ready' : 'empty', hasContent ? 'Layout ready' : 'No layout loaded');
   }
 
-  function showLoadingOverlay(text = 'Fetching HTML...') {
-    if (loadingText) loadingText.textContent = text;
-    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+  function showLoadingOverlay(fetcherName = 'Google Apps Script') {
+    if (fetchModalTitle) fetchModalTitle.textContent = 'Fetching HTML...';
+    if (fetchModalProvider) fetchModalProvider.textContent = fetcherName;
+    if (fetchModal) fetchModal.classList.remove('hidden');
   }
 
   function hideLoadingOverlay() {
-    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+    if (fetchModal) fetchModal.classList.add('hidden');
   }
 
   // Stop button functionality
@@ -506,8 +469,21 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       abortController.abort();
       console.log('Operation stopped');
       hideProgress();
+      hideLoadingOverlay();
     }
   });
+
+  // Modal stop button
+  if (fetchModalStopBtn) {
+    fetchModalStopBtn.addEventListener('click', () => {
+      if (abortController) {
+        abortController.abort();
+        console.log('Operation stopped');
+        hideProgress();
+        hideLoadingOverlay();
+      }
+    });
+  }
 
   // Helper function to validate URL
   function isValidUrl(url) {
@@ -566,7 +542,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
         const { values } = collectKrhredValues();
         subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
       }
-      if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
+      if (!previewPanel || previewPanel.hidden || !htmlInput.value.trim()) return;
       clearTimeout(krhredPreviewTimer);
       krhredPreviewTimer = setTimeout(() => {
         renderLayoutWithKrhredValues();
@@ -678,7 +654,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   }
 
   function renderLayoutWithKrhredValues() {
-    const content = editor.getValue();
+    const content = htmlInput.value;
     console.log('Editor content length:', content.length);
     console.log('Editor content preview:', content.substring(0, 200));
     
@@ -733,7 +709,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
   if (highlightKrhredToggle) {
     highlightKrhredToggle.addEventListener('change', () => {
-      if (!previewPanel || previewPanel.hidden || !editor.getValue().trim()) return;
+      if (!previewPanel || previewPanel.hidden || !htmlInput.value.trim()) return;
       renderLayoutWithKrhredValues();
     });
   }
@@ -818,7 +794,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       const content = await response.text();
       
       if (content && content.includes('<html')) {
-        editor.setValue(content);
+        htmlInput.value = content;
         console.log('Content loaded successfully!');
         generateKrhredColumns(content);
       } else {
@@ -975,16 +951,19 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     try {
-      // Show progress and loading overlay
+      // Get fetcher provider name for modal
+      const fetcherName = fetcherProviderSelect?.options[fetcherProviderSelect.selectedIndex]?.text || 'Google Apps Script';
+
+      // Show progress and loading modal
       showProgress('Fetching HTML content...', 'download');
-      showLoadingOverlay('Fetching HTML...');
+      showLoadingOverlay(fetcherName);
 
       // Disable button during fetch
       downloadBtn.disabled = true;
       downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px; animation: spin 1s linear infinite;"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg>Fetching...';
 
       const result = await fetchRemoteHtmlFast(url);
-      editor.setValue(result.html);
+      htmlInput.value = result.html;
       renderPreview(result.html, `Layout loaded via ${result.via}`, url);
       setLayoutView('preview');
       generateKrhredColumns(result.html);
@@ -1076,7 +1055,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   if (resetKrhredBtn) {
     resetKrhredBtn.addEventListener('click', () => {
       performClearAll();
-      const sourceHtml = editor.getValue();
+      const sourceHtml = htmlInput.value;
       if (sourceHtml.trim()) {
         renderPreview(sourceHtml, 'Preview reset', originalUrlInput.value.trim());
         setLayoutView('preview');
@@ -1095,7 +1074,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     
     if (!krhredText) {
       console.log('No bulk KRHRED text. Applying manual KRHRED input fields.');
-      if (editor.getValue().trim()) {
+      if (htmlInput.value.trim()) {
         renderLayoutWithKrhredValues();
       }
       return;
@@ -1146,7 +1125,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       subjectOutput.value = replaceKrhredPlaceholders(subjectInput.value, values, false);
     }
 
-    if (Object.keys(krhredValues).length && editor.getValue().trim()) {
+    if (Object.keys(krhredValues).length && htmlInput.value.trim()) {
       renderLayoutWithKrhredValues();
     }
   });
@@ -1197,8 +1176,8 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     const storedURL = localStorage.getItem('layoutCheckerURL');
 
     if (storedSource) {
-      editor.setValue(storedSource);
-      // generateKrhredColumns will be called by editor.on('change') event
+      htmlInput.value = storedSource;
+      // generateKrhredColumns will be called by htmlInput input event
       if (storedURL) {
         originalUrlInput.value = storedURL;
         downloadBtn.style.display = 'flex';
@@ -1213,7 +1192,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   // State persistence - DISABLED
   // function saveState() {
   //   const state = {
-  //     htmlContent: editor.getValue(),
+  //     htmlContent: htmlInput.value,
   //     originalUrl: document.getElementById('originalUrlInput').value,
   //     krhredValues: {}
   //   };
@@ -1230,7 +1209,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   //     try {
   //       const state = JSON.parse(saved);
   //       if (state.htmlContent) { 
-  //         editor.setValue(state.htmlContent);
+  //         htmlInput.value = state.htmlContent);
   //         // generateKrhredColumns will be called by editor.on('change') event
   //       }
   //       if (state.originalUrl) {
@@ -1253,16 +1232,15 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   //   }
   // }
 
-  // Auto-save on input changes - DISABLED
-  editor.on('change', () => {
-    const content = editor.getValue();
+  // Auto-update KRHRED columns when HTML content changes
+  htmlInput.addEventListener('input', () => {
+    const content = htmlInput.value;
     if (content.trim()) {
       generateKrhredColumns(content, false);
       setLayoutStatus('ready', 'Layout ready');
     } else {
       setLayoutStatus('empty', 'No layout loaded');
     }
-    //  // DISABLED
   });
   // document.getElementById('originalUrlInput').addEventListener('input', saveState); // DISABLED
   // document.getElementById('krhredInput').addEventListener('input', saveState); // DISABLED
