@@ -1593,6 +1593,48 @@ select {
 .slicer-slice-title {
   color: var(--text, #111827);
   font-weight: 600;
+  font-size: 13px;
+}
+
+.slicer-slice-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.slicer-slice-include {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.slicer-slice-include input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #16a34a;
+  flex-shrink: 0;
+}
+
+.slicer-slice-include input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+  border-radius: 3px;
+}
+
+.slicer-slice-card.is-excluded .slicer-slice-title {
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.slicer-slice-include input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .slicer-slice-meta {
