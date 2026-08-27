@@ -1400,6 +1400,67 @@ select {
   border-left: 3px solid var(--accent-primary, #f3838b);
 }
 
+.slicer-code-snippets {
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+.slicer-code-list {
+  padding: 8px 16px 16px;
+}
+
+.slicer-code-item {
+  margin-bottom: 8px;
+}
+
+.slicer-code-item summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  padding: 8px 0;
+}
+
+.slicer-code-item summary:hover {
+  color: #111827;
+}
+
+.slicer-code-block {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin: 4px 0 8px;
+  white-space: pre;
+}
+
+.slicer-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.slicer-copy-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.slicer-copy-btn.copied {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
 .slicer-slice-card.is-excluded {
   border-left-color: #9ca3af;
   opacity: .55;
