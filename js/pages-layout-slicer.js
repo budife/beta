@@ -635,21 +635,13 @@
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
         <div class="slicer-slice-fields">
-          <div class="slicer-slice-field">
-            <label class="slicer-slice-cta-group">
-              <label class="slicer-slice-cta">
-                <span>CTA Link</span>
-                <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-              </label>
-            </label>
-          </div>
-          <div class="slicer-slice-field">
-            <span>Alt Text</span>
-            <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
+          <div class="slicer-slice-field full-width">
+            <span>CTA Link URL</span>
+            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-field full-width">
-            <span>Link URL</span>
-            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+            <span>Alt Text</span>
+            <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
           </div>
         </div>
       </article>
@@ -1353,19 +1345,6 @@
     updateUi();
   });
 
-  // CTA checkbox
-  els.sliceList.addEventListener('change', (event) => {
-    const checkbox = event.target.closest('[data-slice-cta]');
-    if (!checkbox) return;
-    const index = Number(checkbox.dataset.sliceCta);
-    state.slices[index].cta = checkbox.checked;
-    state.generated = null;
-    // Enable/disable link input based on CTA
-    const linkInput = document.querySelector(`[data-slice-link="${index}"]`);
-    if (linkInput) linkInput.disabled = !checkbox.checked;
-    updateUi();
-  });
-
   // Alt text input
   els.sliceList.addEventListener('input', (event) => {
     const altInput = event.target.closest('[data-slice-alt]');
@@ -1381,6 +1360,7 @@
     if (!linkInput) return;
     const index = Number(linkInput.dataset.sliceLink);
     state.slices[index].link = linkInput.value;
+    state.slices[index].cta = !!linkInput.value;
     state.generated = null;
   });
   [
@@ -1432,7 +1412,7 @@
       const src = `images/${prefix}_${num}.jpg`;
       const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
       
-      if (slice.cta && slice.link) {
+      if (slice.link) {
         return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
       }
       return imgTag;
@@ -1444,7 +1424,7 @@
       const src = `images/${prefix}_${num}.jpg`;
       const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />`;
       
-      if (slice.cta && slice.link) {
+      if (slice.link) {
         return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
       }
       return imgTag;
