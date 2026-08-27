@@ -458,6 +458,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   }
 
   function showLoadingOverlay(fetcherName = 'Google Apps Script') {
+    hideErrorOverlay();
     if (fetchOverlayTitle) fetchOverlayTitle.textContent = 'Checking...';
     if (fetchOverlayStatus) fetchOverlayStatus.textContent = 'Fetching website';
     if (fetchOverlayProvider) fetchOverlayProvider.textContent = fetcherName;
