@@ -2441,6 +2441,7 @@ body *::after {
 
 .lc-source-bar.is-collapsed {
   padding: 6px 18px;
+  grid-template-columns: 1fr auto auto;
 }
 
 .lc-source-bar.is-collapsed .lc-source-field {
