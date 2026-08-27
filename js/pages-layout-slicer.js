@@ -635,12 +635,14 @@
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
         <div class="slicer-slice-fields">
-          <div class="slicer-slice-field full-width slicer-slice-cta-row">
-            <label class="slicer-slice-cta-toggle">
-              <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-              <span>CTA Link</span>
-            </label>
-            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+          <div class="slicer-slice-field full-width">
+            <div class="slicer-slice-cta-row">
+              <label class="slicer-slice-cta-toggle">
+                <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+                <span>CTA Link</span>
+              </label>
+              <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+            </div>
           </div>
           <div class="slicer-slice-field full-width">
             <span>Alt Text ${slice.cta ? '(required)' : ''}</span>

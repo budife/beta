@@ -1686,7 +1686,7 @@ select {
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--text-muted, #6b7280);
-  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .slicer-slice-cta-toggle input[type="checkbox"] {
