@@ -1585,7 +1585,8 @@ select {
 
 .slicer-slice-head {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px 12px;
   align-items: center;
   justify-content: space-between;
 }
@@ -1594,47 +1595,9 @@ select {
   color: var(--text, #111827);
   font-weight: 600;
   font-size: 13px;
-}
-
-.slicer-slice-title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.slicer-slice-include {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
-  white-space: nowrap;
-}
-
-.slicer-slice-include input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #16a34a;
-  flex-shrink: 0;
-}
-
-.slicer-slice-include input[type="checkbox"]:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
-  border-radius: 3px;
-}
-
-.slicer-slice-card.is-excluded .slicer-slice-title {
-  color: #9ca3af;
-  text-decoration: line-through;
-}
-
-.slicer-slice-include input[type="checkbox"]:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .slicer-slice-meta {
@@ -1701,14 +1664,16 @@ select {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: 11px;
-  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text, #111827);
 }
 
 .slicer-slice-include input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   accent-color: #16a34a;
+  flex-shrink: 0;
 }
 
 .slicer-slice-cta-group {
@@ -1743,49 +1708,6 @@ select {
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--text-muted, #6b7280);
-}
-
-.slicer-slice-cta-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 11px;
-  color: #374151;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.slicer-slice-cta-inline input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #dc2626;
-  flex-shrink: 0;
-}
-
-.slicer-slice-cta-inline input[type="checkbox"]:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.slicer-slice-cta-inline span {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--text-muted, #6b7280);
-}
-
-.slicer-slice-field.sifter-slice-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  grid-column: 1 / -1;
-}
-
-.slicer-slice-field.sifter-slice-row input[type="url"] {
-  flex: 1;
-  min-width: 0;
 }
 
 .slicer-slice-card input:disabled {
