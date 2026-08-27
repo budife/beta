@@ -50,7 +50,6 @@ const FETCHER_PROVIDERS = {
   });
 
 const originalUrlInput = document.getElementById('originalUrlInput');
-  const htmlFileInput = document.getElementById('htmlFileInput');
   const layoutStatus = document.getElementById('layoutStatus');
   const codeTabBtn = document.getElementById('codeTabBtn');
   const previewTabBtn = document.getElementById('previewTabBtn');
@@ -727,28 +726,6 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     });
   }
 
-  if (htmlFileInput) {
-    htmlFileInput.addEventListener('change', async () => {
-      const file = htmlFileInput.files && htmlFileInput.files[0];
-      if (!file) return;
-
-      try {
-        setLayoutStatus('loading', 'Loading HTML file');
-        const content = await file.text();
-        editor.setValue(content);
-        generateKrhredColumns(content);
-        renderPreview(content, `${file.name} loaded`);
-        originalUrlInput.value = '';
-        setLayoutStatus('ready', `${file.name} loaded`);
-      } catch (error) {
-        console.error('Failed to read HTML file:', error);
-        setLayoutStatus('error', 'Unable to read HTML');
-      } finally {
-        htmlFileInput.value = '';
-      }
-    });
-  }
-
   // Input color feedback for existing inputs
   const existingInputs = getKrhredInputs();
   existingInputs.forEach(input => {
@@ -1288,6 +1265,9 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     fetcherProviderSelect.addEventListener('change', () => {
       localStorage.setItem(FETCHER_PROVIDER_KEY, fetcherProviderSelect.value);
       updateFetcherUi();
+      if (originalUrlInput?.value.trim()) {
+        downloadBtn?.click();
+      }
     });
   }
   if (fetcherCustomUrlInput) {
@@ -1299,9 +1279,13 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
           localStorage.setItem(FETCHER_CUSTOM_URL_KEY, value);
         } catch {
           setLayoutStatus('error', 'Invalid custom fetcher URL');
+          return;
         }
       } else {
         localStorage.removeItem(FETCHER_CUSTOM_URL_KEY);
+      }
+      if (originalUrlInput?.value.trim() && fetcherProviderSelect?.value === 'custom') {
+        downloadBtn?.click();
       }
     });
   }
