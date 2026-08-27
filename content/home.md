@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.0.5** - Fetch overlay moved inside preview panel with status text and provider info.
 - **Layout Checker v2.0.4** - Added animated progress bar to fetch modal.
 - **Layout Checker v2.0.3** - Improved fetch modal: cleaner design, backdrop blur, animations, outline Stop button.
 - **Layout Checker v2.0.2** - Loading overlay replaced with modal showing fetcher provider + Stop button.

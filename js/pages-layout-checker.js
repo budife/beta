@@ -60,10 +60,10 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
-  const fetchModal = document.getElementById('fetchModal');
-  const fetchModalTitle = document.getElementById('fetchModalTitle');
-  const fetchModalProvider = document.getElementById('fetchModalProvider');
-  const fetchModalStopBtn = document.getElementById('fetchModalStopBtn');
+  const fetchOverlay = document.getElementById('fetchOverlay');
+  const fetchOverlayTitle = document.getElementById('fetchOverlayTitle');
+  const fetchOverlayStatus = document.getElementById('fetchOverlayStatus');
+  const fetchOverlayProvider = document.getElementById('fetchOverlayProvider');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
   const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
@@ -454,13 +454,16 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   }
 
   function showLoadingOverlay(fetcherName = 'Google Apps Script') {
-    if (fetchModalTitle) fetchModalTitle.textContent = 'Fetching HTML...';
-    if (fetchModalProvider) fetchModalProvider.textContent = fetcherName;
-    if (fetchModal) fetchModal.classList.remove('hidden');
+    if (fetchOverlayTitle) fetchOverlayTitle.textContent = 'Checking...';
+    if (fetchOverlayStatus) fetchOverlayStatus.textContent = 'Fetching website';
+    if (fetchOverlayProvider) fetchOverlayProvider.textContent = fetcherName;
+    if (fetchOverlay) fetchOverlay.classList.remove('hidden');
+    // Animate status text
+    setTimeout(() => { if (fetchOverlayStatus) fetchOverlayStatus.textContent = 'Analyzing layout'; }, 1500);
   }
 
   function hideLoadingOverlay() {
-    if (fetchModal) fetchModal.classList.add('hidden');
+    if (fetchOverlay) fetchOverlay.classList.add('hidden');
   }
 
   // Stop button functionality
@@ -472,18 +475,6 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       hideLoadingOverlay();
     }
   });
-
-  // Modal stop button
-  if (fetchModalStopBtn) {
-    fetchModalStopBtn.addEventListener('click', () => {
-      if (abortController) {
-        abortController.abort();
-        console.log('Operation stopped');
-        hideProgress();
-        hideLoadingOverlay();
-      }
-    });
-  }
 
   // Helper function to validate URL
   function isValidUrl(url) {

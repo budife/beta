@@ -2913,6 +2913,7 @@ body *::after {
 }
 
 .lc-preview-panel {
+  position: relative;
   min-height: 360px;
   max-height: 620px;
   flex: 1 1 auto;
@@ -2948,18 +2949,18 @@ body *::after {
   font-size: 14px;
 }
 
-.lc-modal-overlay {
-  position: fixed;
+.lc-fetch-overlay {
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10;
   animation: fadeIn 0.2s ease;
 }
 
@@ -2968,85 +2969,50 @@ body *::after {
   to { opacity: 1; }
 }
 
-.lc-modal {
-  background: #1e293b;
+.lc-fetch-overlay-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 40px;
+  background: rgba(30, 41, 59, 0.9);
   border: 1px solid #475569;
   border-radius: 12px;
-  min-width: 320px;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  animation: slideUp 0.2s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: overlaySlideUp 0.3s ease;
 }
 
-@keyframes slideUp {
+@keyframes overlaySlideUp {
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-.lc-modal-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 20px 12px;
-  font-weight: 600;
-  font-size: 15px;
+.lc-fetch-overlay-title {
+  font-weight: 700;
+  font-size: 16px;
   color: #f1f5f9;
 }
 
-.lc-modal-header i {
-  color: #3b82f6;
-  font-size: 18px;
+.lc-fetch-overlay-status {
+  font-size: 13px;
+  color: #94a3b8;
+  transition: opacity 0.2s ease;
 }
 
-.lc-modal-subtitle {
-  font-size: 12px;
-  font-weight: 400;
+.lc-fetch-overlay-provider {
+  font-size: 11px;
   color: #64748b;
   margin-top: 2px;
+  padding: 3px 10px;
+  background: rgba(51, 65, 85, 0.6);
+  border-radius: 12px;
 }
 
-.lc-modal-progress {
-  height: 3px;
-  background: #334155;
-  overflow: hidden;
-}
-
-.lc-modal-progress-bar {
-  height: 100%;
-  width: 30%;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
-  border-radius: 2px;
-  animation: progressSlide 1.5s ease-in-out infinite;
-}
-
-@keyframes progressSlide {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(400%); }
-}
-
-.lc-modal-footer {
-  padding: 12px 20px;
-  display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid #334155;
-}
-
-.lc-btn-danger {
-  background: transparent;
-  color: #f87171;
-  border: 1px solid #f87171;
-  padding: 8px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 13px;
-  transition: all 0.15s ease;
-}
-
-.lc-btn-danger:hover {
-  background: #dc2626;
-  color: #fff;
-  border-color: #dc2626;
+.lc-fetch-overlay-spinner {
+  font-size: 28px;
+  color: #3b82f6;
+  margin-top: 6px;
 }
 
 .lc-panel + .lc-panel {
