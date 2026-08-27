@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v2.1.1 - 26 August 2026
+
+- Improved collapse button: better styling, smoother icon rotation, press effect.
+
 ## Layout Checker v2.1.0 - 26 August 2026
 
 - Added **auto-retry** for Google Apps Script fetcher (up to 2 retries with 2s delay) to handle cold starts.

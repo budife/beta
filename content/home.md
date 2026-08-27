@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.1.1** - Improved collapse button design.
 - **Layout Checker v2.1.0** - Auto-retry for Google Apps Script (handles cold starts).
 - **Layout Checker v2.0.9** - Added collapse button for source bar.
 - **Layout Checker v2.0.8** - Fixed error overlay not hiding when starting new fetch.
