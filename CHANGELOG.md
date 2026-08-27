@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v2.0.0 - 26 August 2026
+
+- **Major simplification**: Removed CodeMirror editor and all its CDN dependencies (~200KB+). The code view now uses a simple textarea. Preview remains the primary view. Page load is faster and simpler.
+
 ## Layout Checker v1.5.8 - 26 August 2026
 
 - Added a **full-screen loading overlay** when fetching HTML from a URL. Shows a centered spinner and "Fetching HTML..." message.

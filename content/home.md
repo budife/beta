@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.0.0** - Major simplification: removed CodeMirror editor (~200KB saved). Preview remains primary, code view uses simple textarea.
 - **Layout Checker v1.5.8** - Added full-screen loading overlay when fetching HTML.
 - **Layout Checker v1.5.7** - Subject input changed to textarea with 2 rows height.
 - **Layout Checker v1.5.6** - Added reset button for Layout URL.
