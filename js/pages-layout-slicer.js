@@ -635,18 +635,16 @@
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
         <label class="slicer-slice-include">
-          <span>Include in export</span>
+          <span>Include</span>
           <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
         </label>
-        <div class="slicer-slice-cta-group">
-          <label class="slicer-slice-cta">
-            <span>CTA Link</span>
-            <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-          </label>
-        </div>
+        <label class="slicer-slice-cta-toggle">
+          <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+          <span class="slicer-cta-label">CTA</span>
+        </label>
         <label>
-          <span>Alt Text</span>
-          <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
+          <span>Alt</span>
+          <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Alt text" ${excluded ? 'disabled' : ''}>
         </label>
         <label>
           <span>Link URL</span>
