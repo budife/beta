@@ -2714,14 +2714,20 @@ body *::after {
   flex: 1 1 auto;
 }
 
+.lc-url-row,
 .lc-subject-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 8px;
   margin-top: 6px;
   align-items: stretch;
 }
 
+.lc-subject-row {
+  grid-template-columns: 1fr 1fr auto;
+}
+
+.lc-url-row .lc-btn,
 .lc-subject-row .lc-btn {
   height: 100%;
   padding: 0 10px;

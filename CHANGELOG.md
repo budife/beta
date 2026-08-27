@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v1.5.6 - 26 August 2026
+
+- Added a **reset button** next to the Layout URL input to clear the URL and hide the Load URL / Open URL / Text Mode buttons.
+
 ## Layout Checker v1.5.5 - 26 August 2026
 
 - Added a **reset button** next to the Subject fields to clear both the subject input and processed output.

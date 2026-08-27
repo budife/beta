@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.9">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.10">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -57,7 +57,12 @@
     <section class="lc-source-bar" aria-label="Layout source">
       <div class="lc-source-field">
         <label for="originalUrlInput">Layout URL</label>
-        <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+        <div class="lc-url-row">
+          <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+          <button id="resetUrlBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset URL">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
         <div class="lc-subject-row">
           <input type="text" id="subjectInput" placeholder="Subject (KRHRED placeholders)" class="lc-input" />
           <input type="text" id="subjectOutput" readonly class="lc-input" placeholder="Processed" />
@@ -200,8 +205,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.14.9" defer></script>
+<script src="../js/version-config.js?v=6.14.10" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.14.9" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.14.10" defer></script>
 </body>
 </html>

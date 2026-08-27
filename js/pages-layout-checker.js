@@ -50,6 +50,7 @@ const FETCHER_PROVIDERS = {
   });
 
 const originalUrlInput = document.getElementById('originalUrlInput');
+  const resetUrlBtn = document.getElementById('resetUrlBtn');
   const layoutStatus = document.getElementById('layoutStatus');
   const codeTabBtn = document.getElementById('codeTabBtn');
   const previewTabBtn = document.getElementById('previewTabBtn');
@@ -1040,6 +1041,16 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   bindReplaceOnFocus(originalUrlInput);
   bindReplaceOnFocus(krhredInput);
   bindReplaceOnFocus(subjectInput);
+
+  if (resetUrlBtn) {
+    resetUrlBtn.addEventListener('click', () => {
+      if (originalUrlInput) originalUrlInput.value = '';
+      if (downloadBtn) downloadBtn.style.display = 'none';
+      if (manualPasteBtn) manualPasteBtn.style.display = 'none';
+      if (textModeBtn) textModeBtn.style.display = 'none';
+      setLayoutStatus('ready', 'URL cleared');
+    });
+  }
 
   if (resetSubjectBtn) {
     resetSubjectBtn.addEventListener('click', () => {
