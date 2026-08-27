@@ -44,9 +44,7 @@ const FETCHER_PROVIDERS = {
 const originalUrlInput = document.getElementById('originalUrlInput');
   const resetUrlBtn = document.getElementById('resetUrlBtn');
   const layoutStatus = document.getElementById('layoutStatus');
-  const codeTabBtn = document.getElementById('codeTabBtn');
-  const previewTabBtn = document.getElementById('previewTabBtn');
-  const codePanel = document.getElementById('codePanel');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
   const previewPanel = document.getElementById('previewPanel');
   const layoutPreviewFrame = document.getElementById('layoutPreviewFrame');
   const downloadBtn = document.getElementById('downloadBtn');
@@ -117,6 +115,9 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     latestPreviewHtml = html || '';
     latestPreviewSourceUrl = sourceUrl || '';
     layoutPreviewFrame.srcdoc = preparePreviewHtml(latestPreviewHtml, latestPreviewSourceUrl);
+    if (previewPlaceholder) {
+      previewPlaceholder.style.display = html ? 'none' : 'flex';
+    }
     updatePreviewActions();
     setLayoutStatus(html ? 'ready' : 'empty', html ? statusText : 'No layout loaded');
   }
@@ -428,40 +429,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   }
 
   function setLayoutView(view) {
-    const showPreview = view === 'preview';
-    if (codeTabBtn) {
-      codeTabBtn.classList.toggle('is-active', !showPreview);
-      codeTabBtn.setAttribute('aria-selected', String(!showPreview));
-    }
-    if (previewTabBtn) {
-      previewTabBtn.classList.toggle('is-active', showPreview);
-      previewTabBtn.setAttribute('aria-selected', String(showPreview));
-    }
-    if (codePanel) {
-      codePanel.hidden = showPreview;
-      codePanel.classList.toggle('is-active', !showPreview);
-    }
-    if (previewPanel) {
-      previewPanel.hidden = !showPreview;
-      previewPanel.classList.toggle('is-active', showPreview);
-    }
-    if (!showPreview) {
-      
-    }
-  }
-
-  if (codeTabBtn) codeTabBtn.addEventListener('click', () => setLayoutView('code'));
-  if (previewTabBtn) {
-    previewTabBtn.addEventListener('click', () => {
-      const currentHtml = htmlInput.value;
-      if (currentHtml.trim()) {
-        const rendered = renderLayoutWithKrhredValues();
-        if (!rendered) {
-          renderPreview(currentHtml, 'Preview ready', originalUrlInput.value.trim());
-        }
-      }
-      setLayoutView('preview');
-    });
+    // Simplified: preview is always shown, placeholder toggled by renderPreview
   }
   if (openPreviewBtn) openPreviewBtn.addEventListener('click', openPreviewInNewTab);
   if (downloadScreenshotBtn) downloadScreenshotBtn.addEventListener('click', downloadPreviewScreenshot);

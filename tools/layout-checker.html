@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.0">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.1">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -148,10 +148,7 @@
             <span class="lc-eyebrow">Source</span>
             <strong>HTML Content</strong>
           </div>
-          <div class="lc-view-tabs" role="tablist" aria-label="Layout view">
-            <button id="codeTabBtn" class="lc-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="codePanel">Code</button>
-            <button id="previewTabBtn" class="lc-tab" type="button" role="tab" aria-selected="false" aria-controls="previewPanel">Preview</button>
-          </div>
+
           <div class="lc-editor-actions">
             <button id="downloadScreenshotBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
               <i class="fa-solid fa-download"></i> Screenshot
@@ -166,10 +163,12 @@
             </label>
           </div>
         </div>
-        <div id="codePanel" class="lc-editor-body lc-view-panel is-active" role="tabpanel" aria-labelledby="codeTabBtn">
-          <textarea id="htmlInput" placeholder="Paste HTML content here" class="lc-textarea lc-textarea-sm"></textarea>
-        </div>
-        <div id="previewPanel" class="lc-preview-panel lc-view-panel" role="tabpanel" aria-labelledby="previewTabBtn" hidden>
+        <textarea id="htmlInput" class="lc-textarea lc-textarea-sm" style="display:none;"></textarea>
+        <div id="previewPanel" class="lc-preview-panel lc-view-panel">
+          <div id="previewPlaceholder" class="lc-preview-placeholder">
+            <i class="fa-solid fa-image"></i>
+            <p>Load a URL or paste HTML to preview the layout</p>
+          </div>
           <iframe id="layoutPreviewFrame" title="Layout preview" sandbox="allow-same-origin allow-popups"></iframe>
         </div>
       </section>
@@ -205,8 +204,8 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.15.0" defer></script>
+<script src="../js/version-config.js?v=6.15.1" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.15.0" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.15.1" defer></script>
 </body>
 </html>
