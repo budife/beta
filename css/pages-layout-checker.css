@@ -2451,7 +2451,7 @@ body *::after {
 
 .lc-collapse-btn {
   position: absolute;
-  top: 10px;
+  top: -14px;
   right: 12px;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
