@@ -473,6 +473,11 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       console.log('Operation stopped');
       hideProgress();
       hideLoadingOverlay();
+      originalUrlInput.disabled = false;
+      resetUrlBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
+      resetUrlBtn.title = 'Reset URL';
+      downloadBtn.disabled = false;
+      downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
     }
   });
 
@@ -942,12 +947,16 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     try {
-      // Get fetcher provider name for modal
+      // Get fetcher provider name
       const fetcherName = fetcherProviderSelect?.options[fetcherProviderSelect.selectedIndex]?.text || 'Google Apps Script';
 
-      // Show progress and loading modal
-      showProgress('Fetching HTML content...', 'download');
+      // Show loading overlay in preview panel
       showLoadingOverlay(fetcherName);
+
+      // Disable URL input and change reset to stop
+      originalUrlInput.disabled = true;
+      resetUrlBtn.innerHTML = '<i class="fa-solid fa-stop"></i>';
+      resetUrlBtn.title = 'Stop fetching';
 
       // Disable button during fetch
       downloadBtn.disabled = true;
@@ -965,7 +974,9 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     } finally {
       downloadBtn.disabled = false;
       downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
-      hideProgress();
+      originalUrlInput.disabled = false;
+      resetUrlBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
+      resetUrlBtn.title = 'Reset URL';
       hideLoadingOverlay();
     }
   });
@@ -1027,6 +1038,11 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
   if (resetUrlBtn) {
     resetUrlBtn.addEventListener('click', () => {
+      // If fetching, abort
+      if (originalUrlInput.disabled && abortController) {
+        abortController.abort();
+        return;
+      }
       if (originalUrlInput) originalUrlInput.value = '';
       if (downloadBtn) downloadBtn.style.display = 'none';
       if (manualPasteBtn) manualPasteBtn.style.display = 'none';
