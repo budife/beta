@@ -12,7 +12,7 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 ## Layout Checker v2.1.1 - 26 August 2026
 
-- Improved collapse button: better styling, smoother icon rotation, press effect.
+- Improved collapse button visibility: larger size, background, border, better hover state.
 
 ## Layout Checker v2.1.0 - 26 August 2026
 

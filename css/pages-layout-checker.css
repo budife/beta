@@ -2437,11 +2437,11 @@ body *::after {
   padding: 10px 18px;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
-  transition: padding 0.25s ease;
+  transition: padding 0.2s ease;
 }
 
 .lc-source-bar.is-collapsed {
-  padding: 8px 18px;
+  padding: 6px 18px;
 }
 
 .lc-source-bar.is-collapsed .lc-source-field,
@@ -2452,12 +2452,12 @@ body *::after {
 .lc-collapse-btn {
   position: absolute;
   top: 10px;
-  right: 14px;
-  background: #f8fafc;
+  right: 12px;
+  background: #f1f5f9;
   border: 1px solid #e2e8f0;
   cursor: pointer;
   color: #64748b;
-  font-size: 11px;
+  font-size: 13px;
   width: 28px;
   height: 28px;
   display: flex;
@@ -2465,25 +2465,12 @@ body *::after {
   justify-content: center;
   border-radius: 6px;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .lc-collapse-btn:hover {
-  color: #334155;
-  background: #f1f5f9;
+  color: #1e293b;
+  background: #e2e8f0;
   border-color: #cbd5e1;
-}
-
-.lc-collapse-btn:active {
-  transform: scale(0.95);
-}
-
-.lc-collapse-btn i {
-  transition: transform 0.2s ease;
-}
-
-.lc-source-bar.is-collapsed .lc-collapse-btn i {
-  transform: rotate(180deg);
 }
 
 .lc-source-bar.is-collapsed .lc-collapse-btn i {
