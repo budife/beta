@@ -670,7 +670,11 @@
     const hasGenerated = Boolean(state.generated);
     if (els.saveFolder) els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
     const copyCodeBtn = document.getElementById('copy-code-btn');
-    if (copyCodeBtn) copyCodeBtn.disabled = !state.slices.length || state.slices.every(s => state.excluded.includes(s.id));
+    const hasSlices = state.slices.length > 0 && !state.slices.every(s => state.excluded.includes(s.id));
+    if (copyCodeBtn) {
+      copyCodeBtn.disabled = !hasSlices;
+      copyCodeBtn.setAttribute('aria-disabled', String(!hasSlices));
+    }
     updateCampaignPathPreview();
   }
 
