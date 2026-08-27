@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v1.5.7** - Subject input changed to textarea with 3 rows height.
 - **Layout Checker v1.5.6** - Added reset button for Layout URL.
 - **Layout Checker v1.5.5** - Added reset button for Subject fields.
 - **Layout Checker v1.5.4** - Removed Open HTML file upload. Auto-reload URL when switching HTML fetcher provider.

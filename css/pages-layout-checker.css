@@ -2724,16 +2724,18 @@ body *::after {
 }
 
 .lc-subject-row {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: start;
 }
 
-.lc-subject-row > *:first-child {
-  grid-column: 1 / -1;
+.lc-subject-row .lc-textarea {
+  min-height: 60px;
+  resize: vertical;
 }
 
+.lc-url-row .lc-btn,
 .lc-subject-row .lc-btn {
-  height: 34px;
+  height: 100%;
   padding: 0 10px;
 }
 
