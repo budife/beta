@@ -1394,35 +1394,10 @@ select {
 
 .slicer-slice-card {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px 24px;
-  align-items: start;
+  gap: 10px;
   padding: 12px;
   border: 1px solid var(--border, #e5e7eb);
   border-left: 3px solid var(--accent-primary, #f3838b);
-}
-
-.slicer-slice-info {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.slicer-slice-controls {
-  display: grid;
-  gap: 8px;
-  min-width: 280px;
-}
-
-@media (max-width: 720px) {
-  .slicer-slice-card {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .slicer-slice-controls {
-    min-width: 0;
-  }
 }
 
 .slicer-code-snippets {
@@ -1623,27 +1598,75 @@ select {
 .slicer-slice-meta {
   color: var(--text-muted, #6b7280);
   font-family: Consolas, "Courier New", monospace;
-  font-size: 12px;
+  font-size: 11px;
+}
+
+.slicer-slice-fields {
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+@media (min-width: 480px) {
+  .slicer-slice-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.slicer-slice-field {
+  display: grid;
+  gap: 4px;
+}
+
+.slicer-slice-field.full-width {
+  grid-column: 1 / -1;
 }
 
 .slicer-slice-card label {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .slicer-slice-card label span {
   color: var(--text-muted, #6b7280);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
 
-.slicer-slice-card input {
+.slicer-slice-card input,
+.slicer-slice-card select {
   width: 100%;
-  min-height: 36px;
+  min-height: 34px;
   padding: 0 10px;
   border: 1px solid var(--border, #d8dde5);
+  border-radius: 4px;
+  font-size: 12px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.slicer-slice-card input:focus,
+.slicer-slice-card select:focus {
+  outline: none;
+  border-color: var(--accent-primary, #f3838b);
+  box-shadow: 0 0 0 2px rgba(243, 131, 139, 0.15);
+}
+
+.slicer-slice-include {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #374151;
+}
+
+.slicer-slice-include input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #16a34a;
 }
 
 .slicer-slice-cta-group {
@@ -1686,13 +1709,26 @@ select {
   cursor: not-allowed;
 }
 
+.slicer-slice-card input[type="url"] {
+  padding-right: 10px;
+}
+
 .slicer-line-remove {
   min-height: 30px;
   padding: 0 10px;
   color: #b91c1c;
   background: #fff;
   border: 1px solid #fecaca;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.slicer-line-remove:hover {
+  background: #fef2f2;
+  border-color: #f87171;
 }
 
 #html-preview {
