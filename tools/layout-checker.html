@@ -78,7 +78,9 @@
               <option value="cloudflare-worker">Cloudflare Worker</option>
               <option value="custom">Custom URL</option>
             </select>
-            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Reset</button>
+            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset fetcher">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
           </div>
           <div class="lc-worker-row lc-worker-custom-row hidden" id="fetcherCustomUrlRow">
             <input type="url" id="fetcherCustomUrlInput" placeholder="https://your-worker.com/?url=" class="lc-input" />
