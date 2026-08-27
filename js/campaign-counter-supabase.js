@@ -123,12 +123,11 @@
     return data;
   }
 
-  async function loadFolderScans(scannedBy) {
+  async function loadFolderScans() {
     try {
       const data = unwrap(await client()
         .from('campaign_folder_scans')
         .select('campaign_id, campaign_name, folder_date, manager')
-        .eq('scanned_by', scannedBy)
         .order('scanned_at', { ascending: false }));
       return data || [];
     } catch (err) {

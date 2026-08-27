@@ -10,6 +10,33 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v2.1.5 - 26 August 2026
+
+- Moved collapse button into action buttons row, aligned with other action buttons.
+
+## Campaign Counter v1.6.3 - 27 August 2026
+
+- Added **Refresh button** to reload folder scans from Supabase without re-scanning local folder.
+- Last scanned folder name persists across sessions via localStorage.
+
+## Campaign Counter v1.6.2 - 27 August 2026
+
+- Folder scans now visible to all users. Everyone sees all scanned campaigns regardless of who scanned them.
+
+- Improved collapse button layout: own grid column, no overlap with action buttons.
+
+## Layout Checker v2.1.1 - 26 August 2026
+
+- Improved collapse button visibility: larger size, background, border, better hover state.
+
+## Layout Checker v2.1.0 - 26 August 2026
+
+- Added **auto-retry** for Google Apps Script fetcher (up to 2 retries with 2s delay) to handle cold starts.
+
+## Layout Checker v2.0.9 - 26 August 2026
+
+- Added **collapse button** for the source bar (URL, subject, fetcher settings).
+
 ## Layout Checker v2.0.8 - 26 August 2026
 
 - Fixed error overlay not hiding when starting a new fetch.

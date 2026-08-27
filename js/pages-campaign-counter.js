@@ -233,6 +233,7 @@ async function scanFolder() {
     const label = document.getElementById('folder-btn-label');
     if (btn) btn.classList.add('is-loaded');
     if (label) label.textContent = dirHandle.name;
+    localStorage.setItem('edm_last_folder', dirHandle.name);
     renderFolderList();
     updateConflictState();
 
@@ -281,6 +282,32 @@ async function resetFolderScans() {
   } catch (error) {
     console.error('Unable to clear folder scans.', error);
     setMessage('Unable to clear folder scans. Please try again.', 'error');
+  }
+}
+
+async function refreshFolderScans() {
+  if (!connected) {
+    setMessage('Not connected to Supabase.', 'error');
+    return;
+  }
+  try {
+    const scans = await campaignRegistryService.loadFolderScans();
+    scannedFolderIds.clear();
+    scans.forEach(row => {
+      const id = row.campaign_id;
+      if (!scannedFolderIds.has(id)) scannedFolderIds.set(id, []);
+      scannedFolderIds.get(id).push({
+        name: row.campaign_name,
+        date: row.folder_date,
+        manager: row.manager
+      });
+    });
+    renderFolderList();
+    updateConflictState();
+    setMessage(`Refreshed — ${scans.length} campaign ID(s) loaded from Supabase.`, 'success');
+  } catch (error) {
+    console.error('Unable to refresh folder scans.', error);
+    setMessage('Unable to refresh. Please try again.', 'error');
   }
 }
 
@@ -424,7 +451,7 @@ async function refreshDashboard() {
 
     // Load previous folder scans (best-effort — SQL migration may not exist yet)
     try {
-      const scans = await campaignRegistryService.loadFolderScans(username);
+      const scans = await campaignRegistryService.loadFolderScans();
       scannedFolderIds.clear();
       scans.forEach(row => {
         const id = row.campaign_id;
@@ -436,6 +463,14 @@ async function refreshDashboard() {
         });
       });
       renderFolderList();
+      // Restore last folder name from localStorage
+      const lastFolder = localStorage.getItem('edm_last_folder');
+      if (lastFolder) {
+        const btn = document.getElementById('pick-folder');
+        const label = document.getElementById('folder-btn-label');
+        if (btn) btn.classList.add('is-loaded');
+        if (label) label.textContent = lastFolder;
+      }
     } catch (scanErr) {
       console.warn('Folder scan backup not available:', scanErr.message);
     }
@@ -628,6 +663,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   nameInput?.addEventListener('input', () => { nameInput.value = nameInput.value.replace(/\s/g, ''); });
   document.getElementById('pick-folder')?.addEventListener('click', scanFolder);
   document.getElementById('reset-folder')?.addEventListener('click', resetFolderScans);
+  document.getElementById('refresh-folder')?.addEventListener('click', refreshFolderScans);
 
   bindWelcomeDialog();
   bindManualDialog();

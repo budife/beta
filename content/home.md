@@ -15,7 +15,14 @@ category: Home
 
 ## Recent Updates
 
-### 26 August 2026
+### 27 August 2026
+- **Campaign Counter v1.6.3** - Refresh button for folder scans, last folder persists across sessions.
+- **Campaign Counter v1.6.2** - Folder scans visible to all users.
+- **Layout Checker v2.1.5** - Collapse button moved into action buttons row.
+- **Layout Checker v2.1.4** - Collapse button has own grid column, no overlap with action buttons.
+- **Layout Checker v2.1.1** - Improved collapse button visibility.
+- **Layout Checker v2.1.0** - Auto-retry for Google Apps Script (handles cold starts).
+- **Layout Checker v2.0.9** - Added collapse button for source bar.
 - **Layout Checker v2.0.8** - Fixed error overlay not hiding when starting new fetch.
 - **Layout Checker v2.0.7** - Added error overlay with Retry button when fetch fails.
 - **Layout Checker v2.0.6** - URL input disabled during fetch, reset button becomes Stop button.
