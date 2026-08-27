@@ -2428,12 +2428,11 @@ body *::after {
 }
 
 .lc-source-bar {
-  position: relative;
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) auto;
+  grid-template-columns: minmax(280px, 1fr) auto auto;
   flex: 0 0 auto;
   align-items: end;
-  gap: 10px;
+  gap: 8px;
   padding: 10px 18px;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
@@ -2444,15 +2443,11 @@ body *::after {
   padding: 6px 18px;
 }
 
-.lc-source-bar.is-collapsed .lc-source-field,
-.lc-source-bar.is-collapsed .lc-worker-setting {
+.lc-source-bar.is-collapsed .lc-source-field {
   display: none;
 }
 
 .lc-collapse-btn {
-  position: absolute;
-  top: 14px;
-  right: 12px;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
   cursor: pointer;
@@ -2465,6 +2460,7 @@ body *::after {
   justify-content: center;
   border-radius: 6px;
   transition: all 0.15s ease;
+  align-self: end;
 }
 
 .lc-collapse-btn:hover {
