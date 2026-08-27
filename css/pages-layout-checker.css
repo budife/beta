@@ -2429,10 +2429,10 @@ body *::after {
 
 .lc-source-bar {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) auto;
+  grid-template-columns: minmax(280px, 1fr) auto auto;
   flex: 0 0 auto;
   align-items: end;
-  gap: 10px;
+  gap: 8px;
   padding: 10px 18px;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
@@ -2447,11 +2447,17 @@ body *::after {
   display: none;
 }
 
-.lc-source-actions .lc-collapse-btn i {
+.lc-collapse-btn {
+  justify-self: end;
+  align-self: end;
+}
+
+.lc-source-actions .lc-collapse-btn i,
+.lc-collapse-btn i {
   transition: transform 0.15s ease;
 }
 
-.lc-source-bar.is-collapsed .lc-source-actions .lc-collapse-btn i {
+.lc-source-bar.is-collapsed .lc-collapse-btn i {
   transform: rotate(180deg);
 }
 
