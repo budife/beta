@@ -14,6 +14,11 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Moved collapse button into action buttons row, aligned with other action buttons.
 
+## Campaign Counter v1.6.3 - 27 August 2026
+
+- Added **Refresh button** to reload folder scans from Supabase without re-scanning local folder.
+- Last scanned folder name persists across sessions via localStorage.
+
 ## Campaign Counter v1.6.2 - 27 August 2026
 
 - Folder scans now visible to all users. Everyone sees all scanned campaigns regardless of who scanned them.
