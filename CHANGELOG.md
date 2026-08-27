@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v2.1.5 - 26 August 2026
+
+- Moved collapse button into action buttons row, aligned with other action buttons.
+
 ## Layout Checker v2.1.4 - 26 August 2026
 
 - Improved collapse button layout: own grid column, no overlap with action buttons.

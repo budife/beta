@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.1.5** - Collapse button moved into action buttons row.
 - **Layout Checker v2.1.4** - Collapse button has own grid column, no overlap with action buttons.
 - **Layout Checker v2.1.1** - Improved collapse button visibility.
 - **Layout Checker v2.1.0** - Auto-retry for Google Apps Script (handles cold starts).
