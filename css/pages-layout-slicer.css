@@ -1394,10 +1394,35 @@ select {
 
 .slicer-slice-card {
   display: grid;
-  gap: 10px;
+  grid-template-columns: 1fr auto;
+  gap: 12px 24px;
+  align-items: start;
   padding: 12px;
   border: 1px solid var(--border, #e5e7eb);
   border-left: 3px solid var(--accent-primary, #f3838b);
+}
+
+.slicer-slice-info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.slicer-slice-controls {
+  display: grid;
+  gap: 8px;
+  min-width: 280px;
+}
+
+@media (max-width: 720px) {
+  .slicer-slice-card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .slicer-slice-controls {
+    min-width: 0;
+  }
 }
 
 .slicer-code-snippets {
@@ -1621,43 +1646,33 @@ select {
   border: 1px solid var(--border, #d8dde5);
 }
 
-.slicer-slice-include {
+.slicer-slice-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slicer-slice-cta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--text-muted, #6b7280);
+  font-size: 11px;
+  color: #374151;
   cursor: pointer;
 }
 
-.slicer-slice-include input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #3b82f6;
-}
-
-.slicer-slice-cta-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.slicer-slice-cta-toggle input[type="checkbox"] {
+.slicer-slice-cta input[type="checkbox"] {
   width: 16px;
   height: 16px;
   accent-color: #dc2626;
 }
 
-.slicer-slice-cta-toggle input[type="checkbox"]:disabled {
+.slicer-slice-cta input[type="checkbox"]:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.slicer-slice-cta-toggle .slicer-cta-label {
+.slicer-slice-cta-group .slicer-slice-cta span {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .06em;
@@ -1670,6 +1685,14 @@ select {
   color: #9ca3af;
   cursor: not-allowed;
 }
+
+.slicer-line-remove {
+  min-height: 30px;
+  padding: 0 10px;
+  color: #b91c1c;
+  background: #fff;
+  border: 1px solid #fecaca;
+  cursor: pointer;
 }
 
 #html-preview {

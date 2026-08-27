@@ -626,30 +626,32 @@
       const sizeLabel = getSliceSizeLabel(index);
       return `
       <article class="slicer-slice-card${excluded ? ' is-excluded' : ''}">
-        <div class="slicer-slice-head">
-          <div>
-            <div class="slicer-slice-title">${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</div>
-            <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
-            <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
-          </div>
-          ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
+        <div class="slicer-slice-info">
+          <div class="slicer-slice-title">${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</div>
+          <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
+          <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
         </div>
-        <label class="slicer-slice-include">
-          <span>Include</span>
-          <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
-        </label>
-        <label class="slicer-slice-cta-toggle">
-          <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-          <span class="slicer-cta-label">CTA</span>
-        </label>
-        <label>
-          <span>Alt</span>
-          <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Alt text" ${excluded ? 'disabled' : ''}>
-        </label>
-        <label>
-          <span>Link URL</span>
-          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
-        </label>
+        <div class="slicer-slice-controls">
+          ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
+          <label class="slicer-slice-include">
+            <span>Include in export</span>
+            <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
+          </label>
+          <div class="slicer-slice-cta-group">
+            <label class="slicer-slice-cta">
+              <span>CTA Link</span>
+              <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+            </label>
+          </div>
+          <label>
+            <span>Alt Text</span>
+            <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
+          </label>
+          <label>
+            <span>Link URL</span>
+            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+          </label>
+        </div>
       </article>
     `;
     }).join('');
