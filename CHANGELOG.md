@@ -10,9 +10,17 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v1.5.3 - 26 August 2026
+
+- Added a configurable **HTML Fetcher** dropdown in Layout Checker. Users can now choose between Google Apps Script, Cloudflare Worker, Jina AI, or a custom URL. Selections are saved to localStorage. A Reset button restores the default Google Apps Script fetcher.
+
 ## Campaign Counter - Reset Folder Scans
 
 - Added a **Reset** button next to **Scan Folder** in Campaign Counter. Clicking Reset clears all saved folder scan results from Supabase and empties the local folder list.
+
+## Campaign Counter - Tooltip Multiple Entries Fix
+
+- Fixed campaign folder tooltip to display all scanned entries that share the same campaign ID but have different dates. Previously only the first entry was shown on hover.
 
 ## Campaign Counter - Folder Name Parsing Fix
 

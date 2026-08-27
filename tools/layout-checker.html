@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.6">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.7">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -62,6 +62,21 @@
           <input type="text" id="subjectInput" placeholder="Subject (KRHRED placeholders)" class="lc-input" />
           <input type="text" id="subjectOutput" readonly class="lc-input" placeholder="Processed" />
         </div>
+        <details class="lc-worker-setting">
+          <summary>HTML fetcher</summary>
+          <div class="lc-worker-row">
+            <select id="fetcherProviderSelect" class="lc-input">
+              <option value="google-apps-script">Google Apps Script</option>
+              <option value="cloudflare-worker">Cloudflare Worker</option>
+              <option value="custom">Custom URL</option>
+            </select>
+            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Reset</button>
+          </div>
+          <div class="lc-worker-row lc-worker-custom-row hidden" id="fetcherCustomUrlRow">
+            <input type="url" id="fetcherCustomUrlInput" placeholder="https://your-worker.com/?url=" class="lc-input" />
+          </div>
+          <p class="lc-worker-hint">Google Apps Script is the default. Select Custom URL to use your own worker or proxy.</p>
+        </details>
       </div>
       <div class="lc-source-actions">
         <label for="htmlFileInput" class="lc-btn lc-btn-secondary">
@@ -186,8 +201,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.14.2" defer></script>
+<script src="../js/version-config.js?v=6.14.7" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.14.6" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.14.7" defer></script>
 </body>
 </html>
