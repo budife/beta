@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.0.9** - Added collapse button for source bar.
 - **Layout Checker v2.0.8** - Fixed error overlay not hiding when starting new fetch.
 - **Layout Checker v2.0.7** - Added error overlay with Retry button when fetch fails.
 - **Layout Checker v2.0.6** - URL input disabled during fetch, reset button becomes Stop button.

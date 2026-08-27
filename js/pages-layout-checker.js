@@ -1060,6 +1060,15 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   bindReplaceOnFocus(krhredInput);
   bindReplaceOnFocus(subjectInput);
 
+  // Collapse source bar
+  const collapseSourceBtn = document.getElementById('collapseSourceBtn');
+  const sourceBar = document.querySelector('.lc-source-bar');
+  if (collapseSourceBtn && sourceBar) {
+    collapseSourceBtn.addEventListener('click', () => {
+      sourceBar.classList.toggle('is-collapsed');
+    });
+  }
+
   if (resetUrlBtn) {
     resetUrlBtn.addEventListener('click', () => {
       // If fetching, abort
