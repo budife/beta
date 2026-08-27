@@ -1035,10 +1035,19 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const krhredInput = document.getElementById('krhredInput');
   const subjectInput = document.getElementById('subjectInput');
   const subjectOutput = document.getElementById('subjectOutput');
+  const resetSubjectBtn = document.getElementById('resetSubjectBtn');
 
   bindReplaceOnFocus(originalUrlInput);
   bindReplaceOnFocus(krhredInput);
   bindReplaceOnFocus(subjectInput);
+
+  if (resetSubjectBtn) {
+    resetSubjectBtn.addEventListener('click', () => {
+      if (subjectInput) subjectInput.value = '';
+      if (subjectOutput) subjectOutput.value = '';
+      setLayoutStatus('ready', 'Subject cleared');
+    });
+  }
 
   if (resetKrhredBtn) {
     resetKrhredBtn.addEventListener('click', () => {
