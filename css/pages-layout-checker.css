@@ -603,30 +603,46 @@
 }
 
 @media (max-width: 480px) {
-  .lc-button-group {
-    gap: var(--lc-space-3);
+  .lc-main-layout {
+    padding: 6px;
+    gap: 8px;
   }
 
-  .lc-input {
-    font-size: 14px;
-    padding: 12px;
+  .lc-source-bar {
+    padding: 8px 10px;
   }
 
-  .lc-button {
-    padding: 12px 20px;
-    font-size: 14px;
+  .lc-source-actions .lc-btn {
+    font-size: 10px;
+    padding: 5px 8px;
   }
-  
-  .lc-btn {
-    min-width: 100%;
+
+  .lc-collapse-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
   }
-  
+
+  .lc-editor-panel {
+    min-height: 320px;
+  }
+
+  .lc-preview-panel {
+    min-height: 280px;
+  }
+
   .lc-units-container {
-    padding: var(--lc-space-4);
+    padding: 10px;
   }
-  
+
   .lc-sidebar {
-    padding: var(--lc-space-4);
+    padding: 10px;
+  }
+
+  .lc-panel-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 
@@ -2948,6 +2964,17 @@ body *::after {
   background: #fff;
 }
 
+@media (max-width: 720px) {
+  .lc-preview-panel {
+    min-height: 300px;
+    max-height: none;
+  }
+
+  .lc-preview-panel iframe {
+    min-height: 300px;
+  }
+}
+
 .lc-preview-panel iframe {
   width: 100%;
   height: 100%;
@@ -3102,7 +3129,7 @@ body.is-embedded .lc-page-header {
   }
 
   .lc-source-bar {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .lc-source-actions {
@@ -3128,6 +3155,23 @@ body.is-embedded .lc-page-header {
 
   .lc-page-header {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    min-height: auto;
+    padding: 10px 12px;
+  }
+
+  .lc-page-header h1 {
+    font-size: 16px;
+    gap: 6px;
+  }
+
+  .lc-page-header h1 i {
+    font-size: 14px;
+  }
+
+  .lc-page-header p {
+    font-size: 10px;
   }
 
   .lc-main-layout {
@@ -3143,8 +3187,47 @@ body.is-embedded .lc-page-header {
     border-bottom: 0;
   }
 
+  .lc-source-bar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .lc-collapse-btn {
+    justify-self: end;
+  }
+
+  .lc-source-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .lc-source-actions .lc-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .lc-subject-row {
+    grid-template-columns: 1fr;
+  }
+
+  .lc-subject-row .lc-textarea {
+    width: 100%;
+    min-height: 50px;
+  }
+
+  .lc-subject-row .lc-btn {
+    justify-self: end;
+    height: 34px;
+    width: auto;
+    padding: 0 10px;
+  }
+
   .lc-editor-panel {
-    min-height: 560px;
+    min-height: 400px;
   }
 
   .lc-editor-body,
@@ -3158,11 +3241,35 @@ body.is-embedded .lc-page-header {
 
   .lc-editor-toolbar {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    min-height: auto;
+    padding: 8px 10px;
   }
 
   .lc-editor-actions {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .lc-editor-actions .lc-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+    white-space: nowrap;
+  }
+
+  .lc-worker-setting {
+    width: 100%;
+  }
+
+  .lc-url-row {
+    flex-direction: column;
+  }
+
+  .lc-url-row .lc-input {
+    width: 100%;
   }
 }
 

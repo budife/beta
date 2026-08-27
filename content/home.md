@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 27 August 2026
+- **Layout Checker v2.1.7** - Full responsive layout for all screen sizes.
 - **Campaign Counter v1.6.3** - Refresh button for folder scans, last folder persists across sessions.
 - **Campaign Counter v1.6.2** - Folder scans visible to all users.
 - **Layout Checker v2.1.5** - Collapse button moved into action buttons row.

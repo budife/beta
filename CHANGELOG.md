@@ -14,6 +14,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Moved collapse button into action buttons row, aligned with other action buttons.
 
+## Layout Checker v2.1.7 - 27 August 2026
+
+- Full responsive layout for desktop, tablet, and mobile. Source bar, editor toolbar, and all panels adapt properly.
+
 ## Campaign Counter v1.6.3 - 27 August 2026
 
 - Added **Refresh button** to reload folder scans from Supabase without re-scanning local folder.
