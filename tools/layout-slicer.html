@@ -203,6 +203,10 @@
               <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
               Save to folder
             </button>
+            <button id="copy-code-btn" type="button" class="slicer-secondary" disabled>
+              <i class="fa-solid fa-code" aria-hidden="true"></i>
+              Copy Code
+            </button>
           </div>
         </div>
       </div>
@@ -265,82 +269,6 @@
         <div class="slicer-slice-list" id="slice-list">
           <p class="slicer-muted">Slices will appear after you load an image.</p>
         </div>
-        <div class="slicer-code-snippets">
-          <div class="slicer-panel-toolbar">
-            <span><i class="fa-solid fa-code"></i> Code Snippets</span>
-          </div>
-          <div class="slicer-code-list">
-            <details class="slicer-code-item">
-              <summary>Image Block (Header)</summary>
-              <pre class="slicer-code-block"><code>&lt;!-- START OF IMAGE--&gt;
-&lt;tr data-remove="ds-remove-1" class="ds-remove"&gt;
-  &lt;td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top"&gt;
-    &lt;!-- card image --&gt;
-    &lt;img class="img_scale" src="images/template/header-hsbc-premier.jpg" editable="true" alt="HSBC Card" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;!-- end card image --&gt;
-    &lt;!-- main KV image --&gt;
-    &lt;img class="img_scale" src="images/img_01.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;img class="img_scale" src="images/img_02.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;img class="img_scale" src="images/img_03.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;img class="img_scale" src="images/img_04.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;img class="img_scale" src="images/img_05.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;img class="img_scale" src="images/img_06.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-    &lt;!-- end main KV image --&gt;
-  &lt;/td&gt;
-&lt;/tr&gt;
-&lt;!-- END OF IMAGE/--&gt;</code></pre>
-              <button class="slicer-copy-btn" data-copy="code-header"><i class="fa-regular fa-copy"></i> Copy</button>
-            </details>
-            <details class="slicer-code-item">
-              <summary>Image Block (Single)</summary>
-              <pre class="slicer-code-block"><code>&lt;!-- START OF IMAGE--&gt;
-&lt;tr data-remove="ds-remove-1" class="ds-remove"&gt;
-  &lt;td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top"&gt;
-    &lt;img class="img_scale" src="images/img_01.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" /&gt;
-  &lt;/td&gt;
-&lt;/tr&gt;
-&lt;!-- END OF IMAGE/--&gt;</code></pre>
-              <button class="slicer-copy-btn" data-copy="code-single"><i class="fa-regular fa-copy"></i> Copy</button>
-            </details>
-            <details class="slicer-code-item">
-              <summary>Image Block (Gallery)</summary>
-              <pre class="slicer-code-block"><code>&lt;!-- START OF IMAGE--&gt;
-&lt;tr data-remove="ds-remove-1" class="ds-remove"&gt;
-  &lt;td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top"&gt;
-    &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"&gt;
-      &lt;tr&gt;
-        &lt;td width="50%" style="padding: 0 2px;"&gt;
-          &lt;img class="img_scale" src="images/img_01.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" /&gt;
-        &lt;/td&gt;
-        &lt;td width="50%" style="padding: 0 2px;"&gt;
-          &lt;img class="img_scale" src="images/img_02.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" /&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    &lt;/table&gt;
-  &lt;/td&gt;
-&lt;/tr&gt;
-&lt;!-- END OF IMAGE/--&gt;</code></pre>
-              <button class="slicer-copy-btn" data-copy="code-gallery"><i class="fa-regular fa-copy"></i> Copy</button>
-            </details>
-            <details class="slicer-code-item">
-              <summary>Image Block (Button)</summary>
-              <pre class="slicer-code-block"><code>&lt;!-- START OF IMAGE--&gt;
-&lt;tr data-remove="ds-remove-1" class="ds-remove"&gt;
-  &lt;td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top"&gt;
-    &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"&gt;
-      &lt;tr&gt;
-        &lt;td style="padding: 20px 0;"&gt;
-          &lt;a href="#" style="display: inline-block; padding: 12px 30px; background-color: #dc2626; color: #ffffff; text-decoration: none; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; border-radius: 4px;"&gt;Learn More&lt;/a&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    &lt;/table&gt;
-  &lt;/td&gt;
-&lt;/tr&gt;
-&lt;!-- END OF IMAGE/--&gt;</code></pre>
-              <button class="slicer-copy-btn" data-copy="code-button"><i class="fa-regular fa-copy"></i> Copy</button>
-            </details>
-          </div>
-        </div>
       </aside>
     </section>
           </div>
@@ -348,6 +276,26 @@
       </div>
     </section>
   </main>
+
+  <dialog id="code-modal" class="slicer-code-modal">
+    <div class="slicer-code-modal-content">
+      <div class="slicer-code-modal-header">
+        <h3><i class="fa-solid fa-code"></i> HTML Code</h3>
+        <button id="close-code-modal" type="button" class="slicer-code-modal-close">&times;</button>
+      </div>
+      <div class="slicer-code-modal-tabs">
+        <button class="slicer-code-tab is-active" data-tab="all">All Images</button>
+        <button class="slicer-code-tab" data-tab="single">Single</button>
+        <button class="slicer-code-tab" data-tab="gallery">Gallery</button>
+      </div>
+      <pre class="slicer-code-modal-block"><code id="code-modal-output"></code></pre>
+      <div class="slicer-code-modal-footer">
+        <button id="copy-all-code" type="button" class="slicer-primary">
+          <i class="fa-regular fa-copy"></i> Copy to Clipboard
+        </button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="../js/version-config.js?v=6.14.5" defer></script>
   <script src="../js/pages-layout-slicer.js?v=6.14.13" defer></script>
