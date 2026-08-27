@@ -488,10 +488,14 @@
 
   function preserveSliceLinks(ranges) {
     const oldLinks = state.slices.map((slice) => slice.link || '');
+    const oldCta = state.slices.map((slice) => slice.cta || false);
+    const oldAlt = state.slices.map((slice) => slice.alt || '');
     const oldExcluded = state.excluded;
     state.slices = ranges.map((range, index) => ({
       ...range,
-      link: oldLinks[index] || range.link || ''
+      link: oldLinks[index] || range.link || '',
+      cta: oldCta[index] || range.cta || false,
+      alt: oldAlt[index] || range.alt || `Image ${index + 1}`
     }));
     state.excluded = ranges.map((range, index) => Boolean(oldExcluded[index]));
   }
@@ -634,6 +638,20 @@
           <span>Include in export</span>
           <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
         </label>
+        <div class="slicer-slice-cta-group">
+          <label class="slicer-slice-cta">
+            <span>CTA Link</span>
+            <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+          </label>
+        </div>
+        <label>
+          <span>Alt Text</span>
+          <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
+        </label>
+        <label>
+          <span>Link URL</span>
+          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+        </label>
       </article>
     `;
     }).join('');
@@ -670,11 +688,7 @@
     const hasGenerated = Boolean(state.generated);
     if (els.saveFolder) els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
     const copyCodeBtn = document.getElementById('copy-code-btn');
-    const hasSlices = state.slices.length > 0 && !state.slices.every(s => state.excluded.includes(s.id));
-    if (copyCodeBtn) {
-      copyCodeBtn.disabled = !hasSlices;
-      copyCodeBtn.setAttribute('aria-disabled', String(!hasSlices));
-    }
+    if (copyCodeBtn) copyCodeBtn.disabled = !state.slices.length || state.slices.every(s => state.excluded.includes(s.id));
     updateCampaignPathPreview();
   }
 
@@ -1338,6 +1352,37 @@
     state.generated = null;
     updateUi();
   });
+
+  // CTA checkbox
+  els.sliceList.addEventListener('change', (event) => {
+    const checkbox = event.target.closest('[data-slice-cta]');
+    if (!checkbox) return;
+    const index = Number(checkbox.dataset.sliceCta);
+    state.slices[index].cta = checkbox.checked;
+    state.generated = null;
+    // Enable/disable link input based on CTA
+    const linkInput = document.querySelector(`[data-slice-link="${index}"]`);
+    if (linkInput) linkInput.disabled = !checkbox.checked;
+    updateUi();
+  });
+
+  // Alt text input
+  els.sliceList.addEventListener('input', (event) => {
+    const altInput = event.target.closest('[data-slice-alt]');
+    if (!altInput) return;
+    const index = Number(altInput.dataset.sliceAlt);
+    state.slices[index].alt = altInput.value;
+    state.generated = null;
+  });
+
+  // Link URL input
+  els.sliceList.addEventListener('input', (event) => {
+    const linkInput = event.target.closest('[data-slice-link]');
+    if (!linkInput) return;
+    const index = Number(linkInput.dataset.sliceLink);
+    state.slices[index].link = linkInput.value;
+    state.generated = null;
+  });
   [
     els.imageFormat,
     els.exportWidth,
@@ -1375,19 +1420,42 @@
   const codeTabs = document.querySelectorAll('.slicer-code-tab');
 
   function generateCodeForSlices(mode = 'all') {
-    const slices = state.slices.filter(s => !state.excluded.includes(s.id));
+    const slices = state.slices.filter((s, i) => !state.excluded[i]);
     if (!slices.length) return '';
 
     const prefix = document.getElementById('file-prefix')?.value || 'img';
     let code = '';
+
+    function buildImageTag(slice, i) {
+      const num = String(i + 1).padStart(2, '0');
+      const alt = escapeAttribute(slice.alt || `Image ${i + 1}`);
+      const src = `images/${prefix}_${num}.jpg`;
+      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
+      
+      if (slice.cta && slice.link) {
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+      }
+      return imgTag;
+    }
+
+    function buildImageTagGallery(slice, i) {
+      const num = String(i + 1).padStart(2, '0');
+      const alt = escapeAttribute(slice.alt || `Image ${i + 1}`);
+      const src = `images/${prefix}_${num}.jpg`;
+      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />`;
+      
+      if (slice.cta && slice.link) {
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+      }
+      return imgTag;
+    }
 
     if (mode === 'all') {
       code += `<!-- START OF IMAGE-->\n`;
       code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
       code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
       slices.forEach((slice, i) => {
-        const num = String(i + 1).padStart(2, '0');
-        code += `    <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />\n`;
+        code += `    ${buildImageTag(slice, i)}\n`;
       });
       code += `  </td>\n`;
       code += `</tr>\n`;
@@ -1396,11 +1464,10 @@
 
     if (mode === 'single') {
       slices.forEach((slice, i) => {
-        const num = String(i + 1).padStart(2, '0');
         code += `<!-- START OF IMAGE-->\n`;
         code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
         code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
-        code += `    <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />\n`;
+        code += `    ${buildImageTag(slice, i)}\n`;
         code += `  </td>\n`;
         code += `</tr>\n`;
         code += `<!-- END OF IMAGE-->\n\n`;
@@ -1416,9 +1483,8 @@
         code += `      <tr>\n`;
         for (let j = 0; j < 2 && i + j < slices.length; j++) {
           const idx = i + j;
-          const num = String(idx + 1).padStart(2, '0');
           code += `        <td width="50%" style="padding: 0 2px;">\n`;
-          code += `          <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />\n`;
+          code += `          ${buildImageTagGallery(slices[idx], idx)}\n`;
           code += `        </td>\n`;
         }
         code += `      </tr>\n`;
