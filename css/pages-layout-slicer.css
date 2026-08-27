@@ -1745,6 +1745,49 @@ select {
   color: var(--text-muted, #6b7280);
 }
 
+.slicer-slice-cta-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #374151;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.slicer-slice-cta-inline input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #dc2626;
+  flex-shrink: 0;
+}
+
+.slicer-slice-cta-inline input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slicer-slice-cta-inline span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+}
+
+.slicer-slice-field.sifter-slice-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.slicer-slice-field.sifter-slice-row input[type="url"] {
+  flex: 1;
+  min-width: 0;
+}
+
 .slicer-slice-card input:disabled {
   background: #f9fafb;
   color: #9ca3af;

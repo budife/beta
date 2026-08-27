@@ -638,21 +638,16 @@
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
         <div class="slicer-slice-fields">
-          <div class="slicer-slice-field">
-            <label class="slicer-slice-cta-group">
-              <label class="slicer-slice-cta">
-                <span>CTA Link</span>
-                <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-              </label>
+          <div class="slicer-slice-field sifter-slice-row">
+            <label class="slicer-slice-cta-inline">
+              <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+              <span>CTA</span>
             </label>
+            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-field">
             <span>Alt Text</span>
             <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
-          </div>
-          <div class="slicer-slice-field full-width">
-            <span>Link URL</span>
-            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
         </div>
       </article>
