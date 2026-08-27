@@ -10,9 +10,13 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v1.5.8 - 26 August 2026
+
+- Added a **full-screen loading overlay** when fetching HTML from a URL. Shows a centered spinner and "Fetching HTML..." message.
+
 ## Layout Checker v1.5.7 - 26 August 2026
 
-- Changed the **Subject input field** from a single-line text input to a multi-line textarea with 3 rows height.
+- Changed the **Subject input field** from a single-line text input to a multi-line textarea with 2 rows height.
 
 ## Layout Checker v1.5.6 - 26 August 2026
 

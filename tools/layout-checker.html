@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.11">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.12">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -98,6 +98,13 @@
         <i class="fa-solid fa-circle-notch fa-spin"></i>
         <span id="progressText">Processing...</span>
         <button id="stopBtn" class="lc-stop-btn" type="button">Stop</button>
+      </div>
+
+      <div id="loadingOverlay" class="lc-loading-overlay hidden">
+        <div class="lc-loading-content">
+          <i class="fa-solid fa-circle-notch fa-spin lc-loading-icon"></i>
+          <p id="loadingText">Fetching HTML...</p>
+        </div>
       </div>
     </section>
 
@@ -207,8 +214,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.14.11" defer></script>
+<script src="../js/version-config.js?v=6.14.12" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.14.11" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.14.12" defer></script>
 </body>
 </html>

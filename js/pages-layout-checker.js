@@ -70,6 +70,8 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingText = document.getElementById('loadingText');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
   const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
@@ -487,6 +489,15 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     abortController = null;
     const hasContent = editor.getValue().trim().length > 0;
     setLayoutStatus(hasContent ? 'ready' : 'empty', hasContent ? 'Layout ready' : 'No layout loaded');
+  }
+
+  function showLoadingOverlay(text = 'Fetching HTML...') {
+    if (loadingText) loadingText.textContent = text;
+    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+  }
+
+  function hideLoadingOverlay() {
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
   }
 
   // Stop button functionality
@@ -964,9 +975,10 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     try {
-      // Show progress
+      // Show progress and loading overlay
       showProgress('Fetching HTML content...', 'download');
-      
+      showLoadingOverlay('Fetching HTML...');
+
       // Disable button during fetch
       downloadBtn.disabled = true;
       downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px; animation: spin 1s linear infinite;"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg>Fetching...';
@@ -984,6 +996,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       downloadBtn.disabled = false;
       downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
       hideProgress();
+      hideLoadingOverlay();
     }
   });
 

@@ -2739,6 +2739,41 @@ body *::after {
   padding: 0 10px;
 }
 
+.lc-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.lc-loading-overlay.hidden {
+  display: none;
+}
+
+.lc-loading-content {
+  text-align: center;
+  color: #52525b;
+}
+
+.lc-loading-icon {
+  font-size: 32px;
+  color: #b4232d;
+  margin-bottom: 12px;
+}
+
+.lc-loading-content p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .lc-worker-setting {
   margin-top: 6px;
   font-size: 11px;
