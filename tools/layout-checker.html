@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.7">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.14.12">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -57,20 +57,30 @@
     <section class="lc-source-bar" aria-label="Layout source">
       <div class="lc-source-field">
         <label for="originalUrlInput">Layout URL</label>
-        <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+        <div class="lc-url-row">
+          <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+          <button id="resetUrlBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset URL">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
         <div class="lc-subject-row">
-          <input type="text" id="subjectInput" placeholder="Subject (KRHRED placeholders)" class="lc-input" />
-          <input type="text" id="subjectOutput" readonly class="lc-input" placeholder="Processed" />
+          <textarea id="subjectInput" placeholder="Subject (KRHRED placeholders)" class="lc-textarea" rows="2"></textarea>
+          <textarea id="subjectOutput" readonly class="lc-textarea" placeholder="Processed" rows="2"></textarea>
+          <button id="resetSubjectBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset subject">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
         </div>
         <details class="lc-worker-setting">
           <summary>HTML fetcher</summary>
-          <div class="lc-worker-row">
+          <div class="lc-url-row">
             <select id="fetcherProviderSelect" class="lc-input">
               <option value="google-apps-script">Google Apps Script</option>
               <option value="cloudflare-worker">Cloudflare Worker</option>
               <option value="custom">Custom URL</option>
             </select>
-            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Reset</button>
+            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset fetcher">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
           </div>
           <div class="lc-worker-row lc-worker-custom-row hidden" id="fetcherCustomUrlRow">
             <input type="url" id="fetcherCustomUrlInput" placeholder="https://your-worker.com/?url=" class="lc-input" />
@@ -79,10 +89,6 @@
         </details>
       </div>
       <div class="lc-source-actions">
-        <label for="htmlFileInput" class="lc-btn lc-btn-secondary">
-          <i class="fa-regular fa-file-code"></i> Open HTML
-        </label>
-        <input id="htmlFileInput" type="file" accept=".html,.htm,text/html" hidden>
         <button id="downloadBtn" class="lc-btn lc-btn-primary hidden"><i class="fa-solid fa-cloud-arrow-down"></i> Load URL</button>
         <button id="manualPasteBtn" class="lc-btn lc-btn-secondary hidden">Open URL</button>
         <button id="textModeBtn" class="lc-btn lc-btn-secondary hidden">Text Mode</button>
@@ -92,6 +98,13 @@
         <i class="fa-solid fa-circle-notch fa-spin"></i>
         <span id="progressText">Processing...</span>
         <button id="stopBtn" class="lc-stop-btn" type="button">Stop</button>
+      </div>
+
+      <div id="loadingOverlay" class="lc-loading-overlay hidden">
+        <div class="lc-loading-content">
+          <i class="fa-solid fa-circle-notch fa-spin lc-loading-icon"></i>
+          <p id="loadingText">Fetching HTML...</p>
+        </div>
       </div>
     </section>
 
@@ -201,8 +214,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.14.7" defer></script>
+<script src="../js/version-config.js?v=6.14.12" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.14.7" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.14.12" defer></script>
 </body>
 </html>

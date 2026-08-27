@@ -10,6 +10,27 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v1.5.8 - 26 August 2026
+
+- Added a **full-screen loading overlay** when fetching HTML from a URL. Shows a centered spinner and "Fetching HTML..." message.
+
+## Layout Checker v1.5.7 - 26 August 2026
+
+- Changed the **Subject input field** from a single-line text input to a multi-line textarea with 2 rows height.
+
+## Layout Checker v1.5.6 - 26 August 2026
+
+- Added a **reset button** next to the Layout URL input to clear the URL and hide the Load URL / Open URL / Text Mode buttons.
+
+## Layout Checker v1.5.5 - 26 August 2026
+
+- Added a **reset button** next to the Subject fields to clear both the subject input and processed output.
+
+## Layout Checker v1.5.4 - 26 August 2026
+
+- Removed the **Open HTML** file upload button. Layout Checker now only loads HTML from URLs.
+- Added auto-reload: when the HTML fetcher provider is changed in the dropdown and a URL is already entered, the app automatically retries loading the URL with the newly selected fetcher.
+
 ## Layout Checker v1.5.3 - 26 August 2026
 
 - Added a configurable **HTML Fetcher** dropdown in Layout Checker. Users can now choose between Google Apps Script, Cloudflare Worker, Jina AI, or a custom URL. Selections are saved to localStorage. A Reset button restores the default Google Apps Script fetcher.

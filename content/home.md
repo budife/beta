@@ -16,6 +16,11 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v1.5.8** - Added full-screen loading overlay when fetching HTML.
+- **Layout Checker v1.5.7** - Subject input changed to textarea with 2 rows height.
+- **Layout Checker v1.5.6** - Added reset button for Layout URL.
+- **Layout Checker v1.5.5** - Added reset button for Subject fields.
+- **Layout Checker v1.5.4** - Removed Open HTML file upload. Auto-reload URL when switching HTML fetcher provider.
 - **Layout Checker v1.5.3** - Added configurable HTML fetcher dropdown: Google Apps Script, Cloudflare Worker, Jina AI, or Custom URL.
 - **Campaign Counter v2.0.1** - Added Reset button next to Scan Folder to clear all saved folder scans from Supabase.
 - **Campaign Counter v2.0.1** - Fixed campaign folder tooltip to show all entries with the same campaign ID but different dates.
