@@ -3005,6 +3005,25 @@ body *::after {
   margin-top: 2px;
 }
 
+.lc-modal-progress {
+  height: 3px;
+  background: #334155;
+  overflow: hidden;
+}
+
+.lc-modal-progress-bar {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+  border-radius: 2px;
+  animation: progressSlide 1.5s ease-in-out infinite;
+}
+
+@keyframes progressSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
 .lc-modal-footer {
   padding: 12px 20px;
   display: flex;

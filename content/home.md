@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.0.4** - Added animated progress bar to fetch modal.
 - **Layout Checker v2.0.3** - Improved fetch modal: cleaner design, backdrop blur, animations, outline Stop button.
 - **Layout Checker v2.0.2** - Loading overlay replaced with modal showing fetcher provider + Stop button.
 - **Layout Checker v2.0.1** - Removed Code/Preview tab switcher. Preview is default view with placeholder message.
