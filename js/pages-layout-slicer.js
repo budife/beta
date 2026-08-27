@@ -636,12 +636,15 @@
         </div>
         <div class="slicer-slice-fields">
           <div class="slicer-slice-field full-width">
-            <span>CTA Link URL</span>
-            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${excluded ? 'disabled' : ''}>
+            <label class="slicer-slice-cta-toggle">
+              <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+              <span>CTA Link</span>
+            </label>
+            <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-field full-width">
-            <span>Alt Text</span>
-            <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
+            <span>Alt Text ${slice.cta ? '(required)' : ''}</span>
+            <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${slice.cta ? 'required' : ''} ${excluded ? 'disabled' : ''}>
           </div>
         </div>
       </article>
@@ -1345,6 +1348,20 @@
     updateUi();
   });
 
+  // CTA checkbox
+  els.sliceList.addEventListener('change', (event) => {
+    const checkbox = event.target.closest('[data-slice-cta]');
+    if (!checkbox) return;
+    const index = Number(checkbox.dataset.sliceCta);
+    state.slices[index].cta = checkbox.checked;
+    state.generated = null;
+    // Toggle link input
+    const linkInput = document.querySelector(`[data-slice-link="${index}"]`);
+    if (linkInput) linkInput.disabled = !checkbox.checked;
+    // Re-render to update "(required)" label
+    renderSlices();
+  });
+
   // Alt text input
   els.sliceList.addEventListener('input', (event) => {
     const altInput = event.target.closest('[data-slice-alt]');
@@ -1360,7 +1377,6 @@
     if (!linkInput) return;
     const index = Number(linkInput.dataset.sliceLink);
     state.slices[index].link = linkInput.value;
-    state.slices[index].cta = !!linkInput.value;
     state.generated = null;
   });
   [
