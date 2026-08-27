@@ -1377,7 +1377,7 @@
     const prefix = document.getElementById('file-prefix')?.value || 'img';
     let code = '';
 
-    if (mode === 'all' || mode === 'single') {
+    if (mode === 'all') {
       code += `<!-- START OF IMAGE-->\n`;
       code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
       code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
@@ -1390,8 +1390,21 @@
       code += `<!-- END OF IMAGE-->\n`;
     }
 
-    if (mode === 'gallery' && slices.length >= 2) {
-      code += `\n<!-- GALLERY LAYOUT -->\n`;
+    if (mode === 'single') {
+      slices.forEach((slice, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        code += `<!-- START OF IMAGE-->\n`;
+        code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+        code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+        code += `    <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />\n`;
+        code += `  </td>\n`;
+        code += `</tr>\n`;
+        code += `<!-- END OF IMAGE-->\n\n`;
+      });
+    }
+
+    if (mode === 'gallery') {
+      code += `<!-- START OF IMAGE-->\n`;
       code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
       code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
       code += `    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">\n`;
@@ -1409,6 +1422,27 @@
       code += `    </table>\n`;
       code += `  </td>\n`;
       code += `</tr>\n`;
+      code += `<!-- END OF IMAGE-->\n`;
+    }
+
+    if (mode === 'button') {
+      code += `<!-- START OF IMAGE-->\n`;
+      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+      slices.forEach((slice, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        code += `    <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />\n`;
+      });
+      code += `    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">\n`;
+      code += `      <tr>\n`;
+      code += `        <td style="padding: 20px 0;">\n`;
+      code += `          <a href="#" style="display: inline-block; padding: 12px 30px; background-color: #dc2626; color: #ffffff; text-decoration: none; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; border-radius: 4px;">Learn More</a>\n`;
+      code += `        </td>\n`;
+      code += `      </tr>\n`;
+      code += `    </table>\n`;
+      code += `  </td>\n`;
+      code += `</tr>\n`;
+      code += `<!-- END OF IMAGE-->\n`;
     }
 
     return code;
