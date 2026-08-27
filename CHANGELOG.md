@@ -10,6 +10,22 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v2.0.8 - 26 August 2026
+
+- Fixed error overlay not hiding when starting a new fetch.
+
+## Layout Checker v2.0.7 - 26 August 2026
+
+- Added error overlay with **Retry button** when fetch fails. Shows error message and retry option.
+
+## Layout Checker v2.0.6 - 26 August 2026
+
+- Removed progress text during fetch. URL input disabled during fetch, reset button becomes Stop button.
+
+## Layout Checker v2.0.5 - 26 August 2026
+
+- Moved fetch overlay from modal to **inside the preview panel**. Shows "Checking..." title, status text, provider name, and spinner.
+
 ## Layout Checker v2.0.4 - 26 August 2026
 
 - Added animated progress bar to fetch modal with sliding gradient effect.

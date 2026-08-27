@@ -60,10 +60,14 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
-  const fetchModal = document.getElementById('fetchModal');
-  const fetchModalTitle = document.getElementById('fetchModalTitle');
-  const fetchModalProvider = document.getElementById('fetchModalProvider');
-  const fetchModalStopBtn = document.getElementById('fetchModalStopBtn');
+  const fetchOverlay = document.getElementById('fetchOverlay');
+  const fetchOverlayTitle = document.getElementById('fetchOverlayTitle');
+  const fetchOverlayStatus = document.getElementById('fetchOverlayStatus');
+  const fetchOverlayProvider = document.getElementById('fetchOverlayProvider');
+  const fetchErrorOverlay = document.getElementById('fetchErrorOverlay');
+  const fetchErrorTitle = document.getElementById('fetchErrorTitle');
+  const fetchErrorMsg = document.getElementById('fetchErrorMsg');
+  const fetchRetryBtn = document.getElementById('fetchRetryBtn');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
   const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
@@ -454,13 +458,27 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   }
 
   function showLoadingOverlay(fetcherName = 'Google Apps Script') {
-    if (fetchModalTitle) fetchModalTitle.textContent = 'Fetching HTML...';
-    if (fetchModalProvider) fetchModalProvider.textContent = fetcherName;
-    if (fetchModal) fetchModal.classList.remove('hidden');
+    hideErrorOverlay();
+    if (fetchOverlayTitle) fetchOverlayTitle.textContent = 'Checking...';
+    if (fetchOverlayStatus) fetchOverlayStatus.textContent = 'Fetching website';
+    if (fetchOverlayProvider) fetchOverlayProvider.textContent = fetcherName;
+    if (fetchOverlay) fetchOverlay.classList.remove('hidden');
+    // Animate status text
+    setTimeout(() => { if (fetchOverlayStatus) fetchOverlayStatus.textContent = 'Analyzing layout'; }, 1500);
   }
 
   function hideLoadingOverlay() {
-    if (fetchModal) fetchModal.classList.add('hidden');
+    if (fetchOverlay) fetchOverlay.classList.add('hidden');
+  }
+
+  function showErrorOverlay(title = 'Failed to fetch', msg = 'Please try again') {
+    if (fetchErrorTitle) fetchErrorTitle.textContent = title;
+    if (fetchErrorMsg) fetchErrorMsg.textContent = msg;
+    if (fetchErrorOverlay) fetchErrorOverlay.classList.remove('hidden');
+  }
+
+  function hideErrorOverlay() {
+    if (fetchErrorOverlay) fetchErrorOverlay.classList.add('hidden');
   }
 
   // Stop button functionality
@@ -470,18 +488,20 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       console.log('Operation stopped');
       hideProgress();
       hideLoadingOverlay();
+      hideErrorOverlay();
+      originalUrlInput.disabled = false;
+      resetUrlBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
+      resetUrlBtn.title = 'Reset URL';
+      downloadBtn.disabled = false;
+      downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
     }
   });
 
-  // Modal stop button
-  if (fetchModalStopBtn) {
-    fetchModalStopBtn.addEventListener('click', () => {
-      if (abortController) {
-        abortController.abort();
-        console.log('Operation stopped');
-        hideProgress();
-        hideLoadingOverlay();
-      }
+  // Retry button
+  if (fetchRetryBtn) {
+    fetchRetryBtn.addEventListener('click', () => {
+      hideErrorOverlay();
+      downloadBtn.click();
     });
   }
 
@@ -951,12 +971,16 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     try {
-      // Get fetcher provider name for modal
+      // Get fetcher provider name
       const fetcherName = fetcherProviderSelect?.options[fetcherProviderSelect.selectedIndex]?.text || 'Google Apps Script';
 
-      // Show progress and loading modal
-      showProgress('Fetching HTML content...', 'download');
+      // Show loading overlay in preview panel
       showLoadingOverlay(fetcherName);
+
+      // Disable URL input and change reset to stop
+      originalUrlInput.disabled = true;
+      resetUrlBtn.innerHTML = '<i class="fa-solid fa-stop"></i>';
+      resetUrlBtn.title = 'Stop fetching';
 
       // Disable button during fetch
       downloadBtn.disabled = true;
@@ -970,11 +994,13 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
     } catch (error) {
       console.error('Error fetching HTML:', error);
-      console.log('Failed to fetch HTML content. Please try again or use Manual Paste option.');
+      showErrorOverlay('Failed to fetch', error.message || 'Please try again');
     } finally {
       downloadBtn.disabled = false;
       downloadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Load URL';
-      hideProgress();
+      originalUrlInput.disabled = false;
+      resetUrlBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
+      resetUrlBtn.title = 'Reset URL';
       hideLoadingOverlay();
     }
   });
@@ -1036,6 +1062,11 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
   if (resetUrlBtn) {
     resetUrlBtn.addEventListener('click', () => {
+      // If fetching, abort
+      if (originalUrlInput.disabled && abortController) {
+        abortController.abort();
+        return;
+      }
       if (originalUrlInput) originalUrlInput.value = '';
       if (downloadBtn) downloadBtn.style.display = 'none';
       if (manualPasteBtn) manualPasteBtn.style.display = 'none';

@@ -13,7 +13,7 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/theme.css?v=6.14.2">
-  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.4">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.15.8">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.2">
   
   <title>Layout Checker - eDM Helper</title>
@@ -97,23 +97,6 @@
         <button id="stopBtn" class="lc-stop-btn" type="button">Stop</button>
       </div>
 
-      <div id="fetchModal" class="lc-modal-overlay hidden">
-        <div class="lc-modal">
-          <div class="lc-modal-header">
-            <i class="fa-solid fa-circle-notch fa-spin"></i>
-            <div>
-              <div id="fetchModalTitle">Fetching HTML...</div>
-              <div id="fetchModalProvider" class="lc-modal-subtitle">Google Apps Script</div>
-            </div>
-          </div>
-          <div class="lc-modal-progress">
-            <div id="fetchModalProgressBar" class="lc-modal-progress-bar"></div>
-          </div>
-          <div class="lc-modal-footer">
-            <button id="fetchModalStopBtn" class="lc-btn lc-btn-danger">Stop</button>
-          </div>
-        </div>
-      </div>
     </section>
 
     <div class="lc-main-layout">
@@ -180,6 +163,22 @@
             <i class="fa-solid fa-image"></i>
             <p>Load a URL or paste HTML to preview the layout</p>
           </div>
+          <div id="fetchOverlay" class="lc-fetch-overlay hidden">
+            <div class="lc-fetch-overlay-content">
+              <div id="fetchOverlayTitle" class="lc-fetch-overlay-title">Checking...</div>
+              <div id="fetchOverlayStatus" class="lc-fetch-overlay-status">Fetching website</div>
+              <div id="fetchOverlayProvider" class="lc-fetch-overlay-provider">Google Apps Script</div>
+              <i class="fa-solid fa-circle-notch fa-spin lc-fetch-overlay-spinner"></i>
+            </div>
+          </div>
+          <div id="fetchErrorOverlay" class="lc-fetch-overlay hidden">
+            <div class="lc-fetch-overlay-content">
+              <i class="fa-solid fa-triangle-exclamation lc-fetch-error-icon"></i>
+              <div id="fetchErrorTitle" class="lc-fetch-overlay-title">Failed to fetch</div>
+              <div id="fetchErrorMsg" class="lc-fetch-overlay-status">Please try again</div>
+              <button id="fetchRetryBtn" class="lc-btn lc-btn-retry"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+            </div>
+          </div>
           <iframe id="layoutPreviewFrame" title="Layout preview" sandbox="allow-same-origin allow-popups"></iframe>
         </div>
       </section>
@@ -215,8 +214,8 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.15.4" defer></script>
+<script src="../js/version-config.js?v=6.15.8" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.15.4" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.15.8" defer></script>
 </body>
 </html>
