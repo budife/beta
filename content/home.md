@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 26 August 2026
+- **Layout Checker v2.0.2** - Loading overlay replaced with modal showing fetcher provider + Stop button.
 - **Layout Checker v2.0.1** - Removed Code/Preview tab switcher. Preview is default view with placeholder message.
 - **Layout Checker v2.0.0** - Major simplification: removed CodeMirror editor (~200KB saved). Preview remains primary, code view uses simple textarea.
 - **Layout Checker v1.5.8** - Added full-screen loading overlay when fetching HTML.

@@ -60,8 +60,10 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
   const progressContainer = document.getElementById('progressContainer');
   const progressText = document.getElementById('progressText');
   const stopBtn = document.getElementById('stopBtn');
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  const loadingText = document.getElementById('loadingText');
+  const fetchModal = document.getElementById('fetchModal');
+  const fetchModalTitle = document.getElementById('fetchModalTitle');
+  const fetchModalProvider = document.getElementById('fetchModalProvider');
+  const fetchModalStopBtn = document.getElementById('fetchModalStopBtn');
   const krhredUnitsContainer = document.getElementById('krhredUnitsContainer');
   const resetKrhredBtn = document.getElementById('resetKrhredBtn');
   
@@ -451,13 +453,14 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     setLayoutStatus(hasContent ? 'ready' : 'empty', hasContent ? 'Layout ready' : 'No layout loaded');
   }
 
-  function showLoadingOverlay(text = 'Fetching HTML...') {
-    if (loadingText) loadingText.textContent = text;
-    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+  function showLoadingOverlay(fetcherName = 'Google Apps Script') {
+    if (fetchModalTitle) fetchModalTitle.textContent = 'Fetching HTML...';
+    if (fetchModalProvider) fetchModalProvider.textContent = `Using: ${fetcherName}`;
+    if (fetchModal) fetchModal.classList.remove('hidden');
   }
 
   function hideLoadingOverlay() {
-    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+    if (fetchModal) fetchModal.classList.add('hidden');
   }
 
   // Stop button functionality
@@ -466,8 +469,21 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
       abortController.abort();
       console.log('Operation stopped');
       hideProgress();
+      hideLoadingOverlay();
     }
   });
+
+  // Modal stop button
+  if (fetchModalStopBtn) {
+    fetchModalStopBtn.addEventListener('click', () => {
+      if (abortController) {
+        abortController.abort();
+        console.log('Operation stopped');
+        hideProgress();
+        hideLoadingOverlay();
+      }
+    });
+  }
 
   // Helper function to validate URL
   function isValidUrl(url) {
@@ -935,9 +951,12 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     }
 
     try {
-      // Show progress and loading overlay
+      // Get fetcher provider name for modal
+      const fetcherName = fetcherProviderSelect?.options[fetcherProviderSelect.selectedIndex]?.text || 'Google Apps Script';
+
+      // Show progress and loading modal
       showProgress('Fetching HTML content...', 'download');
-      showLoadingOverlay('Fetching HTML...');
+      showLoadingOverlay(fetcherName);
 
       // Disable button during fetch
       downloadBtn.disabled = true;
