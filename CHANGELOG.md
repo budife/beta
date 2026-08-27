@@ -10,6 +10,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 
 - Fixed screenshot capturing only visible viewport instead of full scrollable content. The preview iframe height is now temporarily expanded to match content scrollHeight before capture, then restored afterward.
 
+## Layout Checker v2.0.3 - 26 August 2026
+
+- Improved fetch modal design: cleaner layout with subtitle showing fetcher provider, backdrop blur, smooth animations, outline Stop button.
+
 ## Layout Checker v2.0.2 - 26 August 2026
 
 - Replaced loading overlay with a **modal dialog** that shows which fetcher is being used (Google Apps Script, Cloudflare Worker, or Custom URL) with a Stop button.

@@ -455,7 +455,7 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
 
   function showLoadingOverlay(fetcherName = 'Google Apps Script') {
     if (fetchModalTitle) fetchModalTitle.textContent = 'Fetching HTML...';
-    if (fetchModalProvider) fetchModalProvider.textContent = `Using: ${fetcherName}`;
+    if (fetchModalProvider) fetchModalProvider.textContent = fetcherName;
     if (fetchModal) fetchModal.classList.remove('hidden');
   }
 
