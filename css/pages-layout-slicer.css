@@ -1096,7 +1096,6 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 420px;
-  max-height: 760px;
 }
 
 .slicer-output-panel {
@@ -1390,7 +1389,7 @@ select {
 .slicer-slice-list {
   flex: 1;
   padding: 16px;
-  overflow: auto;
+  overflow: visible;
 }
 
 .slicer-slice-card {
