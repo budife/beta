@@ -1621,6 +1621,26 @@ select {
   font-weight: 600;
   color: var(--text-muted, #4b5563);
   letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.slicer-slice-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slicer-slice-row input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #16a34a;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.slicer-slice-row input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .slicer-slice-card input,
