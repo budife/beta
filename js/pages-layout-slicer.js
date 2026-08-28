@@ -631,22 +631,17 @@
             <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
             <span>${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</span>
           </label>
-          <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px · export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
+        <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px · export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
         <div class="slicer-slice-fields">
           <div class="slicer-slice-field full-width">
-            <div class="slicer-slice-cta-row">
-              <label class="slicer-slice-cta-toggle">
-                <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-                <span>CTA Link</span>
-              </label>
-              <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
-            </div>
+            <label class="slicer-slice-label" for="slice-link-${index}">CTA Link URL</label>
+            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-field full-width">
-            <span>Alt Text ${slice.cta ? '(required)' : ''}</span>
-            <input type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${slice.cta ? 'required' : ''} ${excluded ? 'disabled' : ''}>
+            <label class="slicer-slice-label" for="slice-alt-${index}">Alt Text</label>
+            <input id="slice-alt-${index}" type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Image description" ${excluded ? 'disabled' : ''}>
           </div>
         </div>
       </article>
@@ -1347,23 +1342,7 @@
     if (state.excluded[index] === undefined) return;
     state.excluded[index] = !checkbox.checked;
     state.generated = null;
-    console.log('Include checkbox:', index, 'checked:', checkbox.checked, 'excluded:', state.excluded[index]);
     updateUi();
-  });
-
-  // CTA checkbox
-  els.sliceList.addEventListener('change', (event) => {
-    const checkbox = event.target.closest('[data-slice-cta]');
-    if (!checkbox) return;
-    const index = Number(checkbox.dataset.sliceCta);
-    state.slices[index].cta = checkbox.checked;
-    state.generated = null;
-    console.log('CTA checkbox:', index, 'checked:', checkbox.checked, 'cta:', state.slices[index].cta);
-    // Toggle link input
-    const linkInput = document.querySelector(`[data-slice-link="${index}"]`);
-    if (linkInput) linkInput.disabled = !checkbox.checked;
-    // Re-render to update "(required)" label
-    renderSlices();
   });
 
   // Alt text input
@@ -1381,6 +1360,7 @@
     if (!linkInput) return;
     const index = Number(linkInput.dataset.sliceLink);
     state.slices[index].link = linkInput.value;
+    state.slices[index].cta = !!linkInput.value;
     state.generated = null;
   });
   [
