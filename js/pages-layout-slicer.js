@@ -1347,6 +1347,7 @@
     if (state.excluded[index] === undefined) return;
     state.excluded[index] = !checkbox.checked;
     state.generated = null;
+    console.log('Include checkbox:', index, 'checked:', checkbox.checked, 'excluded:', state.excluded[index]);
     updateUi();
   });
 
@@ -1357,6 +1358,7 @@
     const index = Number(checkbox.dataset.sliceCta);
     state.slices[index].cta = checkbox.checked;
     state.generated = null;
+    console.log('CTA checkbox:', index, 'checked:', checkbox.checked, 'cta:', state.slices[index].cta);
     // Toggle link input
     const linkInput = document.querySelector(`[data-slice-link="${index}"]`);
     if (linkInput) linkInput.disabled = !checkbox.checked;
