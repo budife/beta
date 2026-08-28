@@ -595,7 +595,7 @@
         </div>
         <label>
           <span>Link URL optional</span>
-          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="CTA link">
+          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="http://example.com">
         </label>
       </article>
     `).join('');
@@ -640,7 +640,7 @@
           <div class="slicer-slice-row">
             <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
             <label class="slicer-slice-label" for="slice-link-${index}">CTA</label>
-            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="CTA link" ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="http://example.com" ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-row">
             <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
@@ -1366,6 +1366,9 @@
     const linkInput = event.target.closest('[data-slice-link]');
     if (!linkInput) return;
     const index = Number(linkInput.dataset.sliceLink);
+    if (linkInput.value.startsWith('https://')) {
+      linkInput.value = linkInput.value.replace('https://', 'http://');
+    }
     state.slices[index].link = linkInput.value;
     state.generated = null;
   });
