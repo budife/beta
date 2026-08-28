@@ -595,7 +595,7 @@
         </div>
         <label>
           <span>Link URL optional</span>
-          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://...">
+          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="CTA link">
         </label>
       </article>
     `).join('');
@@ -640,7 +640,7 @@
           <div class="slicer-slice-row">
             <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
             <label class="slicer-slice-label" for="slice-link-${index}">CTA</label>
-            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="CTA link" ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-row">
             <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
