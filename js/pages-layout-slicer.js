@@ -488,10 +488,16 @@
 
   function preserveSliceLinks(ranges) {
     const oldLinks = state.slices.map((slice) => slice.link || '');
+    const oldCta = state.slices.map((slice) => slice.cta || false);
+    const oldUseAlt = state.slices.map((slice) => slice.useAlt || false);
+    const oldAlt = state.slices.map((slice) => slice.alt || '');
     const oldExcluded = state.excluded;
     state.slices = ranges.map((range, index) => ({
       ...range,
-      link: oldLinks[index] || range.link || ''
+      link: oldLinks[index] || range.link || '',
+      cta: oldCta[index] || range.cta || false,
+      useAlt: oldUseAlt[index] || range.useAlt || false,
+      alt: oldAlt[index] || range.alt || `Image ${index + 1}`
     }));
     state.excluded = ranges.map((range, index) => Boolean(oldExcluded[index]));
   }
@@ -589,7 +595,7 @@
         </div>
         <label>
           <span>Link URL optional</span>
-          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://...">
+          <input type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="http://example.com">
         </label>
       </article>
     `).join('');
@@ -623,17 +629,25 @@
       return `
       <article class="slicer-slice-card${excluded ? ' is-excluded' : ''}">
         <div class="slicer-slice-head">
-          <div>
-            <div class="slicer-slice-title">${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</div>
-            <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px</div>
-            <div class="slicer-slice-meta">export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
-          </div>
+          <label class="slicer-slice-include">
+            <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
+            <span>${excluded ? `${index + 1}. ${slice.fileName} (excluded)` : `${exportNumber}. ${exportFileName}`}</span>
+          </label>
           ${index < state.slices.length - 1 ? `<button class="slicer-line-remove" type="button" data-remove-line="${index}">Remove line</button>` : ''}
         </div>
-        <label class="slicer-slice-include">
-          <span>Include in export</span>
-          <input type="checkbox" data-slice-include="${index}" ${excluded ? '' : 'checked'}>
-        </label>
+        <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px · export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
+        <div class="slicer-slice-fields">
+          <div class="slicer-slice-row">
+            <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+            <label class="slicer-slice-label" for="slice-link-${index}">CTA</label>
+            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="http://example.com" ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+          </div>
+          <div class="slicer-slice-row">
+            <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+            <label class="slicer-slice-label" for="slice-alt-${index}">Alt</label>
+            <input id="slice-alt-${index}" type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="${slice.alt || `Image ${index + 1}`}" ${!slice.useAlt ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+          </div>
+        </div>
       </article>
     `;
     }).join('');
@@ -669,6 +683,8 @@
     els.zoomLevel.disabled = !hasImage;
     const hasGenerated = Boolean(state.generated);
     if (els.saveFolder) els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
+    const copyCodeBtn = document.getElementById('copy-code-btn');
+    if (copyCodeBtn) copyCodeBtn.disabled = !state.slices.length || state.slices.every(s => state.excluded.includes(s.id));
     updateCampaignPathPreview();
   }
 
@@ -1332,6 +1348,51 @@
     state.generated = null;
     updateUi();
   });
+
+  // CTA checkbox
+  els.sliceList.addEventListener('change', (event) => {
+    const cb = event.target.closest('[data-slice-cta]');
+    if (!cb) return;
+    const index = Number(cb.dataset.sliceCta);
+    state.slices[index].cta = cb.checked;
+    state.generated = null;
+    const linkInput = document.querySelector(`[data-slice-link="${index}"]`);
+    if (linkInput) linkInput.disabled = !cb.checked;
+    updateUi();
+  });
+
+  // Link URL input
+  els.sliceList.addEventListener('input', (event) => {
+    const linkInput = event.target.closest('[data-slice-link]');
+    if (!linkInput) return;
+    const index = Number(linkInput.dataset.sliceLink);
+    if (linkInput.value.startsWith('https://')) {
+      linkInput.value = linkInput.value.replace('https://', 'http://');
+    }
+    state.slices[index].link = linkInput.value;
+    state.generated = null;
+  });
+
+  // Alt use checkbox
+  els.sliceList.addEventListener('change', (event) => {
+    const cb = event.target.closest('[data-slice-usealt]');
+    if (!cb) return;
+    const index = Number(cb.dataset.sliceUsealt);
+    state.slices[index].useAlt = cb.checked;
+    state.generated = null;
+    const altInput = document.querySelector(`[data-slice-alt="${index}"]`);
+    if (altInput) altInput.disabled = !cb.checked;
+    updateUi();
+  });
+
+  // Alt text input
+  els.sliceList.addEventListener('input', (event) => {
+    const altInput = event.target.closest('[data-slice-alt]');
+    if (!altInput) return;
+    const index = Number(altInput.dataset.sliceAlt);
+    state.slices[index].alt = altInput.value;
+    state.generated = null;
+  });
   [
     els.imageFormat,
     els.exportWidth,
@@ -1359,4 +1420,156 @@
   });
 
   updateUi();
+
+  // Code modal functionality
+  const codeModal = document.getElementById('code-modal');
+  const codeModalOutput = document.getElementById('code-modal-output');
+  const copyCodeBtn = document.getElementById('copy-code-btn');
+  const closeCodeModal = document.getElementById('close-code-modal');
+  const copyAllCode = document.getElementById('copy-all-code');
+  const codeTabs = document.querySelectorAll('.slicer-code-tab');
+
+  function generateCodeForSlices(mode = 'all') {
+    const slices = state.slices.filter((s, i) => !state.excluded[i]);
+    if (!slices.length) return '';
+
+    const prefix = document.getElementById('file-prefix')?.value || 'img';
+    let code = '';
+
+    function buildImageTag(slice, i) {
+      const num = String(i + 1).padStart(2, '0');
+      const alt = escapeAttribute(slice.useAlt ? (slice.alt || 'image') : 'image');
+      const src = `images/${prefix}_${num}.jpg`;
+      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
+      
+      if (slice.cta && slice.link) {
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+      }
+      return imgTag;
+    }
+
+    function buildImageTagGallery(slice, i) {
+      const num = String(i + 1).padStart(2, '0');
+      const alt = escapeAttribute(slice.useAlt ? (slice.alt || 'image') : 'image');
+      const src = `images/${prefix}_${num}.jpg`;
+      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />`;
+      
+      if (slice.cta && slice.link) {
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+      }
+      return imgTag;
+    }
+
+    if (mode === 'all') {
+      code += `<!-- START OF IMAGE-->\n`;
+      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+      slices.forEach((slice, i) => {
+        code += `    ${buildImageTag(slice, i)}\n`;
+      });
+      code += `  </td>\n`;
+      code += `</tr>\n`;
+      code += `<!-- END OF IMAGE-->\n`;
+    }
+
+    if (mode === 'single') {
+      slices.forEach((slice, i) => {
+        code += `<!-- START OF IMAGE-->\n`;
+        code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+        code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+        code += `    ${buildImageTag(slice, i)}\n`;
+        code += `  </td>\n`;
+        code += `</tr>\n`;
+        code += `<!-- END OF IMAGE-->\n\n`;
+      });
+    }
+
+    if (mode === 'gallery') {
+      code += `<!-- START OF IMAGE-->\n`;
+      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+      code += `    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">\n`;
+      for (let i = 0; i < slices.length; i += 2) {
+        code += `      <tr>\n`;
+        for (let j = 0; j < 2 && i + j < slices.length; j++) {
+          const idx = i + j;
+          code += `        <td width="50%" style="padding: 0 2px;">\n`;
+          code += `          ${buildImageTagGallery(slices[idx], idx)}\n`;
+          code += `        </td>\n`;
+        }
+        code += `      </tr>\n`;
+      }
+      code += `    </table>\n`;
+      code += `  </td>\n`;
+      code += `</tr>\n`;
+      code += `<!-- END OF IMAGE-->\n`;
+    }
+
+    if (mode === 'button') {
+      code += `<!-- START OF IMAGE-->\n`;
+      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+      slices.forEach((slice, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        code += `    <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />\n`;
+      });
+      code += `    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">\n`;
+      code += `      <tr>\n`;
+      code += `        <td style="padding: 20px 0;">\n`;
+      code += `          <a href="#" style="display: inline-block; padding: 12px 30px; background-color: #dc2626; color: #ffffff; text-decoration: none; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; border-radius: 4px;">Learn More</a>\n`;
+      code += `        </td>\n`;
+      code += `      </tr>\n`;
+      code += `    </table>\n`;
+      code += `  </td>\n`;
+      code += `</tr>\n`;
+      code += `<!-- END OF IMAGE-->\n`;
+    }
+
+    return code;
+  }
+
+  let currentTab = 'all';
+  function updateModalCode() {
+    if (codeModalOutput) codeModalOutput.textContent = generateCodeForSlices(currentTab);
+  }
+
+  codeTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      codeTabs.forEach(t => t.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      currentTab = tab.dataset.tab;
+      updateModalCode();
+    });
+  });
+
+  if (copyCodeBtn) {
+    copyCodeBtn.addEventListener('click', () => {
+      updateModalCode();
+      codeModal?.showModal();
+    });
+  }
+
+  if (closeCodeModal) {
+    closeCodeModal.addEventListener('click', () => codeModal?.close());
+  }
+
+  if (codeModal) {
+    codeModal.addEventListener('click', (e) => {
+      if (e.target === codeModal) codeModal.close();
+    });
+  }
+
+  if (copyAllCode) {
+    copyAllCode.addEventListener('click', () => {
+      const code = codeModalOutput?.textContent;
+      if (code) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyAllCode.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+          setTimeout(() => {
+            copyAllCode.innerHTML = '<i class="fa-regular fa-copy"></i> Copy to Clipboard';
+          }, 2000);
+        });
+      }
+    });
+  }
 })();
