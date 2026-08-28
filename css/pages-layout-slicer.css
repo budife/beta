@@ -1398,6 +1398,23 @@ select {
   padding: 12px;
   border: 1px solid var(--border, #e5e7eb);
   border-left: 3px solid var(--accent-primary, #f3838b);
+  border-radius: 8px;
+  background: #fff;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.slicer-slice-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: var(--accent-primary, #f3838b);
+}
+
+.slicer-slice-card.is-excluded {
+  opacity: 0.5;
+  border-left-color: #d1d5db;
+}
+
+.slicer-slice-card.is-excluded .slicer-slice-title {
+  text-decoration: line-through;
 }
 
 .slicer-code-snippets {
@@ -1555,28 +1572,6 @@ select {
   justify-content: flex-end;
   padding: 12px 20px;
   border-top: 1px solid #e5e7eb;
-}
-
-.slicer-slice-card.is-excluded {
-  border-left-color: #9ca3af;
-  opacity: .55;
-}
-
-.slicer-slice-card.is-excluded .slicer-slice-title {
-  text-decoration: line-through;
-}
-
-.slicer-slice-include {
-  display: flex !important;
-  gap: 8px !important;
-  align-items: center;
-}
-
-.slicer-slice-include input {
-  width: auto !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
 }
 
 .slicer-slice-card + .slicer-slice-card {
