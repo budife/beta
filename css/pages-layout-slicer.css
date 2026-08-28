@@ -1607,13 +1607,8 @@ select {
 
 .slicer-slice-fields {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   padding-top: 4px;
-}
-
-.slicer-slice-field {
-  display: grid;
-  gap: 4px;
 }
 
 .slicer-slice-label {
@@ -1622,6 +1617,7 @@ select {
   color: var(--text-muted, #4b5563);
   letter-spacing: 0.02em;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .slicer-slice-row {
@@ -1641,6 +1637,12 @@ select {
 .slicer-slice-row input[type="checkbox"]:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.slicer-slice-row input[type="url"],
+.slicer-slice-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
 }
 
 .slicer-slice-card input,

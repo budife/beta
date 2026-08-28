@@ -637,18 +637,14 @@
         </div>
         <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px · export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
         <div class="slicer-slice-fields">
-          <div class="slicer-slice-field full-width">
-            <div class="slicer-slice-row">
-              <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-              <label class="slicer-slice-label" for="slice-link-${index}">CTA Link URL</label>
-            </div>
+          <div class="slicer-slice-row">
+            <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+            <label class="slicer-slice-label" for="slice-link-${index}">CTA</label>
             <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="https://..." ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
-          <div class="slicer-slice-field full-width">
-            <div class="slicer-slice-row">
-              <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-              <label class="slicer-slice-label" for="slice-alt-${index}">Alt Text</label>
-            </div>
+          <div class="slicer-slice-row">
+            <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
+            <label class="slicer-slice-label" for="slice-alt-${index}">Alt</label>
             <input id="slice-alt-${index}" type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="${slice.alt || `Image ${index + 1}`}" ${!slice.useAlt ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
         </div>
