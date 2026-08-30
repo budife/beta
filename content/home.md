@@ -15,6 +15,9 @@ category: Home
 
 ## Recent Updates
 
+### 30 August 2026
+- **Core v6.16.11** - Performance optimizations: removed render-blocking `@import` in `theme.css`, explicit `tokens.css` loading with `preconnect`, lazy-loaded `privacy-settings` and `local backup` on demand, cached `home.md` badge in `sessionStorage`, removed dead auto-update code. Fixed favicon to new logo (`favicon.png` + `favicon.svg`).
+
 ### 27 August 2026
 - **Layout Checker v2.1.7** - Full responsive layout for all screen sizes.
 - **Campaign Counter v1.6.3** - Refresh button for folder scans, last folder persists across sessions.

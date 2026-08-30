@@ -2,6 +2,14 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.16.11 - 30 August 2026
+
+- Removed render-blocking `@import` for `tokens.css` in `theme.css`; shell and all 10 tool pages now load `tokens.css` explicitly with `preconnect` for Font Awesome.
+- Lazy-loaded `privacy-settings.js` and `local-backup.js` on demand via `app.js` for `/maintenance` and docs privacy panels instead of blocking shell load.
+- Cached `content/home.md` sidebar badge data in `sessionStorage` (3 min TTL) and switched fetches to `cache: 'default'` to reduce cold loads.
+- Removed dead auto-update code from `version-config.js` (~8KB).
+- Updated favicon to new logo (`favicon.svg` as base64 PNG wrapper + `favicon.png` fallback) across `index.html`, `404.html`, and all tool pages.
+
 ## Home - Recent Updates Tab Redesign
 
 - Reworked Recent Updates on home page from chronological list into date-based tab navigation. Dates are now `###` headings in markdown, transformed into clickable tabs by JavaScript. Tabs show last 6 update dates (24 Aug, 23 Aug, 21 Aug, 20 Aug, 13 Aug), oldest entries link to full Changelog. Leftmost tab selected by default.

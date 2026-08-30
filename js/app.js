@@ -147,6 +147,54 @@ const TOOL_PRIVACY = {
   '/maintenance': 'Local only'
 };
 
+const LAZY_SCRIPT_CACHE = new Map();
+function loadScript(src) {
+  if (LAZY_SCRIPT_CACHE.has(src)) return LAZY_SCRIPT_CACHE.get(src);
+  if (document.querySelector(`script[src="${CSS.escape(src)}"]`)) {
+    const done = Promise.resolve();
+    LAZY_SCRIPT_CACHE.set(src, done);
+    return done;
+  }
+  const promise = new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = src;
+    el.async = true;
+    el.onload = () => resolve();
+    el.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(el);
+  });
+  LAZY_SCRIPT_CACHE.set(src, promise);
+  return promise;
+}
+
+const HOME_BADGE_CACHE_KEY = 'edm-helper:home-badge-cache';
+const HOME_BADGE_TTL = 3 * 60 * 1000;
+
+function getCachedHomeBadge() {
+  try {
+    const raw = sessionStorage.getItem(HOME_BADGE_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.md || !parsed?.ts) return null;
+    if (Date.now() - parsed.ts > HOME_BADGE_TTL) return null;
+    return parsed.md;
+  } catch { return null; }
+}
+
+function setCachedHomeBadge(md) {
+  try { sessionStorage.setItem(HOME_BADGE_CACHE_KEY, JSON.stringify({ md, ts: Date.now() })); } catch {}
+}
+
+function ensurePrivacySettings() {
+  if (window.EDM_PRIVACY) return Promise.resolve();
+  return loadScript(withBasePath('/js/privacy-settings.js'));
+}
+
+function ensureLocalBackup() {
+  if (window.EDM_LOCAL_BACKUP) return Promise.resolve();
+  return loadScript(withBasePath('/js/local-backup.js'));
+}
+
 function getVersion() {
   return typeof VERSION_CONFIG !== 'undefined' ? VERSION_CONFIG.version : '6.6.0';
 }
@@ -604,9 +652,11 @@ function enhanceHomeDashboard(container) {
   }
 }
 
-function renderPrivacySettings(container) {
+async function renderPrivacySettings(container) {
   const panel = container.querySelector('[data-privacy-settings]');
-  if (!panel || !window.EDM_PRIVACY) return;
+  if (!panel) return;
+  try { await ensurePrivacySettings(); } catch {}
+  if (!window.EDM_PRIVACY) return;
 
   const definitions = window.EDM_PRIVACY.definitions;
   panel.innerHTML = Object.entries(definitions).map(([key, definition]) => `
@@ -626,15 +676,14 @@ function renderPrivacySettings(container) {
   });
 }
 
-function renderLocalBackup(container) {
+async function renderLocalBackup(container) {
   const panel = container.querySelector('[data-local-backup]');
   if (!panel) return;
-
+  try { await ensureLocalBackup(); } catch {}
   if (!window.EDM_LOCAL_BACKUP?.render) {
     panel.innerHTML = '<p class="local-backup-status is-error">Local backup helper failed to load.</p>';
     return;
   }
-
   window.EDM_LOCAL_BACKUP.render(panel);
 }
 
@@ -698,9 +747,8 @@ function renderDocsTools(container) {
   });
 }
 
-function enhanceMaintenancePage(container) {
-  renderLocalBackup(container);
-  renderPrivacySettings(container);
+async function enhanceMaintenancePage(container) {
+  await Promise.all([renderLocalBackup(container), renderPrivacySettings(container)]);
 }
 
 function setActiveLink(path) {
@@ -885,7 +933,7 @@ function showTransientView(markup) {
   activeRoutePath = '';
 }
 
-function renderPage(path, route, markdown) {
+async function renderPage(path, route, markdown) {
   const { attributes, body } = parseFrontmatter(markdown);
   const title = attributes.title || route.label;
   const description = attributes.description || '';
@@ -963,7 +1011,7 @@ function renderPage(path, route, markdown) {
     }
     if (path === '/maintenance') {
       markdownContainer.classList.add('docs-content');
-      enhanceMaintenancePage(markdownContainer);
+      await enhanceMaintenancePage(markdownContainer);
     }
   }
 
@@ -1041,11 +1089,11 @@ async function loadRoute(path) {
   try {
     const contentRoot = route.source === 'docs' ? 'docs' : 'content';
     const contentUrl = `${BASE_PATH}/${contentRoot}/${route.content}`;
-    const response = await fetch(contentUrl, { cache: 'no-cache' });
+    const response = await fetch(contentUrl, { cache: 'default' });
     if (!response.ok) {
       throw new Error(`Unable to load ${contentUrl}: ${response.status}`);
     }
-    renderPage(path, route, await response.text());
+    await renderPage(path, route, await response.text());
     viewport.scrollTop = 0;
     viewport.focus({ preventScroll: true });
   } catch (error) {
@@ -1107,10 +1155,20 @@ document.getElementById('footer-year').textContent = '2025';
 configureRouteLinks();
 
 const homeContentUrl = `${BASE_PATH}/content/home.md`;
-fetch(homeContentUrl, { cache: 'no-cache' })
-  .then((res) => res.ok ? res.text() : '')
-  .then((md) => { parseRecentUpdateDates(md); applySidebarBadges(); })
-  .catch(() => applySidebarBadges());
+const cachedHomeBadge = getCachedHomeBadge();
+if (cachedHomeBadge) {
+  parseRecentUpdateDates(cachedHomeBadge);
+  applySidebarBadges();
+} else {
+  fetch(homeContentUrl, { cache: 'default' })
+    .then((res) => res.ok ? res.text() : '')
+    .then((md) => {
+      if (md) setCachedHomeBadge(md);
+      parseRecentUpdateDates(md);
+      applySidebarBadges();
+    })
+    .catch(() => applySidebarBadges());
+}
 
 viewport.replaceChildren();
 
