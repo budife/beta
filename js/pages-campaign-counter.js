@@ -363,7 +363,8 @@ function formatActivityDate(value) {
 function renderActivity(items) {
   const list = document.getElementById('activity-list');
   if (!list) return;
-  if (!items.length) {
+  const visible = (items || []).slice(0, 10);
+  if (!visible.length) {
     list.innerHTML = '<p class="activity-empty">No Campaign IDs have been generated yet.</p>';
     return;
   }
@@ -371,7 +372,7 @@ function renderActivity(items) {
     ? 'manually set'
     : 'generated';
   const displayId = item => item.full_id ? escapeHtml(item.full_id) : formatId(item.campaign_id);
-  list.innerHTML = items.map(item => `
+  list.innerHTML = visible.map(item => `
     <article class="activity-row">
       <div class="activity-id-wrap">
         <code>${displayId(item)}</code>

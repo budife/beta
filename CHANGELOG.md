@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.16.12 - 30 August 2026
+
+- Made **Campaign Counter** fully fluid responsive: 3→2→1 column grid (`repeat(3, minmax(0, 1fr))` → `repeat(2, minmax(0, 1fr))` at 1250px → single column at 900px), `clamp()` page padding, and stacked folder actions on mobile.
+
 ## Core v6.16.11 - 30 August 2026
 
 - Removed render-blocking `@import` for `tokens.css` in `theme.css`; shell and all 10 tool pages now load `tokens.css` explicitly with `preconnect` for Font Awesome.
@@ -9,6 +13,15 @@ All notable user-facing changes to eDM Helper are tracked here.
 - Cached `content/home.md` sidebar badge data in `sessionStorage` (3 min TTL) and switched fetches to `cache: 'default'` to reduce cold loads.
 - Removed dead auto-update code from `version-config.js` (~8KB).
 - Updated favicon to new logo (`favicon.svg` as base64 PNG wrapper + `favicon.png` fallback) across `index.html`, `404.html`, and all tool pages.
+
+## Campaign Counter v1.6.5 - 30 August 2026
+
+- Compact responsive layout: equal-width 1fr cards, 10→8→6→4 column folder grid, `fit-content` chips with fully visible numbers, equal-height cards with per-list scrolling, optimized welcome dialog, and refined spacing.
+
+## Campaign Counter v1.6.4 - 30 August 2026
+
+- Fluid 3→2→1 column layout for compact monitors and tablets; inputs stack on mobile and folder heading wraps cleanly on narrow screens.
+- Refreshed cache-busters for the responsive update.
 
 ## Home - Recent Updates Tab Redesign
 
