@@ -829,34 +829,37 @@ select {
 .slicer-drop-zone {
   display: grid;
   place-items: center;
-  min-height: 136px;
-  padding: 24px;
-  margin-bottom: 16px;
+  min-height: 100px;
+  padding: 14px;
+  margin-bottom: 12px;
   color: var(--text-muted, #6b7280);
   text-align: center;
-  border: 1px dashed var(--border, #d8dde5);
+  background: var(--ui-accent-soft, #fff1f2);
+  border: 2px dashed var(--accent-primary, #f3838b);
   cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
 }
 
 .slicer-drop-zone.is-dragover,
 .slicer-drop-zone:focus-visible {
   color: var(--accent-hover, #b8323d);
-  background: var(--ui-accent-soft, #fff1f2);
-  outline: 0;
+  background: #ffe4e6;
   border-color: var(--accent-primary, #f3838b);
+  border-style: solid;
+  outline: none;
 }
 
 .slicer-drop-zone i {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   color: var(--accent-primary, #f3838b);
-  font-size: 30px;
+  font-size: 20px;
 }
 
 .slicer-drop-zone strong {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   color: var(--text, #111827);
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -1104,25 +1107,26 @@ select {
 
 .slicer-panel-toolbar {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 10px 12px;
+  background: #f7f7f8;
   border-bottom: 1px solid var(--border, #e5e7eb);
 }
 
 .slicer-preview-panel .slicer-panel-toolbar,
 .slicer-slices-panel .slicer-panel-toolbar {
-  padding: 0 0 12px;
+  padding: 8px 12px;
 }
 
 .slicer-panel-toolbar h2 {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .slicer-panel-toolbar > span {
   color: var(--text-muted, #6b7280);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .slicer-preview-tools {
@@ -1510,32 +1514,7 @@ select {
   color: #111827;
 }
 
-.slicer-code-modal-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 12px 20px;
-  border-bottom: 1px solid #e5e7eb;
-}
 
-.slicer-code-tab {
-  padding: 6px 12px;
-  font-size: 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  color: #374151;
-}
-
-.slicer-code-tab:hover {
-  background: #f9fafb;
-}
-
-.slicer-code-tab.is-active {
-  background: #1e293b;
-  color: #fff;
-  border-color: #1e293b;
-}
 
 .slicer-code-modal-block {
   margin: 0;

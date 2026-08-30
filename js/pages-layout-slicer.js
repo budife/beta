@@ -638,14 +638,12 @@
         <div class="slicer-slice-meta">source y ${slice.top}-${slice.bottom} · ${slice.height}px · export ${getExportWidth()} × ${Math.max(1, Math.round(slice.height * getExportScale()))}px${sizeLabel ? ` · ${sizeLabel}` : ''}</div>
         <div class="slicer-slice-fields">
           <div class="slicer-slice-row">
-            <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-            <label class="slicer-slice-label" for="slice-link-${index}">CTA</label>
-            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="http://example.com" ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+            <input type="checkbox" data-slice-cta="${index}" ${slice.cta ? 'checked' : ''} ${excluded ? 'disabled' : ''} title="Enable CTA link">
+            <input id="slice-link-${index}" type="url" data-slice-link="${index}" value="${escapeAttribute(slice.link)}" placeholder="CTA link" ${!slice.cta ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
           <div class="slicer-slice-row">
-            <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''}>
-            <label class="slicer-slice-label" for="slice-alt-${index}">Alt</label>
-            <input id="slice-alt-${index}" type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="${slice.alt || `Image ${index + 1}`}" ${!slice.useAlt ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
+            <input type="checkbox" data-slice-usealt="${index}" ${slice.useAlt ? 'checked' : ''} ${excluded ? 'disabled' : ''} title="Enable alt text">
+            <input id="slice-alt-${index}" type="text" data-slice-alt="${index}" value="${escapeAttribute(slice.alt)}" placeholder="Alt text" ${!slice.useAlt ? 'disabled' : ''} ${excluded ? 'disabled' : ''}>
           </div>
         </div>
       </article>
@@ -684,7 +682,7 @@
     const hasGenerated = Boolean(state.generated);
     if (els.saveFolder) els.saveFolder.disabled = !hasGenerated || typeof window.showDirectoryPicker !== 'function';
     const copyCodeBtn = document.getElementById('copy-code-btn');
-    if (copyCodeBtn) copyCodeBtn.disabled = !state.slices.length || state.slices.every(s => state.excluded.includes(s.id));
+    if (copyCodeBtn) copyCodeBtn.disabled = !state.generated || !state.generated.slices.length;
     updateCampaignPathPreview();
   }
 
@@ -1427,9 +1425,8 @@
   const copyCodeBtn = document.getElementById('copy-code-btn');
   const closeCodeModal = document.getElementById('close-code-modal');
   const copyAllCode = document.getElementById('copy-all-code');
-  const codeTabs = document.querySelectorAll('.slicer-code-tab');
 
-  function generateCodeForSlices(mode = 'all') {
+  function generateCodeForSlices() {
     const slices = state.slices.filter((s, i) => !state.excluded[i]);
     if (!slices.length) return '';
 
@@ -1460,87 +1457,29 @@
       return imgTag;
     }
 
-    if (mode === 'all') {
-      code += `<!-- START OF IMAGE-->\n`;
-      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
-      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
-      slices.forEach((slice, i) => {
-        code += `    ${buildImageTag(slice, i)}\n`;
-      });
-      code += `  </td>\n`;
-      code += `</tr>\n`;
-      code += `<!-- END OF IMAGE-->\n`;
-    }
+    const cardImageTag = `<img class="img_scale" src="images/template/header-hsbc.jpg" editable="true" alt="HSBC Card" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
 
-    if (mode === 'single') {
-      slices.forEach((slice, i) => {
-        code += `<!-- START OF IMAGE-->\n`;
-        code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
-        code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
-        code += `    ${buildImageTag(slice, i)}\n`;
-        code += `  </td>\n`;
-        code += `</tr>\n`;
-        code += `<!-- END OF IMAGE-->\n\n`;
-      });
-    }
-
-    if (mode === 'gallery') {
-      code += `<!-- START OF IMAGE-->\n`;
-      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
-      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
-      code += `    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">\n`;
-      for (let i = 0; i < slices.length; i += 2) {
-        code += `      <tr>\n`;
-        for (let j = 0; j < 2 && i + j < slices.length; j++) {
-          const idx = i + j;
-          code += `        <td width="50%" style="padding: 0 2px;">\n`;
-          code += `          ${buildImageTagGallery(slices[idx], idx)}\n`;
-          code += `        </td>\n`;
-        }
-        code += `      </tr>\n`;
-      }
-      code += `    </table>\n`;
-      code += `  </td>\n`;
-      code += `</tr>\n`;
-      code += `<!-- END OF IMAGE-->\n`;
-    }
-
-    if (mode === 'button') {
-      code += `<!-- START OF IMAGE-->\n`;
-      code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
-      code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
-      slices.forEach((slice, i) => {
-        const num = String(i + 1).padStart(2, '0');
-        code += `    <img class="img_scale" src="images/${prefix}_${num}.jpg" editable="true" alt="image" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />\n`;
-      });
-      code += `    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">\n`;
-      code += `      <tr>\n`;
-      code += `        <td style="padding: 20px 0;">\n`;
-      code += `          <a href="#" style="display: inline-block; padding: 12px 30px; background-color: #dc2626; color: #ffffff; text-decoration: none; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; border-radius: 4px;">Learn More</a>\n`;
-      code += `        </td>\n`;
-      code += `      </tr>\n`;
-      code += `    </table>\n`;
-      code += `  </td>\n`;
-      code += `</tr>\n`;
-      code += `<!-- END OF IMAGE-->\n`;
-    }
+    code += `<!-- START OF IMAGE-->\n`;
+    code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
+    code += `  <td mc:edit="FA_img" style="padding: 0px; font-family:Arial, sans-serif; font-style: italic; color:#242424; font-size:12px; line-height:18px;" align="center" valign="top">\n`;
+    code += `    <!-- card image -->\n`;
+    code += `    ${cardImageTag}\n`;
+    code += `    <!-- end card image -->\n`;
+    code += `    <!-- main KV image -->\n`;
+    slices.forEach((slice, i) => {
+      code += `    ${buildImageTag(slice, i)}\n`;
+    });
+    code += `    <!-- end main KV image -->\n`;
+    code += `  </td>\n`;
+    code += `</tr>\n`;
+    code += `<!-- END OF IMAGE-->\n`;
 
     return code;
   }
 
-  let currentTab = 'all';
   function updateModalCode() {
-    if (codeModalOutput) codeModalOutput.textContent = generateCodeForSlices(currentTab);
+    if (codeModalOutput) codeModalOutput.textContent = generateCodeForSlices();
   }
-
-  codeTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      codeTabs.forEach(t => t.classList.remove('is-active'));
-      tab.classList.add('is-active');
-      currentTab = tab.dataset.tab;
-      updateModalCode();
-    });
-  });
 
   if (copyCodeBtn) {
     copyCodeBtn.addEventListener('click', () => {

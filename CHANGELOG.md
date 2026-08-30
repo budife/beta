@@ -14,6 +14,10 @@ All notable user-facing changes to eDM Helper are tracked here.
 - Removed dead auto-update code from `version-config.js` (~8KB).
 - Updated favicon to new logo (`favicon.svg` as base64 PNG wrapper + `favicon.png` fallback) across `index.html`, `404.html`, and all tool pages.
 
+## Layout Slicer v0.5.2 - 30 August 2026
+
+- Compact drop zones with visible dashed accent, preserved command wrappers in generated code, added card/main comments and header image, removed code tabs, gated Copy Code until generate, compacted toolbar and slice labels.
+
 ## Campaign Counter v1.6.5 - 30 August 2026
 
 - Compact responsive layout: equal-width 1fr cards, 10→8→6→4 column folder grid, `fit-content` chips with fully visible numbers, equal-height cards with per-list scrolling, optimized welcome dialog, and refined spacing.

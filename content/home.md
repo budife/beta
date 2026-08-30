@@ -16,6 +16,7 @@ category: Home
 ## Recent Updates
 
 ### 30 August 2026
+- **Layout Slicer v0.5.2** - Compact drop zones, header included in generated code with card/main comments, removed code tabs, copy-code gated by generate, compact toolbar and labels.
 - **Campaign Counter v1.6.5** - Compact responsive layout with equal-width cards, max 10-column folder grid (8/6/4 on narrow), fit-size chips, equal-height cards, scroll per list, optimized welcome dialog.
 - **Campaign Counter v1.6.4** - Responsive 3→2→1 column layout: fluid `minmax` grid, stacked inputs on mobile, wraps folder actions on narrow screens.
 - **Core v6.16.11** - Performance optimizations: removed render-blocking `@import` in `theme.css`, explicit `tokens.css` loading with `preconnect`, lazy-loaded `privacy-settings` and `local backup` on demand, cached `home.md` badge in `sessionStorage`, removed dead auto-update code. Fixed favicon to new logo (`favicon.png` + `favicon.svg`).

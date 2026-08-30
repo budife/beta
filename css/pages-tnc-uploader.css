@@ -371,22 +371,24 @@ body {
 .tnc-drop-zone {
   display: grid;
   place-items: center;
-  min-height: 112px;
-  margin-top: 12px;
-  padding: 14px;
+  min-height: 100px;
+  margin-top: 10px;
+  padding: 12px;
   color: var(--text-muted);
   text-align: center;
-  background: #fff;
-  border: 1px dashed var(--border-color);
+  background: var(--ui-accent-soft, #fff1f2);
+  border: 2px dashed var(--accent-primary, #f3838b);
   cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
 }
 
 .tnc-drop-zone.is-dragging,
 .tnc-drop-zone:focus-visible {
   color: var(--accent-primary);
-  background: var(--red-50);
+  background: #ffe4e6;
   border-color: var(--accent-primary);
-  outline: 2px solid rgba(241, 140, 142, .25);
+  border-style: solid;
+  outline: none;
 }
 
 .tnc-drop-zone input {
@@ -394,9 +396,9 @@ body {
 }
 
 .tnc-drop-zone i {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: var(--accent-primary);
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .tnc-drop-zone strong,
@@ -406,13 +408,13 @@ body {
 
 .tnc-drop-zone strong {
   color: var(--text);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: var(--font-weight-semibold);
 }
 
 .tnc-drop-zone span {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 2px;
+  font-size: 11px;
 }
 
 .tnc-dropped-list {
