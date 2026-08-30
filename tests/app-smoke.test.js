@@ -50,9 +50,11 @@ test('tool markdown files point to existing HTML tools', () => {
 });
 
 test('shell loads required maintenance scripts', () => {
+  const app = read('js/app.js');
   for (const file of ['index.html', '404.html']) {
     const html = read(file);
     assert.match(html, /js\/tool-versions\.js/, `${file} loads tool versions`);
-    assert.match(html, /js\/local-backup\.js/, `${file} loads local backup helper`);
   }
+  assert.match(app, /local-backup\.js/, 'app.js lazy-loads local backup helper');
+  assert.match(app, /privacy-settings\.js/, 'app.js lazy-loads privacy settings');
 });

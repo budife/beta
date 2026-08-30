@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.14.6',
+    version: '6.16.13',
     status: 'stable'
   },
   home: {
@@ -21,7 +21,7 @@ const TOOL_VERSIONS = {
   },
   'campaign-counter': {
     label: 'Campaign Counter',
-    version: '1.6.3',
+    version: '1.6.5',
     status: 'stable'
   },
   'config-edm': {
@@ -49,9 +49,9 @@ const TOOL_VERSIONS = {
     version: '2.1.7',
     status: 'stable'
   },
-'layout-slicer': {
+  'layout-slicer': {
     label: 'Layout Slicer',
-    version: '6.14.14',
+    version: '0.5.1',
     status: 'stable'
   },
   'tnc-uploader': {
