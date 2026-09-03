@@ -15,8 +15,8 @@ category: Home
 ## Recent Updates
 
 ### 4 September 2026
-- **Doc to HTML v1.2.0** - Beta warning dialog on load with "Don't show again" option.
 - **Layout Slicer v0.5.3** - Unsaved data warning when navigating away.
+- **Doc to HTML v1.2.0** - Beta warning dialog on load with "Don't show again" option.
 - **Config eDM v1.6.1** - XML preview panel with syntax highlighting, line numbers, search, copy, collapsible. Conversation dropdown (IMO Marketing / Non-Marketing EDM / Custom) with optional checkbox. UAT badge yellow. Form values highlighted in preview.
 
 ### 3 September 2026
