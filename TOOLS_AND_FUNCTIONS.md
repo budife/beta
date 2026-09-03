@@ -40,27 +40,7 @@ eDM Helper adalah kumpulan tools berguna untuk email marketing dan produktivitas
   - SMTP settings
   - Custom parameters
 
-### 4. **Database Generator**
-- **File:** `database-generator.html`
-- **Icon:** 🗄️
-- **Fungsi:** Generate database custom dengan cepat
-- **Fitur:**
-  - Customizable templates
-  - Custom fields
-  - Bulk generation
-  - Export formats (CSV, TXT, JSON)
-
-### 5. **Database Checker**
-- **File:** `database-checker.html`
-- **Icon:** ✅
-- **Fungsi:** Validasi dan cek integritas database
-- **Fitur:**
-  - Comprehensive error reporting
-  - Data validation
-  - Duplicate detection
-  - Format verification
-
-### 6. **WFH Tracker**
+### 4. **WFH Tracker**
 - **File:** `wfh-tracker.html`
 - **Icon:** 📅
 - **Fungsi:** Track dan manage work from home days
@@ -70,7 +50,7 @@ eDM Helper adalah kumpulan tools berguna untuk email marketing dan produktivitas
   - Summary reports
   - Export timesheet
 
-### 8. **Layout Checker**
+### 5. **Layout Checker**
 - **File:** `layout-checker.html`
 - **Icon:** 📏
 - **Fungsi:** Cek kompatibilitas layout email
@@ -109,8 +89,6 @@ Beta/
 ├── bookmarklet.html          # Bookmarklet tool
 ├── campaign-counter.html     # Campaign counter
 ├── config.html               # eDM configuration
-├── database-generator.html   # Database generator
-├── database-checker.html     # Database validator
 ├── wfh-tracker.html          # WFH tracker
 ├── layout-checker.html       # Layout tester
 ├── css/                      # Stylesheets
@@ -140,8 +118,7 @@ Beta/
 ## 💡 Tips Penggunaan
 
 1. **Bookmarklet** - Drag bookmarklet ke browser toolbar untuk akses cepat
-2. **Database Tools** - Gunakan generator untuk membuat test data, checker untuk validasi
-3. **Campaign Counter** - Import XLSX Monday untuk melihat nomor terpakai dan next ID
+2. **Campaign Counter** - Import XLSX Monday untuk melihat nomor terpakai dan next ID
 4. **Layout Checker** - Test di berbagai email client untuk memastikan compatibility
 
 ---

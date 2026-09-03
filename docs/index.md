@@ -9,7 +9,6 @@ category: Reference
 
 - [Privacy](#privacy-network-behavior)
 - [Basics](#global-navigation)
-- [Database](#database-checker)
 - [Tools](#bookmarklet)
 - [Local Backup](#local-data-backup)
 - [Maintenance](#release-workflow)
@@ -31,7 +30,6 @@ eDM Helper is designed as a local-first internal helper. Files such as database 
 :::details What can contact a third-party service?
 
 - Layout Checker URL loading may fetch the layout URL directly and, if enabled, through proxy fallbacks.
-- Database Checker Layout Test may fetch the layout URL directly and, if enabled, through proxy fallbacks.
 - TNC Uploader Check may verify a public PDF URL directly and, if enabled, through proxy fallbacks.
 - WFH Tracker holiday sync requests public Indonesian holiday data by year.
 
@@ -40,8 +38,6 @@ These flows do not intentionally upload local files or customer databases. They 
 
 :::details What stays local?
 
-- Database Checker package parsing and validation.
-- Database Generator customer input and file generation.
 - Config eDM XML parsing, editing, and saving.
 - Campaign Counter XLSX import and ID history.
 - Bookmarklet local campaign ID data.
@@ -64,8 +60,6 @@ The app uses clean SPA routes with a fixed sidebar. Opening a tool changes only 
 - Home: `/`
 - Docs: `/docs`
 - Maintenance: `/maintenance`
-- Database Checker: `/database-checker`
-- Database Generator: `/database-generator`
 - Bookmarklet: `/bookmarklet`
 - Campaign Counter: `/campaign-counter`
 - Config eDM: `/config-edm`
@@ -73,74 +67,6 @@ The app uses clean SPA routes with a fixed sidebar. Opening a tool changes only 
 - Layout Slicer: `/layout-slicer`
 - TNC Uploader: `/tnc-uploader`
 - WFH Tracker: `/wfh-tracker`
-
-## Database Checker
-
-:::details Purpose
-
-Database Checker validates campaign database packages before delivery. It checks whether the package is static or dynamic, verifies required files, compares emails across files, validates field counts, detects KRHRED anomalies, and can test database values against a layout.
-:::
-
-:::details Required files
-
-Each package should contain four file types:
-
-- `CustMast` or `EmailCustMast`
-- `CustPref`
-- `CustSubs`
-- `CustAttr`
-
-The tool accepts both `CustMast` and `EmailCustMast` because both formats appear in real campaign packages.
-:::
-
-:::details Static vs dynamic validation
-
-- Static database: validates package structure and invalid rows.
-- Dynamic database: validates package structure plus KRHRED values in `CustAttr`.
-- Dynamic KRHRED values are checked for empty values, dot-only values, outer whitespace, repeated spaces, and length limits.
-:::
-
-:::details Workflow
-
-- Click Open Folder and select the database folder.
-- Choose a detected package from the package list.
-- Review Package Overview for type, date group, file count, sizes, and KRHRED units.
-- Run Check Database Package.
-- Use grouped findings to inspect invalid rows.
-- Use Raw Data or View line when line-level inspection is needed.
-- Use Layout Test when you want to confirm KRHRED values render into a public or pasted layout.
-:::
-
-:::details Network behavior
-
-Package validation is local. Layout Test only contacts the network when a layout URL is used. If external URL checks are disabled, use pasted HTML or an HTML file fallback instead.
-:::
-
-## Database Generator
-
-:::details Purpose
-
-Database Generator creates static or dynamic campaign database files from customer emails and optional KRHRED values. It keeps the output format consistent with the existing eDM database workflow.
-:::
-
-:::details Workflow
-
-- Enter Campaign ID.
-- Choose Static or Dynamic.
-- Add customer emails one by one or paste bulk emails.
-- For dynamic campaigns, add KRHRED unit numbers such as `30`, `31`, or `32`.
-- Fill KRHRED values per customer.
-- Review the compact table.
-- Generate and download the output files.
-:::
-
-:::details Important behavior
-
-- Duplicate emails are allowed and remain separate records.
-- Numeric KRHRED input is converted internally to `KRHRED_Unit_XX`.
-- Static output and dynamic output keep existing generated file formats.
-- Customer data is not sent outside the browser.
-:::
 
 ## Bookmarklet
 

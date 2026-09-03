@@ -24,14 +24,7 @@ const ROUTES = {
     content: 'config-edm.md',
     label: 'Config eDM'
   },
-  '/database-checker': {
-    content: 'database-checker.md',
-    label: 'Database Checker'
-  },
-  '/database-generator': {
-    content: 'database-generator.md',
-    label: 'Database Generator'
-  },
+
   '/doc-to-html': {
     content: 'doc-to-html.md',
     label: 'Doc to HTML'
@@ -68,8 +61,7 @@ const LEGACY_PATHS = {
   '/bookmarklet.html': '/bookmarklet',
   '/campaign-counter.html': '/campaign-counter',
   '/config.html': '/config-edm',
-  '/database-checker.html': '/database-checker',
-  '/database-generator.html': '/database-generator',
+
   '/doc-to-html.html': '/doc-to-html',
   '/layout-checker.html': '/layout-checker',
   '/layout-slicer.html': '/layout-slicer',
@@ -84,7 +76,7 @@ const backdrop = document.getElementById('sidebar-backdrop');
 const menuToggle = document.getElementById('menu-toggle');
 const routePageCache = new Map();
 const routeScrollPositions = new Map();
-const PERSISTENT_TOOL_ROUTES = new Set(['/database-checker', '/config-edm']);
+const PERSISTENT_TOOL_ROUTES = new Set(['/config-edm']);
 let activeRoutePath = '';
 
 const TOOL_META = {
@@ -100,14 +92,7 @@ const TOOL_META = {
     icon: 'fa-solid fa-sliders',
     label: 'Config eDM'
   },
-  '/database-checker': {
-    icon: 'fa-solid fa-circle-check',
-    label: 'Database Checker'
-  },
-  '/database-generator': {
-    icon: 'fa-solid fa-database',
-    label: 'Database Generator'
-  },
+
   '/doc-to-html': {
     icon: 'fa-solid fa-file-word',
     label: 'Doc to HTML'
@@ -138,8 +123,7 @@ const TOOL_PRIVACY = {
   '/bookmarklet': 'Local only',
   '/campaign-counter': 'Local only',
   '/config-edm': 'Local only',
-  '/database-checker': 'External optional',
-  '/database-generator': 'Local only',
+
   '/layout-checker': 'External optional',
   '/layout-slicer': 'Local only',
   '/tnc-uploader': 'External optional',
@@ -819,7 +803,6 @@ function styleEmbeddedTool(frame) {
     const scrollableToolPaths = [
       '/bookmarklet.html',
       '/campaign-counter.html',
-      '/database-generator.html',
       '/layout-slicer.html',
       '/tnc-uploader.html',
       '/wfh-tracker.html',

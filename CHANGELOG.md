@@ -2,6 +2,10 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.16.13 - 3 September 2026
+
+- Removed **Database Checker** and **Database Generator** tools: deleted all dedicated HTML, JS, CSS, markdown content, and test files; cleaned routes, sidebar navigation, tool metadata, version entries, documentation, and cross-references.
+
 ## Core v6.16.12 - 30 August 2026
 
 - Made **Campaign Counter** fully fluid responsive: 3→2→1 column grid (`repeat(3, minmax(0, 1fr))` → `repeat(2, minmax(0, 1fr))` at 1250px → single column at 900px), `clamp()` page padding, and stacked folder actions on mobile.

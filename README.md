@@ -19,8 +19,6 @@ eDM Helper is a static web app built for validating campaign files, preparing da
 
 | Tool | Status | Purpose |
 | --- | --- | --- |
-| Database Checker | Stable | Validate static/dynamic four-file database packages, inspect issues, export findings, and test data against layouts. |
-| Database Generator | Stable | Generate campaign database text files from email and KRHRED inputs. |
 | Bookmarklet | Stable | Browser shortcuts for repetitive page cleanup and helper actions. |
 | Campaign Counter | Beta | Track campaign ID usage locally from Monday-style folder/XLSX workflows. |
 | Config eDM | Stable | Open and update eDM XML configuration files with safer field editing. |

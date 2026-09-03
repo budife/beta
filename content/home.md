@@ -7,13 +7,15 @@ category: Home
 
 ## Quick Access
 
-- [Database Checker](/database-checker)
 - [Config eDM](/config-edm)
 - [Layout Checker](/layout-checker)
 - [Layout Slicer](/layout-slicer)
 - [Campaign Counter](/campaign-counter)
 
 ## Recent Updates
+
+### 3 September 2026
+- **Core v6.16.13** - Removed Database Checker and Database Generator tools and all related files, routes, sidebar entries, and documentation references.
 
 ### 30 August 2026
 - **Layout Slicer v0.5.2** - Compact drop zones, header included in generated code with card/main comments, removed code tabs, copy-code gated by generate, compact toolbar and labels.
