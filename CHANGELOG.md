@@ -2,6 +2,14 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Config eDM v1.6.1 - 4 September 2026
+
+- XML preview panel: full content, syntax highlighting, line numbers, collapsible, search, copy button.
+- Preview stays sticky with scrollable content area and responsive layout.
+- Added Conversation dropdown (IMO Marketing / IMO Non-Marketing EDM / Custom) with optional checkbox, Description attribute auto-fill.
+- UAT badge color changed from red to yellow.
+- Form field values highlighted in XML preview.
+
 ## Core v6.16.13 - 3 September 2026
 
 - Removed **Database Checker** and **Database Generator** tools: deleted all dedicated HTML, JS, CSS, markdown content, and test files; cleaned routes, sidebar navigation, tool metadata, version entries, documentation, and cross-references.

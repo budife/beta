@@ -14,6 +14,9 @@ category: Home
 
 ## Recent Updates
 
+### 4 September 2026
+- **Config eDM v1.6.1** - XML preview panel with syntax highlighting, line numbers, search, copy, collapsible. Conversation dropdown (IMO Marketing / Non-Marketing EDM / Custom) with optional checkbox. UAT badge yellow. Form values highlighted in preview.
+
 ### 3 September 2026
 - **Core v6.16.13** - Removed Database Checker and Database Generator tools and all related files, routes, sidebar entries, and documentation references.
 
