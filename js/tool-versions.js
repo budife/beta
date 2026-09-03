@@ -26,7 +26,7 @@ const TOOL_VERSIONS = {
   },
   'config-edm': {
     label: 'Config eDM',
-    version: '1.6.0',
+    version: '1.6.1',
     status: 'stable'
   },
 

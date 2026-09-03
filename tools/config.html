@@ -230,6 +230,31 @@
 
         </div>
 
+        <div class="field conversation-field">
+
+          <label class="conversation-label">
+            <input type="checkbox" id="conversationEnabled" />
+            <span>Promo atau Service/Regulatory/Notifications/Info</span>
+          </label>
+
+          <div class="control">
+
+            <div class="input-wrapper conversation-field">
+
+              <select id="conversation" disabled>
+                <option value="IMO Marketing">IMO Marketing</option>
+                <option value="IMO Non-Marketing EDM">IMO Non-Marketing EDM</option>
+                <option value="__custom__">Custom...</option>
+              </select>
+
+              <input id="conversationCustom" type="text" placeholder="Custom conversation name" hidden disabled />
+
+            </div>
+
+          </div>
+
+        </div>
+
 
 
         <div class="buttons config-actions">
@@ -259,21 +284,38 @@
         <div class="xml-workflow-heading">
           <div>
             <span class="panel-eyebrow">XML workflow</span>
-            <strong>Loaded configuration</strong>
-          </div>
-          <span id="xmlWorkflowProgress" class="xml-workflow-progress">0 / 0</span>
-        </div>
-        <div class="xml-workflow-grid">
-          <div class="xml-workflow-item">
-            <span>Current XML</span>
             <strong id="currentXmlName">No XML selected</strong>
           </div>
-          <div class="xml-workflow-item">
-            <span>Next XML</span>
-            <strong id="nextXmlName">End of list</strong>
+          <div class="xml-workflow-actions">
+            <span id="xmlWorkflowProgress" class="xml-workflow-progress">0 / 0</span>
+            <button type="button" id="xmlPreviewSearchToggle" class="xml-preview-btn" title="Search in preview">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button type="button" id="xmlPreviewCopyBtn" class="xml-preview-btn" title="Copy XML">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+            <button type="button" id="xmlPreviewToggle" class="xml-preview-btn" title="Toggle preview">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
           </div>
         </div>
-        <p>Apply and save your campaign values, then use Back or Next XML to continue.</p>
+        <div id="xmlPreviewSearchBar" class="xml-preview-search" hidden>
+          <input type="search" id="xmlPreviewSearchInput" class="xml-preview-search-input" placeholder="Search XML..." aria-label="Search XML preview">
+          <span id="xmlPreviewSearchStatus" class="xml-preview-search-status"></span>
+          <button type="button" id="xmlPreviewSearchPrev" class="xml-preview-search-btn" title="Previous match">
+            <i class="fa-solid fa-chevron-up"></i>
+          </button>
+          <button type="button" id="xmlPreviewSearchNext" class="xml-preview-search-btn" title="Next match">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <button type="button" id="xmlPreviewSearchClose" class="xml-preview-search-btn" title="Close search">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="xmlPreviewBody" class="xml-preview-body">
+          <div id="xmlPreviewLineNumbers" class="xml-preview-lines"></div>
+          <pre id="xmlPreview" class="xml-preview"><code id="xmlPreviewContent"></code></pre>
+        </div>
       </div>
 
 

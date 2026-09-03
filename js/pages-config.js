@@ -73,6 +73,13 @@ function initializeFields() {
     if (elements.campaignIdInput) elements.campaignIdInput.value = '';
     if (elements.subjectInput) elements.subjectInput.value = '';
     if (elements.linkInput) elements.linkInput.value = '';
+    if (elements.conversationSelect) elements.conversationSelect.value = 'IMO Marketing';
+    if (elements.conversationCustom) elements.conversationCustom.hidden = true;
+    if (elements.conversationEnabled) {
+      elements.conversationEnabled.checked = false;
+      if (elements.conversationSelect) elements.conversationSelect.disabled = true;
+      if (elements.conversationCustom) elements.conversationCustom.disabled = true;
+    }
     updateCampaignCountIndicator('');
     currentCampaignId = ''; // Reset current campaign ID
     // Update character counts to 0 when no XML
@@ -108,6 +115,34 @@ function initializeFields() {
   const messageBody = xmlDoc.querySelector('MessageBody');
   const link = messageBody ? messageBody.getAttribute('content') : '';
   if (elements.linkInput) elements.linkInput.value = link;
+
+  const conversation = xmlDoc.querySelector('Conversation');
+  const conversationName = conversation ? conversation.getAttribute('name') : '';
+  if (elements.conversationEnabled) {
+    elements.conversationEnabled.checked = !!conversationName;
+  }
+  if (elements.conversationSelect) {
+    elements.conversationSelect.disabled = !conversationName;
+    if (elements.conversationCustom) elements.conversationCustom.disabled = !conversationName;
+    const opts = Array.from(elements.conversationSelect.options);
+    const match = opts.find(o => o.value === conversationName);
+    if (match) {
+      elements.conversationSelect.value = conversationName;
+    } else if (conversationName) {
+      elements.conversationSelect.value = '__custom__';
+      if (elements.conversationCustom) {
+        elements.conversationCustom.hidden = false;
+        elements.conversationCustom.value = conversationName;
+      }
+    } else {
+      elements.conversationSelect.value = 'IMO Marketing';
+      if (elements.conversationCustom) elements.conversationCustom.hidden = true;
+    }
+  }
+  if (elements.conversationCustom && elements.conversationSelect?.value !== '__custom__') {
+    elements.conversationCustom.hidden = true;
+  }
+
   updateEnvironmentToggle();
   
   // Update character counts after loading values
@@ -202,6 +237,9 @@ const elements = {
   toggleUatBtn: document.getElementById('toggleUatBtn'),
   subjectInput: document.getElementById('subject'),
   linkInput: document.getElementById('link'),
+  conversationSelect: document.getElementById('conversation'),
+  conversationCustom: document.getElementById('conversationCustom'),
+  conversationEnabled: document.getElementById('conversationEnabled'),
   campaignCountIndicator: document.getElementById('campaignCountIndicator'),
   breadcrumb: document.getElementById('breadcrumb'),
   fileMetadata: document.getElementById('fileMetadata'),
@@ -216,7 +254,7 @@ const elements = {
   xmlWorkflow: document.getElementById('xmlWorkflow'),
   xmlWorkflowProgress: document.getElementById('xmlWorkflowProgress'),
   currentXmlName: document.getElementById('currentXmlName'),
-  nextXmlName: document.getElementById('nextXmlName'),
+  nextXmlName: null,
   overlay: document.getElementById('overlay'),
   spinner: document.querySelector('.spinner')
 };
@@ -228,7 +266,6 @@ function getXmlFileItems() {
 function updateXmlWorkflow() {
   const files = getXmlFileItems();
   const currentIndex = selectedFileItem ? files.indexOf(selectedFileItem) : -1;
-  const nextItem = currentIndex >= 0 ? files[currentIndex + 1] : null;
 
   if (elements.xmlWorkflow) elements.xmlWorkflow.hidden = currentIndex < 0;
   if (elements.currentXmlName) {
@@ -236,17 +273,13 @@ function updateXmlWorkflow() {
       ? selectedFileItem.querySelector('.label')?.textContent || 'Selected XML'
       : 'No XML selected';
   }
-  if (elements.nextXmlName) {
-    elements.nextXmlName.textContent = nextItem
-      ? nextItem.querySelector('.label')?.textContent || 'Next XML'
-      : 'End of list';
-  }
   if (elements.xmlWorkflowProgress) {
     elements.xmlWorkflowProgress.textContent = currentIndex >= 0
       ? `${currentIndex + 1} / ${files.length}`
       : `0 / ${files.length}`;
   }
   if (elements.nextXmlBtn) {
+    const nextItem = currentIndex >= 0 ? files[currentIndex + 1] : null;
     elements.nextXmlBtn.disabled = !nextItem;
     elements.nextXmlBtn.title = nextItem ? 'Save pending changes and open the next XML file' : 'No next XML file';
   }
@@ -254,6 +287,219 @@ function updateXmlWorkflow() {
     const previousItem = currentIndex > 0 ? files[currentIndex - 1] : null;
     elements.previousXmlBtn.disabled = !previousItem;
     elements.previousXmlBtn.title = previousItem ? 'Save pending changes and open the previous XML file' : 'No previous XML file';
+  }
+
+  const previewContent = document.getElementById('xmlPreviewContent');
+  const lineNumbers = document.getElementById('xmlPreviewLineNumbers');
+  if (previewContent) {
+    if (currentIndex >= 0 && elements.editor && elements.editor.getValue) {
+      const raw = elements.editor.getValue();
+      let html = highlightXml(escapeHtml(raw));
+      html = highlightFormValues(html);
+      previewContent.innerHTML = html;
+      if (lineNumbers) {
+        const count = raw.split('\n').length;
+        lineNumbers.innerHTML = Array.from({ length: count }, (_, i) => `<span>${i + 1}</span>`).join('');
+      }
+    } else {
+      previewContent.textContent = '';
+      if (lineNumbers) lineNumbers.innerHTML = '';
+    }
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function highlightXml(escaped) {
+  return escaped
+    .replace(/&lt;(\/?[\w:-]+)/g, '&lt;<span class="xml-tag">$1</span>')
+    .replace(/([\w:-]+)=(&quot;[^&]*?&quot;)/g, '<span class="xml-attr">$1</span>=<span class="xml-val">$2</span>')
+    .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="xml-comment">$1</span>');
+}
+
+function getConversationDescription(name) {
+  if (name === 'IMO Marketing') return 'For IMO Marketing messages process';
+  if (name === 'IMO Non-Marketing EDM') return 'to bypass unsubscribed customer email';
+  return '';
+}
+
+function highlightFormValues(html) {
+  const convSelect = elements.conversationSelect;
+  const convCustom = elements.conversationCustom;
+  const convValue = convSelect?.value === '__custom__'
+    ? convCustom?.value?.trim()
+    : convSelect?.value;
+
+  const values = [
+    elements.campaignIdInput?.value?.trim(),
+    elements.subjectInput?.value?.trim(),
+    elements.linkInput?.value?.trim(),
+    convValue
+  ].filter(v => v && v.length > 2);
+
+  let result = html;
+  for (const val of values) {
+    const escaped = escapeHtml(val);
+    const re = new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    result = result.replace(re, `<span class="xml-form-hl">${escaped}</span>`);
+  }
+  return result;
+}
+
+let xmlPreviewCollapsed = false;
+
+function toggleXmlPreview() {
+  xmlPreviewCollapsed = !xmlPreviewCollapsed;
+  const body = document.getElementById('xmlPreviewBody');
+  const icon = document.querySelector('#xmlPreviewToggle i');
+  if (body) body.hidden = xmlPreviewCollapsed;
+  if (icon) {
+    icon.classList.toggle('fa-chevron-up', !xmlPreviewCollapsed);
+    icon.classList.toggle('fa-chevron-down', xmlPreviewCollapsed);
+  }
+}
+
+function setupXmlPreviewToggle() {
+  const btn = document.getElementById('xmlPreviewToggle');
+  if (btn) btn.addEventListener('click', toggleXmlPreview);
+}
+
+function setupXmlPreviewCopy() {
+  const btn = document.getElementById('xmlPreviewCopyBtn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (!elements.editor || !elements.editor.getValue) return;
+    const raw = elements.editor.getValue();
+    navigator.clipboard.writeText(raw).then(() => {
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1200);
+    });
+  });
+}
+
+let xmlSearchMatches = [];
+let xmlSearchIndex = -1;
+
+function setupXmlPreviewSearch() {
+  const toggleBtn = document.getElementById('xmlPreviewSearchToggle');
+  const bar = document.getElementById('xmlPreviewSearchBar');
+  const input = document.getElementById('xmlPreviewSearchInput');
+  const status = document.getElementById('xmlPreviewSearchStatus');
+  const prevBtn = document.getElementById('xmlPreviewSearchPrev');
+  const nextBtn = document.getElementById('xmlPreviewSearchNext');
+  const closeBtn = document.getElementById('xmlPreviewSearchClose');
+
+  if (toggleBtn && bar) {
+    toggleBtn.addEventListener('click', () => {
+      bar.hidden = !bar.hidden;
+      if (!bar.hidden && input) input.focus();
+      if (bar.hidden) clearXmlSearch();
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      bar.hidden = true;
+      clearXmlSearch();
+    });
+  }
+
+  if (input) {
+    let debounce;
+    input.addEventListener('input', () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => runXmlSearch(input.value), 150);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) navigateXmlSearch(-1);
+        else navigateXmlSearch(1);
+      }
+      if (e.key === 'Escape') {
+        bar.hidden = true;
+        clearXmlSearch();
+      }
+    });
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', () => navigateXmlSearch(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => navigateXmlSearch(1));
+}
+
+function runXmlSearch(query) {
+  const code = document.getElementById('xmlPreviewContent');
+  const status = document.getElementById('xmlPreviewSearchStatus');
+  xmlSearchMatches = [];
+  xmlSearchIndex = -1;
+
+  if (!code || !query) {
+    if (code) code.innerHTML = highlightXml(escapeHtml(elements.editor?.getValue?.() || ''));
+    if (status) status.textContent = '';
+    return;
+  }
+
+  const raw = elements.editor?.getValue?.() || '';
+  const highlighted = highlightXml(escapeHtml(raw));
+  const lower = raw.toLowerCase();
+  const q = query.toLowerCase();
+  let result = '';
+  let lastIdx = 0;
+
+  while (true) {
+    const idx = lower.indexOf(q, lastIdx);
+    if (idx === -1) break;
+    xmlSearchMatches.push(idx);
+    const before = escapeHtml(raw.slice(lastIdx, idx));
+    const match = escapeHtml(raw.slice(idx, idx + query.length));
+    result += highlightXml(before) + `<span class="xml-search-hl">${match}</span>`;
+    lastIdx = idx + query.length;
+  }
+  result += highlightXml(escapeHtml(raw.slice(lastIdx)));
+  code.innerHTML = result;
+
+  if (xmlSearchMatches.length > 0) {
+    xmlSearchIndex = 0;
+    updateXmlSearchStatus(status);
+    scrollXmlSearchMatch();
+  } else {
+    if (status) status.textContent = 'No results';
+  }
+}
+
+function navigateXmlSearch(dir) {
+  if (xmlSearchMatches.length === 0) return;
+  xmlSearchIndex = (xmlSearchIndex + dir + xmlSearchMatches.length) % xmlSearchMatches.length;
+  const status = document.getElementById('xmlPreviewSearchStatus');
+  updateXmlSearchStatus(status);
+  scrollXmlSearchMatch();
+}
+
+function updateXmlSearchStatus(status) {
+  if (status && xmlSearchMatches.length > 0) {
+    status.textContent = `${xmlSearchIndex + 1} / ${xmlSearchMatches.length}`;
+  }
+}
+
+function scrollXmlSearchMatch() {
+  const highlights = document.querySelectorAll('.xml-search-hl');
+  if (highlights[xmlSearchIndex]) {
+    highlights[xmlSearchIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
+
+function clearXmlSearch() {
+  xmlSearchMatches = [];
+  xmlSearchIndex = -1;
+  const input = document.getElementById('xmlPreviewSearchInput');
+  const status = document.getElementById('xmlPreviewSearchStatus');
+  if (input) input.value = '';
+  if (status) status.textContent = '';
+  const code = document.getElementById('xmlPreviewContent');
+  if (code && elements.editor?.getValue) {
+    code.innerHTML = highlightXml(escapeHtml(elements.editor.getValue()));
   }
 }
 
@@ -901,6 +1147,29 @@ async function applyFormChangesToXML() {
     }
   }
   
+  // Check if Conversation has changes (only if checkbox is enabled)
+  if (elements.conversationEnabled?.checked && elements.conversationSelect) {
+    const convValue = elements.conversationSelect.value === '__custom__'
+      ? (elements.conversationCustom?.value?.trim() || '')
+      : elements.conversationSelect.value;
+    const currentConv = xmlDoc.querySelector('Conversation')?.getAttribute('name') || '';
+    if (convValue && convValue !== currentConv) {
+      hasChanges = true;
+      const conversation = xmlDoc.querySelector('Conversation');
+      if (conversation) {
+        conversation.setAttribute('name', convValue);
+        const desc = getConversationDescription(convValue);
+        if (desc) conversation.setAttribute('Description', desc);
+        else conversation.removeAttribute('Description');
+        updateCount++;
+      }
+      const campaign = xmlDoc.querySelector('Campaign');
+      if (campaign) {
+        campaign.setAttribute('conversation', convValue);
+      }
+    }
+  }
+  
   console.log('Update summary:', { hasChanges, updateCount });
   
   // Update editor if there were changes
@@ -1357,13 +1626,42 @@ if (elements.campaignIdInput) {
     if (wrapper) {
       wrapper.classList.remove('focused');
     }
-  });
+    });
+  }
 
-}
+  setupXmlPreviewToggle();
+  setupXmlPreviewCopy();
+  setupXmlPreviewSearch();
+  
 
 // Add saveState event listeners
 if (elements.subjectInput) elements.subjectInput.addEventListener('input', saveState);
 if (elements.linkInput) elements.linkInput.addEventListener('input', saveState);
+if (elements.conversationSelect) {
+  elements.conversationSelect.addEventListener('change', () => {
+    if (elements.conversationCustom) {
+      const isCustom = elements.conversationSelect.value === '__custom__';
+      elements.conversationCustom.hidden = !isCustom;
+      if (isCustom) {
+        elements.conversationCustom.disabled = !elements.conversationEnabled?.checked;
+        elements.conversationCustom.focus();
+      }
+    }
+    saveState();
+  });
+}
+if (elements.conversationCustom) elements.conversationCustom.addEventListener('input', saveState);
+if (elements.conversationEnabled) {
+  elements.conversationEnabled.addEventListener('change', () => {
+    const enabled = elements.conversationEnabled.checked;
+    if (elements.conversationSelect) elements.conversationSelect.disabled = !enabled;
+    if (elements.conversationCustom) {
+      elements.conversationCustom.disabled = !enabled;
+      if (!enabled) elements.conversationCustom.hidden = true;
+    }
+    saveState();
+  });
+}
 
 /* Campaign ID Format Validation */
 function validateCampaignIdFormat(campaignId) {
@@ -2163,6 +2461,9 @@ function manageTooltipCollision(fieldContainer) {
       const campaignIdValue = elements.campaignIdInput ? elements.campaignIdInput.value.trim() : '';
       const subjectValue = elements.subjectInput ? elements.subjectInput.value.trim() : '';
       const linkValue = elements.linkInput ? elements.linkInput.value.trim() : '';
+      const convValue = elements.conversationSelect?.value === '__custom__'
+        ? (elements.conversationCustom?.value?.trim() || '')
+        : (elements.conversationSelect?.value || '');
       
       // Check if Campaign ID has changes
       if (campaignIdValue && campaignIdValue !== currentCampaignId) {
@@ -2276,6 +2577,26 @@ function manageTooltipCollision(fieldContainer) {
         }
       }
       
+      // Check if Conversation has changes (only if checkbox is enabled)
+      if (elements.conversationEnabled?.checked && convValue) {
+        const currentConv = xmlDoc.querySelector('Conversation')?.getAttribute('name') || '';
+        if (convValue !== currentConv) {
+          hasChanges = true;
+          const conversation = xmlDoc.querySelector('Conversation');
+          if (conversation) {
+            conversation.setAttribute('name', convValue);
+            const desc = getConversationDescription(convValue);
+            if (desc) conversation.setAttribute('Description', desc);
+            else conversation.removeAttribute('Description');
+            updateCount++;
+          }
+          const campaign = xmlDoc.querySelector('Campaign');
+          if (campaign) {
+            campaign.setAttribute('conversation', convValue);
+          }
+        }
+      }
+      
       // Update editor first, then show notification only if there were changes
       if (hasChanges) {
         if (updateCount > 0) {
@@ -2287,6 +2608,9 @@ function manageTooltipCollision(fieldContainer) {
           
           // Re-initialize fields to sync with updated XML
           initializeFields();
+          
+          // Refresh XML preview
+          updateXmlWorkflow();
           
           // Update button states after re-initializing fields
           updateSaveAndApplyButtons();
