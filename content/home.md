@@ -15,6 +15,7 @@ category: Home
 ## Recent Updates
 
 ### 4 September 2026
+- **Bookmarklet v1.3.1** - Removed 8 bookmarklets, kept Typo Scanner and Local to HSBC URL only. Fixed typo scanner with expanded dictionary and inline highlighting.
 - **Layout Slicer v0.5.3** - Unsaved data warning when navigating away.
 - **Doc to HTML v1.2.0** - Beta warning dialog on load with "Don't show again" option.
 - **Config eDM v1.6.1** - XML preview panel with syntax highlighting, line numbers, search, copy, collapsible. Conversation dropdown (IMO Marketing / Non-Marketing EDM / Custom) with optional checkbox. UAT badge yellow. Form values highlighted in preview.

@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Bookmarklet v1.3.1 - 4 September 2026
+
+- Removed all bookmarklets except Typo Scanner and Local to HSBC URL.
+- Fixed Typo Scanner: corrupted unicode, expanded dictionary (~90 words), inline highlighting with hover tooltip, clipboard copy.
+
 ## Layout Slicer v0.5.3 - 4 September 2026
 
 - Added unsaved data warning when navigating away from the tool with loaded image, slices, or generated output.

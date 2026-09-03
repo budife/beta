@@ -16,7 +16,7 @@ const TOOL_VERSIONS = {
   },
   bookmarklet: {
     label: 'Bookmarklet',
-    version: '1.3.0',
+    version: '1.3.1',
     status: 'stable'
   },
   'campaign-counter': {
