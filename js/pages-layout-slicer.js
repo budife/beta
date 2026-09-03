@@ -1511,4 +1511,18 @@
       }
     });
   }
+
+  function updateUnsavedFlag() {
+    window.hasUnsavedData = !!(state.image || state.slices.length || state.generated);
+  }
+
+  const unsavedWatch = ['image', 'slices', 'generated'];
+  for (const key of unsavedWatch) {
+    let val = state[key];
+    Object.defineProperty(state, key, {
+      get() { return val; },
+      set(v) { val = v; updateUnsavedFlag(); }
+    });
+  }
+  updateUnsavedFlag();
 })();

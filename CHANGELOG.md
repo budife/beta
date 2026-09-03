@@ -2,6 +2,14 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Doc to HTML v1.2.0 - 4 September 2026
+
+- Added beta warning dialog on tool load with "Don't show again" option (localStorage).
+
+## Layout Slicer v0.5.3 - 4 September 2026
+
+- Added unsaved data warning when navigating away from the tool with loaded image, slices, or generated output.
+
 ## Config eDM v1.6.1 - 4 September 2026
 
 - XML preview panel: full content, syntax highlighting, line numbers, collapsible, search, copy button.

@@ -1116,8 +1116,16 @@ document.addEventListener('click', (event) => {
   const url = new URL(link.href, window.location.origin);
   if (url.origin !== window.location.origin) return;
 
+  const targetPath = normalizePath(stripBasePath(url.pathname));
+  if (targetPath !== activeRoutePath) {
+    const frame = viewport.querySelector('.tool-frame');
+    if (frame?.contentWindow?.hasUnsavedData && !window.confirm('Tool ini memiliki data yang belum tersimpan. Tetap pindah?')) {
+      return;
+    }
+  }
+
   event.preventDefault();
-  navigate(normalizePath(stripBasePath(url.pathname)));
+  navigate(targetPath);
 });
 
 window.addEventListener('popstate', () => {
