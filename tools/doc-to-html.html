@@ -117,6 +117,27 @@
     </div>
   </main>
 
+  <dialog id="d2h-beta-dialog" class="d2h-beta-dialog">
+    <div class="d2h-beta-card">
+      <div class="d2h-beta-icon">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      </div>
+      <h3>Doc to HTML (Beta)</h3>
+      <p>Tool ini masih dalam tahap pengembangan. Hasil konversi mungkin belum sempurna dan bisa berubah di update berikutnya.</p>
+      <ul>
+        <li>Hasil DOCX → HTML umumnya akurat, tapi format kompleks bisa sedikit berbeda.</li>
+        <li>Hasil PDF → HTML bergantung pada struktur file asli.</li>
+      </ul>
+      <label class="d2h-beta-snooze">
+        <input type="checkbox" id="d2h-beta-snooze" />
+        <span>Jangan tampilkan lagi</span>
+      </label>
+      <div class="d2h-beta-actions">
+        <button id="d2h-beta-close" class="d2h-primary" type="button">Mengerti</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>

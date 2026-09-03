@@ -976,4 +976,34 @@
   els.htmlOutput.addEventListener('input', () => {
     renderPreview(els.htmlOutput.value);
   });
+
+  // Beta warning dialog
+  const betaDialog = document.getElementById('d2h-beta-dialog');
+  const betaSnooze = document.getElementById('d2h-beta-snooze');
+  const betaClose = document.getElementById('d2h-beta-close');
+  const BETA_SNOOZE_KEY = 'd2h-beta-snooze';
+
+  if (betaDialog && !localStorage.getItem(BETA_SNOOZE_KEY)) {
+    betaDialog.showModal();
+  }
+
+  if (betaClose) {
+    betaClose.addEventListener('click', () => {
+      if (betaSnooze?.checked) {
+        localStorage.setItem(BETA_SNOOZE_KEY, '1');
+      }
+      betaDialog?.close();
+    });
+  }
+
+  if (betaDialog) {
+    betaDialog.addEventListener('click', (e) => {
+      if (e.target === betaDialog) {
+        if (betaSnooze?.checked) {
+          localStorage.setItem(BETA_SNOOZE_KEY, '1');
+        }
+        betaDialog.close();
+      }
+    });
+  }
 })();

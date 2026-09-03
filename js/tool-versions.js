@@ -32,7 +32,7 @@ const TOOL_VERSIONS = {
 
   'doc-to-html': {
     label: 'Doc to HTML',
-    version: '1.1.0',
+    version: '1.2.0',
     status: 'stable'
   },
   'layout-checker': {
@@ -42,7 +42,7 @@ const TOOL_VERSIONS = {
   },
   'layout-slicer': {
     label: 'Layout Slicer',
-    version: '0.5.2',
+    version: '0.5.3',
     status: 'stable'
   },
   'tnc-uploader': {
