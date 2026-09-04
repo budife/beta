@@ -24,6 +24,14 @@ const ROUTES = {
     content: 'config-edm.md',
     label: 'Config eDM'
   },
+  '/database-checker': {
+    content: 'database-checker.md',
+    label: 'Database Checker'
+  },
+  '/database-generator': {
+    content: 'database-generator.md',
+    label: 'Database Generator'
+  },
 
   '/doc-to-html': {
     content: 'doc-to-html.md',
@@ -61,6 +69,8 @@ const LEGACY_PATHS = {
   '/bookmarklet.html': '/bookmarklet',
   '/campaign-counter.html': '/campaign-counter',
   '/config.html': '/config-edm',
+  '/database-checker.html': '/database-checker',
+  '/database-generator.html': '/database-generator',
 
   '/doc-to-html.html': '/doc-to-html',
   '/layout-checker.html': '/layout-checker',
@@ -76,7 +86,7 @@ const backdrop = document.getElementById('sidebar-backdrop');
 const menuToggle = document.getElementById('menu-toggle');
 const routePageCache = new Map();
 const routeScrollPositions = new Map();
-const PERSISTENT_TOOL_ROUTES = new Set(['/config-edm']);
+const PERSISTENT_TOOL_ROUTES = new Set(['/database-checker', '/config-edm']);
 let activeRoutePath = '';
 
 const TOOL_META = {
@@ -91,6 +101,14 @@ const TOOL_META = {
   '/config-edm': {
     icon: 'fa-solid fa-sliders',
     label: 'Config eDM'
+  },
+  '/database-checker': {
+    icon: 'fa-solid fa-circle-check',
+    label: 'Database Checker'
+  },
+  '/database-generator': {
+    icon: 'fa-solid fa-database',
+    label: 'Database Generator'
   },
 
   '/doc-to-html': {
@@ -123,6 +141,8 @@ const TOOL_PRIVACY = {
   '/bookmarklet': 'Local only',
   '/campaign-counter': 'Local only',
   '/config-edm': 'Local only',
+  '/database-checker': 'External optional',
+  '/database-generator': 'Local only',
 
   '/layout-checker': 'External optional',
   '/layout-slicer': 'Local only',
@@ -803,6 +823,7 @@ function styleEmbeddedTool(frame) {
     const scrollableToolPaths = [
       '/bookmarklet.html',
       '/campaign-counter.html',
+      '/database-generator.html',
       '/layout-slicer.html',
       '/tnc-uploader.html',
       '/wfh-tracker.html',
@@ -1119,7 +1140,8 @@ document.addEventListener('click', (event) => {
   const targetPath = normalizePath(stripBasePath(url.pathname));
   if (targetPath !== activeRoutePath) {
     const frame = viewport.querySelector('.tool-frame');
-    if (frame?.contentWindow?.hasUnsavedData && !window.confirm('Tool ini memiliki data yang belum tersimpan. Tetap pindah?')) {
+    const slicerState = frame?.contentWindow?.getSlicerState?.();
+    if (slicerState && (slicerState.hasImage || slicerState.hasSlices || slicerState.hasGenerated) && !window.confirm('Tool ini memiliki data yang belum tersimpan. Tetap pindah?')) {
       return;
     }
   }

@@ -2,6 +2,11 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Core v6.16.14 - 4 September 2026
+
+- Restored Database Checker and Database Generator tools and all references.
+- Fixed Layout Slicer unsaved data warning: replaced reactive flag with direct state query via `getSlicerState()`.
+
 ## Bookmarklet v1.3.1 - 4 September 2026
 
 - Removed all bookmarklets except Typo Scanner and Local to HSBC URL.

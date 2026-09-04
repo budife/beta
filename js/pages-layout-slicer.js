@@ -1512,17 +1512,11 @@
     });
   }
 
-  function updateUnsavedFlag() {
-    window.hasUnsavedData = !!(state.image || state.slices.length || state.generated);
-  }
-
-  const unsavedWatch = ['image', 'slices', 'generated'];
-  for (const key of unsavedWatch) {
-    let val = state[key];
-    Object.defineProperty(state, key, {
-      get() { return val; },
-      set(v) { val = v; updateUnsavedFlag(); }
-    });
-  }
-  updateUnsavedFlag();
+  window.getSlicerState = function() {
+    return {
+      hasImage: !!state.image,
+      hasSlices: state.slices.length > 0,
+      hasGenerated: !!state.generated
+    };
+  };
 })();

@@ -29,6 +29,16 @@ const TOOL_VERSIONS = {
     version: '1.6.1',
     status: 'stable'
   },
+  'database-checker': {
+    label: 'Database Checker',
+    version: '1.8.1',
+    status: 'stable'
+  },
+  'database-generator': {
+    label: 'Database Generator',
+    version: '1.5.0',
+    status: 'stable'
+  },
 
   'doc-to-html': {
     label: 'Doc to HTML',
