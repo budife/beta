@@ -15,6 +15,7 @@ category: Home
 ## Recent Updates
 
 ### 4 September 2026
+- **Core v6.16.14** - Restored Database Checker and Database Generator. Fixed Layout Slicer unsaved data warning.
 - **Bookmarklet v1.3.1** - Removed 8 bookmarklets, kept Typo Scanner and Local to HSBC URL only. Fixed typo scanner with expanded dictionary and inline highlighting.
 - **Layout Slicer v0.5.3** - Unsaved data warning when navigating away.
 - **Doc to HTML v1.2.0** - Beta warning dialog on load with "Don't show again" option.
