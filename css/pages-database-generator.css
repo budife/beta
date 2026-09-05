@@ -1064,9 +1064,9 @@ legend.form-label {
    DATABASE GENERATOR COMPACT UI
    =================================== */
 .generator-shell {
-  width: min(860px, 100%);
+  width: min(880px, 100%);
   margin: 0 auto;
-  padding: 16px;
+  padding: 14px;
 }
 
 .is-embedded .generator-shell {
@@ -1091,7 +1091,7 @@ legend.form-label {
 
 .section-heading {
   min-height: 40px;
-  padding: 8px 14px;
+  padding: 8px 12px;
   background: var(--ui-background, #ffffff);
 }
 
@@ -1106,14 +1106,14 @@ legend.form-label {
 }
 
 .setup-grid {
-  grid-template-columns: minmax(0, 1.2fr) minmax(240px, 1fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 1fr);
+  gap: 12px;
   align-items: start;
-  padding: 10px 14px;
+  padding: 8px 12px;
 }
 
 .campaign-id-field {
-  max-width: 400px;
+  max-width: 420px;
 }
 
 .campaign-id-input {
@@ -1206,20 +1206,20 @@ legend.form-label {
 .workspace-toolbar {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-bottom: 0;
 }
 
 .is-dynamic-generator .workspace-toolbar {
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 1fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 1fr);
+  gap: 12px;
 }
 
 .customer-source-column {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   min-width: 0;
-  max-width: 520px;
+  max-width: 540px;
   gap: 10px;
 }
 
@@ -1352,13 +1352,13 @@ legend.form-label {
 }
 
 .table-meta {
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-top: 1px solid var(--ui-border, #e5e7eb);
 }
 
 .data-table-wrap {
   max-height: clamp(260px, 38vh, 480px);
-  margin: 0 14px 10px;
+  margin: 0 12px 10px;
   border: 1px solid var(--ui-border, #e5e7eb);
 }
 
@@ -1412,7 +1412,7 @@ legend.form-label {
 }
 
 .table-tips {
-  margin: 0 14px 10px;
+  margin: 0 12px 10px;
 }
 
 .output-card {
@@ -1420,13 +1420,13 @@ legend.form-label {
 }
 
 .status-bar {
-  margin: 8px 14px 0;
+  margin: 8px 12px 0;
   min-height: 32px;
 }
 
 .preview-grid {
   gap: 8px;
-  padding: 8px 14px 12px;
+  padding: 8px 12px 12px;
 }
 
 .preview-content {
@@ -1434,11 +1434,11 @@ legend.form-label {
 }
 
 .manual-downloads {
-  margin: 0 14px 10px;
+  margin: 0 12px 10px;
 }
 
 .output-note {
-  padding: 0 14px 12px;
+  padding: 0 12px 12px;
 }
 
 @media (max-width: 900px) {
