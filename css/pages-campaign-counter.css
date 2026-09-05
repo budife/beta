@@ -541,6 +541,9 @@
 .activity-copy:active { background: #e4e4e7; }
 .activity-copy:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 .activity-row .activity-meta { color: #52525b; font-size: 11px; line-height: 1.4; }
+.activity-row.is-conflict { background: #fef2f2; }
+.activity-row.is-conflict code { color: #dc2626; }
+.activity-conflict-badge { display: inline-flex; align-items: center; padding: 1px 6px; background: #fecaca; color: #991b1b; font-size: 9px; font-weight: 600; border-radius: 3px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0; }
 .activity-empty { padding: 36px 20px; color: #71717a; font-size: 13px; text-align: center; }
 
 .welcome-dialog { width: min(380px, calc(100vw - 32px)); padding: 20px; color: #212121; background: #ffffff; border: 1px solid #d8dde5; }

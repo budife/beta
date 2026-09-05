@@ -6,6 +6,7 @@ let generating = false;
 let currentCampaignId = 0;
 const GENERATED_FROM_POINTER_NOTE = 'Generated from active counter';
 let scannedFolderIds = new Map();
+let lastRenderedActivity = [];
 
 function formatId(value) {
   return String(Number.parseInt(value, 10) || 0).padStart(4, '0');
@@ -182,8 +183,12 @@ function updateConflictState() {
   const currentId = formatId(currentCampaignId);
   if (scannedFolderIds.has(currentId)) {
     idEl.classList.add('is-conflict');
+    const folders = scannedFolderIds.get(currentId);
+    const details = folders.map(f => `${f.name || 'No name'} (${f.date || 'No date'})`).join(', ');
+    idEl.title = `Campaign ID ${currentId} already exists: ${details}`;
   } else {
     idEl.classList.remove('is-conflict');
+    idEl.title = '';
   }
 }
 
@@ -236,6 +241,7 @@ async function scanFolder() {
     localStorage.setItem('edm_last_folder', dirHandle.name);
     renderFolderList();
     updateConflictState();
+    renderActivity(lastRenderedActivity);
 
     // Save only the newly found IDs to Supabase as backup
     if (connected && username && newEntries.length) {
@@ -274,6 +280,7 @@ async function resetFolderScans() {
     scannedFolderIds.clear();
     renderFolderList();
     updateConflictState();
+    renderActivity(lastRenderedActivity);
     const btn = document.getElementById('pick-folder');
     const label = document.getElementById('folder-btn-label');
     if (btn) btn.classList.remove('is-loaded');
@@ -304,6 +311,7 @@ async function refreshFolderScans() {
     });
     renderFolderList();
     updateConflictState();
+    renderActivity(lastRenderedActivity);
     setMessage(`Refreshed — ${scans.length} campaign ID(s) loaded from Supabase.`, 'success');
   } catch (error) {
     console.error('Unable to refresh folder scans.', error);
@@ -363,7 +371,8 @@ function formatActivityDate(value) {
 function renderActivity(items) {
   const list = document.getElementById('activity-list');
   if (!list) return;
-  const visible = (items || []).slice(0, 10);
+  lastRenderedActivity = items || [];
+  const visible = lastRenderedActivity.slice(0, 20);
   if (!visible.length) {
     list.innerHTML = '<p class="activity-empty">No Campaign IDs have been generated yet.</p>';
     return;
@@ -372,10 +381,18 @@ function renderActivity(items) {
     ? 'manually set'
     : 'generated';
   const displayId = item => item.full_id ? escapeHtml(item.full_id) : formatId(item.campaign_id);
-  list.innerHTML = visible.map(item => `
-    <article class="activity-row">
+  list.innerHTML = visible.map(item => {
+    const id = item.campaign_id;
+    const idStr = formatId(id);
+    const isConflict = scannedFolderIds.has(idStr);
+    const conflictClass = isConflict ? ' is-conflict' : '';
+    const conflictAttr = isConflict ? ` title="Campaign ID ${idStr} already exists in scanned folders"` : '';
+    const conflictBadge = isConflict ? '<span class="activity-conflict-badge" title="Campaign ID already exists">exists</span>' : '';
+    return `
+    <article class="activity-row${conflictClass}"${conflictAttr}>
       <div class="activity-id-wrap">
         <code>${displayId(item)}</code>
+        ${conflictBadge}
         <button class="activity-copy" type="button" aria-label="Copy Campaign ID" title="Copy Campaign ID" data-id="${displayId(item)}">
           <i class="fa-regular fa-copy" aria-hidden="true"></i>
         </button>
@@ -383,7 +400,8 @@ function renderActivity(items) {
       <div class="activity-meta">
         ${actionLabel(item)} on ${escapeHtml(formatActivityDate(item.generated_at))} by ${escapeHtml(item.generated_by || 'Unknown')}
       </div>
-    </article>`).join('');
+    </article>`;
+  }).join('');
 
   list.querySelectorAll('.activity-copy').forEach(btn => {
     btn.addEventListener('click', async (e) => {

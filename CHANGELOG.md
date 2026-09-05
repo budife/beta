@@ -2,6 +2,12 @@
 
 All notable user-facing changes to eDM Helper are tracked here.
 
+## Campaign Counter v1.6.6 - 5 September 2026
+
+- Added conflict tooltip on red Campaign ID and "exists" badge on Recent Activity rows when ID already exists in scanned folders.
+- Recent Activity now shows last 20 entries instead of 10.
+- Activity list auto-refreshes after folder scan, refresh, or reset.
+
 ## Core v6.16.14 - 4 September 2026
 
 - Restored Database Checker and Database Generator tools and all references.
