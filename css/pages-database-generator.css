@@ -1106,14 +1106,14 @@ legend.form-label {
 }
 
 .setup-grid {
-  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(240px, 1fr);
   gap: 14px;
   align-items: start;
   padding: 10px 14px;
 }
 
 .campaign-id-field {
-  max-width: none;
+  max-width: 480px;
 }
 
 .campaign-id-input {
@@ -1219,7 +1219,7 @@ legend.form-label {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   min-width: 0;
-  max-width: 760px;
+  max-width: 620px;
   gap: 10px;
 }
 
