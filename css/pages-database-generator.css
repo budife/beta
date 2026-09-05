@@ -1064,9 +1064,9 @@ legend.form-label {
    DATABASE GENERATOR COMPACT UI
    =================================== */
 .generator-shell {
-  width: min(880px, 100%);
+  width: min(780px, 100%);
   margin: 0 auto;
-  padding: 14px;
+  padding: 12px;
 }
 
 .is-embedded .generator-shell {
