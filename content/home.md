@@ -16,7 +16,7 @@ category: Home
 
 ### 5 September 2026
 - **Campaign Counter v1.6.6** - Conflict tooltip on red ID, "exists" badge on Recent Activity, show 20 recent entries, auto-refresh activity after folder scan.
-- **Database Generator v1.5.7** - Narrower shell (860px), shorter input columns.
+- **Database Generator v1.5.7** - Compact 880px centered shell, tighter padding.
 
 ### 4 September 2026
 - **Core v6.16.14** - Restored Database Checker and Database Generator. Fixed Layout Slicer unsaved data warning.
