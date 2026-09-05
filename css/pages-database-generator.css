@@ -1064,7 +1064,7 @@ legend.form-label {
    DATABASE GENERATOR COMPACT UI
    =================================== */
 .generator-shell {
-  width: min(1000px, 100%);
+  width: min(860px, 100%);
   margin: 0 auto;
   padding: 16px;
 }
@@ -1113,7 +1113,7 @@ legend.form-label {
 }
 
 .campaign-id-field {
-  max-width: 480px;
+  max-width: 400px;
 }
 
 .campaign-id-input {
@@ -1219,7 +1219,7 @@ legend.form-label {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   min-width: 0;
-  max-width: 620px;
+  max-width: 520px;
   gap: 10px;
 }
 
