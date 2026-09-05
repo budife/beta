@@ -1064,7 +1064,7 @@ legend.form-label {
    DATABASE GENERATOR MODERN COMPACT UI
    =================================== */
 .generator-shell {
-  width: min(1280px, 100%);
+  width: min(960px, 100%);
   padding: 20px;
 }
 
@@ -1105,14 +1105,14 @@ legend.form-label {
 }
 
 .setup-grid {
-  grid-template-columns: minmax(0, 1.85fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr);
   gap: 16px;
   align-items: start;
   padding: 12px;
 }
 
 .campaign-id-field {
-  max-width: none;
+  max-width: 560px;
 }
 
 .campaign-id-input {
@@ -1203,7 +1203,7 @@ legend.form-label {
 }
 
 .is-dynamic-generator .workspace-toolbar {
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 1fr);
   gap: 16px;
 }
 

@@ -36,7 +36,7 @@ const TOOL_VERSIONS = {
   },
   'database-generator': {
     label: 'Database Generator',
-    version: '1.5.1',
+    version: '1.5.2',
     status: 'stable'
   },
 
