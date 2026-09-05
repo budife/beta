@@ -1061,11 +1061,11 @@ legend.form-label {
 }
 
 /* ===================================
-   DATABASE GENERATOR MODERN COMPACT UI
+   DATABASE GENERATOR COMPACT UI
    =================================== */
 .generator-shell {
-  width: min(960px, 100%);
-  padding: 20px;
+  width: min(1200px, 100%);
+  padding: 16px;
 }
 
 .is-embedded .generator-shell {
@@ -1073,24 +1073,24 @@ legend.form-label {
 }
 
 .page-header {
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
 .page-header h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
 }
 
 .generator-card {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   border: 1px solid var(--ui-border, #e5e7eb);
   border-radius: 0;
   box-shadow: none;
 }
 
 .section-heading {
-  min-height: 44px;
-  padding: 10px 14px;
+  min-height: 40px;
+  padding: 8px 14px;
   background: var(--ui-background, #ffffff);
 }
 
@@ -1100,19 +1100,19 @@ legend.form-label {
 }
 
 .section-copy {
-  max-width: 420px;
+  max-width: 380px;
   font-size: 11px;
 }
 
 .setup-grid {
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 1fr);
+  gap: 14px;
   align-items: start;
-  padding: 12px;
+  padding: 10px 14px;
 }
 
 .campaign-id-field {
-  max-width: 560px;
+  max-width: none;
 }
 
 .campaign-id-input {
@@ -1123,9 +1123,9 @@ legend.form-label {
 .campaign-row {
   display: grid;
   min-width: 0;
-  gap: 12px;
+  gap: 10px;
   align-content: start;
-  padding-left: 20px;
+  padding-left: 16px;
   border-left: 1px solid var(--ui-border, #e5e7eb);
 }
 
@@ -1134,35 +1134,42 @@ legend.form-label {
 }
 
 .campaign-type-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  min-height: 34px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 36px;
   align-items: center;
 }
 
 .radio-option {
-  min-height: 28px;
+  display: flex;
+  min-height: 36px;
   gap: 8px;
-  padding: 0;
-  background: transparent;
-  border: 0;
+  padding: 5px 10px;
+  background: var(--ui-background, #fff);
+  border: 1px solid var(--ui-border, #e5e7eb);
+  border-radius: var(--ui-radius-control, 4px);
+  cursor: pointer;
 }
 
-.radio-option:hover,
+.radio-option:hover {
+  border-color: var(--ui-border-strong, #d1d5db);
+}
+
 .radio-option:has(input:checked) {
-  background: transparent;
-  border-color: transparent;
+  background: var(--ui-accent-soft, #fff0f1);
+  border-color: var(--ui-accent, #f27f86);
 }
 
 .radio-option input {
   width: 14px;
   height: 14px;
+  accent-color: var(--ui-accent, #f27f86);
 }
 
 .radio-label {
   color: var(--ui-text, #111827);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
 }
 
@@ -1198,21 +1205,21 @@ legend.form-label {
 .workspace-toolbar {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
-  padding: 12px;
+  padding: 10px 14px;
   border-bottom: 0;
 }
 
 .is-dynamic-generator .workspace-toolbar {
   grid-template-columns: minmax(0, 1fr) minmax(260px, 1fr);
-  gap: 16px;
+  gap: 14px;
 }
 
 .customer-source-column {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   min-width: 0;
-  max-width: 700px;
-  gap: 12px;
+  max-width: 760px;
+  gap: 10px;
 }
 
 .input-button-group {
@@ -1237,10 +1244,33 @@ legend.form-label {
   width: 136px;
 }
 
+.bulk-box {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--ui-surface, #f8fafc);
+  border: 1px solid var(--ui-border, #e5e7eb);
+}
+
+.bulk-box .form-label,
+.bulk-box .form-hint {
+  margin-left: 0;
+}
+
+.bulk-box textarea {
+  min-height: 68px;
+  margin-top: 6px;
+  resize: vertical;
+  border-color: var(--ui-border, #e5e7eb);
+}
+
+.bulk-actions {
+  margin-top: 6px;
+}
+
 .krhred-section {
   align-self: start;
   min-height: 100%;
-  padding-left: 16px;
+  padding-left: 14px;
   border-left: 1px solid var(--ui-border, #e5e7eb);
 }
 
@@ -1270,7 +1300,7 @@ legend.form-label {
   min-height: 28px;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .krhred-chip {
@@ -1320,37 +1350,14 @@ legend.form-label {
   min-width: 34px;
 }
 
-.bulk-box {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  border: 0;
-}
-
-.bulk-box .form-label,
-.bulk-box .form-hint {
-  margin-left: 0;
-}
-
-.bulk-box textarea {
-  min-height: 72px;
-  margin-top: 8px;
-  resize: vertical;
-  border-color: var(--ui-border, #e5e7eb);
-}
-
-.bulk-actions {
-  margin-top: 8px;
-}
-
 .table-meta {
   padding: 6px 14px;
   border-top: 1px solid var(--ui-border, #e5e7eb);
 }
 
 .data-table-wrap {
-  max-height: clamp(240px, 35vh, 420px);
-  margin: 0 12px 12px;
+  max-height: clamp(260px, 38vh, 480px);
+  margin: 0 14px 10px;
   border: 1px solid var(--ui-border, #e5e7eb);
 }
 
@@ -1404,7 +1411,7 @@ legend.form-label {
 }
 
 .table-tips {
-  margin: 0 12px 12px;
+  margin: 0 14px 10px;
 }
 
 .output-card {
@@ -1412,17 +1419,25 @@ legend.form-label {
 }
 
 .status-bar {
-  margin: 10px 12px 0;
-  min-height: 28px;
+  margin: 8px 14px 0;
+  min-height: 32px;
 }
 
 .preview-grid {
   gap: 8px;
-  padding: 8px 12px 12px;
+  padding: 8px 14px 12px;
 }
 
 .preview-content {
-  max-height: 140px;
+  max-height: 150px;
+}
+
+.manual-downloads {
+  margin: 0 14px 10px;
+}
+
+.output-note {
+  padding: 0 14px 12px;
 }
 
 @media (max-width: 900px) {
@@ -1430,7 +1445,7 @@ legend.form-label {
   .workspace-toolbar,
   .is-dynamic-generator .workspace-toolbar {
     grid-template-columns: minmax(0, 1fr) !important;
-    gap: 14px;
+    gap: 12px;
   }
 
   .campaign-row,
@@ -1466,7 +1481,7 @@ legend.form-label {
   }
 
   .campaign-type-selector {
-    gap: 12px;
+    gap: 10px;
   }
 
   .input-button-group {
@@ -1477,8 +1492,8 @@ legend.form-label {
   .table-tips,
   .status-bar,
   .manual-downloads {
-    margin-right: 12px;
-    margin-left: 12px;
+    margin-right: 10px;
+    margin-left: 10px;
   }
 
   .data-table th:first-child,
