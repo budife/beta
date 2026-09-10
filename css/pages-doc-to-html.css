@@ -388,17 +388,20 @@ textarea {
 
 @media (min-width: 761px) {
   .d2h-view-toggle { display: none; }
-  .d2h-workspace {
+  #d2h-workspace.d2h-workspace {
+    display: grid !important;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1px;
     background: var(--border, #e5e7eb);
   }
-  .d2h-panel {
+  #d2h-workspace > #d2h-panel-preview,
+  #d2h-workspace > #d2h-panel-html {
+    display: flex !important;
+    visibility: visible !important;
     min-width: 0;
     background: var(--surface, #fff);
   }
-  .d2h-panel.d2h-hidden { display: flex !important; }
   .d2h-panel-head { min-height: 44px; }
 }
 

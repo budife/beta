@@ -60,6 +60,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Fixed the desktop split workspace so the editable HTML code panel remains visible beside the preview.
 
+## DOCX/PDF to HTML v1.2.5 - 10 September 2026
+
+- Made the desktop workspace explicitly render Preview on the left and the editable HTML result on the right.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.

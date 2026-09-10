@@ -42,7 +42,7 @@ const TOOL_VERSIONS = {
 
   'doc-to-html': {
     label: 'DOCX/PDF to HTML',
-    version: '1.2.4',
+    version: '1.2.5',
     status: 'stable'
   },
   'layout-checker': {
