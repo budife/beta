@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BETA Text Correction - Convert text case and clean up text">
+  <meta name="author" content="BETA">
+  <title>Text Correction - BETA</title>
+  <link rel="stylesheet" href="../css/tokens.css?v=6.16.17">
+  <link rel="stylesheet" href="../css/theme.css?v=6.16.17">
+  <link rel="stylesheet" href="../css/pages-text-correction.css?v=6.16.17">
+  <link rel="stylesheet" href="../css/controls.css?v=6.16.17">
+</head>
+<body>
+  <main class="text-correction-app">
+    <header class="text-correction-header">
+      <a class="text-correction-brand" href="../index.html">
+        <span class="text-correction-brand-mark">B</span>
+        <span>BETA · Text Correction</span>
+      </a>
+    </header>
+
+    <div class="text-correction-layout">
+      <section class="text-correction-main">
+        <h1>Convert Text Case</h1>
+        <p class="text-correction-lead">Paste or type your text, then choose a correction mode.</p>
+
+        <div class="text-correction-panes">
+          <div class="text-correction-pane">
+            <div class="text-correction-pane-head">
+              <span class="text-correction-pane-label">Input</span>
+              <span id="input-stats" class="text-correction-pane-stats">0 characters · 0 words · 0 lines</span>
+            </div>
+            <div class="text-correction-input-card">
+              <textarea id="text-input" placeholder="Paste or type your text here..." spellcheck="false"></textarea>
+            </div>
+          </div>
+
+          <div class="text-correction-case-buttons">
+            <button class="text-correction-case-btn" data-case="sentence" type="button">Sentence case</button>
+            <button class="text-correction-case-btn" data-case="lower" type="button">lower case</button>
+            <button class="text-correction-case-btn" data-case="upper" type="button">UPPER CASE</button>
+            <button class="text-correction-case-btn" data-case="capitalized" type="button">Capitalized Case</button>
+            <button class="text-correction-case-btn" data-case="alternating" type="button">aLtErNaTiNg cAsE</button>
+            <button class="text-correction-case-btn" data-case="title" type="button">Title Case</button>
+            <button class="text-correction-case-btn" data-case="inverse" type="button">InVeRsE CaSe</button>
+            <button class="text-correction-case-btn" data-case="trimspaces" type="button">Trim Spaces</button>
+          </div>
+
+          <div class="text-correction-pane">
+            <div class="text-correction-pane-head">
+              <span class="text-correction-pane-label">Output</span>
+              <div class="text-correction-pane-actions">
+                <button id="copy-btn" class="text-correction-action-btn" type="button">Copy</button>
+                <button id="download-btn" class="text-correction-action-btn" type="button">Download</button>
+              </div>
+            </div>
+            <div class="text-correction-input-card text-correction-output-card">
+              <textarea id="text-output" placeholder="Converted text will appear here..." spellcheck="false" readonly></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-correction-actions">
+          <button id="clear-btn" class="text-correction-action-btn" type="button">Clear</button>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="../js/pages-text-correction.js?v=6.16.17" defer></script>
+</body>
+</html>

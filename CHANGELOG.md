@@ -16,6 +16,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Added Text Correction as the eleventh tool using the Epsilon workspace page.
 
+## Text Correction v1.0.1 - 10 September 2026
+
+- Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
+
 ## TNC Uploader v0.3.10 - 10 September 2026
 
 - Made duplicate PDF warnings visible when a queued PDF was already saved in the selected destination.
