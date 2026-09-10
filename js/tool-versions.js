@@ -47,7 +47,7 @@ const TOOL_VERSIONS = {
   },
   'layout-checker': {
     label: 'Layout Checker',
-    version: '2.1.9',
+    version: '2.1.10',
     status: 'stable'
   },
   'layout-slicer': {
