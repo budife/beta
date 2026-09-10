@@ -20,6 +20,11 @@ All notable user-facing changes to BETA are tracked here.
 
 - Marked Text Correction as a local tool in the privacy badge.
 
+## Layout Slicer v0.5.4 - 10 September 2026
+
+- Improved generated HTML code modal with aligned line numbers and cleaner code spacing.
+- Copying code still excludes the line number gutter.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
@@ -27,10 +32,6 @@ All notable user-facing changes to BETA are tracked here.
 ## Text Correction v1.0.2 - 10 September 2026
 
 - Added explicit plain-text paste handling to remove rich-text formatting from pasted content.
-
-## Layout Slicer v0.5.4 - 10 September 2026
-
-- Pretty-formatted the generated HTML Code output with consistent indentation and multiline image attributes.
 
 ## TNC Uploader v0.3.10 - 10 September 2026
 

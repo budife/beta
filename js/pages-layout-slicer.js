@@ -1422,6 +1422,7 @@
   // Code modal functionality
   const codeModal = document.getElementById('code-modal');
   const codeModalOutput = document.getElementById('code-modal-output');
+  const codeModalLines = document.getElementById('code-modal-lines');
   const copyCodeBtn = document.getElementById('copy-code-btn');
   const closeCodeModal = document.getElementById('close-code-modal');
   const copyAllCode = document.getElementById('copy-all-code');
@@ -1437,10 +1438,10 @@
       const num = String(i + 1).padStart(2, '0');
       const alt = escapeAttribute(slice.useAlt ? (slice.alt || 'image') : 'image');
       const src = `images/${prefix}_${num}.jpg`;
-      const imgTag = `<img\n      class="img_scale"\n      src="${src}"\n      editable="true"\n      alt="${alt}"\n      style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);"\n      border="0"\n      width="600"\n    />`;
+      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
       
       if (slice.cta && slice.link) {
-        return `<a\n    href="${escapeAttribute(slice.link)}"\n    target="_blank"\n    title="${alt}"\n  >\n    ${imgTag}\n  </a>`;
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
       }
       return imgTag;
     }
@@ -1449,15 +1450,15 @@
       const num = String(i + 1).padStart(2, '0');
       const alt = escapeAttribute(slice.useAlt ? (slice.alt || 'image') : 'image');
       const src = `images/${prefix}_${num}.jpg`;
-      const imgTag = `<img\n      class="img_scale"\n      src="${src}"\n      editable="true"\n      alt="${alt}"\n      style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);"\n      border="0"\n      width="300"\n    />`;
+      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />`;
       
       if (slice.cta && slice.link) {
-        return `<a\n    href="${escapeAttribute(slice.link)}"\n    target="_blank"\n    title="${alt}"\n  >\n    ${imgTag}\n  </a>`;
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
       }
       return imgTag;
     }
 
-    const cardImageTag = `<img\n      class="img_scale"\n      src="images/template/header-hsbc.jpg"\n      editable="true"\n      alt="HSBC Card"\n      style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);"\n      border="0"\n      width="600"\n    />`;
+    const cardImageTag = `<img class="img_scale" src="images/template/header-hsbc.jpg" editable="true" alt="HSBC Card" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
 
     code += `<!-- START OF IMAGE-->\n`;
     code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
@@ -1478,8 +1479,17 @@
   }
 
   function updateModalCode() {
-    if (codeModalOutput) codeModalOutput.textContent = generateCodeForSlices();
+    const code = generateCodeForSlices();
+    if (codeModalOutput) codeModalOutput.textContent = code;
+    if (codeModalLines) {
+      const lineCount = Math.max(1, code.split('\n').length);
+      codeModalLines.textContent = Array.from({ length: lineCount }, (_, index) => index + 1).join('\n');
+    }
   }
+
+  codeModalOutput?.parentElement.addEventListener('scroll', () => {
+    if (codeModalLines) codeModalLines.scrollTop = codeModalOutput.parentElement.scrollTop;
+  });
 
   if (copyCodeBtn) {
     copyCodeBtn.addEventListener('click', () => {
