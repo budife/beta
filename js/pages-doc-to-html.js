@@ -40,6 +40,7 @@
   let codeEditor = null;
   let syncingEditor = false;
   let visualDocxHtml = '';
+  let docxEditableHtml = '';
   let previewEditing = false;
 
   function getEditorValue() {
@@ -780,13 +781,10 @@
     els.fileIcon.textContent = 'W';
     renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
     setEditorValue(formatHtmlWithTabs(normalizedHtml));
+    docxEditableHtml = normalizedHtml;
     try {
       const rendered = await renderDocxVisual(arrayBuffer);
-      if (rendered) {
-        const visualHtml = els.preview.innerHTML;
-        visualDocxHtml = visualHtml;
-        setEditorValue(formatHtmlWithTabs(visualHtml));
-      }
+      if (rendered) visualDocxHtml = els.preview.innerHTML;
     } catch (error) {
       console.warn('Visual DOCX preview unavailable; keeping HTML preview.', error);
     }
@@ -1018,7 +1016,7 @@
     els.resetPreviewBtn.classList.add('d2h-hidden');
     els.editTools?.classList.add('d2h-hidden');
     els.preview.innerHTML = visualDocxHtml;
-    setEditorValue(formatHtmlWithTabs(visualDocxHtml));
+    setEditorValue(formatHtmlWithTabs(docxEditableHtml));
   });
   els.editTools?.querySelectorAll('[data-edit-command]').forEach((control) => {
     const eventName = control.tagName === 'SELECT' ? 'change' : 'mousedown';

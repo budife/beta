@@ -82,6 +82,10 @@ All notable user-facing changes to BETA are tracked here.
 - Added an editable Preview mode with basic bold, italic, underline, font size, and alignment controls.
 - Preview edits sync back to the CodeMirror HTML editor, with Reset to visual DOCX available.
 
+## DOCX/PDF to HTML v1.2.10 - 10 September 2026
+
+- Prevented DOCX visual header/footer content from being wrapped a second time when opening or saving generated HTML.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
