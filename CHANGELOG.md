@@ -25,6 +25,10 @@ All notable user-facing changes to BETA are tracked here.
 - Improved generated HTML code modal with aligned line numbers and cleaner code spacing.
 - Copying code still excludes the line number gutter.
 
+## Layout Slicer v0.5.5 - 10 September 2026
+
+- Fixed generated CTA markup indentation so anchor and image elements are nested and aligned correctly.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.

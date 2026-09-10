@@ -1441,7 +1441,7 @@
       const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
       
       if (slice.cta && slice.link) {
-        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n  ${imgTag}\n</a>`;
       }
       return imgTag;
     }
@@ -1453,7 +1453,7 @@
       const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />`;
       
       if (slice.cta && slice.link) {
-        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n  ${imgTag}\n</a>`;
       }
       return imgTag;
     }
@@ -1468,7 +1468,7 @@
     code += `    <!-- end card image -->\n`;
     code += `    <!-- main KV image -->\n`;
     slices.forEach((slice, i) => {
-      code += `    ${buildImageTag(slice, i)}\n`;
+      code += `${buildImageTag(slice, i).split('\n').map((line) => `    ${line}`).join('\n')}\n`;
     });
     code += `    <!-- end main KV image -->\n`;
     code += `  </td>\n`;
