@@ -24,6 +24,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 ### 10 September 2026
 - **Text Correction v1.0.1** - Migrated Text Correction into a local BETA tool with case conversion, copy, download, and clear workflows.
 - **Core v6.16.17** - Added Text Correction as the eleventh tool from the Epsilon workspace.
+- **Core v6.16.18** - Marked Text Correction as a local tool.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.
 - **TNC Uploader v0.3.10** - Visible warning when a PDF was already uploaded to the selected destination.

@@ -157,7 +157,7 @@ const TOOL_PRIVACY = {
   '/layout-checker': 'External optional',
   '/layout-slicer': 'Local only',
   '/tnc-uploader': 'External optional',
-  '/text-correction': 'External tool',
+  '/text-correction': 'Local only',
   '/wfh-tracker': 'Holiday sync optional',
   '/maintenance': 'Local only'
 };

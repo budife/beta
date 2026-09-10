@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.16.17',
+    version: '6.16.18',
     status: 'stable'
   },
   home: {
