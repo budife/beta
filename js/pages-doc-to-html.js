@@ -37,6 +37,7 @@
   let syncingEditor = false;
   let visualDocxHtml = '';
   let docxEditableHtml = '';
+  let savedPreviewRange = null;
   let previewEditing = false;
 
   function getEditorValue() {
@@ -709,6 +710,18 @@
     setEditorValue(formatHtmlWithTabs(clone.innerHTML));
   }
 
+  function savePreviewSelection() {
+    const selection = window.getSelection();
+    if (selection?.rangeCount) savedPreviewRange = selection.getRangeAt(0).cloneRange();
+  }
+
+  function restorePreviewSelection() {
+    if (!savedPreviewRange) return;
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(savedPreviewRange);
+  }
+
   async function renderDocxVisual(arrayBuffer) {
     if (!window.docx?.renderAsync) return false;
     els.preview.innerHTML = '';
@@ -922,16 +935,20 @@
   els.editTools?.querySelectorAll('[data-edit-command]').forEach((control) => {
     const eventName = control.tagName === 'SELECT' ? 'change' : 'mousedown';
     control.addEventListener(eventName, (event) => {
+      savePreviewSelection();
       if (eventName === 'mousedown') event.preventDefault();
       if (!previewEditing) return;
+      restorePreviewSelection();
       const command = control.dataset.editCommand;
       document.execCommand(command, false, control.value || null);
       syncPreviewToEditor();
       els.preview.querySelector('.document-content')?.focus();
     });
   });
+  els.fontSize?.addEventListener('mousedown', savePreviewSelection);
   els.fontSize?.addEventListener('change', () => {
     if (!previewEditing) return;
+    restorePreviewSelection();
     const size = Number(els.fontSize.value);
     if (!Number.isFinite(size) || size < 6 || size > 96) return;
     document.execCommand('fontSize', false, '7');
