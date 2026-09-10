@@ -903,6 +903,11 @@
   }
 
   function switchTab(tab) {
+    if (window.matchMedia('(min-width: 761px)').matches) {
+      els.panelPreview.classList.remove('d2h-hidden');
+      els.panelHtml.classList.remove('d2h-hidden');
+      return;
+    }
     const isPreview = tab === 'preview';
     els.tabPreview.classList.toggle('is-active', isPreview);
     els.tabHtml.classList.toggle('is-active', !isPreview);
@@ -912,6 +917,9 @@
 
   els.tabPreview.addEventListener('click', () => switchTab('preview'));
   els.tabHtml.addEventListener('click', () => switchTab('html'));
+  els.htmlOutput.addEventListener('input', () => {
+    renderPreview(els.htmlOutput.value, 'Preview updated from HTML editor', '');
+  });
   els.openTab.addEventListener('click', () => {
     const blob = new Blob([buildFullDocument()], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
