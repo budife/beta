@@ -6,6 +6,7 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'js/pages-database-generator.js'), 'utf8');
+const html = fs.readFileSync(path.join(root, 'tools/database-generator.html'), 'utf8');
 const normalizeStart = source.indexOf('function normalizeKey');
 const normalizeEnd = source.indexOf('function createEmailRow', normalizeStart);
 const normalizeFunction = source.slice(normalizeStart, normalizeEnd);
@@ -13,6 +14,15 @@ const functionStart = source.indexOf('function recordId');
 const functionEnd = source.indexOf('function downloadText', functionStart);
 const generatorFunctions = source.slice(functionStart, functionEnd);
 const sandbox = {};
+
+test('Database Generator HTML uses the current core cache-buster', () => {
+  assert.match(html, /pages-database-generator\.js\?v=6\.16\.14/);
+  assert.doesNotMatch(html, /pages-database-generator\.js\?v=6\.14\.0/);
+});
+
+test('bulk paste does not depend on removed toggle controls', () => {
+  assert.doesNotMatch(source, /bulkBtn|cancelBulkBtn/);
+});
 
 vm.createContext(sandbox);
 vm.runInContext(`

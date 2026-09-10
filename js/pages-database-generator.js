@@ -12,11 +12,8 @@ const $ = (sel) => document.querySelector(sel);
     const addEmailBtn = $('#addEmail');
 
     // BULK refs
-    const bulkBtn = $('#bulkBtn');
-    const bulkBox = $('#bulkBox');
     const bulkEmailsEl = $('#bulkEmails');
     const applyBulkBtn = $('#applyBulk');
-    const cancelBulkBtn = $('#cancelBulk');
     const bulkInfo = $('#bulkInfo');
 
     const newKeyEl = $('#newKey');
@@ -210,9 +207,10 @@ const $ = (sel) => document.querySelector(sel);
 
         const tdEmail = document.createElement('td');
         tdEmail.className = 'email-column';
+        const emailIsValid = emailRegex.test(email);
         tdEmail.innerHTML = `
           <div class="email-input-wrapper">
-            <input class="email-input" type="email" value="${escapeHtml(email)}" placeholder="email@example.com" aria-label="Email customer" />
+            <input class="email-input${emailIsValid ? '' : ' is-invalid'}" type="email" value="${escapeHtml(email)}" placeholder="email@example.com" aria-label="Email customer" aria-invalid="${String(!emailIsValid)}" />
             <button class="email-remove-btn" type="button" title="Hapus ${escapeHtml(email)}" aria-label="Hapus ${escapeHtml(email)}" data-remove-row="${rowId}">
               <i class="fa-solid fa-trash"></i>
             </button>
@@ -227,6 +225,7 @@ const $ = (sel) => document.querySelector(sel);
           inp.className = 'krhred-input';
           inp.value = rowMap.get(key) ?? '';
           inp.placeholder = 'nilai';
+          inp.setAttribute('aria-label', `${key} untuk ${email}`);
           inp.addEventListener('input', () => { rowMap.set(key, inp.value); updateUI(); });
           td.appendChild(inp);
           tr.appendChild(td);
@@ -235,7 +234,13 @@ const $ = (sel) => document.querySelector(sel);
 
         // email change listener
         const emailInput = tdEmail.querySelector('input');
-        emailInput.addEventListener('input', () => migrateEmail(rowId, emailInput.value.trim()));
+        emailInput.addEventListener('input', () => {
+          const value = emailInput.value.trim();
+          const isValid = emailRegex.test(value);
+          emailInput.classList.toggle('is-invalid', !isValid);
+          emailInput.setAttribute('aria-invalid', String(!isValid));
+          migrateEmail(rowId, value);
+        });
       }
 
       // Listeners: remove email / remove key
@@ -497,23 +502,7 @@ const $ = (sel) => document.querySelector(sel);
       }
     });
 
-    // Bulk handlers
-    if (bulkBtn) {
-      bulkBtn.addEventListener('click', () => {
-        bulkBox.classList.toggle('hidden');
-        bulkBtn.setAttribute('aria-expanded', String(!bulkBox.classList.contains('hidden')));
-        bulkInfo.textContent = '';
-        if (!bulkBox.classList.contains('hidden')) bulkEmailsEl.focus();
-      });
-    }
-    if (cancelBulkBtn) {
-      cancelBulkBtn.addEventListener('click', () => {
-        bulkBox.classList.add('hidden');
-        if (bulkBtn) bulkBtn.setAttribute('aria-expanded', 'false');
-        bulkEmailsEl.value = '';
-        bulkInfo.textContent = '';
-      });
-    }
+    // Bulk paste remains visible in the compact workspace.
     applyBulkBtn.addEventListener('click', () => {
       const list = parseManyEmails(bulkEmailsEl.value);
       const valid = [];
