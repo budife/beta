@@ -8,6 +8,10 @@ All notable user-facing changes to BETA are tracked here.
 - Added a welcome section to the Home page.
 - Removed social links and creator note interactions; footer attribution is now non-clickable `budife.psd`.
 
+## Core v6.16.16 - 10 September 2026
+
+- Corrected Home tool count to exclude Maintenance and improved Bookmarklet mobile layout.
+
 ## TNC Uploader v0.3.10 - 10 September 2026
 
 - Made duplicate PDF warnings visible when a queued PDF was already saved in the selected destination.

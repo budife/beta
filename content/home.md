@@ -21,6 +21,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 ## Recent Updates
 
 ### 10 September 2026
+- **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.
 - **TNC Uploader v0.3.10** - Visible warning when a PDF was already uploaded to the selected destination.
 - **TNC Uploader v0.3.11** - Warning before leaving with uploaded PDFs or an active queue.
@@ -109,6 +110,6 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ## System Info
 
-- **Available tools:** `9`
+- **Available tools:** `10`
 - **Deployment:** GitHub Pages and local server
 - **Status:** All tools available

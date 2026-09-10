@@ -39,6 +39,12 @@ test('all tool routes have a tool version entry', () => {
   }
 });
 
+test('home tool count excludes maintenance route', () => {
+  const app = read('js/app.js');
+  assert.match(app, /const TOOL_COUNT = Object\.keys\(TOOL_META\)\.filter\(\(path\) => path !== '\/maintenance'\)\.length;/);
+  assert.match(read('content/home.md'), /\*\*Available tools:\*\* `10`/);
+});
+
 test('tool markdown files point to existing HTML tools', () => {
   for (const fileName of fs.readdirSync(path.join(root, 'content')).filter((name) => name.endsWith('.md'))) {
     const markdown = read(`content/${fileName}`);

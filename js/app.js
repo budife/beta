@@ -137,6 +137,8 @@ const TOOL_META = {
   }
 };
 
+const TOOL_COUNT = Object.keys(TOOL_META).filter((path) => path !== '/maintenance').length;
+
 const TOOL_PRIVACY = {
   '/bookmarklet': 'Local only',
   '/campaign-counter': 'Local only',
@@ -948,7 +950,7 @@ async function renderPage(path, route, markdown) {
           <div class="home-meta" aria-label="Application information">
             <span class="version-badge">v${escapeHtml(getVersion())}</span>
             <span class="status-badge"><span class="status-dot"></span>All systems operational</span>
-            <span class="tool-count-badge">${Object.keys(TOOL_META).length} tools</span>
+            <span class="tool-count-badge">${TOOL_COUNT} tools</span>
           </div>
         ` : ''}
       </div>
