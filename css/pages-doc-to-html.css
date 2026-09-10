@@ -534,6 +534,14 @@ textarea#d2h-html-output {
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+.d2h-app input:focus,
+.d2h-app textarea:focus,
+.d2h-app select:focus,
+.d2h-app .CodeMirror-focused {
+  outline: none;
+  box-shadow: none;
+}
+
 .d2h-preview-editing {
   outline: 2px solid var(--accent-primary, #f3838b);
   outline-offset: -2px;

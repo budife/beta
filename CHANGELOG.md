@@ -79,6 +79,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Removed browser font-size autocomplete/history so only the custom preset menu appears.
 
+## DOCX to HTML v1.3.9 - 10 September 2026
+
+- Removed the red focus ring from DOCX to HTML fields and CodeMirror.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.
