@@ -38,6 +38,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **DOCX/PDF to HTML v1.2.6** - Simplified the workspace to two direct columns: Preview left and HTML code right.
 - **DOCX/PDF to HTML v1.2.7** - Added visual DOCX rendering with docx-preview while keeping Mammoth for editable HTML.
 - **DOCX/PDF to HTML v1.2.8** - Uses visual docx-preview markup as the editable DOCX output, with Mammoth fallback.
+- **DOCX/PDF to HTML v1.2.9** - Keeps docx-preview for visual fidelity while using clean Mammoth HTML for editing and upload.
 - **DOCX/PDF to HTML** - Renamed the document conversion tool to clarify DOCX/PDF input and HTML output.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.

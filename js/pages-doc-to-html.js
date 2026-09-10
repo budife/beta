@@ -706,10 +706,7 @@
       renderFootnotes: true,
       renderEndnotes: true,
     });
-    const markup = els.preview.innerHTML;
-    setEditorValue(markup);
-    isDocxVisualMarkup = true;
-    return Boolean(markup.trim());
+    return true;
   }
 
   async function convertFile(file) {

@@ -77,6 +77,10 @@ All notable user-facing changes to BETA are tracked here.
 - DOCX now uses the visual `docx-preview` markup as the editable CodeMirror output, keeping the preview and code in sync more closely.
 - Mammoth remains as a fallback when visual DOCX rendering is unavailable.
 
+## DOCX/PDF to HTML v1.2.9 - 10 September 2026
+
+- Kept `docx-preview` for the visual preview only and restored Mammoth as the clean editable HTML output, avoiding renderer-internal markup in the code editor.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
