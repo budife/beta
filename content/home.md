@@ -33,6 +33,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **DOCX/PDF to HTML v1.2.1** - Added conversion detail notes and a side-by-side Preview/HTML workspace on desktop.
 - **DOCX/PDF to HTML v1.2.2** - Preview left, editable full HTML code right, with live preview updates while editing.
 - **DOCX/PDF to HTML v1.2.3** - Improved HTML formatting for nested tags, tables, lists, and links.
+- **DOCX/PDF to HTML v1.2.4** - Fixed the editable HTML code panel visibility in the desktop split workspace.
 - **DOCX/PDF to HTML** - Renamed the document conversion tool to clarify DOCX/PDF input and HTML output.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.

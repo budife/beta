@@ -398,6 +398,7 @@ textarea {
     min-width: 0;
     background: var(--surface, #fff);
   }
+  .d2h-panel.d2h-hidden { display: flex !important; }
   .d2h-panel-head { min-height: 44px; }
 }
 
