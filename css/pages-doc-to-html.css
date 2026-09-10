@@ -379,36 +379,18 @@ textarea {
 /* ── Workspace (tabs + panels) ────────────────────── */
 
 .d2h-workspace {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  gap: 1px;
+  background: var(--border, #e5e7eb);
 }
 
 @media (min-width: 761px) {
   .d2h-workspace {
     height: 100%;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 1px;
-    background: var(--border, #e5e7eb);
-  }
-  .d2h-view-toggle {
-    grid-column: 2;
-    grid-row: 1;
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 16px;
-  }
-  .d2h-panel-preview {
-    grid-column: 1;
-    grid-row: 1 / 3;
-  }
-  .d2h-panel-html {
-    grid-column: 2;
-    grid-row: 2;
   }
   .d2h-panel {
     min-width: 0;
@@ -551,6 +533,10 @@ textarea#d2h-html-output {
   color: #d1d5db;
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
+
+.d2h-panel-head strong { display: inline-flex; gap: 7px; align-items: center; font-size: 13px; }
+.d2h-panel-head strong i { color: var(--accent-primary, #f3838b); }
+.d2h-panel-meta { color: var(--text-muted, #6b7280); font-size: 12px; }
 
 .d2h-panel-html .CodeMirror {
   height: 100%;
@@ -732,11 +718,7 @@ textarea#d2h-html-output {
     padding: 10px 16px;
   }
 
-  .d2h-view-toggle {
-    padding: 0 16px;
-  }
-
-  .d2h-workspace { overflow: auto; }
+  .d2h-workspace { display: flex; flex-direction: column; overflow: auto; background: transparent; gap: 12px; }
   .d2h-panel { min-height: 360px; flex: none; }
 }
 

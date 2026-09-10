@@ -10,7 +10,7 @@
 
   <link rel="stylesheet" href="../css/tokens.css?v=6.16.14">
   <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
-  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.23">
+  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.24">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
@@ -89,26 +89,21 @@
     <div id="d2h-messages" class="d2h-messages d2h-hidden"></div>
 
     <div id="d2h-workspace" class="d2h-workspace d2h-hidden">
-      <div class="d2h-view-toggle">
-        <button id="d2h-tab-preview" class="d2h-tab" type="button">
-          <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
-        </button>
-        <button id="d2h-tab-html" class="d2h-tab is-active" type="button">
-          <i class="fa-solid fa-code" aria-hidden="true"></i> HTML
-        </button>
-        <span id="d2h-element-count" class="d2h-tab-meta"></span>
-        <button id="d2h-open-tab" class="d2h-tab-action" type="button" title="Open in new tab">
-          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-        </button>
-      </div>
-
-      <section id="d2h-panel-preview" class="d2h-panel">
+      <section id="d2h-panel-preview" class="d2h-panel d2h-panel-preview">
+        <div class="d2h-panel-head">
+          <strong><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</strong>
+          <span id="d2h-element-count" class="d2h-panel-meta"></span>
+        </div>
         <article id="d2h-preview" class="d2h-preview"></article>
       </section>
 
-      <section id="d2h-panel-html" class="d2h-panel">
+      <section id="d2h-panel-html" class="d2h-panel d2h-panel-html">
         <div class="d2h-panel-head">
+          <strong><i class="fa-solid fa-code" aria-hidden="true"></i> HTML code</strong>
           <div class="d2h-panel-tools">
+            <button id="d2h-open-tab" class="d2h-mini-button" type="button">
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Open
+            </button>
             <button id="d2h-copy-btn" class="d2h-mini-button" type="button">
               <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy HTML
             </button>
@@ -146,6 +141,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
   <script src="../js/version-config.js?v=6.16.15" defer></script>
-  <script src="../js/pages-doc-to-html.js?v=6.16.23" defer></script>
+  <script src="../js/pages-doc-to-html.js?v=6.16.24" defer></script>
 </body>
 </html>

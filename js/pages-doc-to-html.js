@@ -946,8 +946,8 @@
     els.panelHtml.classList.toggle('d2h-hidden', isPreview);
   }
 
-  els.tabPreview.addEventListener('click', () => switchTab('preview'));
-  els.tabHtml.addEventListener('click', () => switchTab('html'));
+  els.tabPreview?.addEventListener('click', () => switchTab('preview'));
+  els.tabHtml?.addEventListener('click', () => switchTab('html'));
   els.htmlOutput.addEventListener('input', () => {
     renderPreview(els.htmlOutput.value, 'Preview updated from HTML editor', '');
   });
