@@ -29,6 +29,11 @@ All notable user-facing changes to BETA are tracked here.
 
 - Fixed generated CTA markup indentation so anchor and image elements are nested and aligned correctly.
 
+## Layout Checker v2.1.8 - 10 September 2026
+
+- Added a local HTML Typo Checker button beside Screenshot with all results shown in a responsive modal.
+- Added shared English and Indonesian typo dictionary with explicit and possible typo detection.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.

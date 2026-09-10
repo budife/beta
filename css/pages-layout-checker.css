@@ -498,6 +498,40 @@
   cursor: not-allowed;
 }
 
+.lc-typo-modal {
+  width: min(620px, calc(100vw - 32px));
+  max-height: min(720px, calc(100vh - 32px));
+  padding: 0;
+  color: var(--text, #111827);
+  background: var(--surface, #fff);
+  border: 1px solid var(--gray-200, #e5e7eb);
+  border-radius: 8px;
+}
+
+.lc-typo-modal::backdrop { background: rgba(15, 23, 42, .45); }
+.lc-typo-modal-card { padding: 20px; }
+.lc-typo-modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--gray-200, #e5e7eb); }
+.lc-typo-modal-header h2 { margin: 3px 0 0; font-size: 20px; }
+.lc-typo-results { max-height: 520px; overflow: auto; padding-top: 16px; }
+.lc-typo-summary { margin: 0 0 10px; color: var(--text-muted, #6b7280); font-size: 13px; }
+.lc-typo-summary strong { color: var(--text, #111827); font-size: 18px; }
+.lc-typo-list { display: grid; gap: 7px; }
+.lc-typo-item { display: grid; grid-template-columns: minmax(90px, 1fr) 22px minmax(90px, 1fr) auto; align-items: center; gap: 8px; min-width: 0; padding: 10px 12px; background: var(--gray-50, #f8fafc); border: 1px solid var(--gray-200, #e5e7eb); }
+.lc-typo-item code, .lc-typo-item strong { overflow-wrap: anywhere; }
+.lc-typo-item code { color: #b42318; font-family: var(--font-family-mono, Consolas, monospace); }
+.lc-typo-item i { color: var(--text-muted, #6b7280); text-align: center; }
+.lc-typo-item span { color: var(--text-muted, #6b7280); font-size: 11px; text-align: right; }
+.lc-typo-note { margin: 14px 0 0; color: var(--text-muted, #6b7280); font-size: 11px; }
+.lc-typo-empty { display: grid; justify-items: center; gap: 7px; padding: 32px 16px; color: var(--text-muted, #6b7280); text-align: center; }
+.lc-typo-empty i { color: #16a34a; font-size: 24px; }
+.lc-typo-empty strong { color: var(--text, #111827); }
+
+@media (max-width: 540px) {
+  .lc-typo-modal-card { padding: 14px; }
+  .lc-typo-item { grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr); }
+  .lc-typo-item span { grid-column: 1 / -1; text-align: left; }
+}
+
 /* Button Sizes */
 .lc-btn-sm {
   padding: var(--lc-space-2) var(--lc-space-3);

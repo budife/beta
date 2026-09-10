@@ -48,7 +48,11 @@ const originalUrlInput = document.getElementById('originalUrlInput');
   const previewPanel = document.getElementById('previewPanel');
   const layoutPreviewFrame = document.getElementById('layoutPreviewFrame');
   const downloadBtn = document.getElementById('downloadBtn');
-  const downloadScreenshotBtn = document.getElementById('downloadScreenshotBtn');
+const downloadScreenshotBtn = document.getElementById('downloadScreenshotBtn');
+const typoCheckerBtn = document.getElementById('typoCheckerBtn');
+const typoCheckerModal = document.getElementById('typoCheckerModal');
+const closeTypoCheckerBtn = document.getElementById('closeTypoCheckerBtn');
+const typoCheckerResults = document.getElementById('typoCheckerResults');
   const openPreviewBtn = document.getElementById('openPreviewBtn');
   const manualPasteBtn = document.getElementById('manualPasteBtn');
 const textModeBtn = document.getElementById('textModeBtn');
@@ -132,7 +136,38 @@ const highlightKrhredToggle = document.getElementById('highlightKrhredToggle');
     const hasPreview = Boolean(latestPreviewHtml && latestPreviewHtml.trim());
     if (openPreviewBtn) openPreviewBtn.disabled = !hasPreview;
     if (downloadScreenshotBtn) downloadScreenshotBtn.disabled = !hasPreview;
+    if (typoCheckerBtn) typoCheckerBtn.disabled = !hasPreview;
   }
+
+  function renderTypoResults() {
+    const results = window.BetaTypoEngine?.scanHtml?.(latestPreviewHtml) || [];
+    if (!typoCheckerResults) return;
+    if (!results.length) {
+      typoCheckerResults.innerHTML = '<div class="lc-typo-empty"><i class="fa-solid fa-circle-check"></i><strong>No possible typos found.</strong><span>Only visible HTML text and text-related attributes were scanned. Images are not scanned.</span></div>';
+    } else {
+      typoCheckerResults.innerHTML = `
+        <p class="lc-typo-summary"><strong>${results.length}</strong> possible typo${results.length === 1 ? '' : 's'} found</p>
+        <div class="lc-typo-list">
+          ${results.map((item) => `
+            <div class="lc-typo-item">
+              <code>${escapeHtml(item.word)}</code>
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              <strong>${escapeHtml(item.suggestion)}</strong>
+              <span>${escapeHtml(item.type)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <p class="lc-typo-note">Image text is not included in this scan.</p>
+      `;
+    }
+    typoCheckerModal?.showModal();
+  }
+
+  typoCheckerBtn?.addEventListener('click', renderTypoResults);
+  closeTypoCheckerBtn?.addEventListener('click', () => typoCheckerModal?.close());
+  typoCheckerModal?.addEventListener('click', (event) => {
+    if (event.target === typoCheckerModal) typoCheckerModal.close();
+  });
 
   function getPreviewDocument() {
     return layoutPreviewFrame?.contentDocument || layoutPreviewFrame?.contentWindow?.document || null;

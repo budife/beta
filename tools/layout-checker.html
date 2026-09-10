@@ -152,6 +152,9 @@
             <button id="downloadScreenshotBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
               <i class="fa-solid fa-download"></i> Screenshot
             </button>
+            <button id="typoCheckerBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
+              <i class="fa-solid fa-spell-check"></i> Typo Checker
+            </button>
             <button id="openPreviewBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
               <i class="fa-solid fa-up-right-from-square"></i> Open preview
             </button>
@@ -191,6 +194,19 @@
   </div>
 </main>
 
+  <dialog id="typoCheckerModal" class="lc-typo-modal">
+    <div class="lc-typo-modal-card">
+      <div class="lc-typo-modal-header">
+        <div>
+          <span class="lc-eyebrow">HTML text scan</span>
+          <h2>Typo Checker</h2>
+        </div>
+        <button id="closeTypoCheckerBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Close</button>
+      </div>
+      <div id="typoCheckerResults" class="lc-typo-results"></div>
+    </div>
+  </dialog>
+
 <!-- Footer -->
   <footer class="footer" role="contentinfo">
     <div class="container">
@@ -205,8 +221,10 @@
   </footer>
 
 <script src="../js/footer.js" defer></script>
-<script src="../js/version-config.js?v=6.16.15" defer></script>
+<script src="../js/typo-dictionary.js?v=6.16.18" defer></script>
+<script src="../js/typo-engine.js?v=6.16.18" defer></script>
+<script src="../js/version-config.js?v=6.16.18" defer></script>
 <script src="../js/privacy-settings.js?v=6.14.2" defer></script>
-<script src="../js/pages-layout-checker.js?v=6.16.9" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.16.19" defer></script>
 </body>
 </html>

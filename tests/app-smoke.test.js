@@ -56,6 +56,15 @@ test('tool markdown files point to existing HTML tools', () => {
   }
 });
 
+test('Layout Checker includes local typo scanner assets', () => {
+  const html = read('tools/layout-checker.html');
+  assert.match(html, /js\/typo-dictionary\.js/);
+  assert.match(html, /js\/typo-engine\.js/);
+  assert.match(html, /id="typoCheckerBtn"/);
+  assert.match(read('js/typo-dictionary.js'), /hte:\s*'the'/);
+  assert.match(read('js/typo-engine.js'), /function scanHtml\(html\)/);
+});
+
 test('shell loads required maintenance scripts', () => {
   const app = read('js/app.js');
   for (const file of ['index.html', '404.html']) {
