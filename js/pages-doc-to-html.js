@@ -722,6 +722,12 @@
     selection.addRange(savedPreviewRange);
   }
 
+  function selectionIsInPreview() {
+    const content = els.preview.querySelector('.document-content');
+    const selection = window.getSelection();
+    return Boolean(content && selection?.rangeCount && content.contains(selection.anchorNode));
+  }
+
   async function renderDocxVisual(arrayBuffer) {
     if (!window.docx?.renderAsync) return false;
     els.preview.innerHTML = '';
@@ -935,7 +941,7 @@
   els.editTools?.querySelectorAll('[data-edit-command]').forEach((control) => {
     const eventName = control.tagName === 'SELECT' ? 'change' : 'mousedown';
     control.addEventListener(eventName, (event) => {
-      savePreviewSelection();
+      if (selectionIsInPreview()) savePreviewSelection();
       if (eventName === 'mousedown') event.preventDefault();
       if (!previewEditing) return;
       restorePreviewSelection();
@@ -945,7 +951,9 @@
       els.preview.querySelector('.document-content')?.focus();
     });
   });
-  els.fontSize?.addEventListener('mousedown', savePreviewSelection);
+  els.fontSize?.addEventListener('mousedown', () => {
+    if (selectionIsInPreview()) savePreviewSelection();
+  });
   els.fontSize?.addEventListener('change', () => {
     if (!previewEditing) return;
     restorePreviewSelection();

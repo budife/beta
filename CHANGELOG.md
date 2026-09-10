@@ -59,6 +59,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Preserved selected text when applying font size or formatting from the preview toolbar.
 
+## DOCX to HTML v1.3.4 - 10 September 2026
+
+- Fixed font-size dropdown selection so the selected text block is preserved when the toolbar receives focus.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.
