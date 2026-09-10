@@ -162,6 +162,15 @@
       return `<${element.tagName.toLowerCase()}${attributes}>`;
     };
 
+    function serializeInline(node) {
+      if (node.nodeType === Node.TEXT_NODE) return node.textContent.replace(/\s+/g, ' ');
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+      const tagName = node.tagName.toLowerCase();
+      const opening = openingTag(node);
+      if (voidTags.has(node.tagName)) return opening;
+      return `${opening}${[...node.childNodes].map(serializeInline).join('')}</${tagName}>`;
+    }
+
     function serializeNode(node, depth) {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent.replace(/\s+/g, ' ').trim();
@@ -175,7 +184,8 @@
 
       const hasBlockChild = [...node.children].some((child) => blockTags.has(child.tagName));
       if (!hasBlockChild) {
-        return `${indent(depth)}${opening}${node.innerHTML}</${tagName}>`;
+        const value = [...node.childNodes].map(serializeInline).join('').replace(/\s+/g, ' ').trim();
+        return `${indent(depth)}${opening}${value}</${tagName}>`;
       }
 
       const lines = [];
@@ -207,9 +217,9 @@
             lines.push(`${indent(depth + 1)}<br>`);
           }
         } else if (child.nodeType === Node.TEXT_NODE) {
-          inlineBuffer += child.textContent;
+          inlineBuffer += serializeInline(child);
         } else if (child.nodeType === Node.ELEMENT_NODE) {
-          inlineBuffer += child.outerHTML;
+          inlineBuffer += serializeInline(child);
         }
       });
       flushInline();

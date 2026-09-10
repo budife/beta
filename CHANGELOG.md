@@ -52,6 +52,10 @@ All notable user-facing changes to BETA are tracked here.
 - Desktop workspace now keeps the preview on the left and the full editable HTML code on the right.
 - Editing the HTML code updates the preview immediately.
 
+## DOCX/PDF to HTML v1.2.3 - 10 September 2026
+
+- Improved HTML formatter indentation for nested inline tags, table cells, list items, and links.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
