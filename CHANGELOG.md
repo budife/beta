@@ -60,9 +60,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Fixed the desktop split workspace so the editable HTML code panel remains visible beside the preview.
 
-## DOCX/PDF to HTML v1.2.5 - 10 September 2026
+## DOCX/PDF to HTML v1.3.0 - 10 September 2026
 
-- Made the desktop workspace explicitly render Preview on the left and the editable HTML result on the right.
+- Replaced the plain HTML textarea with a CodeMirror editor on the right side of the desktop workspace.
+- Preview stays on the left and updates live while the HTML code is edited.
 
 ## Text Correction v1.0.1 - 10 September 2026
 

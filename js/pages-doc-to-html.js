@@ -16,6 +16,7 @@
     savePath: document.getElementById('d2h-save-path'),
     preview: document.getElementById('d2h-preview'),
     htmlOutput: document.getElementById('d2h-html-output'),
+    editor: document.getElementById('d2h-editor'),
     elementCount: document.getElementById('d2h-element-count'),
     copyBtn: document.getElementById('d2h-copy-btn'),
     copyBottomBtn: document.getElementById('d2h-copy-bottom-btn'),
@@ -34,6 +35,35 @@
 
   let pendingPdfFile = null;
   let directoryHandle = null;
+  let codeEditor = null;
+
+  function getEditorValue() {
+    return codeEditor ? codeEditor.getValue() : els.htmlOutput.value;
+  }
+
+  function setEditorValue(value) {
+    const next = value || '';
+    els.htmlOutput.value = next;
+    if (codeEditor && codeEditor.getValue() !== next) codeEditor.setValue(next);
+  }
+
+  function initEditor() {
+    if (!window.CodeMirror || !els.editor || codeEditor) return;
+    codeEditor = window.CodeMirror(els.editor, {
+      value: els.htmlOutput.value || '',
+      mode: 'htmlmixed',
+      theme: 'eclipse',
+      lineNumbers: true,
+      lineWrapping: true,
+      indentUnit: 2,
+      tabSize: 2,
+      autoCloseTags: true,
+      viewportMargin: Infinity
+    });
+    codeEditor.on('change', () => {
+      renderPreview(getEditorValue(), 'Preview updated from HTML editor', '');
+    });
+  }
 
   const documentCss = `
     :root { color: #111; background: #ececec; font-family: Arial, Helvetica, sans-serif; }
@@ -714,7 +744,7 @@
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'W';
     renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
-    els.htmlOutput.value = formatHtmlWithTabs(normalizedHtml);
+    setEditorValue(formatHtmlWithTabs(normalizedHtml));
     const count = els.preview.querySelectorAll('*').length;
     els.elementCount.textContent = `${count} elements`;
 
@@ -782,7 +812,7 @@
     els.fileIcon.textContent = 'PDF';
 
     renderPreview(pagesHtml || '<p>PDF has no extractable text.</p>');
-    els.htmlOutput.value = formatHtmlWithTabs(pagesHtml);
+    setEditorValue(formatHtmlWithTabs(pagesHtml));
     els.elementCount.textContent = `${totalPages} pages`;
     els.messages.textContent = `PDF converted as editable text (${totalPages} pages). Layout may differ slightly from original.`;
     els.messages.classList.remove('d2h-hidden');
@@ -822,27 +852,28 @@
 
     const fullHtml = `<div class="pdf-pages">${pagesHtml}</div>`;
     renderPreview(fullHtml);
-    els.htmlOutput.value = formatHtmlWithTabs(fullHtml);
+    setEditorValue(formatHtmlWithTabs(fullHtml));
     els.elementCount.textContent = `${totalPages} pages`;
     els.messages.textContent = `PDF converted as ${totalPages} page image(s). Text is not editable in HTML.`;
     els.messages.classList.remove('d2h-hidden');
   }
 
   function buildFullDocument() {
+    const editorHtml = getEditorValue();
     const titleTemplate = document.createElement('template');
-    titleTemplate.innerHTML = els.htmlOutput.value;
+    titleTemplate.innerHTML = editorHtml;
     const documentTitle = [...titleTemplate.content.querySelectorAll(':scope > p.docx-center, :scope > p.center, :scope > p.centered')]
       .map((element) => element.textContent.replace(/\s+/g, ' ').trim())
       .filter(Boolean)
       .join(' ')
       || currentFileName;
     const safeTitle = escapeHtml(documentTitle);
-    const isPdf = els.htmlOutput.value.includes('pdf-page') || els.htmlOutput.value.includes('pdf-page-content');
+    const isPdf = editorHtml.includes('pdf-page') || editorHtml.includes('pdf-page-content');
     if (isPdf) {
       const pdfCss = `body{margin:0;padding:24px;background:#e8e8e8;font-family:Arial,sans-serif;}.pdf-pages{max-width:min(210mm,calc(100% - 48px));margin:0 auto;}.pdf-page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12);margin-bottom:20px;}.pdf-page img{display:block;width:100%;height:auto;}.pdf-page-label{padding:6px 0;text-align:center;color:#6b7280;font-size:12px;}.pdf-page-content{padding:8px 0;line-height:1.6;font-size:11pt;}.pdf-page-content+.pdf-page-content{margin-top:16px;padding-top:16px;border-top:1px solid #e5e5e5;}`;
-      return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${pdfCss}</style>\n</head>\n<body>\n${els.htmlOutput.value}\n</body>\n</html>`;
+      return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${pdfCss}</style>\n</head>\n<body>\n${editorHtml}\n</body>\n</html>`;
     }
-    const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(els.htmlOutput.value, false));
+    const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(editorHtml, false));
     return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${documentCss}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>`;
   }
 
@@ -1002,9 +1033,7 @@
   els.outputFileName.addEventListener('blur', (event) => {
     currentFileName = extractFileName(sanitizeFileName(event.currentTarget.value)) || 'document';
   });
-  els.htmlOutput.addEventListener('input', () => {
-    renderPreview(els.htmlOutput.value);
-  });
+  initEditor();
 
   // Beta warning dialog
   const betaDialog = document.getElementById('d2h-beta-dialog');
