@@ -83,7 +83,7 @@ All notable user-facing changes to BETA are tracked here.
 
 - Removed the red focus ring from DOCX to HTML fields and CodeMirror.
 
-## Core v6.16.19 - 10 September 2026
+## Core v6.16.19 - 11 September 2026
 
 - Removed the beta badge from DOCX to HTML navigation.
 

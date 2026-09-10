@@ -21,7 +21,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ## Recent Updates
 
-### 10 September 2026
+### 11 September 2026
 - **DOCX to HTML v1.3.0** - Removed PDF conversion and changed preview font size controls to numeric values.
 - **DOCX to HTML v1.3.1** - Added custom numeric font-size input for preview editing.
 - **DOCX to HTML v1.3.2** - Combined font-size presets and custom entry into one numeric control.
