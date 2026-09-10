@@ -1,6 +1,6 @@
-# eDM Helper UI Style Guide
+# BETA UI Style Guide
 
-This document defines the reusable visual rules for eDM Helper and future
+This document defines the reusable visual rules for BETA and future
 web applications. Use it as the default reference before adding page-specific
 CSS.
 

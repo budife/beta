@@ -1,6 +1,12 @@
 # Changelog
 
-All notable user-facing changes to eDM Helper are tracked here.
+All notable user-facing changes to BETA are tracked here.
+
+## Core v6.16.15 - 10 September 2026
+
+- Rebranded the application to BETA (Budd Email Tools & Automation).
+- Added a welcome section to the Home page.
+- Removed social links and creator note interactions; footer attribution is now non-clickable `budife.psd`.
 
 ## Campaign Counter v1.6.6 - 5 September 2026
 

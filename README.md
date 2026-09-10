@@ -1,8 +1,8 @@
-# eDM Helper
+# BETA
 
-Clean reference hub and productivity toolkit for everyday email marketing work.
+Budd Email Tools & Automation for everyday campaign work.
 
-eDM Helper is a static web app built for validating campaign files, preparing database outputs, checking HTML layouts, managing campaign IDs, uploading TNC PDFs, slicing visual layouts, and tracking WFH/office days. It is intentionally lightweight: mostly vanilla HTML, CSS, and JavaScript, with browser-local storage where possible.
+BETA is a static web app built for validating campaign files, preparing database outputs, checking HTML layouts, managing campaign IDs, uploading TNC PDFs, slicing visual layouts, and tracking WFH/office days. It is intentionally lightweight: mostly vanilla HTML, CSS, and JavaScript, with browser-local storage where possible.
 
 [Live site](https://budife.github.io/beta/)
 
