@@ -534,9 +534,20 @@ textarea#d2h-html-output {
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+.d2h-preview-editing {
+  outline: 2px solid var(--accent-primary, #f3838b);
+  outline-offset: -2px;
+  cursor: text;
+}
+
+.d2h-preview-editing:focus { outline: 2px solid var(--accent-hover, #b8323d); }
+
 .d2h-panel-head strong { display: inline-flex; gap: 7px; align-items: center; font-size: 13px; }
 .d2h-panel-head strong i { color: var(--accent-primary, #f3838b); }
 .d2h-panel-meta { color: var(--text-muted, #6b7280); font-size: 12px; }
+.d2h-edit-tools { display: inline-flex; gap: 3px; align-items: center; }
+.d2h-edit-tools button, .d2h-edit-tools select { min-height: 28px; padding: 2px 7px; color: var(--text-muted, #6b7280); background: #fff; border: 1px solid var(--border, #e5e7eb); font-size: 11px; cursor: pointer; }
+.d2h-edit-tools button:hover, .d2h-edit-tools select:hover { color: var(--accent-primary, #f3838b); border-color: var(--accent-primary, #f3838b); }
 
 .d2h-panel-html .CodeMirror {
   height: 100%;

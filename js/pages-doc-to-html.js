@@ -26,6 +26,9 @@
     openTab: document.getElementById('d2h-open-tab'),
     panelPreview: document.getElementById('d2h-panel-preview'),
     panelHtml: document.getElementById('d2h-panel-html'),
+    editPreviewBtn: document.getElementById('d2h-edit-preview-btn'),
+    resetPreviewBtn: document.getElementById('d2h-reset-preview-btn'),
+    editTools: document.getElementById('d2h-edit-tools'),
     pdfMode: document.getElementById('d2h-pdf-mode'),
     pdfEditableBtn: document.getElementById('d2h-pdf-editable'),
     pdfImageBtn: document.getElementById('d2h-pdf-image'),
@@ -36,6 +39,8 @@
   let directoryHandle = null;
   let codeEditor = null;
   let syncingEditor = false;
+  let visualDocxHtml = '';
+  let previewEditing = false;
 
   function getEditorValue() {
     return codeEditor ? codeEditor.getValue() : els.htmlOutput.value;
@@ -686,6 +691,23 @@
 
   function renderPreview(html) {
     els.preview.innerHTML = `<style>${documentCss}</style>${wrapWithDocumentTemplate(html)}`;
+    if (previewEditing) enablePreviewEditing();
+  }
+
+  function enablePreviewEditing() {
+    const content = els.preview.querySelector('.document-content');
+    if (!content) return;
+    content.contentEditable = 'true';
+    content.classList.add('d2h-preview-editing');
+  }
+
+  function syncPreviewToEditor() {
+    const content = els.preview.querySelector('.document-content');
+    if (!content) return;
+    const clone = content.cloneNode(true);
+    clone.removeAttribute('contenteditable');
+    clone.classList.remove('d2h-preview-editing');
+    setEditorValue(formatHtmlWithTabs(clone.innerHTML));
   }
 
   async function renderDocxVisual(arrayBuffer) {
@@ -762,6 +784,7 @@
       const rendered = await renderDocxVisual(arrayBuffer);
       if (rendered) {
         const visualHtml = els.preview.innerHTML;
+        visualDocxHtml = visualHtml;
         setEditorValue(formatHtmlWithTabs(visualHtml));
       }
     } catch (error) {
@@ -980,6 +1003,37 @@
 
   els.tabPreview?.addEventListener('click', () => switchTab('preview'));
   els.tabHtml?.addEventListener('click', () => switchTab('html'));
+  els.editPreviewBtn?.addEventListener('click', () => {
+    previewEditing = !previewEditing;
+    els.editPreviewBtn.textContent = previewEditing ? 'Done editing' : 'Edit preview';
+    els.resetPreviewBtn?.classList.toggle('d2h-hidden', !previewEditing);
+    els.editTools?.classList.toggle('d2h-hidden', !previewEditing);
+    if (previewEditing) enablePreviewEditing();
+    else syncPreviewToEditor();
+  });
+  els.resetPreviewBtn?.addEventListener('click', () => {
+    if (!visualDocxHtml) return;
+    previewEditing = false;
+    els.editPreviewBtn.textContent = 'Edit preview';
+    els.resetPreviewBtn.classList.add('d2h-hidden');
+    els.editTools?.classList.add('d2h-hidden');
+    els.preview.innerHTML = visualDocxHtml;
+    setEditorValue(formatHtmlWithTabs(visualDocxHtml));
+  });
+  els.editTools?.querySelectorAll('[data-edit-command]').forEach((control) => {
+    const eventName = control.tagName === 'SELECT' ? 'change' : 'mousedown';
+    control.addEventListener(eventName, (event) => {
+      if (eventName === 'mousedown') event.preventDefault();
+      if (!previewEditing) return;
+      const command = control.dataset.editCommand;
+      document.execCommand(command, false, control.value || null);
+      syncPreviewToEditor();
+      els.preview.querySelector('.document-content')?.focus();
+    });
+  });
+  els.preview.addEventListener('input', () => {
+    if (previewEditing) syncPreviewToEditor();
+  });
   els.htmlOutput.addEventListener('input', () => {
     renderPreview(els.htmlOutput.value, 'Preview updated from HTML editor', '');
   });

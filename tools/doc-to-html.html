@@ -10,7 +10,7 @@
 
   <link rel="stylesheet" href="../css/tokens.css?v=6.16.14">
   <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
-  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.26">
+  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.27">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
@@ -92,7 +92,22 @@
       <section id="d2h-panel-preview" class="d2h-panel d2h-panel-preview">
         <div class="d2h-panel-head">
           <strong><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</strong>
-          <span id="d2h-element-count" class="d2h-panel-meta"></span>
+          <div class="d2h-panel-tools">
+            <span id="d2h-element-count" class="d2h-panel-meta"></span>
+            <button id="d2h-edit-preview-btn" class="d2h-mini-button" type="button">Edit preview</button>
+            <button id="d2h-reset-preview-btn" class="d2h-mini-button d2h-hidden" type="button">Reset</button>
+            <span id="d2h-edit-tools" class="d2h-edit-tools d2h-hidden" aria-label="Preview formatting tools">
+              <button type="button" data-edit-command="bold" title="Bold"><strong>B</strong></button>
+              <button type="button" data-edit-command="italic" title="Italic"><em>I</em></button>
+              <button type="button" data-edit-command="underline" title="Underline"><u>U</u></button>
+              <select data-edit-command="fontSize" title="Font size" aria-label="Font size">
+                <option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">XL</option>
+              </select>
+              <button type="button" data-edit-command="justifyLeft" title="Align left">Left</button>
+              <button type="button" data-edit-command="justifyCenter" title="Align center">Center</button>
+              <button type="button" data-edit-command="justifyRight" title="Align right">Right</button>
+            </span>
+          </div>
         </div>
         <article id="d2h-preview" class="d2h-preview"></article>
       </section>
@@ -141,6 +156,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
   <script src="../js/version-config.js?v=6.16.15" defer></script>
-  <script src="../js/pages-doc-to-html.js?v=6.16.26" defer></script>
+  <script src="../js/pages-doc-to-html.js?v=6.16.27" defer></script>
 </body>
 </html>

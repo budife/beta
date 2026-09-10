@@ -77,6 +77,11 @@ All notable user-facing changes to BETA are tracked here.
 - DOCX visual rendering now becomes the editor source when available, preserving font size, spacing, bold, italic, and layout more closely.
 - Mammoth remains the fallback converter when visual DOCX rendering is unavailable.
 
+## DOCX/PDF to HTML v1.2.9 - 10 September 2026
+
+- Added an editable Preview mode with basic bold, italic, underline, font size, and alignment controls.
+- Preview edits sync back to the CodeMirror HTML editor, with Reset to visual DOCX available.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
