@@ -53,6 +53,15 @@
     output.value = input.value;
   });
 
+  input.addEventListener('paste', (event) => {
+    event.preventDefault();
+    const plainText = event.clipboardData?.getData('text/plain') || '';
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    input.setRangeText(plainText, start, end, 'end');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
   copyBtn.addEventListener('click', async () => {
     if (!output.value) return;
     try {

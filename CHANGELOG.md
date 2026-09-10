@@ -24,6 +24,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
 
+## Text Correction v1.0.2 - 10 September 2026
+
+- Added explicit plain-text paste handling to remove rich-text formatting from pasted content.
+
 ## TNC Uploader v0.3.10 - 10 September 2026
 
 - Made duplicate PDF warnings visible when a queued PDF was already saved in the selected destination.

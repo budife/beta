@@ -62,7 +62,7 @@ const TOOL_VERSIONS = {
   },
   'text-correction': {
     label: 'Text Correction',
-    version: '1.0.1',
+    version: '1.0.2',
     status: 'stable'
   },
   'wfh-tracker': {
