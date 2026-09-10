@@ -30,6 +30,8 @@
     resetPreviewBtn: document.getElementById('d2h-reset-preview-btn'),
     editTools: document.getElementById('d2h-edit-tools'),
     fontSize: document.getElementById('d2h-font-size'),
+    fontSizeDown: document.getElementById('d2h-font-size-down'),
+    fontSizeUp: document.getElementById('d2h-font-size-up'),
   };
 
   let directoryHandle = null;
@@ -967,6 +969,18 @@
     syncPreviewToEditor();
     els.preview.querySelector('.document-content')?.focus();
   });
+  function changeFontSize(delta) {
+    if (!previewEditing) return;
+    if (selectionIsInPreview()) savePreviewSelection();
+    restorePreviewSelection();
+    const current = Number(els.fontSize.value) || 14;
+    els.fontSize.value = String(Math.max(6, Math.min(96, current + delta)));
+    els.fontSize.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  els.fontSizeDown?.addEventListener('mousedown', (event) => event.preventDefault());
+  els.fontSizeUp?.addEventListener('mousedown', (event) => event.preventDefault());
+  els.fontSizeDown?.addEventListener('click', () => changeFontSize(-1));
+  els.fontSizeUp?.addEventListener('click', () => changeFontSize(1));
   els.preview.addEventListener('input', () => {
     if (previewEditing) syncPreviewToEditor();
   });
