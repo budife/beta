@@ -78,7 +78,7 @@
               <button type="button" data-edit-command="underline" title="Underline"><u>U</u></button>
               <span class="d2h-font-size-control" aria-label="Font size control">
                 <button id="d2h-font-size-down" type="button" title="Decrease font size" aria-label="Decrease font size">−</button>
-                <input id="d2h-font-size" class="d2h-font-size" type="text" inputmode="numeric" pattern="[0-9]*" value="14" list="d2h-font-size-options" title="Font size in pixels" aria-label="Font size in pixels">
+                <input id="d2h-font-size" class="d2h-font-size" type="text" inputmode="numeric" pattern="[0-9]*" value="14" autocomplete="off" title="Font size in pixels" aria-label="Font size in pixels">
                 <button id="d2h-font-size-up" type="button" title="Increase font size" aria-label="Increase font size">+</button>
                 <div id="d2h-font-size-menu" class="d2h-font-size-menu" hidden>
                   <button type="button" data-font-size="10">10px</button>
@@ -88,9 +88,6 @@
                   <button type="button" data-font-size="32">32px</button>
                 </div>
               </span>
-              <datalist id="d2h-font-size-options">
-                <option value="10"><option value="14"><option value="18"><option value="24"><option value="32">
-              </datalist>
               <button type="button" data-edit-command="justifyLeft" title="Align left">Left</button>
               <button type="button" data-edit-command="justifyCenter" title="Align center">Center</button>
               <button type="button" data-edit-command="justifyRight" title="Align right">Right</button>

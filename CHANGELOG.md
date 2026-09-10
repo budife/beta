@@ -75,6 +75,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Replaced the unreliable native datalist with a visible custom font-size preset menu.
 
+## DOCX to HTML v1.3.8 - 10 September 2026
+
+- Removed browser font-size autocomplete/history so only the custom preset menu appears.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.
