@@ -239,6 +239,13 @@
     return `${getTargetPath()}/${targetName || fileName}`.toLowerCase();
   }
 
+  function findHistoricalTarget(targetName) {
+    if (state.mode === 'replace') return null;
+    return state.items.find((item) => !item.file
+      && item.targetPath === getTargetPath()
+      && item.targetName.toLowerCase() === targetName.toLowerCase());
+  }
+
   function serializeItem(item) {
     const {
       id,
@@ -474,12 +481,19 @@
       }
     });
 
+    const duplicate = incoming
+      .map((file) => createItemFromFile(file))
+      .map((item) => findHistoricalTarget(item.targetName))
+      .find(Boolean);
+
     if (!incoming.length) {
       setStatus('No PDF found. Drop or choose .pdf files only.', 'error');
     } else if (trimmedForReplace) {
       setStatus('Replace mode uses one PDF at a time. Added the first PDF and cleared the active queue.', 'error');
     } else if (state.mode === 'replace') {
       setStatus('Replacement PDF added. Active queue is limited to this one file.', 'success');
+    } else if (duplicate) {
+      setStatus(`${duplicate.targetName} sudah pernah disimpan di folder tujuan ini. Pilih nama lain atau gunakan Replace PDF link.`, 'error');
     } else {
       setStatus(`${incoming.length} PDF file(s) added.`, 'success');
     }
@@ -825,6 +839,13 @@
     addActivity('File history cleared', 'Saved file records were removed.');
     setStatus('TNC uploader history cleared.');
   }
+
+  window.getTncUploaderState = function () {
+    return {
+      hasQueuedFiles: state.items.some((item) => Boolean(item.file)),
+      hasUploadedFiles: state.items.some((item) => item.status === 'saved' || Boolean(item.savedAt)),
+    };
+  };
 
   async function copyText(text) {
     try {

@@ -22,6 +22,8 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ### 5 September 2026
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.
+- **TNC Uploader v0.3.10** - Visible warning when a PDF was already uploaded to the selected destination.
+- **TNC Uploader v0.3.11** - Warning before leaving with uploaded PDFs or an active queue.
 - **Campaign Counter v1.6.6** - Conflict tooltip on red ID, "exists" badge on Recent Activity, show 20 recent entries, auto-refresh activity after folder scan.
 - **Database Generator v1.5.9** - Fixed generator cache-buster, removed unused bulk toggle code, and improved input accessibility.
 - **Database Generator v1.5.8** - Compact 780px centered shell.

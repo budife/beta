@@ -1134,6 +1134,10 @@ document.addEventListener('click', (event) => {
     if (slicerState && (slicerState.hasImage || slicerState.hasSlices || slicerState.hasGenerated) && !window.confirm('Tool ini memiliki data yang belum tersimpan. Tetap pindah?')) {
       return;
     }
+    const tncState = frame?.contentWindow?.getTncUploaderState?.();
+    if (tncState && (tncState.hasQueuedFiles || tncState.hasUploadedFiles) && !window.confirm('TNC Uploader memiliki PDF yang sudah di-upload atau masih berada di queue. Tetap pindah?')) {
+      return;
+    }
   }
 
   event.preventDefault();

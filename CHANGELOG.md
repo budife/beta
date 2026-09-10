@@ -8,6 +8,14 @@ All notable user-facing changes to BETA are tracked here.
 - Added a welcome section to the Home page.
 - Removed social links and creator note interactions; footer attribution is now non-clickable `budife.psd`.
 
+## TNC Uploader v0.3.10 - 10 September 2026
+
+- Made duplicate PDF warnings visible when a queued PDF was already saved in the selected destination.
+
+## TNC Uploader v0.3.11 - 10 September 2026
+
+- Added a navigation warning when leaving the tool with uploaded PDFs or an active PDF queue.
+
 ## Campaign Counter v1.6.6 - 5 September 2026
 
 - Added conflict tooltip on red Campaign ID and "exists" badge on Recent Activity rows when ID already exists in scanned folders.

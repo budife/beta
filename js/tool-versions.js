@@ -57,7 +57,7 @@ const TOOL_VERSIONS = {
   },
   'tnc-uploader': {
     label: 'TNC Uploader',
-    version: '0.3.9',
+    version: '0.3.11',
     status: 'stable'
   },
   'wfh-tracker': {
