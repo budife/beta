@@ -51,6 +51,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Added a custom numeric font-size input for preview editing.
 
+## DOCX to HTML v1.3.2 - 10 September 2026
+
+- Combined font-size presets and custom entry into one Word-like numeric control.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.

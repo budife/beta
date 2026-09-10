@@ -24,6 +24,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 ### 10 September 2026
 - **DOCX to HTML v1.3.0** - Removed PDF conversion and changed preview font size controls to numeric values.
 - **DOCX to HTML v1.3.1** - Added custom numeric font-size input for preview editing.
+- **DOCX to HTML v1.3.2** - Combined font-size presets and custom entry into one numeric control.
 - **Text Correction v1.0.2** - Pasted content is now forced to plain text without rich-text formatting.
 - **Core v6.16.17** - Added Text Correction as the eleventh tool from the Epsilon workspace.
 - **Core v6.16.18** - Marked Text Correction as a local tool.
