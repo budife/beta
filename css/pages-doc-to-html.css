@@ -352,6 +352,13 @@ textarea {
   flex-shrink: 0;
 }
 
+.d2h-message-summary { font-weight: 600; }
+.d2h-message-details { margin-top: 6px; }
+.d2h-message-details summary { cursor: pointer; font-size: 12px; font-weight: 600; }
+.d2h-message-details ul { max-height: 140px; margin: 6px 0 0; padding-left: 20px; overflow: auto; }
+.d2h-message-details li { margin: 3px 0; }
+.d2h-message-details li strong { margin-right: 6px; text-transform: capitalize; }
+
 .d2h-save-path {
   display: flex;
   align-items: center;
@@ -377,6 +384,21 @@ textarea {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+@media (min-width: 761px) {
+  .d2h-view-toggle { display: none; }
+  .d2h-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1px;
+    background: var(--border, #e5e7eb);
+  }
+  .d2h-panel {
+    min-width: 0;
+    background: var(--surface, #fff);
+  }
+  .d2h-panel-head { min-height: 44px; }
 }
 
 .d2h-view-toggle {
@@ -677,6 +699,9 @@ textarea#d2h-html-output {
   .d2h-view-toggle {
     padding: 0 16px;
   }
+
+  .d2h-workspace { overflow: auto; }
+  .d2h-panel { min-height: 360px; flex: none; }
 }
 
 .d2h-beta-dialog {

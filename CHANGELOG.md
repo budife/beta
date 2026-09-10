@@ -42,6 +42,11 @@ All notable user-facing changes to BETA are tracked here.
 
 - Clarified on the Typo Checker button that only HTML text is scanned, not text inside images.
 
+## DOCX/PDF to HTML v1.2.1 - 10 September 2026
+
+- Added expandable conversion details so unsupported Word formatting areas are easier to identify.
+- Preview and generated HTML now appear side-by-side on desktop and stack responsively on smaller screens.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.

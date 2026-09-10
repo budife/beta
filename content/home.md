@@ -30,6 +30,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **Layout Checker v2.1.8** - Added local HTML Typo Checker with dictionary and possible typo results in a modal.
 - **Layout Checker v2.1.9** - Centered the Typo Checker modal in the viewport.
 - **Layout Checker v2.1.10** - Clarified that Typo Checker scans HTML text only, not image text.
+- **DOCX/PDF to HTML v1.2.1** - Added conversion detail notes and a side-by-side Preview/HTML workspace on desktop.
 - **DOCX/PDF to HTML** - Renamed the document conversion tool to clarify DOCX/PDF input and HTML output.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.

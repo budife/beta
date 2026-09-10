@@ -709,9 +709,20 @@
     els.elementCount.textContent = `${count} elements`;
 
     if (conversion.messages.length) {
-      els.messages.textContent = `${conversion.messages.length} conversion note(s) - some Word formatting may be simplified.`;
+      const details = conversion.messages.map((item) => {
+        const type = escapeHtml(item.type || 'note');
+        const message = escapeHtml(item.message || 'Some formatting may be simplified.');
+        return `<li><strong>${type}</strong><span>${message}</span></li>`;
+      }).join('');
+      els.messages.innerHTML = `
+        <div class="d2h-message-summary">${conversion.messages.length} conversion note${conversion.messages.length === 1 ? '' : 's'} - some Word formatting may be simplified.</div>
+        <details class="d2h-message-details">
+          <summary>Show conversion details</summary>
+          <ul>${details}</ul>
+        </details>`;
       els.messages.classList.remove('d2h-hidden');
     } else {
+      els.messages.textContent = '';
       els.messages.classList.add('d2h-hidden');
     }
   }
