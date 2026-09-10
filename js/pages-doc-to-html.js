@@ -683,6 +683,24 @@
     els.preview.innerHTML = `<style>${documentCss}</style>${wrapWithDocumentTemplate(html)}`;
   }
 
+  async function renderDocxVisual(arrayBuffer) {
+    if (!window.docx?.renderAsync) return false;
+    els.preview.innerHTML = '';
+    await window.docx.renderAsync(arrayBuffer, els.preview, null, {
+      className: 'docx-preview',
+      inWrapper: true,
+      breakPages: true,
+      ignoreWidth: false,
+      ignoreHeight: false,
+      useBase64URL: true,
+      renderHeaders: true,
+      renderFooters: true,
+      renderFootnotes: true,
+      renderEndnotes: true,
+    });
+    return true;
+  }
+
   async function convertFile(file) {
     const ext = file?.name?.toLowerCase().split('.').pop();
     if (!file || (ext !== 'docx' && ext !== 'pdf')) {
@@ -735,6 +753,11 @@
     els.fileIcon.textContent = 'W';
     renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
     setEditorValue(formatHtmlWithTabs(normalizedHtml));
+    try {
+      await renderDocxVisual(arrayBuffer);
+    } catch (error) {
+      console.warn('Visual DOCX preview unavailable; keeping HTML preview.', error);
+    }
     const count = els.preview.querySelectorAll('*').length;
     els.elementCount.textContent = `${count} elements`;
 
