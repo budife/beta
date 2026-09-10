@@ -5,32 +5,30 @@
   <link rel="icon" type="image/png" href="../favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Konverter DOCX dan PDF ke HTML yang bekerja langsung di browser.">
+  <meta name="description" content="Konverter DOCX ke HTML yang bekerja langsung di browser.">
   <meta name="author" content="BETA">
 
   <link rel="stylesheet" href="../css/tokens.css?v=6.16.14">
   <link rel="stylesheet" href="../css/theme.css?v=6.14.5">
-  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.29">
+  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.30">
   <link rel="stylesheet" href="../css/controls.css?v=6.14.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-  <title>DOCX/PDF to HTML - BETA</title>
+  <title>DOCX to HTML - BETA</title>
 </head>
 <body>
   <main class="d2h-app" id="d2h-app">
-    <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX or PDF file">
-      <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf" hidden>
+    <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX file">
+      <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
       <div class="d2h-dropzone-inner">
         <div class="d2h-dropzone-icons">
           <span class="d2h-doc-icon"><i class="fa-solid fa-file-word" aria-hidden="true"></i></span>
-          <span class="d2h-plus"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
-          <span class="d2h-pdf-icon"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
         </div>
         <strong>Drop your file here</strong>
         <span class="d2h-dropzone-sub">or <button id="d2h-choose-btn" class="d2h-text-link" type="button">browse from folder</button></span>
-        <small>Supports .docx and .pdf up to 20 MB</small>
+         <small>Supports .docx up to 20 MB</small>
       </div>
     </div>
 
@@ -64,28 +62,6 @@
 
     <div id="d2h-save-path" class="d2h-save-path d2h-hidden"></div>
 
-    <div id="d2h-pdf-mode" class="d2h-pdf-mode d2h-hidden">
-      <div class="d2h-pdf-mode-card">
-        <h3><i class="fa-solid fa-file-pdf" aria-hidden="true"></i> Choose PDF conversion mode</h3>
-        <p>Select how you want to convert this PDF:</p>
-        <div class="d2h-pdf-mode-options">
-          <button id="d2h-pdf-editable" class="d2h-pdf-option" type="button">
-            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-            <strong>Editable Text</strong>
-            <span>Extract text, editable in HTML. Text may differ slightly from original layout.</span>
-          </button>
-          <button id="d2h-pdf-image" class="d2h-pdf-option" type="button">
-            <i class="fa-solid fa-image" aria-hidden="true"></i>
-            <strong>Image (Exact)</strong>
-            <span>Render as images, 100% visually identical. Text not editable.</span>
-          </button>
-        </div>
-        <button id="d2h-pdf-cancel" class="d2h-text-button" type="button">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancel
-        </button>
-      </div>
-    </div>
-
     <div id="d2h-messages" class="d2h-messages d2h-hidden"></div>
 
     <div id="d2h-workspace" class="d2h-workspace d2h-hidden">
@@ -101,7 +77,7 @@
               <button type="button" data-edit-command="italic" title="Italic"><em>I</em></button>
               <button type="button" data-edit-command="underline" title="Underline"><u>U</u></button>
               <select data-edit-command="fontSize" title="Font size" aria-label="Font size">
-                <option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">XL</option>
+                <option value="2">10px</option><option value="3" selected>14px</option><option value="4">18px</option><option value="5">24px</option><option value="6">32px</option>
               </select>
               <button type="button" data-edit-command="justifyLeft" title="Align left">Left</button>
               <button type="button" data-edit-command="justifyCenter" title="Align center">Center</button>
@@ -134,11 +110,10 @@
       <div class="d2h-beta-icon">
         <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
       </div>
-      <h3>DOCX/PDF to HTML (Beta)</h3>
+      <h3>DOCX to HTML (Beta)</h3>
       <p>Tool ini masih dalam tahap pengembangan. Hasil konversi mungkin belum sempurna dan bisa berubah di update berikutnya.</p>
       <ul>
         <li>Hasil DOCX → HTML umumnya akurat, tapi format kompleks bisa sedikit berbeda.</li>
-        <li>Hasil PDF → HTML bergantung pada struktur file asli.</li>
       </ul>
       <label class="d2h-beta-snooze">
         <input type="checkbox" id="d2h-beta-snooze" />
@@ -152,10 +127,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
   <script src="../js/version-config.js?v=6.16.15" defer></script>
-  <script src="../js/pages-doc-to-html.js?v=6.16.29" defer></script>
+  <script src="../js/pages-doc-to-html.js?v=6.16.30" defer></script>
 </body>
 </html>

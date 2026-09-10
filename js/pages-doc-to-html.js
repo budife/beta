@@ -29,13 +29,8 @@
     editPreviewBtn: document.getElementById('d2h-edit-preview-btn'),
     resetPreviewBtn: document.getElementById('d2h-reset-preview-btn'),
     editTools: document.getElementById('d2h-edit-tools'),
-    pdfMode: document.getElementById('d2h-pdf-mode'),
-    pdfEditableBtn: document.getElementById('d2h-pdf-editable'),
-    pdfImageBtn: document.getElementById('d2h-pdf-image'),
-    pdfCancelBtn: document.getElementById('d2h-pdf-cancel')
   };
 
-  let pendingPdfFile = null;
   let directoryHandle = null;
   let codeEditor = null;
   let syncingEditor = false;
@@ -733,8 +728,8 @@
 
   async function convertFile(file) {
     const ext = file?.name?.toLowerCase().split('.').pop();
-    if (!file || (ext !== 'docx' && ext !== 'pdf')) {
-      alert('Please choose a .docx or .pdf file.');
+    if (!file || ext !== 'docx') {
+      alert('Please choose a .docx file.');
       return;
     }
     if (file.size > 20 * 1024 * 1024) {
@@ -744,11 +739,7 @@
 
     setBusy(true);
     try {
-      if (ext === 'pdf') {
-        await convertPdf(file);
-      } else {
-        await convertDocx(file);
-      }
+      await convertDocx(file);
       els.dropzone.classList.add('d2h-hidden');
       els.filebar.classList.remove('d2h-hidden');
       els.workspace.classList.remove('d2h-hidden');
@@ -812,97 +803,6 @@
     }
   }
 
-  async function convertPdf(file) {
-    pendingPdfFile = file;
-    els.dropzone.classList.add('d2h-hidden');
-    els.pdfMode.classList.remove('d2h-hidden');
-    setBusy(false);
-  }
-
-  async function convertPdfEditable(file) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    const totalPages = pdf.numPages;
-
-    let pagesHtml = '';
-
-    for (let i = 1; i <= totalPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-
-      let lastY = null;
-      let pageContent = '';
-
-      textContent.items.forEach((item) => {
-        const y = Math.round(item.transform[5]);
-        if (lastY !== null && Math.abs(y - lastY) > 5) {
-          pageContent += '<br>';
-        }
-        const style = item.fontName?.includes('Bold') ? 'font-weight:700;' : '';
-        const fontSize = Math.round(Math.abs(item.height) * 0.75) || 11;
-        pageContent += `<span style="${style}font-size:${fontSize}pt;">${escapeHtml(item.str)}</span>`;
-        lastY = y;
-      });
-
-      pagesHtml += `<div class="pdf-page-content">\n${pageContent}\n</div>\n`;
-    }
-
-    currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const year = new Date().getFullYear();
-    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
-    els.outputFileName.value = pathPrefix + currentFileName;
-    els.fileSize.textContent = formatBytes(file.size);
-    els.fileIcon.textContent = 'PDF';
-
-    renderPreview(pagesHtml || '<p>PDF has no extractable text.</p>');
-    setEditorValue(formatHtmlWithTabs(pagesHtml));
-    els.elementCount.textContent = `${totalPages} pages`;
-    els.messages.textContent = `PDF converted as editable text (${totalPages} pages). Layout may differ slightly from original.`;
-    els.messages.classList.remove('d2h-hidden');
-  }
-
-  async function convertPdfImage(file) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    const totalPages = pdf.numPages;
-    const scale = 2;
-
-    let pagesHtml = '';
-
-    for (let i = 1; i <= totalPages; i++) {
-      const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      const ctx = canvas.getContext('2d');
-
-      await page.render({ canvasContext: ctx, viewport }).promise;
-
-      const imgDataUrl = canvas.toDataURL('image/png');
-      pagesHtml += `<div class="pdf-page"><img src="${imgDataUrl}" alt="Page ${i}" style="width:100%;height:auto;display:block;"><p class="pdf-page-label">Page ${i} of ${totalPages}</p></div>\n`;
-    }
-
-    currentFileName = sanitizeFileName(file.name.replace(/\.pdf$/i, ''));
-    const year = new Date().getFullYear();
-    const pathPrefix = `emailblast\\MKT\\${year}\\tnc\\`;
-    els.outputFileName.value = pathPrefix + currentFileName;
-    els.fileSize.textContent = formatBytes(file.size);
-    els.fileIcon.textContent = 'PDF';
-
-    const fullHtml = `<div class="pdf-pages">${pagesHtml}</div>`;
-    renderPreview(fullHtml);
-    setEditorValue(formatHtmlWithTabs(fullHtml));
-    els.elementCount.textContent = `${totalPages} pages`;
-    els.messages.textContent = `PDF converted as ${totalPages} page image(s). Text is not editable in HTML.`;
-    els.messages.classList.remove('d2h-hidden');
-  }
-
   function buildFullDocument() {
     const editorHtml = getEditorValue();
     const titleTemplate = document.createElement('template');
@@ -913,11 +813,6 @@
       .join(' ')
       || currentFileName;
     const safeTitle = escapeHtml(documentTitle);
-    const isPdf = editorHtml.includes('pdf-page') || editorHtml.includes('pdf-page-content');
-    if (isPdf) {
-      const pdfCss = `body{margin:0;padding:24px;background:#e8e8e8;font-family:Arial,sans-serif;}.pdf-pages{max-width:min(210mm,calc(100% - 48px));margin:0 auto;}.pdf-page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12);margin-bottom:20px;}.pdf-page img{display:block;width:100%;height:auto;}.pdf-page-label{padding:6px 0;text-align:center;color:#6b7280;font-size:12px;}.pdf-page-content{padding:8px 0;line-height:1.6;font-size:11pt;}.pdf-page-content+.pdf-page-content{margin-top:16px;padding-top:16px;border-top:1px solid #e5e5e5;}`;
-       return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${pdfCss}</style>\n</head>\n<body>\n${editorHtml}\n</body>\n</html>`;
-    }
     const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(editorHtml, false));
     return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${documentCss}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>`;
   }
@@ -1056,51 +951,9 @@
   els.resetBtn.addEventListener('click', () => {
     els.filebar.classList.add('d2h-hidden');
     els.workspace.classList.add('d2h-hidden');
-    els.pdfMode.classList.add('d2h-hidden');
     els.savePath.classList.add('d2h-hidden');
     els.dropzone.classList.remove('d2h-hidden');
     els.fileInput.value = '';
-  });
-  els.pdfEditableBtn.addEventListener('click', async () => {
-    els.pdfMode.classList.add('d2h-hidden');
-    setBusy(true);
-    try {
-      await convertPdfEditable(pendingPdfFile);
-      els.dropzone.classList.add('d2h-hidden');
-      els.filebar.classList.remove('d2h-hidden');
-      els.workspace.classList.remove('d2h-hidden');
-      refreshCodeEditor();
-    } catch (error) {
-      console.error(error);
-      alert('Unable to convert this PDF. Make sure the file is not corrupted or password-protected.');
-      els.dropzone.classList.remove('d2h-hidden');
-    } finally {
-      setBusy(false);
-      pendingPdfFile = null;
-    }
-  });
-  els.pdfImageBtn.addEventListener('click', async () => {
-    els.pdfMode.classList.add('d2h-hidden');
-    setBusy(true);
-    try {
-      await convertPdfImage(pendingPdfFile);
-      els.dropzone.classList.add('d2h-hidden');
-      els.filebar.classList.remove('d2h-hidden');
-      els.workspace.classList.remove('d2h-hidden');
-      refreshCodeEditor();
-    } catch (error) {
-      console.error(error);
-      alert('Unable to convert this PDF. Make sure the file is not corrupted or password-protected.');
-      els.dropzone.classList.remove('d2h-hidden');
-    } finally {
-      setBusy(false);
-      pendingPdfFile = null;
-    }
-  });
-  els.pdfCancelBtn.addEventListener('click', () => {
-    els.pdfMode.classList.add('d2h-hidden');
-    els.dropzone.classList.remove('d2h-hidden');
-    pendingPdfFile = null;
   });
   els.copyBtn.addEventListener('click', (event) => copyHtml(event.currentTarget));
   els.copyBottomBtn.addEventListener('click', (event) => copyHtml(event.currentTarget));

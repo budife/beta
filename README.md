@@ -24,7 +24,7 @@ BETA is a static web app built for validating campaign files, preparing database
 | Config eDM | Stable | Open and update eDM XML configuration files with safer field editing. |
 | Layout Checker | Stable | Load HTML layouts, apply KRHRED values, preview, open in a new tab, and capture screenshots when browser security allows. |
 | Layout Slicer | Beta | Slice flat JPG/PNG layouts into ordered image assets. |
-| DOCX/PDF to HTML | Stable | Convert DOCX and PDF files into upload-ready HTML directly in the browser. |
+| DOCX to HTML | Stable | Convert DOCX files into upload-ready HTML directly in the browser. |
 | TNC Uploader | Beta | Rename, queue, save, and generate public links for PDF terms and conditions. |
 | WFH Tracker | Stable | Track WFH/WFO/cuti/libur days with optional holiday sync. |
 

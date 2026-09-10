@@ -35,7 +35,7 @@ const ROUTES = {
 
   '/doc-to-html': {
     content: 'doc-to-html.md',
-    label: 'DOCX/PDF to HTML'
+    label: 'DOCX to HTML'
   },
   '/layout-checker': {
     content: 'layout-checker.md',
@@ -117,7 +117,7 @@ const TOOL_META = {
 
   '/doc-to-html': {
     icon: 'fa-solid fa-file-word',
-    label: 'DOCX/PDF to HTML'
+    label: 'DOCX to HTML'
   },
   '/layout-checker': {
     icon: 'fa-solid fa-ruler-combined',

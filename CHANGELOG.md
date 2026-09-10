@@ -42,6 +42,11 @@ All notable user-facing changes to BETA are tracked here.
 
 - Clarified on the Typo Checker button that only HTML text is scanned, not text inside images.
 
+## DOCX to HTML v1.3.0 - 10 September 2026
+
+- Removed PDF input and PDF conversion modes; the tool now focuses on DOCX to HTML conversion.
+- Font size controls now display numeric values.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.
