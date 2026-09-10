@@ -151,14 +151,14 @@ const TOOL_PRIVACY = {
   '/bookmarklet': 'Local only',
   '/campaign-counter': 'Local only',
   '/config-edm': 'Local only',
-  '/database-checker': 'External optional',
+  '/database-checker': 'External checks optional',
   '/database-generator': 'Local only',
 
-  '/layout-checker': 'External optional',
+  '/layout-checker': 'External checks optional',
   '/layout-slicer': 'Local only',
-  '/tnc-uploader': 'External optional',
+  '/tnc-uploader': 'External checks optional',
   '/text-correction': 'Local only',
-  '/wfh-tracker': 'Holiday sync optional',
+  '/wfh-tracker': 'External holiday sync',
   '/maintenance': 'Local only'
 };
 

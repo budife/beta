@@ -25,36 +25,10 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **Core v6.16.19** - Removed the DOCX to HTML beta badge.
 
 ### 10 September 2026
-- **DOCX to HTML v1.3.0** - Removed PDF conversion and changed preview font size controls to numeric values.
-- **DOCX to HTML v1.3.1** - Added custom numeric font-size input for preview editing.
-- **DOCX to HTML v1.3.2** - Combined font-size presets and custom entry into one numeric control.
-- **DOCX to HTML v1.3.3** - Preserved selected text when applying preview formatting controls.
-- **DOCX to HTML v1.3.4** - Fixed font-size dropdown selection and preserved the selected preview block.
-- **DOCX to HTML v1.3.5** - Added minus, editable numeric font size, and plus controls.
-- **DOCX to HTML v1.3.6** - Replaced the number spinner with a preset dropdown and numeric text input.
-- **DOCX to HTML v1.3.7** - Added a reliable visible font-size preset menu.
-- **DOCX to HTML v1.3.8** - Removed browser font-size autocomplete/history from the editor control.
-- **DOCX to HTML v1.3.9** - Removed the red focus ring from converter fields and CodeMirror.
 - **Text Correction v1.0.2** - Pasted content is now forced to plain text without rich-text formatting.
-- **Core v6.16.17** - Added Text Correction as the eleventh tool from the Epsilon workspace.
-- **Core v6.16.18** - Marked Text Correction as a local tool.
-- **Layout Slicer v0.5.4** - Added aligned line numbers and cleaner generated HTML code modal formatting.
-- **Layout Slicer v0.5.5** - Fixed generated CTA anchor and image indentation in the code modal.
-- **Layout Checker v2.1.8** - Added local HTML Typo Checker with dictionary and possible typo results in a modal.
-- **Layout Checker v2.1.9** - Centered the Typo Checker modal in the viewport.
-- **Layout Checker v2.1.10** - Clarified that Typo Checker scans HTML text only, not image text.
-- **DOCX/PDF to HTML v1.2.1** - Added conversion detail notes and a side-by-side Preview/HTML workspace on desktop.
-- **DOCX/PDF to HTML v1.2.2** - Preview left, editable full HTML code right, with live preview updates while editing.
-- **DOCX/PDF to HTML v1.2.3** - Fixed desktop alignment for the preview, controls, and editable HTML panel.
-- **DOCX/PDF to HTML v1.2.4** - Enabled CodeMirror with line numbers and HTML syntax mode in the editor.
-- **DOCX/PDF to HTML v1.2.5** - Fixed the desktop layout so the full CodeMirror editor stays visible on the right.
-- **DOCX/PDF to HTML v1.2.6** - Simplified the workspace to two direct columns: Preview left and HTML code right.
-- **DOCX/PDF to HTML v1.2.7** - Added visual DOCX rendering with docx-preview while keeping Mammoth for editable HTML.
-- **DOCX/PDF to HTML v1.2.8** - Uses the visual DOCX render as the editable source when available to preserve formatting more closely.
-- **DOCX/PDF to HTML v1.2.9** - Added Word-like preview editing with formatting controls and reset support.
-- **DOCX/PDF to HTML v1.2.10** - Prevented duplicate headers and footers when saving or opening edited DOCX output.
-- **DOCX/PDF to HTML v1.2.11** - Fixed Edit Preview to avoid duplicating DOCX visual headers and footers.
-- **DOCX/PDF to HTML** - Renamed the document conversion tool to clarify DOCX/PDF input and HTML output.
+- **DOCX to HTML v1.3.9** - Finalized the local DOCX conversion and editing workflow.
+- **Layout Checker v2.1.10** - Added local HTML Typo Checker with text-only scope clarification.
+- **Layout Slicer v0.5.5** - Fixed generated CTA anchor and image indentation.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.
 - **TNC Uploader v0.3.10** - Visible warning when a PDF was already uploaded to the selected destination.
@@ -140,10 +114,8 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **TNC Uploader v0.3.4 beta** - Put active dropped PDFs above saved history, clarified the selected destination and target path, and streamlined actions to pick a folder, save PDFs, or clear the queue.
 - **TNC Uploader v0.3.3 beta** - Added a persistent right-side Recent Activity log for local queue, folder, save, download, copy, check, and cleanup actions without changing the existing PDF history.
 
-[Older updates → Changelog](https://github.com/budife/beta/blob/main/CHANGELOG.md)
-
 ## System Info
 
 - **Available tools:** `11`
-- **Deployment:** GitHub Pages and local server
+- **Deployment:** Private GitHub Pages and local server
 - **Status:** All tools available

@@ -4,7 +4,7 @@ Budd Email Tools & Automation for everyday campaign work.
 
 BETA is a static web app built for validating campaign files, preparing database outputs, checking HTML layouts, managing campaign IDs, uploading TNC PDFs, slicing visual layouts, and tracking WFH/office days. It is intentionally lightweight: mostly vanilla HTML, CSS, and JavaScript, with browser-local storage where possible.
 
-[Live site](https://budife.github.io/beta/)
+Internal deployment; server URL is environment-specific.
 
 ## Highlights
 
@@ -34,6 +34,7 @@ This project is designed for internal-style daily work and avoids sending sensit
 
 - Database files, generated campaign IDs, WFH marks, and most tool data stay in the browser or selected local folders.
 - External network access is optional for features such as layout URL fetching, link checking, proxy fallback, or holiday sync.
+- DOCX to HTML loads Mammoth, JSZip, CodeMirror, and docx-preview from CDN assets; mirror these assets locally if the private server blocks outbound CDN access.
 - Campaign Counter Phase 1 uses Supabase with a public anon key for shared Campaign ID allocation and activity; the Monday bookmarklet remains browser-local.
 - Review the source before using it with confidential work. The code is plain static web code and can be inspected directly in this repository.
 
@@ -58,19 +59,15 @@ http://localhost:8000/layout-checker
 http://localhost:8000/tnc-uploader
 ```
 
-## GitHub Pages
+## Internal Deployment
 
-The app is configured for a project site under:
-
-```text
-https://budife.github.io/beta/
-```
+The app is intended for an authenticated private GitHub Pages or internal static deployment. Configure the final base path for the target environment before publishing.
 
 Important deployment details:
 
-- `.nojekyll` is included so GitHub Pages serves underscored and static files normally.
-- `404.html` acts as the SPA fallback so refresh on clean routes works.
-- Runtime code uses a base path helper for GitHub Pages project paths.
+- `.nojekyll` is included for static hosting environments that support it.
+- `404.html` acts as the SPA fallback for clean-route refreshes.
+- Runtime code uses a base path helper for project-site paths.
 - Asset and content fetch paths must stay relative or base-path aware.
 
 ## Browser Support

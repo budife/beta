@@ -16,7 +16,7 @@ const generatorFunctions = source.slice(functionStart, functionEnd);
 const sandbox = {};
 
 test('Database Generator HTML uses the current core cache-buster', () => {
-  assert.match(html, /pages-database-generator\.js\?v=6\.16\.14/);
+  assert.match(html, /pages-database-generator\.js\?v=6\.16\.19/);
   assert.doesNotMatch(html, /pages-database-generator\.js\?v=6\.14\.0/);
 });
 

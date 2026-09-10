@@ -79,3 +79,11 @@ test('shell loads required maintenance scripts', () => {
   assert.match(app, /local-backup\.js/, 'app.js lazy-loads local backup helper');
   assert.match(app, /privacy-settings\.js/, 'app.js lazy-loads privacy settings');
 });
+
+test('standalone tools use the current core version-config cache-buster', () => {
+  const toolsDir = path.join(root, 'tools');
+  for (const fileName of fs.readdirSync(toolsDir).filter((name) => name.endsWith('.html'))) {
+    const html = read(`tools/${fileName}`);
+    assert.match(html, /version-config\.js\?v=6\.16\.19/, `${fileName} uses current version config`);
+  }
+});
