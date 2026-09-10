@@ -36,6 +36,7 @@
 
     let best = null;
     for (const [typo, suggestion] of Object.entries(dictionary)) {
+      if (suggestion.toLowerCase() === lower) continue;
       if (Math.abs(typo.length - lower.length) > 1) continue;
       const score = distance(lower, typo);
       if (score <= 1 && (!best || score < best.score)) best = { word, suggestion, type: 'Possible typo', score };

@@ -65,6 +65,11 @@ test('Layout Checker includes local typo scanner assets', () => {
   assert.match(read('js/typo-engine.js'), /function scanHtml\(html\)/);
 });
 
+test('typo engine does not flag correctly spelled dictionary suggestions', () => {
+  const engine = read('js/typo-engine.js');
+  assert.match(engine, /if \(suggestion\.toLowerCase\(\) === lower\) continue;/);
+});
+
 test('shell loads required maintenance scripts', () => {
   const app = read('js/app.js');
   for (const file of ['index.html', '404.html']) {
