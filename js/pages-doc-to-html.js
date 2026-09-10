@@ -35,6 +35,7 @@
   let pendingPdfFile = null;
   let directoryHandle = null;
   let codeEditor = null;
+  let isDocxVisualMarkup = false;
 
   function getEditorValue() {
     return codeEditor ? codeEditor.getValue() : els.htmlOutput.value;
@@ -57,7 +58,14 @@
       indentUnit: 2,
       viewportMargin: Infinity,
     });
-    codeEditor.on('change', () => renderPreview(getEditorValue(), 'Preview updated from HTML editor', ''));
+    codeEditor.on('change', () => {
+      const value = getEditorValue();
+      if (isDocxVisualMarkup) {
+        els.preview.innerHTML = value;
+      } else {
+        renderPreview(value, 'Preview updated from HTML editor', '');
+      }
+    });
   }
 
   function refreshCodeEditor() {
@@ -698,7 +706,10 @@
       renderFootnotes: true,
       renderEndnotes: true,
     });
-    return true;
+    const markup = els.preview.innerHTML;
+    setEditorValue(markup);
+    isDocxVisualMarkup = true;
+    return Boolean(markup.trim());
   }
 
   async function convertFile(file) {
@@ -751,12 +762,15 @@
     els.outputFileName.value = pathPrefix + currentFileName;
     els.fileSize.textContent = formatBytes(file.size);
     els.fileIcon.textContent = 'W';
+    isDocxVisualMarkup = false;
     renderPreview(normalizedHtml || '<p>Document has no convertible content.</p>');
     setEditorValue(formatHtmlWithTabs(normalizedHtml));
     try {
-      await renderDocxVisual(arrayBuffer);
+      const rendered = await renderDocxVisual(arrayBuffer);
+      if (!rendered) throw new Error('Visual DOCX renderer returned no markup.');
     } catch (error) {
       console.warn('Visual DOCX preview unavailable; keeping HTML preview.', error);
+      isDocxVisualMarkup = false;
     }
     const count = els.preview.querySelectorAll('*').length;
     els.elementCount.textContent = `${count} elements`;
@@ -788,6 +802,7 @@
   }
 
   async function convertPdfEditable(file) {
+    isDocxVisualMarkup = false;
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     const arrayBuffer = await file.arrayBuffer();
@@ -832,6 +847,7 @@
   }
 
   async function convertPdfImage(file) {
+    isDocxVisualMarkup = false;
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     const arrayBuffer = await file.arrayBuffer();
