@@ -109,7 +109,6 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ## Useful Links
 
-- [GitHub Repository](https://github.com/budife/beta) - Source code and project history.
 - [Report an Issue](https://github.com/budife/beta/issues) - Submit a bug or improvement request.
 - [Changelog](https://github.com/budife/beta/blob/main/CHANGELOG.md) - Read full release notes.
 - [Maintenance](/maintenance) - Local backup/restore, privacy switches, and release checklist.
