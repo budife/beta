@@ -499,6 +499,9 @@
 }
 
 .lc-typo-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
   width: min(620px, calc(100vw - 32px));
   max-height: min(720px, calc(100vh - 32px));
   padding: 0;

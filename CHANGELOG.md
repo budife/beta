@@ -34,6 +34,10 @@ All notable user-facing changes to BETA are tracked here.
 - Added a local HTML Typo Checker button beside Screenshot with all results shown in a responsive modal.
 - Added shared English and Indonesian typo dictionary with explicit and possible typo detection.
 
+## Layout Checker v2.1.9 - 10 September 2026
+
+- Centered the Typo Checker modal consistently in the viewport.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
