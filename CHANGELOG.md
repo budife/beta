@@ -28,6 +28,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Added explicit plain-text paste handling to remove rich-text formatting from pasted content.
 
+## Layout Slicer v0.5.4 - 10 September 2026
+
+- Pretty-formatted the generated HTML Code output with consistent indentation and multiline image attributes.
+
 ## TNC Uploader v0.3.10 - 10 September 2026
 
 - Made duplicate PDF warnings visible when a queued PDF was already saved in the selected destination.

@@ -1437,10 +1437,10 @@
       const num = String(i + 1).padStart(2, '0');
       const alt = escapeAttribute(slice.useAlt ? (slice.alt || 'image') : 'image');
       const src = `images/${prefix}_${num}.jpg`;
-      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
+      const imgTag = `<img\n      class="img_scale"\n      src="${src}"\n      editable="true"\n      alt="${alt}"\n      style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);"\n      border="0"\n      width="600"\n    />`;
       
       if (slice.cta && slice.link) {
-        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+        return `<a\n    href="${escapeAttribute(slice.link)}"\n    target="_blank"\n    title="${alt}"\n  >\n    ${imgTag}\n  </a>`;
       }
       return imgTag;
     }
@@ -1449,15 +1449,15 @@
       const num = String(i + 1).padStart(2, '0');
       const alt = escapeAttribute(slice.useAlt ? (slice.alt || 'image') : 'image');
       const src = `images/${prefix}_${num}.jpg`;
-      const imgTag = `<img class="img_scale" src="${src}" editable="true" alt="${alt}" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="300" />`;
+      const imgTag = `<img\n      class="img_scale"\n      src="${src}"\n      editable="true"\n      alt="${alt}"\n      style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);"\n      border="0"\n      width="300"\n    />`;
       
       if (slice.cta && slice.link) {
-        return `<a href="${escapeAttribute(slice.link)}" target="_blank" title="${alt}">\n${imgTag}\n</a>`;
+        return `<a\n    href="${escapeAttribute(slice.link)}"\n    target="_blank"\n    title="${alt}"\n  >\n    ${imgTag}\n  </a>`;
       }
       return imgTag;
     }
 
-    const cardImageTag = `<img class="img_scale" src="images/template/header-hsbc.jpg" editable="true" alt="HSBC Card" style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);" border="0" width="600" />`;
+    const cardImageTag = `<img\n      class="img_scale"\n      src="images/template/header-hsbc.jpg"\n      editable="true"\n      alt="HSBC Card"\n      style="display: block; text-decoration: none; border-color: rgb(238, 53, 37); color: rgb(238, 53, 37);"\n      border="0"\n      width="600"\n    />`;
 
     code += `<!-- START OF IMAGE-->\n`;
     code += `<tr data-remove="ds-remove-1" class="ds-remove">\n`;
