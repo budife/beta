@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.16.16',
+    version: '6.16.17',
     status: 'stable'
   },
   home: {
@@ -58,6 +58,11 @@ const TOOL_VERSIONS = {
   'tnc-uploader': {
     label: 'TNC Uploader',
     version: '0.3.11',
+    status: 'stable'
+  },
+  'text-correction': {
+    label: 'Text Correction',
+    version: '1.0.0',
     status: 'stable'
   },
   'wfh-tracker': {

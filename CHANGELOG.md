@@ -12,6 +12,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Corrected Home tool count to exclude Maintenance and improved Bookmarklet mobile layout.
 
+## Core v6.16.17 - 10 September 2026
+
+- Added Text Correction as the eleventh tool using the Epsilon workspace page.
+
 ## TNC Uploader v0.3.10 - 10 September 2026
 
 - Made duplicate PDF warnings visible when a queued PDF was already saved in the selected destination.

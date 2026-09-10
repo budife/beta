@@ -17,10 +17,13 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - [Layout Checker](/layout-checker)
 - [Layout Slicer](/layout-slicer)
 - [Campaign Counter](/campaign-counter)
+- [Text Correction](/text-correction)
 
 ## Recent Updates
 
 ### 10 September 2026
+- **Text Correction** - Added the text correction tool from the Epsilon workspace.
+- **Core v6.16.17** - Added Text Correction as the eleventh tool from the Epsilon workspace.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.
 - **TNC Uploader v0.3.10** - Visible warning when a PDF was already uploaded to the selected destination.
@@ -110,6 +113,6 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ## System Info
 
-- **Available tools:** `10`
+- **Available tools:** `11`
 - **Deployment:** GitHub Pages and local server
 - **Status:** All tools available

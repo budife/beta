@@ -42,7 +42,7 @@ test('all tool routes have a tool version entry', () => {
 test('home tool count excludes maintenance route', () => {
   const app = read('js/app.js');
   assert.match(app, /const TOOL_COUNT = Object\.keys\(TOOL_META\)\.filter\(\(path\) => path !== '\/maintenance'\)\.length;/);
-  assert.match(read('content/home.md'), /\*\*Available tools:\*\* `10`/);
+  assert.match(read('content/home.md'), /\*\*Available tools:\*\* `11`/);
 });
 
 test('tool markdown files point to existing HTML tools', () => {
@@ -51,6 +51,7 @@ test('tool markdown files point to existing HTML tools', () => {
     const toolMatch = markdown.match(/^tool:\s*(.+)$/m);
     if (!toolMatch) continue;
     const toolPath = toolMatch[1].trim().replace(/^\/+/, '').split('?')[0];
+    if (/^https?:\/\//i.test(toolPath)) continue;
     assert.ok(fs.existsSync(path.join(root, toolPath)), `${fileName} tool exists at ${toolPath}`);
   }
 });

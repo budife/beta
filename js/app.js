@@ -49,6 +49,10 @@ const ROUTES = {
     content: 'tnc-uploader.md',
     label: 'TNC Uploader'
   },
+  '/text-correction': {
+    content: 'text-correction.md',
+    label: 'Text Correction'
+  },
   '/wfh-tracker': {
     content: 'wfh-tracker.md',
     label: 'WFH Tracker'
@@ -127,6 +131,10 @@ const TOOL_META = {
     icon: 'fa-solid fa-file-pdf',
     label: 'TNC Uploader'
   },
+  '/text-correction': {
+    icon: 'fa-solid fa-spell-check',
+    label: 'Text Correction'
+  },
   '/wfh-tracker': {
     icon: 'fa-solid fa-calendar-days',
     label: 'WFH Tracker'
@@ -149,6 +157,7 @@ const TOOL_PRIVACY = {
   '/layout-checker': 'External optional',
   '/layout-slicer': 'Local only',
   '/tnc-uploader': 'External optional',
+  '/text-correction': 'External tool',
   '/wfh-tracker': 'Holiday sync optional',
   '/maintenance': 'Local only'
 };
@@ -935,7 +944,11 @@ async function renderPage(path, route, markdown) {
   const description = attributes.description || '';
   const icon = attributes.icon || 'fa-solid fa-wand-magic-sparkles';
   const category = attributes.category || 'BETA';
-  const tool = attributes.tool ? withQueryParam(withBasePath(attributes.tool), 'embed', '1') : '';
+  const tool = attributes.tool
+    ? /^https?:\/\//i.test(attributes.tool)
+      ? attributes.tool
+      : withQueryParam(withBasePath(attributes.tool), 'embed', '1')
+    : '';
   const isHome = route.content === 'home.md';
   const isDocs = route.source === 'docs';
 
