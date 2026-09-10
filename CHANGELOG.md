@@ -47,6 +47,10 @@ All notable user-facing changes to BETA are tracked here.
 - Removed PDF input and PDF conversion modes; the tool now focuses on DOCX to HTML conversion.
 - Font size controls now display numeric values.
 
+## DOCX to HTML v1.3.1 - 10 September 2026
+
+- Added a custom numeric font-size input for preview editing.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.

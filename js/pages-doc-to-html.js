@@ -29,6 +29,7 @@
     editPreviewBtn: document.getElementById('d2h-edit-preview-btn'),
     resetPreviewBtn: document.getElementById('d2h-reset-preview-btn'),
     editTools: document.getElementById('d2h-edit-tools'),
+    customFontSize: document.getElementById('d2h-custom-font-size'),
   };
 
   let directoryHandle = null;
@@ -928,6 +929,18 @@
       syncPreviewToEditor();
       els.preview.querySelector('.document-content')?.focus();
     });
+  });
+  els.customFontSize?.addEventListener('change', () => {
+    if (!previewEditing) return;
+    const size = Number(els.customFontSize.value);
+    if (!Number.isFinite(size) || size < 6 || size > 96) return;
+    document.execCommand('fontSize', false, '7');
+    els.preview.querySelectorAll('font[size="7"]').forEach((element) => {
+      element.removeAttribute('size');
+      element.style.fontSize = `${size}px`;
+    });
+    syncPreviewToEditor();
+    els.preview.querySelector('.document-content')?.focus();
   });
   els.preview.addEventListener('input', () => {
     if (previewEditing) syncPreviewToEditor();
