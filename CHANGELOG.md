@@ -8,6 +8,12 @@ All notable user-facing changes to eDM Helper are tracked here.
 - Recent Activity now shows last 20 entries instead of 10.
 - Activity list auto-refreshes after folder scan, refresh, or reset.
 
+## Database Generator v1.5.9 - 5 September 2026
+
+- Fixed the JavaScript cache-buster so deployed pages load the current generator behavior.
+- Removed unused bulk toggle code.
+- Added Static/Dynamic mode hints and improved table input accessibility and invalid email states.
+
 ## Database Generator v1.5.8 - 5 September 2026
 
 - Compact 780px centered shell.
