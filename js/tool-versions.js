@@ -41,7 +41,7 @@ const TOOL_VERSIONS = {
   },
 
   'doc-to-html': {
-    label: 'Doc to HTML',
+    label: 'DOCX/PDF to HTML',
     version: '1.2.0',
     status: 'stable'
   },
