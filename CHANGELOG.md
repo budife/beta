@@ -67,6 +67,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Reworked font-size control into decrease, editable numeric value, and increase controls.
 
+## DOCX to HTML v1.3.6 - 10 September 2026
+
+- Replaced the native number spinner with a text input and preset datalist dropdown.
+
 ## DOCX/PDF to HTML v1.2.1 - 10 September 2026
 
 - Added expandable conversion details so unsupported Word formatting areas are easier to identify.

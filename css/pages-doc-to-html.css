@@ -552,6 +552,7 @@ textarea#d2h-html-output {
 .d2h-font-size-control button { width: 25px; height: 28px; padding: 0; color: var(--text-muted, #6b7280); background: #fff; border: 1px solid var(--border, #e5e7eb); cursor: pointer; font-size: 15px; line-height: 1; }
 .d2h-font-size-control button:hover { color: var(--accent-primary, #f3838b); border-color: var(--accent-primary, #f3838b); }
 .d2h-font-size { width: 48px; height: 28px; padding: 2px 4px; border: 1px solid var(--border, #e5e7eb); border-right: 0; border-left: 0; color: var(--text, #111827); font-size: 11px; text-align: center; }
+.d2h-font-size::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .7; }
 
 .d2h-panel-html .CodeMirror {
   height: 100%;

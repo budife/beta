@@ -28,6 +28,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **DOCX to HTML v1.3.3** - Preserved selected text when applying preview formatting controls.
 - **DOCX to HTML v1.3.4** - Fixed font-size dropdown selection and preserved the selected preview block.
 - **DOCX to HTML v1.3.5** - Added minus, editable numeric font size, and plus controls.
+- **DOCX to HTML v1.3.6** - Replaced the number spinner with a preset dropdown and numeric text input.
 - **Text Correction v1.0.2** - Pasted content is now forced to plain text without rich-text formatting.
 - **Core v6.16.17** - Added Text Correction as the eleventh tool from the Epsilon workspace.
 - **Core v6.16.18** - Marked Text Correction as a local tool.
