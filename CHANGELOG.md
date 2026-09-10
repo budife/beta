@@ -56,6 +56,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Fixed desktop workspace alignment: Preview stays on the left, while the view controls and code editor stay on the right.
 
+## DOCX/PDF to HTML v1.2.4 - 10 September 2026
+
+- Enabled CodeMirror with line numbers and HTML syntax mode in the right-side editor.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.

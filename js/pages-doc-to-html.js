@@ -16,7 +16,6 @@
     savePath: document.getElementById('d2h-save-path'),
     preview: document.getElementById('d2h-preview'),
     htmlOutput: document.getElementById('d2h-html-output'),
-    editor: document.getElementById('d2h-editor'),
     elementCount: document.getElementById('d2h-element-count'),
     copyBtn: document.getElementById('d2h-copy-btn'),
     copyBottomBtn: document.getElementById('d2h-copy-bottom-btn'),
@@ -43,26 +42,22 @@
 
   function setEditorValue(value) {
     const next = value || '';
-    els.htmlOutput.value = next;
-    if (codeEditor && codeEditor.getValue() !== next) codeEditor.setValue(next);
+    if (codeEditor) codeEditor.setValue(next);
+    else els.htmlOutput.value = next;
   }
 
-  function initEditor() {
-    if (!window.CodeMirror || !els.editor || codeEditor) return;
-    codeEditor = window.CodeMirror(els.editor, {
-      value: els.htmlOutput.value || '',
-      mode: 'htmlmixed',
-      theme: 'eclipse',
+  function initCodeEditor() {
+    if (!window.CodeMirror || codeEditor || !els.htmlOutput) return;
+    codeEditor = window.CodeMirror.fromTextArea(els.htmlOutput, {
+      mode: 'text/html',
+      theme: 'dracula',
       lineNumbers: true,
-      lineWrapping: true,
-      indentUnit: 2,
+      lineWrapping: false,
       tabSize: 2,
-      autoCloseTags: true,
-      viewportMargin: Infinity
+      indentUnit: 2,
+      viewportMargin: Infinity,
     });
-    codeEditor.on('change', () => {
-      renderPreview(getEditorValue(), 'Preview updated from HTML editor', '');
-    });
+    codeEditor.on('change', () => renderPreview(getEditorValue(), 'Preview updated from HTML editor', ''));
   }
 
   const documentCss = `
@@ -192,15 +187,6 @@
       return `<${element.tagName.toLowerCase()}${attributes}>`;
     };
 
-    function serializeInline(node) {
-      if (node.nodeType === Node.TEXT_NODE) return node.textContent.replace(/\s+/g, ' ');
-      if (node.nodeType !== Node.ELEMENT_NODE) return '';
-      const tagName = node.tagName.toLowerCase();
-      const opening = openingTag(node);
-      if (voidTags.has(node.tagName)) return opening;
-      return `${opening}${[...node.childNodes].map(serializeInline).join('')}</${tagName}>`;
-    }
-
     function serializeNode(node, depth) {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent.replace(/\s+/g, ' ').trim();
@@ -214,8 +200,7 @@
 
       const hasBlockChild = [...node.children].some((child) => blockTags.has(child.tagName));
       if (!hasBlockChild) {
-        const value = [...node.childNodes].map(serializeInline).join('').replace(/\s+/g, ' ').trim();
-        return `${indent(depth)}${opening}${value}</${tagName}>`;
+        return `${indent(depth)}${opening}${node.innerHTML}</${tagName}>`;
       }
 
       const lines = [];
@@ -247,9 +232,9 @@
             lines.push(`${indent(depth + 1)}<br>`);
           }
         } else if (child.nodeType === Node.TEXT_NODE) {
-          inlineBuffer += serializeInline(child);
+          inlineBuffer += child.textContent;
         } else if (child.nodeType === Node.ELEMENT_NODE) {
-          inlineBuffer += serializeInline(child);
+          inlineBuffer += child.outerHTML;
         }
       });
       flushInline();
@@ -871,7 +856,7 @@
     const isPdf = editorHtml.includes('pdf-page') || editorHtml.includes('pdf-page-content');
     if (isPdf) {
       const pdfCss = `body{margin:0;padding:24px;background:#e8e8e8;font-family:Arial,sans-serif;}.pdf-pages{max-width:min(210mm,calc(100% - 48px));margin:0 auto;}.pdf-page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.12);margin-bottom:20px;}.pdf-page img{display:block;width:100%;height:auto;}.pdf-page-label{padding:6px 0;text-align:center;color:#6b7280;font-size:12px;}.pdf-page-content{padding:8px 0;line-height:1.6;font-size:11pt;}.pdf-page-content+.pdf-page-content{margin-top:16px;padding-top:16px;border-top:1px solid #e5e5e5;}`;
-      return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${pdfCss}</style>\n</head>\n<body>\n${editorHtml}\n</body>\n</html>`;
+       return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${pdfCss}</style>\n</head>\n<body>\n${editorHtml}\n</body>\n</html>`;
     }
     const bodyHtml = formatHtmlWithTabs(wrapWithDocumentTemplate(editorHtml, false));
     return `<!doctype html>\n<html lang="id">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${safeTitle}</title>\n<style>${documentCss}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>`;
@@ -1033,7 +1018,7 @@
   els.outputFileName.addEventListener('blur', (event) => {
     currentFileName = extractFileName(sanitizeFileName(event.currentTarget.value)) || 'document';
   });
-  initEditor();
+  initCodeEditor();
 
   // Beta warning dialog
   const betaDialog = document.getElementById('d2h-beta-dialog');
