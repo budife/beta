@@ -593,12 +593,7 @@ function enhanceHomeDashboard(container) {
 
         sub.querySelectorAll('code').forEach((code) => {
           if (code.textContent.trim().toLowerCase() !== 'budd') return;
-          const creatorLink = document.createElement('button');
-          creatorLink.className = 'creator-link recent-creator-link';
-          creatorLink.type = 'button';
-          creatorLink.dataset.creatorModal = '';
-          creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span>';
-          code.replaceWith(creatorLink);
+           code.textContent = 'budife.psd';
         });
 
         tabContent.appendChild(panel);
@@ -625,12 +620,7 @@ function enhanceHomeDashboard(container) {
       updateItems[0]?.classList.add('latest-update');
       updates.querySelectorAll('code').forEach((code) => {
         if (code.textContent.trim().toLowerCase() !== 'budd') return;
-        const creatorLink = document.createElement('button');
-        creatorLink.className = 'creator-link recent-creator-link';
-        creatorLink.type = 'button';
-        creatorLink.dataset.creatorModal = '';
-        creatorLink.innerHTML = 'budd<span class="creator-popover" role="tooltip"><strong>meet the maker</strong></span>';
-        code.replaceWith(creatorLink);
+         code.textContent = 'budife.psd';
       });
     }
   }
@@ -921,7 +911,7 @@ function activateRoutePage(path) {
   deactivateRoutePages();
   page.hidden = false;
   activeRoutePath = path;
-  document.title = page.dataset.documentTitle || `${ROUTES[path]?.label || 'eDM Helper'} | eDM Helper`;
+  document.title = page.dataset.documentTitle || `${ROUTES[path]?.label || 'BETA'} | BETA`;
   viewport.scrollTop = routeScrollPositions.get(path) || 0;
   viewport.focus({ preventScroll: true });
   return true;
@@ -942,12 +932,12 @@ async function renderPage(path, route, markdown) {
   const title = attributes.title || route.label;
   const description = attributes.description || '';
   const icon = attributes.icon || 'fa-solid fa-wand-magic-sparkles';
-  const category = attributes.category || 'eDM Helper';
+  const category = attributes.category || 'BETA';
   const tool = attributes.tool ? withQueryParam(withBasePath(attributes.tool), 'embed', '1') : '';
   const isHome = route.content === 'home.md';
   const isDocs = route.source === 'docs';
 
-  const documentTitle = `${title} | eDM Helper`;
+  const documentTitle = `${title} | BETA`;
   document.title = documentTitle;
 
   const intro = `
@@ -1032,30 +1022,30 @@ async function renderPage(path, route, markdown) {
 }
 
 function renderNotFound() {
-  document.title = 'Page Not Found | eDM Helper';
+  document.title = 'Page Not Found | BETA';
   showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">404</p>
       <h1>Page not found</h1>
-      <p>The requested eDM Helper tool does not exist.</p>
+      <p>The requested BETA tool does not exist.</p>
       <a href="${withBasePath('/')}" data-route data-route-path="/">Back to overview</a>
     </section>
   `);
 }
 
 function renderLocalServerWarning() {
-  document.title = 'Local Server Required | eDM Helper';
+  document.title = 'Local Server Required | BETA';
   showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">Local file</p>
       <h1>Unable to load this tool</h1>
-      <p>Please run eDM Helper through its local server instead of opening the HTML file directly.</p>
+      <p>Please run BETA through its local server instead of opening the HTML file directly.</p>
     </section>
   `);
 }
 
 function renderContentError(error) {
-  document.title = 'Content Error | eDM Helper';
+  document.title = 'Content Error | BETA';
   showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">Content error</p>

@@ -1,9 +1,15 @@
 ---
-title: eDM Helper
-description: Email marketing utilities, campaign references, and everyday productivity tools in one workspace.
+title: BETA
+description: Budd Email Tools & Automation for campaign work and everyday productivity.
 icon: fa-solid fa-layer-group
 category: Home
 ---
+
+## Welcome to BETA
+
+**Budd Email Tools & Automation** is a focused workspace for campaign operations, database preparation, layout checks, and everyday marketing utilities.
+
+Use the sidebar to open a tool, or start with one of the quick access links below.
 
 ## Quick Access
 
