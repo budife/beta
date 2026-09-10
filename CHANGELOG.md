@@ -60,6 +60,10 @@ All notable user-facing changes to BETA are tracked here.
 
 - Enabled CodeMirror with line numbers and HTML syntax mode in the right-side editor.
 
+## DOCX/PDF to HTML v1.2.5 - 10 September 2026
+
+- Forced the desktop layout to show the full editable CodeMirror panel on the right of the preview.
+
 ## Text Correction v1.0.1 - 10 September 2026
 
 - Migrated Text Correction into a local BETA tool with the same case conversion, copy, download, and clear workflows.
