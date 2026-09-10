@@ -40,6 +40,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **DOCX/PDF to HTML v1.2.8** - Uses the visual DOCX render as the editable source when available to preserve formatting more closely.
 - **DOCX/PDF to HTML v1.2.9** - Added Word-like preview editing with formatting controls and reset support.
 - **DOCX/PDF to HTML v1.2.10** - Prevented duplicate headers and footers when saving or opening edited DOCX output.
+- **DOCX/PDF to HTML v1.2.11** - Fixed Edit Preview to avoid duplicating DOCX visual headers and footers.
 - **DOCX/PDF to HTML** - Renamed the document conversion tool to clarify DOCX/PDF input and HTML output.
 - **Core v6.16.16** - Corrected the tool count to 10 and improved Bookmarklet mobile layout.
 - **Core v6.16.15** - Rebranded the app as BETA, added a welcome section, and simplified footer attribution to non-clickable `budife.psd`.

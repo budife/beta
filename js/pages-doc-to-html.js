@@ -706,6 +706,8 @@
     const content = els.preview.querySelector('.document-content');
     if (!content) return;
     const clone = content.cloneNode(true);
+    clone.querySelector('.document-header')?.remove();
+    clone.querySelector('.document-footer')?.remove();
     clone.removeAttribute('contenteditable');
     clone.classList.remove('d2h-preview-editing');
     setEditorValue(formatHtmlWithTabs(clone.innerHTML));
@@ -1006,7 +1008,10 @@
     els.editPreviewBtn.textContent = previewEditing ? 'Done editing' : 'Edit preview';
     els.resetPreviewBtn?.classList.toggle('d2h-hidden', !previewEditing);
     els.editTools?.classList.toggle('d2h-hidden', !previewEditing);
-    if (previewEditing) enablePreviewEditing();
+    if (previewEditing) {
+      renderPreview(docxEditableHtml || getEditorValue());
+      enablePreviewEditing();
+    }
     else syncPreviewToEditor();
   });
   els.resetPreviewBtn?.addEventListener('click', () => {
