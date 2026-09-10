@@ -30,6 +30,7 @@
     resetPreviewBtn: document.getElementById('d2h-reset-preview-btn'),
     editTools: document.getElementById('d2h-edit-tools'),
     fontSize: document.getElementById('d2h-font-size'),
+    fontSizeMenu: document.getElementById('d2h-font-size-menu'),
     fontSizeDown: document.getElementById('d2h-font-size-down'),
     fontSizeUp: document.getElementById('d2h-font-size-up'),
   };
@@ -956,6 +957,24 @@
   els.fontSize?.addEventListener('mousedown', () => {
     if (selectionIsInPreview()) savePreviewSelection();
   });
+  els.fontSize?.addEventListener('focus', () => {
+    if (previewEditing) els.fontSizeMenu?.removeAttribute('hidden');
+  });
+  els.fontSize?.addEventListener('click', () => {
+    if (previewEditing) els.fontSizeMenu?.removeAttribute('hidden');
+  });
+  els.fontSizeMenu?.querySelectorAll('[data-font-size]').forEach((option) => {
+    option.addEventListener('mousedown', (event) => event.preventDefault());
+    option.addEventListener('click', () => {
+      if (selectionIsInPreview()) savePreviewSelection();
+      els.fontSize.value = option.dataset.fontSize;
+      els.fontSizeMenu.hidden = true;
+      els.fontSize.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+  document.addEventListener('mousedown', (event) => {
+    if (!event.target.closest('.d2h-font-size-control')) els.fontSizeMenu?.setAttribute('hidden', '');
+  });
   els.fontSize?.addEventListener('change', () => {
     if (!previewEditing) return;
     restorePreviewSelection();
@@ -968,6 +987,7 @@
     });
     syncPreviewToEditor();
     els.preview.querySelector('.document-content')?.focus();
+    els.fontSizeMenu?.setAttribute('hidden', '');
   });
   function changeFontSize(delta) {
     if (!previewEditing) return;
