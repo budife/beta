@@ -60,6 +60,10 @@
     codeEditor.on('change', () => renderPreview(getEditorValue(), 'Preview updated from HTML editor', ''));
   }
 
+  function refreshCodeEditor() {
+    window.requestAnimationFrame(() => codeEditor?.refresh?.());
+  }
+
   const documentCss = `
     :root { color: #111; background: #ececec; font-family: Arial, Helvetica, sans-serif; }
     * { box-sizing: border-box; }
@@ -700,6 +704,7 @@
       els.dropzone.classList.add('d2h-hidden');
       els.filebar.classList.remove('d2h-hidden');
       els.workspace.classList.remove('d2h-hidden');
+      refreshCodeEditor();
     } catch (error) {
       console.error(error);
       alert('Unable to convert this document. Make sure the file is not corrupted or password-protected.');
@@ -975,6 +980,7 @@
       els.dropzone.classList.add('d2h-hidden');
       els.filebar.classList.remove('d2h-hidden');
       els.workspace.classList.remove('d2h-hidden');
+      refreshCodeEditor();
     } catch (error) {
       console.error(error);
       alert('Unable to convert this PDF. Make sure the file is not corrupted or password-protected.');
@@ -992,6 +998,7 @@
       els.dropzone.classList.add('d2h-hidden');
       els.filebar.classList.remove('d2h-hidden');
       els.workspace.classList.remove('d2h-hidden');
+      refreshCodeEditor();
     } catch (error) {
       console.error(error);
       alert('Unable to convert this PDF. Make sure the file is not corrupted or password-protected.');

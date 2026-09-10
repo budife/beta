@@ -542,6 +542,17 @@ textarea#d2h-html-output {
   font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+.d2h-panel-html .CodeMirror {
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.d2h-panel-html .CodeMirror-scroll {
+  min-height: 0;
+}
+
 /* ── PDF mode selector ────────────────────────────── */
 
 .d2h-pdf-mode {
