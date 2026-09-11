@@ -134,7 +134,7 @@ Before calling a feature or fix done:
 
 ## Credits
 
-Created and maintained by [budife](https://github.com/budife).
+Created and maintained as an internal BETA toolkit.
 
 Built with vanilla HTML, CSS, JavaScript, Markdown, Font Awesome, CodeMirror, SheetJS/XLSX, File System Access API, IndexedDB, localStorage, and GitHub Pages.
 

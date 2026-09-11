@@ -14,8 +14,6 @@
 const CONFIG = {
   // Allowed frontend origins. Add any additional origins you need.
   allowedOrigins: [
-    'https://budife.github.io',
-    'https://budife.github.io/beta',
     'http://localhost:5500',
     'http://127.0.0.1:5500',
     'http://localhost:3000',

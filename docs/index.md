@@ -383,22 +383,20 @@ Hi rakyat, terima kasih sudah menyempatkan waktu buat mengecek web app buatan sa
 
 Tujuan web app ini dibuat karena saya malas dan biar kerja repetitif jadi lebih sat set. It should be a sederhana web, but here we are: jauh dari kata sempurna, but it is useful.
 
-100% aman untuk workflow lokal yang sensitif. Source code bisa dilihat di repo GitHub saya: [github.com/budife/beta](https://github.com/budife/beta).
+100% aman untuk workflow lokal yang sensitif. BETA memproses data di browser atau folder lokal sesuai fungsi yang sedang digunakan.
 
-Kalau mau utak-atik sendiri, fork aja. Kalau ada bug, request, atau complain, pakai form feedback dari creator modal. Form itu hanya membuka draft email ke `budi.indra94@gmail.com`.
+Untuk deployment internal, gunakan prosedur maintenance dan security yang berlaku di environment target.
 
 Enjoy bro n sis.
 
 Cheers,
 
-**budd the Lazy**
+**BETA internal toolkit**
 :::
 
 :::details Credits
 
-- **budd the Lazy** - built, broke, fixed, tested, and kept going.
-- **OpenAI Codex** - coding partner for planning, refactoring, debugging, and release notes.
-- **GitHub & GitHub Pages** - source repository, version history, and deployment flow.
+- **BETA** - internal campaign operations toolkit.
 - **Vanilla JavaScript, CSS, and Markdown** - the simple stack behind the app shell and documentation.
 - **Font Awesome** - icon set for the sidebar, buttons, and tool UI.
 - **SheetJS/XLSX** - local Monday XLSX imports for Campaign Counter.
