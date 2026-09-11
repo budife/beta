@@ -23,6 +23,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ### 11 September 2026
 - **Core v6.16.19** - Removed the DOCX to HTML beta badge.
+- **DOCX to HTML v1.3.10** - Removed the obsolete beta warning popup.
 
 ### 10 September 2026
 - **Text Correction v1.0.2** - Pasted content is now forced to plain text without rich-text formatting.
