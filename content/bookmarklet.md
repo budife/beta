@@ -1,7 +1,0 @@
----
-title: Bookmarklet
-description: Browser shortcuts for quick eDM actions and repetitive daily tasks.
-icon: fa-solid fa-bookmark
-category: Tools
-tool: /tools/bookmarklet.html?embed=1
----

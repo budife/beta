@@ -1,125 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="BETA - Budd Email Tools &amp; Automation">
-  <meta name="theme-color" content="#F18C8E">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-   <link rel="stylesheet" href="css/tokens.css?v=6.16.19">
-   <link rel="stylesheet" href="css/theme.css?v=6.16.19">
-   <link rel="stylesheet" href="css/app.css?v=6.16.19">
-   <link rel="stylesheet" href="css/controls.css?v=6.16.19">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-  <title>BETA - Budd Email Tools &amp; Automation</title>
+  <meta name="description" content="BETA project completion notice">
+  <meta name="theme-color" content="#172554">
+  <title>BETA | Project Completed</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #081226; color: #eef6ff; }
+    * { box-sizing: border-box; }
+    body { display: grid; min-width: 320px; min-height: 100vh; margin: 0; background: radial-gradient(circle at 18% 12%, rgba(91,105,173,.18), transparent 28%), radial-gradient(circle at 82% 70%, rgba(83,54,121,.2), transparent 32%), linear-gradient(145deg, #030817 0%, #08132b 45%, #111532 72%, #1a1230 100%); }
+    #fireworks { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+    main { display: grid; place-items: center; width: min(100% - 32px, 760px); margin: auto; }
+    .glass-card { position: relative; z-index: 1; width: 100%; padding: clamp(32px, 7vw, 72px); text-align: center; background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.24); border-radius: 32px; box-shadow: 0 24px 80px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.18); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    .brand { display: inline-grid; width: 58px; height: 58px; place-items: center; margin-bottom: 24px; font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #9eabc9, #9d8fb9); border: 1px solid rgba(255,255,255,.45); border-radius: 18px; }
+    .eyebrow { margin: 0 0 12px; color: #c6c9e2; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(32px, 7vw, 58px); line-height: 1.05; letter-spacing: -.04em; }
+    p { max-width: 560px; margin: 22px auto 0; color: rgba(238,246,255,.76); font-size: clamp(15px, 2vw, 18px); line-height: 1.7; }
+    .contact { display: inline-flex; gap: 10px; align-items: center; margin-top: 30px; padding: 13px 18px; font-weight: 700; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 999px; }
+    .contact::before { content: "✦"; color: #d9c7d5; }
+    footer { position: fixed; right: 24px; bottom: 18px; left: 24px; color: rgba(238,246,255,.48); font-size: 12px; text-align: center; }
+    @media (max-width: 520px) { body { overflow: auto; } .glass-card { border-radius: 24px; } footer { position: static; margin: 20px 0; } }
+  </style>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation">
-      <a class="sidebar-brand" href="./" data-route>
-        <span class="brand-mark" aria-hidden="true">B</span>
-        <span>
-          <strong>BETA</strong>
-          <small>Budd Email Tools &amp; Automation</small>
-        </span>
-      </a>
-
-      <nav class="sidebar-navigation">
-        <div class="nav-group">
-          <p class="nav-group-label">Database</p>
-          <a class="sidebar-link" href="database-checker" data-route>
-            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-            <span>Database Checker</span>
-          </a>
-          <a class="sidebar-link" href="database-generator" data-route>
-            <i class="fa-solid fa-database" aria-hidden="true"></i>
-            <span>Database Generator</span>
-          </a>
-        </div>
-
-        <div class="nav-group">
-          <p class="nav-group-label">Tools</p>
-          <a class="sidebar-link" href="bookmarklet" data-route>
-            <i class="fa-solid fa-bookmark" aria-hidden="true"></i>
-            <span>Bookmarklet</span>
-          </a>
-          <a class="sidebar-link" href="campaign-counter" data-route>
-            <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-            <span>Campaign Counter</span>
-          </a>
-          <a class="sidebar-link" href="config-edm" data-route>
-            <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-            <span>Config eDM</span>
-          </a>
-          <a class="sidebar-link" href="doc-to-html" data-route>
-            <i class="fa-solid fa-file-word" aria-hidden="true"></i>
-            <span>DOCX to HTML</span>
-          </a>
-          <a class="sidebar-link" href="layout-checker" data-route>
-            <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
-            <span>Layout Checker</span>
-          </a>
-          <a class="sidebar-link" href="layout-slicer" data-route>
-            <i class="fa-solid fa-scissors" aria-hidden="true"></i>
-            <span>Layout Slicer</span>
-          </a>
-          <a class="sidebar-link" href="tnc-uploader" data-route>
-            <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
-            <span>TNC Uploader</span>
-          </a>
-          <a class="sidebar-link" href="text-correction" data-route>
-            <i class="fa-solid fa-spell-check" aria-hidden="true"></i>
-            <span>Text Correction</span>
-          </a>
-          <a class="sidebar-link" href="wfh-tracker" data-route>
-            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
-            <span>WFH Tracker</span>
-          </a>
-        </div>
-
-        <div class="nav-group">
-          <p class="nav-group-label">Reference</p>
-          <a class="sidebar-link" href="docs" data-route>
-            <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-            <span>Docs</span>
-          </a>
-          <a class="sidebar-link" href="maintenance" data-route>
-            <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>
-            <span>Maintenance</span>
-          </a>
-        </div>
-      </nav>
-
-      <footer class="sidebar-footer">
-        <p>&copy; <span id="footer-year">2025</span> BETA by <span>budife.psd</span></p>
-      </footer>
-    </aside>
-
-    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
-
-    <section class="app-content">
-      <header class="mobile-header">
-        <button class="menu-toggle" id="menu-toggle" type="button" aria-controls="app-sidebar" aria-expanded="false">
-          <i class="fa-solid fa-bars" aria-hidden="true"></i>
-          <span class="sr-only">Open navigation</span>
-        </button>
-        <a href="./" data-route>BETA</a>
-      </header>
-
-      <main class="content-viewport" id="content-viewport" tabindex="-1">
-        <div class="content-loading" role="status">
-          <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-          <span>Loading tool...</span>
-        </div>
-      </main>
+  <canvas id="fireworks" aria-hidden="true"></canvas>
+  <main>
+    <section class="glass-card" aria-labelledby="page-title">
+      <div class="brand" aria-hidden="true">B</div>
+      <p class="eyebrow">BETA project</p>
+      <h1 id="page-title">Terima kasih.</h1>
+      <p>Project BETA telah selesai dan aplikasi ini sudah tidak tersedia untuk digunakan. Terima kasih atas waktu, dukungan, dan kepercayaan yang telah diberikan selama project ini berjalan.</p>
+      <div class="contact">Silakan hubungi Yuda Andi untuk informasi lebih lanjut</div>
     </section>
-  </div>
+    <footer>Completed by <strong>budife.psd</strong></footer>
+  </main>
+  <script>
+    (() => {
+      const canvas = document.getElementById('fireworks');
+      const context = canvas.getContext('2d');
+      if (!context || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const rockets = [];
+      const sparks = [];
+      const colors = ['#e7eefc', '#c9c2f5', '#e8c9dc', '#ead7b7', '#b9ddd8'];
+      let width = 0;
+      let height = 0;
+      let lastLaunch = 0;
+      let lastFrame = 0;
 
-  <script src="js/version-config.js?v=6.16.19"></script>
-  <script src="js/tool-versions.js?v=6.16.19"></script>
-  <script src="js/app.js?v=6.16.19" defer></script>
+      function resize() {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      }
+
+      function launch() {
+        rockets.push({ x: width * (.15 + Math.random() * .7), y: height + 12, target: height * (.18 + Math.random() * .34), speed: 380 + Math.random() * 100, color: colors[Math.floor(Math.random() * colors.length)] });
+      }
+
+      function explode(rocket) {
+        for (let index = 0; index < 42; index += 1) {
+          const angle = (Math.PI * 2 * index) / 34;
+          const speed = 110 + Math.random() * 190;
+          sparks.push({ x: rocket.x, y: rocket.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1, decay: .35 + Math.random() * .18, size: 1.5 + Math.random() * 1.5, color: rocket.color });
+        }
+      }
+
+      function frame(time) {
+        const delta = Math.min((time - lastFrame) / 1000 || 0, .033);
+        lastFrame = time;
+        context.clearRect(0, 0, width, height);
+        if (time - lastLaunch > 1700) { launch(); lastLaunch = time; }
+
+        rockets.forEach((rocket, index) => {
+          rocket.y -= rocket.speed * delta;
+          context.fillStyle = rocket.color;
+          context.shadowBlur = 12;
+          context.shadowColor = rocket.color;
+          context.fillRect(rocket.x, rocket.y, 2, 8);
+          context.shadowBlur = 0;
+          if (rocket.y <= rocket.target) { explode(rocket); rockets.splice(index, 1); }
+        });
+
+        sparks.forEach((spark, index) => {
+          spark.x += spark.vx * delta;
+          spark.y += spark.vy * delta;
+          spark.vy += 135 * delta;
+          spark.life -= spark.decay * delta;
+          context.globalAlpha = Math.max(0, spark.life);
+          context.fillStyle = spark.color;
+          context.shadowBlur = 9;
+          context.shadowColor = spark.color;
+          context.fillRect(spark.x, spark.y, spark.size, spark.size);
+          if (spark.life <= 0) sparks.splice(index, 1);
+        });
+        context.shadowBlur = 0;
+        context.globalAlpha = 1;
+        window.requestAnimationFrame(frame);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      launch();
+      window.requestAnimationFrame(frame);
+    })();
+  </script>
 </body>
 </html>
