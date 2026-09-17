@@ -22,6 +22,7 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 ## Recent Updates
 
 ### 16 September 2026
+- **Campaign Counter v1.7.3** - Fixed laptop-width responsive layout so the right-side panels no longer get clipped.
 - **Core v6.16.28** - Fixed GitHub Pages routing so the live `beta` project loads assets, content, and clean routes correctly.
 - **Documentation** - Added Credits attribution for Budi Indra Ilham, Yuda Andi Nofariawan, OpenCode, and GPT-5.6 Luna.
 - **Footer** - Linked the `budife.psd` creator credit to LinkedIn and added a branded Meet the Maker hover label.

@@ -8,6 +8,10 @@ All notable user-facing changes to BETA are tracked here.
 - Updated creator credits to Budi Indra Ilham and Yuda Andi Nofariawan.
 - Linked the `budife.psd` footer credit to LinkedIn with a branded Meet the Maker hover label.
 
+## Campaign Counter v1.7.3 - 17 September 2026
+
+- Fixed laptop-width responsive layout so the right-side panels no longer get clipped.
+
 ## Documentation - 16 September 2026
 
 - Added Credits attribution for Budi Indra Ilham, Yuda Andi Nofariawan, OpenCode, and GPT-5.6 Luna.

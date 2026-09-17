@@ -936,7 +936,7 @@ function activateRoutePage(path) {
   deactivateRoutePages();
   page.hidden = false;
   activeRoutePath = path;
-  document.title = page.dataset.documentTitle || `${ROUTES[path]?.label || 'BETA'} | BETA`;
+  document.title = page.dataset.documentTitle || `${ROUTES[path]?.label || 'BETA'} | Budd Email Tools & Automation`;
   viewport.scrollTop = routeScrollPositions.get(path) || 0;
   viewport.focus({ preventScroll: true });
   return true;
@@ -966,7 +966,7 @@ async function renderPage(path, route, markdown) {
   const isHome = route.content === 'home.md';
   const isDocs = route.source === 'docs';
 
-  const documentTitle = `${title} | BETA`;
+  const documentTitle = `${title} | Budd Email Tools & Automation`;
   document.title = documentTitle;
 
   const intro = `
@@ -1047,7 +1047,7 @@ async function renderPage(path, route, markdown) {
 }
 
 function renderNotFound() {
-  document.title = 'Page Not Found | BETA';
+  document.title = 'Page Not Found | Budd Email Tools & Automation';
   showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">404</p>
@@ -1059,7 +1059,7 @@ function renderNotFound() {
 }
 
 function renderLocalServerWarning() {
-  document.title = 'Local Server Required | BETA';
+  document.title = 'Local Server Required | Budd Email Tools & Automation';
   showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">Local file</p>
@@ -1070,7 +1070,7 @@ function renderLocalServerWarning() {
 }
 
 function renderContentError(error) {
-  document.title = 'Content Error | BETA';
+  document.title = 'Content Error | Budd Email Tools & Automation';
   showTransientView(`
     <section class="content-error">
       <p class="content-eyebrow">Content error</p>

@@ -1,4 +1,12 @@
 .campaign-section,
+.campaign-section .container,
+.campaign-counter-page,
+.counter-workspace,
+.counter-card {
+  box-sizing: border-box;
+}
+
+.campaign-section,
 .campaign-section .container {
   width: 100%;
   max-width: none;
@@ -68,9 +76,9 @@
 
 .counter-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 400px) minmax(0, 400px) minmax(0, 500px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--ui-content-gap, 16px);
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   flex: 0 0 auto;
   min-height: 0;
@@ -199,6 +207,7 @@
 
 .folder-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -227,6 +236,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
   padding: 6px 8px 6px;
   border-bottom: 1px solid #e4e4e7;
 }
@@ -574,6 +584,11 @@
 
 @media (max-width: 1200px) {
   .counter-workspace { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .counter-folder { grid-column: 1 / -1; }
+}
+
+@media (max-width: 1100px) {
+  .counter-workspace { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 900px) {
