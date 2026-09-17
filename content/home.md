@@ -21,6 +21,12 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 
 ## Recent Updates
 
+### 17 September 2026
+- **Documentation** - Added detailed processing flows for all tools, storage and network boundaries, reproducible audit steps, and source-level security proof.
+- **Documentation UI** - Improved table rendering, collapsible tool panels, and responsive readability.
+- **Documentation navigation** - Fixed section links and clarified the `On This Page` navigation label.
+- **Credits UI** - Refined the Credits & Dedication section into clearer, warmer panels.
+
 ### 16 September 2026
 - **Campaign Counter v1.7.3** - Fixed laptop-width responsive layout so the right-side panels no longer get clipped.
 - **Core v6.16.28** - Fixed GitHub Pages routing so the live `beta` project loads assets, content, and clean routes correctly.

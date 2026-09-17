@@ -2,6 +2,13 @@
 
 All notable user-facing changes to BETA are tracked here.
 
+## Documentation - 17 September 2026
+
+- Added detailed per-tool processing flows, local storage paths, external request exceptions, reproducible DevTools audit steps, and source-level security proof.
+- Improved Documentation readability with real responsive tables, clearer collapsible panels, and a simpler visual hierarchy.
+- Fixed Documentation navigation anchors and renamed the navigation label to `On This Page`.
+- Refined the Credits & Dedication section into clearer people, technology, and appreciation panels.
+
 ## Core v6.16.28 - 16 September 2026
 
 - Fixed GitHub Pages project routing for the `beta` repository base path.

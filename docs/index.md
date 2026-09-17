@@ -5,41 +5,28 @@ icon: fa-solid fa-book-open
 category: Reference
 ---
 
-## Documentation Navigation
+## On This Page
 
 - [Security proof](#security-proof)
 - [Security summary](#privacy-network-behavior)
-- [Data by tool](#data-handling-by-tool)
+- [Data by tool](#data-handling-by-tool-plain-english-summary)
 - [Network controls](#network-settings)
 - [Local backup](#local-data-backup)
 - [Recovery and audit](#recovery-and-audit)
-- [Credits](#credits-dedication)
+- [Credits](#credits)
 
 Use the search field to find a tool, data type, setting, filename, or error message quickly. This page combines the former Documentation and Maintenance pages and includes an auditable security proof.
 
 ## Security Proof
 
-The following points are verifiable from the static source code and browser behavior:
-
-- There is no application endpoint that accepts uploaded campaign files.
-- Local file workflows use browser JavaScript, `localStorage`, IndexedDB, or a folder explicitly selected through the browser.
-- Campaign Counter, WFH Tracker, TNC Uploader, Config eDM, Database Generator, DOCX conversion, Text Correction, and Layout Slicer do not send their local work data to a third party.
-- TNC Uploader has no automatic PDF link checker or proxy fallback.
-- WFH Tracker does not call a holiday API; its holiday list is bundled in the tool source.
-- External requests are limited to explicitly used public URL workflows and static CDN assets listed below.
-- URL requests do not silently attach local database, PDF, DOCX, Campaign Counter, or WFH data.
-
-This is a source-level and runtime-design guarantee, not a claim that the browser, hosting provider, browser extensions, operating system, or a manually selected external URL can never observe network metadata. Use the audit steps below for the deployment you are using.
+The detailed, source-based evidence and reproducible audit steps are in **Security Proof And Audit Evidence** below. The short result is: BETA has no silent upload path for local work files; only deliberately entered public URLs and declared static libraries can use the network.
 
 ## Privacy & Network Behavior
 
 eDM Helper is a local-first static web application. Local files and campaign data are processed by JavaScript in the browser. There is no application upload endpoint, server-side campaign database, or automatic cloud sync for local work data.
 
-- Database, XML, XLSX, DOCX, PDF, pasted HTML, and generated output files are not uploaded by eDM Helper.
-- Campaign Counter, WFH Tracker, TNC Uploader history, and configuration drafts stay in browser storage or IndexedDB.
-- TNC Uploader saves PDFs to a folder selected by the user and has no automatic link checker.
-- WFH Tracker uses built-in holiday data and has no holiday API request.
-- External requests exist only for explicitly selected public URL workflows and static CDN assets.
+- Local files and work data stay in the browser or a folder explicitly selected by the user unless the user deliberately uses an external URL workflow.
+- External requests are limited to the optional URL workflows and static libraries identified in the table below.
 
 :::details What can contact a third-party service?
 
@@ -48,20 +35,6 @@ eDM Helper is a local-first static web application. Local files and campaign dat
 - Browser pages may request CDN libraries such as Font Awesome, Mammoth, CodeMirror, html2canvas, JSZip, or PDF.js.
 
 These flows do not intentionally upload local files, PDFs, DOCX files, customer databases, Campaign Counter data, or WFH marks. URL providers receive only the public URL required for the selected request.
-:::
-
-:::details What stays local?
-
-- Config eDM XML parsing, editing, and saving.
-- Database parsing, validation, findings, and pasted HTML.
-- Database Generator inputs and generated files.
-- Campaign Counter counter, activity, folder scans, and JSON backups.
-- Bookmarklet local campaign ID data.
-- DOCX conversion and editing.
-- TNC PDF queue/history and generated links.
-- Layout Slicer source processing and generated assets.
-- Text Correction text processing.
-- WFH/WFO marks, statistics, and built-in holidays.
 :::
 
 ## Network Settings
@@ -73,23 +46,56 @@ Use these controls before working with stricter campaign data. Settings are save
 
 {{privacy-settings}}
 
-## Data Handling By Tool
+## Data Handling By Tool - Plain-English Summary
 
-| Tool | Local data | Possible external activity |
+| Tool | What stays on this computer | What may go online |
 | --- | --- | --- |
-| Campaign Counter | Counter, activity, folder scans, JSON backups | None |
-| Config eDM | XML parsing, edits, selected folders | None for local files |
-| Database Checker | Database files, pasted HTML, validation results | Entered public layout URLs only |
-| Database Generator | Inputs and generated files | None for local generation |
-| DOCX to HTML | DOCX conversion and editing | CDN libraries only |
-| Layout Checker | Pasted HTML and local test values | Entered layout URL, provider/proxy, CDN screenshot library |
-| Layout Slicer | Local PDF/image processing and generated assets | CDN libraries only |
-| TNC Uploader | PDF queue, history, folder save, generated links | None; no link checker |
-| Text Correction | Pasted text and generated output | None |
-| WFH Tracker | Calendar marks, stats, built-in holidays | None |
-| Bookmarklet | Browser-local helper data | Actions run on the page where clicked |
+| Campaign Counter | Counter, activity, folder scan, JSON backup | **Nothing from the tool** |
+| Config eDM | XML files, edits, and selected folders | **Nothing from the tool** |
+| Database Checker | **Database files stay on this computer.** Pasted HTML and validation results are also local. | **The database never leaves BETA. Only the public layout URL you deliberately enter may be requested during Layout Test.** |
+| Database Generator | Customer inputs and generated files | **Nothing from the tool** |
+| DOCX to HTML | DOCX conversion, edits, and generated HTML | **Program libraries may load from a CDN; your DOCX does not** |
+| Layout Checker | Pasted HTML, customer test values, and local preview | **Only a URL you choose to fetch, plus optional image/screenshot libraries** |
+| Layout Slicer | PDF/image processing, slices, and selected folders | **PDF.js may load from a CDN; your PDF/image does not** |
+| TNC Uploader | PDF queue, history, selected folder, and generated links | **Nothing; there is no automatic PDF upload or link checker** |
+| Text Correction | Pasted text and corrected output | **Nothing from the tool** |
+| WFH Tracker | Calendar marks, statistics, and built-in holidays | **Nothing from the tool** |
+| Bookmarklet | Browser-local helper data | **It runs on the page where you deliberately click it** |
 
-## Local Data Backup
+## Security Proof And Audit Evidence
+
+This section is a source-level proof that local work data is not silently uploaded. It is intentionally specific so another developer can reproduce the audit.
+
+| Proof check | Evidence in this repository | Result |
+| --- | --- | --- |
+| No application upload endpoint | Static app contains no backend upload route; standalone tools use Blob downloads and selected File System Access folders | Local files have no automatic BETA upload path |
+| Campaign Counter storage | `js/campaign-counter-local.js` uses `localStorage`; `js/pages-campaign-counter.js` uses folder picker and Blob export | Counter and JSON backup stay local |
+| WFH storage | `js/pages-wfh-tracker.js` opens IndexedDB `CalendarDB`; holiday data is bundled in the script | Marks and holiday data stay local |
+| TNC storage | `js/pages-tnc-uploader.js` uses browser storage and selected folder actions | PDF queue/history stay local; no PDF upload |
+| Config storage | `js/pages-config.js` uses selected folders and `localStorage` | XML state stays local |
+| Generated files | Generator, DOCX, Layout Slicer, and Layout Checker use `Blob`, download, canvas, or selected folder APIs | Output leaves the browser only when the user downloads/saves it |
+| URL requests | `pages-database-checker.js` and `pages-layout-checker.js` call `fetch` only for entered URL workflows | Only the deliberately entered URL can follow the external path |
+| CDN requests | HTML pages reference Font Awesome and selected conversion/rendering libraries | Static library requests may expose normal browser request metadata, not local work files |
+
+### Reproducible browser audit
+
+1. Open the deployed tool in Edge or Chrome.
+2. Open DevTools with `F12`, select the **Network** tab, and enable **Preserve log**.
+3. Clear the network log and perform one workflow at a time.
+4. For a local-only tool, select local files, generate output, and confirm requests are limited to the app shell and any declared static CDN assets.
+5. For Database Checker or Layout Checker, paste HTML instead of entering a URL and disable external checks/proxy fallback in Documentation.
+6. If a request appears, inspect its URL, method, and request payload. Local files should not appear in the request body for the documented workflows.
+7. Inspect browser Application storage to see `localStorage` and IndexedDB records; these are origin-local and are not server databases.
+
+### What this proof does and does not claim
+
+- It proves that BETA has no silent application upload path for local campaign files, PDFs, DOCX files, database data, Campaign Counter state, or WFH marks.
+- It does not claim that a browser, operating system, browser extension, hosting provider, CDN, or manually opened external website cannot observe ordinary network metadata.
+- It does not claim that an external public URL is private after the user chooses to fetch it.
+- It does not claim that a file is safe after the user manually uploads it to another website or copies it into another service.
+- The safest mode is: paste content instead of entering URLs, disable external checks and proxy fallbacks, and mirror optional CDN libraries locally when the environment requires zero third-party requests.
+
+## Backup Recovery Notes
 
 Backup files are generated and downloaded by the browser. They are not uploaded by eDM Helper.
 
@@ -139,9 +145,14 @@ The Campaign ID Tracker bookmarklet can load local Monday XLSX data, show used c
 If Monday subitems are collapsed in the visible page, browser scanning cannot read them. Export/upload XLSX when complete campaign ID coverage is needed.
 :::
 
-:::details Privacy behavior
+:::details Data process and privacy
 
-Bookmarklet helpers run in the browser page where they are clicked. Campaign ID data is local. The current local workflow does not sync to Supabase.
+1. The bookmarklet runs only after you activate it on the current browser page.
+2. Typo Scanner reads visible text and highlights matches locally.
+3. Campaign ID data comes from a selected local XLSX file or browser-local IndexedDB data.
+4. Copy and export use browser clipboard or download APIs.
+
+**Data path:** browser page or selected file → browser JavaScript → screen, clipboard, download, or IndexedDB. There is no BETA upload endpoint or Supabase sync. The bookmarklet can interact with the page where you deliberately click it; that page is outside BETA’s control.
 :::
 
 ## Campaign Counter
@@ -165,10 +176,16 @@ Campaign Counter stores the current Campaign ID, activity, folder scans, and JSO
 The same campaign number can appear multiple times for reblast scenarios. Folder scanning groups duplicate numbers and shows all related campaign names, dates, and managers in the details view.
 :::
 
-:::details Storage
+:::details Data process and privacy
 
-Campaign Counter data is stored in this browser only. It is not uploaded to Supabase or another third-party service.
+1. Generate, Back, and manual adjustment use the current browser-local counter.
+2. Counter, activity, username, and folder scans are stored in `localStorage`.
+3. Folder scanning reads only the directory selected through the browser picker.
+4. Export downloads JSON with a `YYYYMMDD-HHmmss` timestamp; Import replaces or merges selected JSON data.
+
+**Data path:** typed values or selected folder → JavaScript → `localStorage`, screen, or local JSON download. No `fetch`, upload endpoint, database server, or third-party sync is used.
 :::
+
 
 ## Config eDM
 
@@ -193,6 +210,52 @@ Config eDM edits campaign XML config values such as Campaign ID, Subject, and Li
 After paste/apply, fields can auto-select for quick replacement. Selection can be cancelled and fields can still be edited manually. The workflow is local and does not upload XML files.
 :::
 
+:::details Data process and privacy
+
+1. The browser reads XML files from a folder selected by the user.
+2. XML values are parsed and edited in memory.
+3. Apply writes output to a local download or selected folder.
+4. Draft state is kept in `localStorage` for same-browser recovery.
+
+**Data path:** selected XML files → browser parser and form state → local download or selected folder. XML contents are not sent to a remote endpoint. URLs typed into XML fields are campaign output values, not requests made by the tool.
+:::
+
+## Database Checker
+
+:::details Purpose and workflow
+
+Select or drop the supported database files, run validation, and review filenames, dates, email relationships, KRHRED values, package structure, warnings, and optional CSV reports. Validation workers run locally in the browser.
+:::
+
+:::details Data process and privacy
+
+Normal validation stays in the browser. **The selected database files never leave BETA and are never attached to an external request.** If Layout Test is run with a public layout URL, only that entered URL may be fetched directly or through an enabled proxy provider. Disable `externalChecks` and `proxyFallbacks` for strict local-only validation.
+:::
+
+## Database Generator
+
+:::details Purpose and workflow
+
+Enter or paste customer and KRHRED values, review the generated TXT/CSV/XML preview, then download the files or save them to a folder selected through the browser.
+:::
+
+:::details Data process and privacy
+
+Customer inputs and generated files are processed locally in memory. Download and Save to Folder use browser Blob and File System Access APIs. No network request is required and source customer data is not uploaded.
+:::
+
+## DOCX to HTML
+
+:::details Purpose and workflow
+
+Select a DOCX, convert it to editable HTML in the browser, review or edit the preview, then download the HTML or save it to a selected folder.
+:::
+
+:::details Data process and privacy
+
+The DOCX is parsed locally by browser libraries and is not posted to a BETA server. The page may download Mammoth, JSZip, CodeMirror, and Font Awesome libraries from a CDN; these are program assets, not the selected DOCX.
+:::
+
 ## Layout Checker
 
 :::details Purpose
@@ -210,9 +273,14 @@ Layout Checker loads or accepts HTML source, detects KRHRED placeholders, applie
 - Reset values to restore the original placeholders.
 :::
 
-:::details Network behavior
+:::details Data process and privacy
 
-If a layout URL is used, the tool may request the layout directly. If direct browser access is blocked and proxy fallback is enabled, it may try proxy services. Disable external checks or proxy fallback in Docs when working with restricted material.
+1. Pasted HTML stays in the browser preview; a URL workflow fetches only the URL entered by the user.
+2. KRHRED placeholders and customer test values are processed locally.
+3. Screenshot capture may load `html2canvas` from a CDN.
+4. HTML, screenshots, and reports are downloaded locally when requested.
+
+**Data path:** pasted HTML → local preview → screen/download. A URL workflow may contact the target or selected proxy/image provider, but local database files, pasted local HTML, and test values are not attached automatically. Disable external checks and proxy fallback for strict local-only testing.
 :::
 
 ## Layout Slicer
@@ -237,6 +305,14 @@ Layout Slicer turns a flat JPG or PNG eDM mockup into ordered image slices. It u
 - Download the generated images or save them into a selected local folder.
 :::
 
+:::details Data process and privacy
+
+1. JPG, PNG, and PDF inputs are decoded with browser image/canvas APIs and PDF.js.
+2. Guides, slices, and generated image Blobs remain in browser memory.
+3. Downloads and Save to Folder write only to locations selected by the user.
+4. PDF.js may load from a CDN, but source images, PDFs, and copied folders are not uploaded.
+:::
+
 :::details Campaign location helper
 
 The Location panel can copy an existing template folder into a new campaign path.
@@ -253,11 +329,6 @@ The Location panel can copy an existing template folder into a new campaign path
 - After copy, HTML files in the copied folder are listed so the selected ID/INDO file can be renamed to the final campaign HTML filename.
 
 Folder copying uses the browser File System Access API and stays local.
-:::
-
-:::details Local behavior
-
-Image processing uses the browser Canvas API. Files stay in the browser unless you explicitly download them or save them to a chosen local folder.
 :::
 
 :::details Export quality and width
@@ -289,9 +360,12 @@ TNC Uploader prepares PDF files for the `emailblast/MKT/YYYY/tnc` folder structu
 Use Replace PDF link when an existing public PDF URL must be replaced. Paste the old PDF link and the tool derives year, target folder, and final filename from the old URL.
 :::
 
-:::details Live check behavior
+:::details Data process and privacy
 
-Check only verifies whether a generated public PDF link appears reachable. It does not upload the PDF. If direct browser check fails and proxy fallback is enabled, it may use a proxy check. Disable proxy fallback if that is not allowed.
+1. Dropped PDFs are queued and renamed locally.
+2. Queue and activity history use browser `localStorage`.
+3. Save to Folder and Download create local output; generated public links are text values.
+4. There is no PDF upload endpoint or automatic link checker.
 :::
 
 ## WFH Tracker
@@ -318,9 +392,12 @@ WFH Tracker marks WFH/WFO days on a monthly calendar and shows a compact monthly
 - Weekend: grey.
 :::
 
-:::details Holiday data
+:::details Data process and privacy
 
-WFH Tracker uses the built-in Indonesian holiday and cuti bersama data. It does not fetch external holiday data or send personal WFH/WFO marks.
+1. Calendar marks and summaries are calculated in the browser.
+2. Calendar state is stored in IndexedDB on the current device.
+3. Holiday and cuti bersama dates are bundled in the tool source.
+4. WFH/WFO marks are not sent to a server by the tool.
 :::
 
 ## Release Workflow
@@ -433,9 +510,9 @@ Browser checks may be blocked even when the link is valid. Use Open to verify ma
 The tracker uses the built-in holiday list. Update the local holiday list in the tool source when a new year needs to be added.
 :::
 
-## Credits & Dedication
+## Credits
 
-:::details A small note
+:::details A Note From BETA
 
 Hi everyone, thank you for taking the time to review this web app.
 
@@ -445,25 +522,58 @@ For local workflows, BETA processes data in the browser or a local folder accord
 
 For internal deployment, follow the security and maintenance procedures required by the target environment.
 
-Enjoy bro n sis.
+Enjoy, bro n sis.
 
 Cheers,
 
 **BETA internal toolkit**
 :::
 
-:::details Credits
+:::details People Behind BETA
 
 - **Budi Indra Ilham** - creator and maintainer of BETA.
 - **Yuda Andi Nofariawan** - contributor, collaborator, and coach.
-- **OpenCode** - AI coding assistant used during development and maintenance.
-- **GPT-5.6 Luna** - model used through OpenCode for development assistance.
+- **MKT testers** - colleagues who tested the tools in real campaign workflows and shared practical feedback.
+:::
+
+:::details Built With
+**App stack**
+
 - **BETA** - internal campaign operations toolkit.
-- **Vanilla JavaScript, CSS, and Markdown** - the simple stack behind the app shell and documentation.
-- **Font Awesome** - icon set for the sidebar, buttons, and tool UI.
+- **HTML5, CSS3, Vanilla JavaScript, and Markdown** - the core application and documentation stack.
+
+**Hosting & development**
+
+- **GitHub Pages** - static hosting and deployment.
+- **Python `http.server`** - local development server.
+- **Visual Studio Code** - code editing and project development.
+
+**Browser APIs**
+
+- **File System Access API** - selected folder read/write workflows.
+- **IndexedDB and localStorage** - browser-local structured data and preferences.
+- **Canvas API** - image processing and screenshot/export workflows.
+- **Web Workers** - local background processing for larger validations.
+- **Clipboard API and drag-and-drop** - copying results and importing files.
+
+**Libraries**
+
+- **Font Awesome** - icons for the sidebar, buttons, and tool UI.
 - **SheetJS/XLSX** - local Monday XLSX imports for Campaign Counter.
 - **CodeMirror** - lightweight HTML editing in Layout Checker.
-- **Browser APIs** - File System Access, IndexedDB, localStorage, drag-and-drop, and clipboard helpers.
+- **PDF.js** - local PDF reading in Layout Slicer.
+- **Mammoth.js** - DOCX conversion in DOCX to HTML.
+- **JSZip** - document and archive processing.
+- **html2canvas** - preview screenshot capture.
+
+**AI assistance**
+
+- **OpenCode** - AI coding assistant used during development and maintenance.
+- **GPT-5.6 Luna** - model used through OpenCode for development assistance.
+- **Kimi 2, Kimi 3, DeepSeek, Muse, NVIDIA Nemotron Lightning, Mimo 2.5, and MiniMax** - AI assistance used during exploration and development.
+:::
+
+:::details The Spirit of It
 - **Forks and feedback** - welcome when they make the workflow simpler.
 - **The campaign workflow** - messy enough to deserve its own helper.
 - **Local-first tools** - because not every file needs to leave the browser.

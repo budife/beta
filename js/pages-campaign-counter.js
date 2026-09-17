@@ -19,6 +19,14 @@ function formatDatestamp(date) {
   return `${y}${m}${d}`;
 }
 
+function formatBackupTimestamp(date) {
+  const datePart = formatDatestamp(date);
+  const timePart = [date.getHours(), date.getMinutes(), date.getSeconds()]
+    .map(value => String(value).padStart(2, '0'))
+    .join('');
+  return `${datePart}-${timePart}`;
+}
+
 function slugifyCampaignName(name) {
   return name
     .trim()
@@ -624,7 +632,7 @@ function exportBackup() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `campaign-counter-backup-${formatDatestamp(new Date())}.json`;
+  link.download = `campaign-counter-backup-${formatBackupTimestamp(new Date())}.json`;
   link.click();
   URL.revokeObjectURL(url);
   setMessage('Local backup exported as JSON.', 'success');

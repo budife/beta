@@ -402,6 +402,7 @@ function renderMarkdown(source) {
   let sectionOpen = false;
   let subsectionOpen = false;
   let detailsOpen = false;
+  let tableRows = [];
 
   const flushParagraph = () => {
     if (!paragraph.length) return;
@@ -415,7 +416,26 @@ function renderMarkdown(source) {
     listType = null;
   };
 
+  const flushTable = () => {
+    if (!tableRows.length) return;
+    const rows = tableRows.map(row => row.map(cell => inlineMarkdown(cell.trim())));
+    const [header, ...body] = rows;
+    html.push(`<div class="markdown-table-wrap"><table><thead><tr>${header.map(cell => `<th>${cell}</th>`).join('')}</tr></thead><tbody>${body.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+    tableRows = [];
+  };
+
   lines.forEach((line) => {
+    const table = line.match(/^\|(.+)\|$/);
+    if (table) {
+      flushParagraph();
+      closeList();
+      if (!/^\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|$/.test(line)) {
+        tableRows.push(table[1].split('|'));
+      }
+      return;
+    }
+    flushTable();
+
     const detailsStart = line.match(/^:::details\s+(.+)$/);
     if (detailsStart) {
       flushParagraph();
@@ -502,6 +522,7 @@ function renderMarkdown(source) {
 
   flushParagraph();
   closeList();
+  flushTable();
   if (detailsOpen) html.push('</details>');
   if (subsectionOpen) html.push('</div>');
   if (sectionOpen) html.push('</section>');

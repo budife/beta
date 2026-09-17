@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.16.28',
+    version: '6.16.31',
     status: 'stable'
   },
   home: {
@@ -21,7 +21,7 @@ const TOOL_VERSIONS = {
   },
   'campaign-counter': {
     label: 'Campaign Counter',
-    version: '1.7.3',
+    version: '1.7.4',
     status: 'stable'
   },
   'config-edm': {
