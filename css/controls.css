@@ -1,0 +1,14 @@
+/*
+ * Shared form-control typography.
+ * Loaded after page styles while legacy tool CSS is gradually migrated.
+ */
+body :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):not([data-ui-control-size="custom"]) {
+  font-family: var(--ui-font) !important;
+  font-size: var(--ui-control-font-size) !important;
+  font-weight: var(--ui-weight-regular) !important;
+  line-height: var(--ui-control-line-height) !important;
+}

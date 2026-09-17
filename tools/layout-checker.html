@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  
+  <!-- Meta Tags -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BETA Layout Checker - Test and validate your layouts">
+  <meta name="keywords" content="edm, layout, checker, validation, tools">
+  <meta name="author" content="BETA">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/tokens.css?v=6.16.27">
+  <link rel="stylesheet" href="../css/theme.css?v=6.16.28">
+  <link rel="stylesheet" href="../css/pages-layout-checker.css?v=6.16.19">
+  <link rel="stylesheet" href="../css/controls.css?v=6.16.27">
+  
+  <title>Layout Checker - BETA</title>
+  <meta name="theme-color" content="#0f172a" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <header class="header" role="banner">
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <!-- Home Button -->
+      <div class="nav-left">
+        <a href="../index.html" class="nav-link">
+          <i class="fa-solid fa-home"></i>
+          <span>Home</span>
+        </a>
+      </div>
+      
+      <div class="nav-right">
+        <!-- Additional navigation items can be added here -->
+      </div>
+    </nav>
+  </header>
+
+<!-- Main Content -->
+<main id="main-content" role="main">
+  <div class="lc-workspace">
+    <header class="lc-page-header">
+      <div>
+        <span class="lc-eyebrow">Layout validation</span>
+        <h1><i class="fa-solid fa-ruler-combined"></i> Layout Checker</h1>
+        <p>Load HTML, populate KRHRED values, and inspect the personalized layout before publishing.</p>
+      </div>
+      <span id="layoutStatus" class="lc-status" data-state="empty">No layout loaded</span>
+    </header>
+
+    <section class="lc-source-bar" aria-label="Layout source">
+      <div class="lc-source-field">
+        <label for="originalUrlInput">Layout URL</label>
+        <div class="lc-url-row">
+          <input type="url" id="originalUrlInput" placeholder="https://mail.example.com/campaign/layout.html" class="lc-input" />
+          <button id="resetUrlBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset URL">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+        <div class="lc-subject-row">
+          <textarea id="subjectInput" placeholder="Subject (KRHRED placeholders)" class="lc-textarea" rows="2"></textarea>
+          <textarea id="subjectOutput" readonly class="lc-textarea" placeholder="Processed" rows="2"></textarea>
+          <button id="resetSubjectBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset subject">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+        <details class="lc-worker-setting">
+          <summary>HTML fetcher</summary>
+          <div class="lc-url-row">
+            <select id="fetcherProviderSelect" class="lc-input">
+              <option value="google-apps-script">Google Apps Script</option>
+              <option value="cloudflare-worker">Cloudflare Worker</option>
+              <option value="custom">Custom URL</option>
+            </select>
+            <button id="resetFetcherBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Reset fetcher">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+          <div class="lc-worker-row lc-worker-custom-row hidden" id="fetcherCustomUrlRow">
+            <input type="url" id="fetcherCustomUrlInput" placeholder="https://your-worker.com/?url=" class="lc-input" />
+          </div>
+          <p class="lc-worker-hint">Google Apps Script is the default. Select Custom URL to use your own worker or proxy.</p>
+        </details>
+      </div>
+      <div class="lc-source-actions">
+        <button id="downloadBtn" class="lc-btn lc-btn-primary hidden"><i class="fa-solid fa-cloud-arrow-down"></i> Load URL</button>
+        <button id="manualPasteBtn" class="lc-btn lc-btn-secondary hidden">Open URL</button>
+        <button id="textModeBtn" class="lc-btn lc-btn-secondary hidden">Text Mode</button>
+      </div>
+      <button id="collapseSourceBtn" class="lc-btn lc-btn-secondary lc-btn-sm lc-collapse-btn" type="button" title="Collapse/Expand">
+        <i class="fa-solid fa-chevron-up"></i>
+      </button>
+
+      <div id="progressContainer" class="lc-inline-status hidden">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span id="progressText">Processing...</span>
+        <button id="stopBtn" class="lc-stop-btn" type="button">Stop</button>
+      </div>
+
+    </section>
+
+    <div class="lc-main-layout">
+      <aside class="lc-sidebar">
+        <section class="lc-panel">
+          <div class="lc-panel-heading">
+            <div>
+              <span class="lc-eyebrow">Customer data</span>
+              <strong>Bulk KRHRED values</strong>
+            </div>
+            <div class="lc-panel-actions">
+              <button id="resetKrhredBtn" class="lc-btn lc-btn-secondary lc-btn-sm">Reset</button>
+              <button id="applyKrhredBtn" class="lc-btn lc-btn-primary lc-btn-sm">Apply</button>
+            </div>
+          </div>
+          <textarea id="krhredInput" placeholder="Paste attr:KRHRED_Unit_XX and its value here." class="lc-textarea"></textarea>
+        </section>
+
+        <section id="krhredUnitsContainer" class="lc-panel lc-units-container">
+          <div class="lc-panel-heading">
+            <div>
+              <span class="lc-eyebrow">Detected placeholders</span>
+              <strong>KRHRED Units</strong>
+            </div>
+          </div>
+          <div id="inputGrid" class="lc-input-grid">
+            <div><input type="text" id="krhred_unit_30" name="krhred_unit_30" placeholder="30" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_31" name="krhred_unit_31" placeholder="31" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_32" name="krhred_unit_32" placeholder="32" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_33" name="krhred_unit_33" placeholder="33" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_34" name="krhred_unit_34" placeholder="34" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_35" name="krhred_unit_35" placeholder="35" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_36" name="krhred_unit_36" placeholder="36" class="lc-input-field" /></div>
+            <div><input type="text" id="krhred_unit_37" name="krhred_unit_37" placeholder="37" class="lc-input-field" /></div>
+          </div>
+        </section>
+
+      </aside>
+
+      <section class="lc-editor-panel">
+        <div class="lc-editor-toolbar">
+          <div>
+            <span class="lc-eyebrow">Source</span>
+            <strong>HTML Content</strong>
+          </div>
+
+          <div class="lc-editor-actions">
+            <button id="downloadScreenshotBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
+              <i class="fa-solid fa-download"></i> Screenshot
+            </button>
+            <button id="typoCheckerBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" title="Checks HTML text only; text inside images is not scanned." disabled>
+              <i class="fa-solid fa-spell-check"></i> Typo Checker <small>(HTML text only)</small>
+            </button>
+            <button id="openPreviewBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button" disabled>
+              <i class="fa-solid fa-up-right-from-square"></i> Open preview
+            </button>
+<label class="lc-toggle" for="highlightKrhredToggle">
+              <input id="highlightKrhredToggle" type="checkbox">
+              <i class="fa-solid fa-highlighter" aria-hidden="true"></i>
+              <span>Highlight KRHRED</span>
+            </label>
+          </div>
+        </div>
+        <textarea id="htmlInput" class="lc-textarea lc-textarea-sm" style="display:none;"></textarea>
+        <div id="previewPanel" class="lc-preview-panel lc-view-panel">
+          <div id="previewPlaceholder" class="lc-preview-placeholder">
+            <i class="fa-solid fa-image"></i>
+            <p>Load a URL or paste HTML to preview the layout</p>
+          </div>
+          <div id="fetchOverlay" class="lc-fetch-overlay hidden">
+            <div class="lc-fetch-overlay-content">
+              <div id="fetchOverlayTitle" class="lc-fetch-overlay-title">Checking...</div>
+              <div id="fetchOverlayStatus" class="lc-fetch-overlay-status">Fetching website</div>
+              <div id="fetchOverlayProvider" class="lc-fetch-overlay-provider">Google Apps Script</div>
+              <i class="fa-solid fa-circle-notch fa-spin lc-fetch-overlay-spinner"></i>
+            </div>
+          </div>
+          <div id="fetchErrorOverlay" class="lc-fetch-overlay hidden">
+            <div class="lc-fetch-overlay-content">
+              <i class="fa-solid fa-triangle-exclamation lc-fetch-error-icon"></i>
+              <div id="fetchErrorTitle" class="lc-fetch-overlay-title">Failed to fetch</div>
+              <div id="fetchErrorMsg" class="lc-fetch-overlay-status">Please try again</div>
+              <button id="fetchRetryBtn" class="lc-btn lc-btn-retry"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+            </div>
+          </div>
+          <iframe id="layoutPreviewFrame" title="Layout preview" sandbox="allow-same-origin allow-popups"></iframe>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+  <dialog id="typoCheckerModal" class="lc-typo-modal">
+    <div class="lc-typo-modal-card">
+      <div class="lc-typo-modal-header">
+        <div>
+          <span class="lc-eyebrow">HTML text scan</span>
+          <h2>Typo Checker</h2>
+        </div>
+        <button id="closeTypoCheckerBtn" class="lc-btn lc-btn-secondary lc-btn-sm" type="button">Close</button>
+      </div>
+      <div id="typoCheckerResults" class="lc-typo-results"></div>
+    </div>
+  </dialog>
+
+<!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-left">
+          <p class="footer-text">&copy; <span id="footer-year">2025</span> BETA by <a href="https://www.linkedin.com/in/budife/" target="_blank" rel="noopener noreferrer" data-tooltip="Meet the Maker" aria-label="Meet the Maker">budife.psd</a></p>
+        </div>
+        <div class="footer-right">
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script src="../js/footer.js" defer></script>
+<script src="../js/typo-dictionary.js?v=6.16.19" defer></script>
+<script src="../js/typo-engine.js?v=6.16.19" defer></script>
+<script src="../js/version-config.js?v=6.16.28" defer></script>
+<script src="../js/privacy-settings.js?v=6.16.19" defer></script>
+<script src="../js/pages-layout-checker.js?v=6.16.20" defer></script>
+</body>
+</html>

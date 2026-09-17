@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Convert DOCX files to HTML directly in the browser.">
+  <meta name="author" content="BETA">
+
+  <link rel="stylesheet" href="../css/tokens.css?v=6.16.27">
+  <link rel="stylesheet" href="../css/theme.css?v=6.16.28">
+  <link rel="stylesheet" href="../css/pages-doc-to-html.css?v=6.16.39">
+  <link rel="stylesheet" href="../css/controls.css?v=6.16.27">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <title>DOCX to HTML - BETA</title>
+</head>
+<body>
+  <main class="d2h-app" id="d2h-app">
+    <div class="d2h-dropzone" id="d2h-dropzone" tabindex="0" role="button" aria-label="Choose DOCX file">
+      <input id="d2h-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <div class="d2h-dropzone-inner">
+        <div class="d2h-dropzone-icons">
+          <span class="d2h-doc-icon"><i class="fa-solid fa-file-word" aria-hidden="true"></i></span>
+        </div>
+        <strong>Drop your file here</strong>
+        <span class="d2h-dropzone-sub">or <button id="d2h-choose-btn" class="d2h-text-link" type="button">browse from folder</button></span>
+         <small>Supports .docx up to 20 MB</small>
+      </div>
+    </div>
+
+    <div id="d2h-filebar" class="d2h-filebar d2h-hidden">
+      <div class="d2h-filebar-left">
+        <span class="d2h-word-icon" id="d2h-file-icon">W</span>
+        <div class="d2h-file-details">
+          <label for="d2h-output-name">Output file name</label>
+          <span class="d2h-file-name-field">
+            <input id="d2h-output-name" type="text" aria-label="Output file name" placeholder="emailblast\MKT\2026\tnc\filename">
+            <span>.html</span>
+          </span>
+        </div>
+        <small id="d2h-file-size"></small>
+      </div>
+      <div class="d2h-filebar-right">
+        <button id="d2h-copy-bottom-btn" class="d2h-mini-button" type="button">
+          <i class="fa-solid fa-clipboard" aria-hidden="true"></i> Copy
+        </button>
+        <button id="d2h-download-btn" class="d2h-secondary" type="button">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Download
+        </button>
+        <button id="d2h-save-btn" class="d2h-primary" type="button">
+          <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Save to Folder
+        </button>
+        <button id="d2h-reset-btn" class="d2h-text-button" type="button">
+          <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Change file
+        </button>
+      </div>
+    </div>
+
+    <div id="d2h-save-path" class="d2h-save-path d2h-hidden"></div>
+
+    <div id="d2h-messages" class="d2h-messages d2h-hidden"></div>
+
+    <div id="d2h-workspace" class="d2h-workspace d2h-hidden">
+      <section id="d2h-panel-preview" class="d2h-panel d2h-panel-preview">
+        <div class="d2h-panel-head">
+          <strong><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</strong>
+          <div class="d2h-panel-tools">
+            <span id="d2h-element-count" class="d2h-panel-meta"></span>
+            <button id="d2h-edit-preview-btn" class="d2h-mini-button" type="button">Edit preview</button>
+            <button id="d2h-reset-preview-btn" class="d2h-mini-button d2h-hidden" type="button">Reset</button>
+            <span id="d2h-edit-tools" class="d2h-edit-tools d2h-hidden" aria-label="Preview formatting tools">
+              <button type="button" data-edit-command="bold" title="Bold"><strong>B</strong></button>
+              <button type="button" data-edit-command="italic" title="Italic"><em>I</em></button>
+              <button type="button" data-edit-command="underline" title="Underline"><u>U</u></button>
+              <span class="d2h-font-size-control" aria-label="Font size control">
+                <button id="d2h-font-size-down" type="button" title="Decrease font size" aria-label="Decrease font size">−</button>
+                <input id="d2h-font-size" class="d2h-font-size" type="text" inputmode="numeric" pattern="[0-9]*" value="14" autocomplete="off" title="Font size in pixels" aria-label="Font size in pixels">
+                <button id="d2h-font-size-up" type="button" title="Increase font size" aria-label="Increase font size">+</button>
+                <div id="d2h-font-size-menu" class="d2h-font-size-menu" hidden>
+                  <button type="button" data-font-size="10">10px</button>
+                  <button type="button" data-font-size="14">14px</button>
+                  <button type="button" data-font-size="18">18px</button>
+                  <button type="button" data-font-size="24">24px</button>
+                  <button type="button" data-font-size="32">32px</button>
+                </div>
+              </span>
+              <button type="button" data-edit-command="justifyLeft" title="Align left">Left</button>
+              <button type="button" data-edit-command="justifyCenter" title="Align center">Center</button>
+              <button type="button" data-edit-command="justifyRight" title="Align right">Right</button>
+            </span>
+          </div>
+        </div>
+        <article id="d2h-preview" class="d2h-preview"></article>
+      </section>
+
+      <section id="d2h-panel-html" class="d2h-panel d2h-panel-html">
+        <div class="d2h-panel-head">
+          <strong><i class="fa-solid fa-code" aria-hidden="true"></i> HTML code</strong>
+          <div class="d2h-panel-tools">
+            <button id="d2h-open-tab" class="d2h-mini-button" type="button">
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Open
+            </button>
+            <button id="d2h-copy-btn" class="d2h-mini-button" type="button">
+              <i class="fa-solid fa-copy" aria-hidden="true"></i> Copy HTML
+            </button>
+          </div>
+        </div>
+        <textarea id="d2h-html-output" spellcheck="false" aria-label="HTML output"></textarea>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="../js/version-config.js?v=6.16.28" defer></script>
+  <script src="../js/pages-doc-to-html.js?v=6.16.39" defer></script>
+</body>
+</html>

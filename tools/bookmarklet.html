@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  
+  <!-- Meta Tags -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BETA Bookmarklet - Browser tools for email marketing">
+  <meta name="keywords" content="edm, bookmarklet, browser, tools, marketing">
+  <meta name="author" content="BETA">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/tokens.css?v=6.16.27">
+  <link rel="stylesheet" href="../css/theme.css?v=6.16.28">
+  <link rel="stylesheet" href="../css/pages-bookmarklet.css?v=6.16.27">
+  <link rel="stylesheet" href="../css/controls.css?v=6.16.27">
+  
+  <title>Bookmarklet - BETA</title>
+  <meta name="theme-color" content="#0f172a" />
+  <!-- Font Awesome - Non-blocking load -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+</head>
+<body>
+  <!-- Initial State Script - Removed -->
+  
+  <header class="header" role="banner">
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <!-- Home Button -->
+      <div class="nav-left">
+        <a href="../index.html" class="nav-link">
+          <i class="fa-solid fa-home"></i>
+          <span>Home</span>
+        </a>
+      </div>
+      
+      <div class="nav-right">
+        <!-- Additional navigation items can be added here -->
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content" role="main">
+    <section class="bookmarklet-section">
+      <div class="container">
+        <div class="page-header">
+          <div class="page-header-content">
+            <h1>
+              <i class="fa-solid fa-bookmark"></i>
+              BETA Bookmarklets
+            </h1>
+            <p class="subtitle">A collection of powerful bookmarklets for everyday productivity</p>
+          </div>
+        </div>
+        
+        <!-- Quick Guide -->
+        <div class="instructions">
+            <h3><i class="fa-solid fa-circle-info"></i> How to Use Bookmarklets:</h3>
+            <ol>
+                <li><strong>Drag</strong> a bookmarklet button below to your browser's <strong>bookmark bar</strong></li>
+                <li>Alternatively: <strong>Right-click</strong> → <strong>Add to Bookmarks</strong></li>
+                <li>Open the target page and <strong>click the bookmarklet</strong> to run it</li>
+            </ol>
+            <div class="browser-notes">
+                <p><strong>Note:</strong> Works on Chrome, Firefox, Edge, and Safari. Make sure the bookmark bar is visible (Ctrl+Shift+B).</p>
+            </div>
+        </div>
+
+        <!-- Search/Filter Section -->
+        <div class="bookmarklet-filter">
+            <input type="text" class="bookmarklet-search" placeholder="Search bookmarklets..." id="bookmarkletSearch">
+            <button class="bookmarklet-filter-btn" onclick="clearSearch()">
+                <i class="fa-solid fa-times"></i>
+                Clear
+            </button>
+            <button class="bookmarklet-filter-btn" onclick="toggleView()">
+                <i class="fa-solid fa-grip"></i>
+                Grid
+            </button>
+        </div>
+
+        <!-- Bookmarklets Grid -->
+        <div class="bookmarklets-grid" id="bookmarkletsGrid">
+            <!-- Typo Scanner -->
+            <div class="bookmarklet-card">
+                <div class="bookmarklet-header">
+                    <i class="fa-solid fa-spell-check"></i>
+                    <h3>Typo Scanner</h3>
+                </div>
+                <p>Scan & highlight typos directly on the page</p>
+                <a href="javascript:(function(){if(window.__typoScannerRunning){return;}window.__typoScannerRunning=true;function showToast(msg){var t=document.createElement('div');t.style.cssText='position:fixed;top:20px;right:20px;background:#333;color:white;padding:12px 20px;border-radius:4px;z-index:100000;font-family:Arial,sans-serif;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:opacity 0.3s';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove()},300);},3000);}var typos={teh:'the',adn:'and',recieve:'receive',beleive:'believe',occured:'occurred',untill:'until',wich:'which',begining:'beginning',neccessary:'necessary',seperate:'separate',definately:'definitely',comming:'coming',sucess:'success',thier:'their',tommorow:'tomorrow',writting:'writing',adna:'adalah',bekeja:'bekerja',meblokir:'memblokir',beberap:'beberapa',foldr:'folder',fetc:'fetch',websit:'website',doker:'dokter',karna:'karena',makasih:'makasih',mantapp:'mantap',bismillahh:'bismillah',insyaallah:'insyaallah',mashaallah:'mashaallah',subhanallah:'subhanallah',alhamdulillah:'alhamdulillah',jazakallah:'jazakallah',wassalam:'wassalam',assalamualaikum:'assalamualaikum',terimakasih:'terima kasih',sedangg:'sedang',sudahh:'sudah',yangg:'yang',yukk:'yuk',hallo:'halo',heppi:'happy',programmerr:'programmer',webhookk:'webhook',javascriptt:'javascript',servernyaa:'servernya',emailnya:'emailnya',platformnya:'platformnya',notifnya:'notifikasi',jabatanx:'jabatan',kotlinx:'kotlin',kirimann:'kirim',gambarr:'gambar',gambarrr:'gambar',informasii:'informasi',fungsii:'fungsi',kualitasnyaa:'kualitasnya',praktikan:'praktikan',responsenya:'responsenya',implementasi:'implementasi',dependensi:'dependensi',konfigurasi:'konfigurasi',inisialisasi:'inisialisasi',otentikasi:'otentikasi',otorisasi:'otorisasi',eksekusi:'eksekusi',aplikasinya:'aplikasinya',fungsinya:'fungsinya',arsitektur:'arsitektur',infrastruktur:'infrastruktur',debugging:'debugging',deployment:'deployment',repository:'repository',environment:'environment',refactoring:'refactoring'};var count=0;var found=[];var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);var nodes=[];while(walker.nextNode()){var p=walker.currentNode.parentNode;if(p&&p.tagName!=='SCRIPT'&&p.tagName!=='STYLE'&&!p.classList.contains('typo-highlight')){nodes.push(walker.currentNode);}}nodes.forEach(function(node){var text=node.nodeValue;if(!text||!text.trim())return;var words=text.split(/(\s+)/);for(var i=0;i<words.length;i++){var w=words[i];if(!w.trim())continue;var clean=w.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();if(clean.length<3)continue;for(var typo in typos){if(clean===typo){var span=document.createElement('span');span.style.cssText='background:#fef08a;border-bottom:2px wavy red;padding:0 2px;border-radius:2px;cursor:pointer;position:relative';span.textContent=w;span.title='Typo: '+typo+' -> '+typos[typo];span.className='typo-highlight';count++;found.push(typo+' -> '+typos[typo]);var parent=node.parentNode;if(parent){parent.replaceChild(span,node);}break;}}}});if(count>0){var output='Typos Found ('+count+'):\n\n'+found.join('\n');console.log(output);if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(output).then(function(){showToast('Found '+count+' typos (copied!)');});}else{showToast('Found '+count+' typos');}var style=document.createElement('style');style.textContent='.typo-highlight:hover::after{content:attr(title);position:absolute;bottom:100%;left:0;background:#333;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;z-index:100001}';document.head.appendChild(style);}else{showToast('No typos found!');}window.__typoScannerRunning=false;})();"
+                   class="bookmarklet-btn"
+                   draggable="true"
+                   data-tool="Typo Scanner">
+                    <i class="fa-solid fa-play"></i>
+                    <span class="btn-text">Typo Scanner</span>
+                </a>
+            </div>
+
+            <!-- Local to HSBC URL Converter -->
+            <div class="bookmarklet-card">
+                <div class="bookmarklet-header">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    <h3>Local to HSBC URL</h3>
+                </div>
+                <p>Convert localhost URL to HSBC mail server</p>
+                <a href="javascript:(function(){function showToast(msg,type){const toast=document.createElement('div');toast.style.cssText='position:fixed;top:20px;right:20px;background:#333;color:white;padding:12px 20px;border-radius:4px;z-index:10000;animation:slideIn 0.3s ease';toast.textContent=msg;document.body.appendChild(toast);setTimeout(()=>toast.remove(),3000);}const currentUrl=window.location.href;if(currentUrl.includes('127.0.0.1:5500')){const newUrl=currentUrl.replace('http://127.0.0.1:5500','https://mail.hsbc.com.hk/id');if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(newUrl).then(()=>{showToast('\u2705 URL copied!','success');}).catch(()=>{fallbackCopy(newUrl);});}else{fallbackCopy(newUrl);}function fallbackCopy(text){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');showToast('\u2705 URL copied!','success');}catch(err){console.error('Gagal menyalin:',err);prompt('Copy manual URL:',text);}document.body.removeChild(ta);}}else{showToast('\u274c URL tidak mengandung 127.0.0.1:5500','error');}const style=document.createElement('style');style.textContent='@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}';document.head.appendChild(style);})();"; 
+                   class="bookmarklet-btn" 
+                   draggable="true"
+                   data-tool="Local to HSBC URL">
+                    <i class="fa-solid fa-play"></i>
+                    <span class="btn-text">Local to HSBC URL</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults">
+            <i class="fa-solid fa-search"></i>
+            <p>No bookmarklets found</p>
+            <p style="font-size: var(--font-size-sm); margin-top: var(--space-2);">Try another search term</p>
+        </div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="instructions">
+            <h3><i class="fa-solid fa-keyboard"></i> Useful Keyboard Shortcuts:</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>U</kbd>
+                    <span>View source code</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>
+                    <span>Inspect element</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd>
+                    <span>Open console</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>
+                    <span>Toggle bookmark bar</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>A</kbd>
+                    <span>Select all</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>C</kbd>
+                    <span>Copy</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-section">
+            <h3><i class="fa-solid fa-lightbulb"></i> Pro Tips:</h3>
+            <ul>
+                <li>Bookmarklets work best in modern browsers (Chrome, Firefox, Edge, Safari 12+)</li>
+                <li>Some websites may block the fetch API. Use View Source as an alternative</li>
+                <li>Keep bookmarklets in a dedicated folder for better organization</li>
+                <li>Test bookmarklets in a development environment first</li>
+            </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-left">
+          <p class="footer-text">&copy; <span id="footer-year">2025</span> BETA by <a href="https://www.linkedin.com/in/budife/" target="_blank" rel="noopener noreferrer" data-tooltip="Meet the Maker" aria-label="Meet the Maker">budife.psd</a></p>
+        </div>
+        <div class="footer-right">
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Settings Modal -->
+  <div id="settings-container"></div>
+
+<script src="../js/footer.js" defer></script>
+  <script src="../js/version-config.js?v=6.16.28" defer></script>
+<!-- All functionality in one inline script -->
+<script>
+// Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    if (new URLSearchParams(window.location.search).get('embed') === '1') {
+        document.body.classList.add('is-embedded');
+    }
+
+    const searchInput = document.getElementById('bookmarkletSearch');
+    const cards = document.querySelectorAll('.bookmarklet-card');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const desc = card.querySelector('p').textContent.toLowerCase();
+                card.style.display = (title.includes(term) || desc.includes(term)) ? '' : 'none';
+            });
+        });
+    }
+
+    // Add drag event listeners to bookmarklet buttons
+    const bookmarkletBtns = document.querySelectorAll('.bookmarklet-btn');
+    bookmarkletBtns.forEach(btn => {
+        btn.addEventListener('dragstart', function(e) {
+            const toolName = this.getAttribute('data-tool');
+            showToast(`Dragging ${toolName}...`, 'info', 2000);
+        });
+
+        btn.addEventListener('dragend', function(e) {
+            const toolName = this.getAttribute('data-tool');
+            showToast(`${toolName} ready! Add to your bookmarks bar.`, 'success', 3000);
+        });
+    });
+});
+
+// Global functions for onclick
+function clearSearch() {
+    const search = document.getElementById('bookmarkletSearch');
+    if (search) {
+        search.value = '';
+        search.dispatchEvent(new Event('input'));
+        showToast('Search cleared', 'info', 1500);
+    }
+}
+
+function toggleView() {
+    const grid = document.getElementById('bookmarkletsGrid');
+    const btn = document.querySelector('.bookmarklet-filter-btn:last-child');
+    if (grid && btn) {
+        grid.classList.toggle('list-view');
+        const isListView = grid.classList.contains('list-view');
+        btn.innerHTML = isListView ? 
+            '<i class="fa-solid fa-list"></i> List' : 
+            '<i class="fa-solid fa-grip"></i> Grid';
+        // Removed toast notification for better performance
+    }
+}
+
+// Toast notification function - Only for button success
+function showToast(message, type = 'success', duration = 3000) {
+    // Only show toast for button-related success messages
+    if (type !== 'success' || (!message.toLowerCase().includes('copied') && !message.toLowerCase().includes('clipboard'))) {
+        return;
+    }
+    
+    // Create toast container if it doesn't exist
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container button-toast'; // Add button-toast class
+        document.body.appendChild(container);
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // Icon mapping
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+
+    toast.innerHTML = `
+        <i class="fa-solid ${icons[type]} toast-icon"></i>
+        <div class="toast-content">
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+            <i class="fa-solid fa-times"></i>
+        </button>
+    `;
+
+    // Add to container
+    container.appendChild(toast);
+
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Auto remove
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+</script>
+</body>
+</html>
