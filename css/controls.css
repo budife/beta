@@ -12,3 +12,31 @@ body :is(
   font-weight: var(--ui-weight-regular) !important;
   line-height: var(--ui-control-line-height) !important;
 }
+
+/* Keep form focus consistent across standalone tools. */
+body :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):not([data-ui-control-size="custom"]) {
+  border: 1px solid var(--ui-border) !important;
+  background: #fff;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):not([data-ui-control-size="custom"]):hover,
+body :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea
+):not([data-ui-control-size="custom"]):focus {
+  border-color: var(--ui-accent) !important;
+  background: #fff;
+  outline: none !important;
+  box-shadow: none !important;
+}

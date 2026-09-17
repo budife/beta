@@ -26,6 +26,17 @@ Use the sidebar to open a tool, or start with one of the quick access links belo
 - **Documentation UI** - Improved table rendering, collapsible tool panels, and responsive readability.
 - **Documentation navigation** - Fixed section links and clarified the `On This Page` navigation label.
 - **Credits UI** - Refined the Credits & Dedication section into clearer, warmer panels.
+- **Recent Updates UI** - Replaced the crowded date tabs with a compact date selector.
+- **Recent Updates UI** - Matched the date selector styling to Quick Access.
+- **Documentation UI** - Unified control focus and hover strokes while keeping white backgrounds.
+- **Text Correction v1.0.3** - Matched textarea focus styling to the shared one-pixel control stroke.
+- **Core v6.16.36** - Normalized form-control hover and focus strokes across the tools.
+- **Database Generator v1.5.10** - Matched generator form focus styling to the shared one-pixel control stroke.
+- **Text Correction** - Kept the textarea focus treatment to a single thin card stroke.
+- **Core v6.16.38** - Fixed global control specificity for the Text Correction focus stroke.
+- **Text Correction v1.0.4** - Locked focus to the same thin card stroke used on hover.
+- **Text Correction v1.0.5** - Marked editor textareas as custom controls to preserve the card focus treatment.
+- **Text Correction v1.0.6** - Restored the thin accent stroke on editor cards for hover and focus.
 
 ### 16 September 2026
 - **Campaign Counter v1.7.3** - Fixed laptop-width responsive layout so the right-side panels no longer get clipped.

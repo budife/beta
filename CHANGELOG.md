@@ -8,6 +8,17 @@ All notable user-facing changes to BETA are tracked here.
 - Improved Documentation readability with real responsive tables, clearer collapsible panels, and a simpler visual hierarchy.
 - Fixed Documentation navigation anchors and renamed the navigation label to `On This Page`.
 - Refined the Credits & Dedication section into clearer people, technology, and appreciation panels.
+- Replaced the crowded Recent Updates tabs with a compact date selector.
+- Matched the Recent Updates selector border and hover treatment to Quick Access.
+- Unified Documentation control focus and hover strokes without changing their white backgrounds.
+- Reduced the Text Correction textarea focus stroke to match the shared one-pixel control style.
+- Normalized input, select, and textarea hover/focus strokes across all standalone tools.
+- Updated Database Generator form focus styling to use the shared one-pixel control stroke.
+- Kept the Text Correction textarea borderless inside its single-line card focus treatment.
+- Fixed global control specificity so Text Correction does not regain a thicker inner focus stroke.
+- Locked Text Correction focus to the same one-pixel card stroke used on hover.
+- Marked Text Correction textareas as custom controls so the global form reset cannot override their card treatment.
+- Restored the thin accent stroke on Text Correction cards for both hover and focus.
 
 ## Core v6.16.28 - 16 September 2026
 

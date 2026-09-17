@@ -218,8 +218,7 @@ legend.form-label {
 .email-input:focus,
 .krhred-input:focus {
   border-color: var(--ui-accent-dark);
-  outline: 2px solid var(--ui-accent-soft);
-  outline-offset: 0;
+  outline: none;
 }
 
 .form-hint,
@@ -367,8 +366,7 @@ legend.form-label {
 
 .krhred-number-field:focus-within {
   border-color: var(--ui-accent-dark);
-  outline: 2px solid var(--ui-accent-soft);
-  outline-offset: 0;
+  outline: none;
 }
 
 .krhred-prefix {

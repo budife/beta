@@ -6,7 +6,7 @@
 const TOOL_VERSIONS = {
   core: {
     label: 'Core',
-    version: '6.16.31',
+    version: '6.16.38',
     status: 'stable'
   },
   home: {
@@ -36,7 +36,7 @@ const TOOL_VERSIONS = {
   },
   'database-generator': {
     label: 'Database Generator',
-    version: '1.5.9',
+    version: '1.5.10',
     status: 'stable'
   },
 
@@ -62,7 +62,7 @@ const TOOL_VERSIONS = {
   },
   'text-correction': {
     label: 'Text Correction',
-    version: '1.0.2',
+    version: '1.0.6',
     status: 'stable'
   },
   'wfh-tracker': {

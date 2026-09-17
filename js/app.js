@@ -612,27 +612,24 @@ function enhanceHomeDashboard(container) {
       const tabsWrapper = document.createElement('div');
       tabsWrapper.className = 'updates-tabs';
 
-      const tabBar = document.createElement('div');
-      tabBar.className = 'updates-tab-bar';
-      tabsWrapper.appendChild(tabBar);
+       const selector = document.createElement('label');
+       selector.className = 'updates-selector';
+       selector.innerHTML = '<span>Choose update date</span><select aria-label="Choose update date"></select>';
+       const select = selector.querySelector('select');
+       tabsWrapper.appendChild(selector);
 
       const tabContent = document.createElement('div');
       tabContent.className = 'updates-tab-content';
       tabsWrapper.appendChild(tabContent);
 
-      const tabIds = [];
-      subsections.forEach((sub, i) => {
+       subsections.forEach((sub, i) => {
         const h3 = sub.querySelector('h3');
         const dateText = h3?.textContent || `Tab ${i + 1}`;
         const tabId = `update-tab-${i}`;
-        tabIds.push(tabId);
-
-        const tabBtn = document.createElement('button');
-        tabBtn.type = 'button';
-        tabBtn.className = `updates-tab-btn${i === 0 ? ' active' : ''}`;
-        tabBtn.dataset.tab = tabId;
-        tabBtn.textContent = dateText;
-        tabBar.appendChild(tabBtn);
+         const option = document.createElement('option');
+         option.value = tabId;
+         option.textContent = dateText;
+         select.appendChild(option);
 
         const panel = document.createElement('div');
         panel.className = `updates-tab-panel${i === 0 ? ' active' : ''}`;
@@ -647,15 +644,11 @@ function enhanceHomeDashboard(container) {
         tabContent.appendChild(panel);
       });
 
-      tabBar.addEventListener('click', (e) => {
-        const btn = e.target.closest('.updates-tab-btn');
-        if (!btn) return;
-        const tabId = btn.dataset.tab;
-        tabBar.querySelectorAll('.updates-tab-btn').forEach((b) => b.classList.remove('active'));
-        tabContent.querySelectorAll('.updates-tab-panel').forEach((p) => p.classList.remove('active'));
-        btn.classList.add('active');
-        tabContent.querySelector(`#${tabId}`)?.classList.add('active');
-      });
+       select.addEventListener('change', () => {
+         const tabId = select.value;
+         tabContent.querySelectorAll('.updates-tab-panel').forEach((p) => p.classList.remove('active'));
+         tabContent.querySelector(`#${tabId}`)?.classList.add('active');
+       });
 
       subsections.forEach((sub) => sub.remove());
       const existingLink = updates.querySelector('p:last-child a');

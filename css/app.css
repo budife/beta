@@ -579,6 +579,11 @@ a {
   border: 1px solid var(--app-border);
 }
 
+.docs-search:hover,
+.docs-search:focus-within {
+  border-color: var(--app-accent);
+}
+
 .docs-search input {
   min-width: 0;
   width: 100%;
@@ -611,8 +616,27 @@ a {
 
 .docs-tools-actions button:hover,
 .docs-tools-actions button:focus-visible {
-  color: #9f3f45;
+  color: #3f3f46;
   border-color: var(--app-accent);
+  outline: none;
+}
+
+.docs-content input:not([type="checkbox"]):not([type="radio"]),
+.docs-content select,
+.docs-content textarea {
+  border: 1px solid var(--app-border);
+  border-radius: 0;
+  background: #fff;
+}
+
+.docs-content input:not([type="checkbox"]):not([type="radio"]):hover,
+.docs-content input:not([type="checkbox"]):not([type="radio"]):focus,
+.docs-content select:hover,
+.docs-content select:focus,
+.docs-content textarea:hover,
+.docs-content textarea:focus {
+  border-color: var(--app-accent);
+  outline: none;
 }
 
 .docs-search-status {
@@ -1460,42 +1484,45 @@ a {
   }
 }
 
-/* ── Recent Updates Tabs ─────────────────────────────── */
+/* ── Recent Updates Selector ────────────────────────── */
 .updates-tabs {
   margin-top: 12px;
 }
 
-.updates-tab-bar {
+.updates-selector {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--app-border);
+  align-items: center;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
-.updates-tab-btn {
-  padding: 6px 12px;
+.updates-selector span {
   color: var(--app-muted);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: var(--ui-weight-semibold);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.updates-selector select {
+  min-width: 190px;
+  min-height: 34px;
+  padding: 6px 30px 6px 10px;
+  color: var(--app-muted);
+  background: #fff;
+  border: 1px solid var(--app-border);
+  border-radius: 0;
+  font: inherit;
+  font-size: 12px;
   cursor: pointer;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 
-.updates-tab-btn:hover {
-  color: var(--app-accent);
-  background: var(--app-soft);
-}
-
-.updates-tab-btn.active {
-  color: var(--app-accent);
-  background: var(--app-soft);
-  border-color: var(--app-border);
-  border-bottom-color: var(--app-soft);
+.updates-selector select:hover,
+.updates-selector select:focus-visible {
+  color: var(--app-muted);
+  background: #fff;
+  border-color: var(--app-accent);
+  outline: none;
 }
 
 .updates-tab-content {
